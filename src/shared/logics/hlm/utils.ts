@@ -256,8 +256,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   getStructuralCaseConstraintParameter(term: Fmt.Expression, structuralCaseTerm: Fmt.Expression): Fmt.Parameter {
-    let structuralCaseEquality = new FmtHLM.MetaRefExpression_equals;
-    structuralCaseEquality.terms = [term, structuralCaseTerm];
+    let structuralCaseEquality = new FmtHLM.MetaRefExpression_equals(term, structuralCaseTerm);
     return this.createConstraintParameter(structuralCaseEquality, '_');
   }
 
@@ -518,27 +517,21 @@ export class HLMUtils extends GenericUtils {
     };
     let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-      let result = new FmtHLM.MetaRefExpression_sub;
-      result.subset = getVariableRefExpression();
-      result.superset = this.applySubstitutionContext(type.superset, indexContext);
-      return result;
+      let subset = getVariableRefExpression();
+      let superset = this.applySubstitutionContext(type.superset, indexContext);
+      return new FmtHLM.MetaRefExpression_sub(subset, superset);
     } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
-      let result = new FmtHLM.MetaRefExpression_setEquals;
       let left = getVariableRefExpression();
       let right = this.applySubstitutionContext(type._set, indexContext);
-      result.terms = [left, right];
-      return result;
+      return new FmtHLM.MetaRefExpression_setEquals(left, right);
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let result = new FmtHLM.MetaRefExpression_in;
-      result.element = getVariableRefExpression();
-      result._set = this.applySubstitutionContext(type._set, indexContext);
-      return result;
+      let element = getVariableRefExpression();
+      let set = this.applySubstitutionContext(type._set, indexContext);
+      return new FmtHLM.MetaRefExpression_in(element, set);
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
-      let result = new FmtHLM.MetaRefExpression_equals;
       let left = getVariableRefExpression();
       let right = this.applySubstitutionContext(type.element, indexContext);
-      result.terms = [left, right];
-      return result;
+      return new FmtHLM.MetaRefExpression_equals(left, right);
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
       return type.formula;
     } else {
@@ -570,81 +563,52 @@ export class HLMUtils extends GenericUtils {
         .then((currentResult: Fmt.Expression | undefined) => (currentResult ? [currentResult] : undefined));
     } else if (formula instanceof FmtHLM.MetaRefExpression_not) {
       return this.getNextFormulas(formula.formula, unfoldParameters).then((nextFormulas: Fmt.Expression[] | undefined) =>
-        nextFormulas?.map((nextFormula: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_not;
-          resultFormula.formula = nextFormula;
-          return resultFormula;
-        }));
+        nextFormulas?.map((nextFormula: Fmt.Expression) => new FmtHLM.MetaRefExpression_not(nextFormula)));
     } else if ((formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or || formula instanceof FmtHLM.MetaRefExpression_equiv) && formula.formulas) {
       let result: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
       formula.formulas.forEach((innerFormula: Fmt.Expression, index: number) => {
         result = this.concatExpressions(result, () =>
           this.getNextFormulas(innerFormula, unfoldParameters).then((nextInnerFormulas: Fmt.Expression[] | undefined) =>
             nextInnerFormulas?.map((nextInnerFormula: Fmt.Expression) => {
-              let resultFormula = formula instanceof FmtHLM.MetaRefExpression_or ? new FmtHLM.MetaRefExpression_or : formula instanceof FmtHLM.MetaRefExpression_and ? new FmtHLM.MetaRefExpression_and : new FmtHLM.MetaRefExpression_equiv;
-              resultFormula.formulas = formula.formulas!.map((originalInnerFormula: Fmt.Expression, currentIndex: number) => {
+              let resultFormulas = formula.formulas!.map((originalInnerFormula: Fmt.Expression, currentIndex: number) => {
                 if (currentIndex === index) {
                   return nextInnerFormula;
                 } else {
                   return originalInnerFormula;
                 }
               });
-              return resultFormula;
+              return formula instanceof FmtHLM.MetaRefExpression_or ? new FmtHLM.MetaRefExpression_or(...resultFormulas) : formula instanceof FmtHLM.MetaRefExpression_and ? new FmtHLM.MetaRefExpression_and(...resultFormulas) : new FmtHLM.MetaRefExpression_equiv(...resultFormulas);
             })));
       });
       return result;
     } else if ((formula instanceof FmtHLM.MetaRefExpression_forall || formula instanceof FmtHLM.MetaRefExpression_exists || formula instanceof FmtHLM.MetaRefExpression_existsUnique) && formula.formula) {
       return this.getNextFormulas(formula.formula, unfoldParameters).then((nextFormulas: Fmt.Expression[] | undefined) =>
-        nextFormulas?.map((nextFormula: Fmt.Expression) => {
-          let resultFormula = formula instanceof FmtHLM.MetaRefExpression_existsUnique ? new FmtHLM.MetaRefExpression_existsUnique : formula instanceof FmtHLM.MetaRefExpression_exists ? new FmtHLM.MetaRefExpression_exists : new FmtHLM.MetaRefExpression_forall;
-          resultFormula.formula = nextFormula;
-          return resultFormula;
-        }));
+        nextFormulas?.map((nextFormula: Fmt.Expression) =>
+          formula instanceof FmtHLM.MetaRefExpression_existsUnique ? new FmtHLM.MetaRefExpression_existsUnique(formula.parameters, nextFormula) : formula instanceof FmtHLM.MetaRefExpression_exists ? new FmtHLM.MetaRefExpression_exists(formula.parameters, nextFormula) : new FmtHLM.MetaRefExpression_forall(formula.parameters, nextFormula)));
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       let elementResult = this.getNextElementTerms(formula.element, unfoldParameters).then((nextElements: Fmt.Expression[] | undefined) =>
-        nextElements?.map((nextElement: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_in;
-          resultFormula.element = nextElement;
-          resultFormula._set = formula._set;
-          return resultFormula;
-        }));
+        nextElements?.map((nextElement: Fmt.Expression) => new FmtHLM.MetaRefExpression_in(nextElement, formula._set)));
       return this.concatExpressions(elementResult, () => this.getNextSetTerms(formula._set, unfoldParameters).then((nextSets: Fmt.Expression[] | undefined) =>
-        nextSets?.map((nextSet: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_in;
-          resultFormula.element = formula.element;
-          resultFormula._set = nextSet;
-          return resultFormula;
-        })));
+        nextSets?.map((nextSet: Fmt.Expression) => new FmtHLM.MetaRefExpression_in(formula.element, nextSet))));
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
       let subsetResult = this.getNextSetTerms(formula.subset, unfoldParameters).then((nextSubsets: Fmt.Expression[] | undefined) =>
-        nextSubsets?.map((nextSubset: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_sub;
-          resultFormula.subset = nextSubset;
-          resultFormula.superset = formula.superset;
-          return resultFormula;
-        }));
+        nextSubsets?.map((nextSubset: Fmt.Expression) => new FmtHLM.MetaRefExpression_sub(nextSubset, formula.superset)));
       return this.concatExpressions(subsetResult, () => this.getNextSetTerms(formula.superset, unfoldParameters).then((nextSupersets: Fmt.Expression[] | undefined) =>
-        nextSupersets?.map((nextSuperset: Fmt.Expression) => {
-          let resultFormula = new FmtHLM.MetaRefExpression_sub;
-          resultFormula.subset = formula.subset;
-          resultFormula.superset = nextSuperset;
-          return resultFormula;
-        })));
+        nextSupersets?.map((nextSuperset: Fmt.Expression) => new FmtHLM.MetaRefExpression_sub(formula.subset, nextSuperset))));
     } else if (formula instanceof FmtHLM.MetaRefExpression_setEquals) {
       let result: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
       formula.terms.forEach((innerTerm: Fmt.Expression, index: number) => {
         result = this.concatExpressions(result, () =>
           this.getNextSetTerms(innerTerm, unfoldParameters).then((nextInnerTerms: Fmt.Expression[] | undefined) =>
             nextInnerTerms?.map((nextInnerTerm: Fmt.Expression) => {
-              let resultFormula = new FmtHLM.MetaRefExpression_setEquals;
-              resultFormula.terms = formula.terms!.map((originalInnerTerm: Fmt.Expression, currentIndex: number) => {
+              let terms = formula.terms!.map((originalInnerTerm: Fmt.Expression, currentIndex: number) => {
                 if (currentIndex === index) {
                   return nextInnerTerm;
                 } else {
                   return originalInnerTerm;
                 }
               });
-              return resultFormula;
+              return new FmtHLM.MetaRefExpression_setEquals(...terms);
             })));
       });
       return result;
@@ -654,15 +618,14 @@ export class HLMUtils extends GenericUtils {
         result = this.concatExpressions(result, () =>
           this.getNextElementTerms(innerTerm, unfoldParameters).then((nextInnerTerms: Fmt.Expression[] | undefined) =>
             nextInnerTerms?.map((nextInnerTerm: Fmt.Expression) => {
-              let resultFormula = new FmtHLM.MetaRefExpression_equals;
-              resultFormula.terms = formula.terms!.map((originalInnerTerm: Fmt.Expression, currentIndex: number) => {
+              let terms = formula.terms!.map((originalInnerTerm: Fmt.Expression, currentIndex: number) => {
                 if (currentIndex === index) {
                   return nextInnerTerm;
                 } else {
                   return originalInnerTerm;
                 }
               });
-              return resultFormula;
+              return new FmtHLM.MetaRefExpression_equals(...terms);
             })));
       });
       return result;
@@ -1231,8 +1194,7 @@ export class HLMUtils extends GenericUtils {
       } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
         term = term.term;
       } else if (term instanceof Fmt.PlaceholderExpression) {
-        let result = new FmtHLM.MetaRefExpression_enumeration;
-        result.terms = [term];
+        let result = new FmtHLM.MetaRefExpression_enumeration(term);
         return CachedPromise.resolve(result);
       } else {
         return CachedPromise.reject(new Error('Element term expected'));
@@ -1274,11 +1236,16 @@ export class HLMUtils extends GenericUtils {
   }
 
   buildStructuralCaseTerm(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], expressionType: HLMExpressionType): Fmt.Expression {
-    let result = expressionType === HLMExpressionType.SetTerm ? new FmtHLM.MetaRefExpression_setStructuralCases : expressionType === HLMExpressionType.ElementTerm ? new FmtHLM.MetaRefExpression_structuralCases : new FmtHLM.MetaRefExpression_structural;
-    result.term = term;
-    result.construction = construction;
-    result.cases = cases;
-    return result;
+    switch (expressionType) {
+    case HLMExpressionType.SetTerm:
+      return new FmtHLM.MetaRefExpression_setStructuralCases(term, construction, cases);
+    case HLMExpressionType.ElementTerm:
+      return new FmtHLM.MetaRefExpression_structuralCases(term, construction, cases);
+    case HLMExpressionType.Formula:
+      return new FmtHLM.MetaRefExpression_structural(term, construction, cases);
+    default:
+      throw new Error('Invalid expression type');
+    }
   }
 
   buildSingleStructuralCaseTerm(term: Fmt.Expression, construction: Fmt.Expression, constructor: Fmt.Expression, parameters: Fmt.ParameterList | undefined, value: Fmt.Expression, expressionType: HLMExpressionType): Fmt.Expression {
@@ -1358,31 +1325,17 @@ export class HLMUtils extends GenericUtils {
     if (formula instanceof FmtHLM.MetaRefExpression_not) {
       return CachedPromise.resolve(formula.formula);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
-      return this.negateFormulas(formula.formulas, followDefinitions).then((negatedFormulas: Fmt.Expression[] | undefined) => {
-        let result = new FmtHLM.MetaRefExpression_or;
-        result.formulas = negatedFormulas;
-        return result;
-      });
+      return this.negateFormulas(formula.formulas ?? [], followDefinitions).then((negatedFormulas: Fmt.Expression[]) =>
+        new FmtHLM.MetaRefExpression_or(...negatedFormulas));
     } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
-      return this.negateFormulas(formula.formulas, followDefinitions).then((negatedFormulas: Fmt.Expression[] | undefined) => {
-        let result = new FmtHLM.MetaRefExpression_and;
-        result.formulas = negatedFormulas;
-        return result;
-      });
+      return this.negateFormulas(formula.formulas ?? [], followDefinitions).then((negatedFormulas: Fmt.Expression[]) =>
+        new FmtHLM.MetaRefExpression_and(...negatedFormulas));
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
-      return this.negateFormula(formula.formula, followDefinitions).then((negatedFormula: Fmt.Expression) => {
-        let result = new FmtHLM.MetaRefExpression_exists;
-        result.parameters = formula.parameters;
-        result.formula = negatedFormula;
-        return result;
-      });
+      return this.negateFormula(formula.formula, followDefinitions).then((negatedFormula: Fmt.Expression) =>
+        new FmtHLM.MetaRefExpression_exists(formula.parameters, negatedFormula));
     } else if (formula instanceof FmtHLM.MetaRefExpression_exists && formula.formula) {
-      return this.negateFormula(formula.formula, followDefinitions).then((negatedFormula: Fmt.Expression) => {
-        let result = new FmtHLM.MetaRefExpression_forall;
-        result.parameters = formula.parameters;
-        result.formula = negatedFormula;
-        return result;
-      });
+      return this.negateFormula(formula.formula, followDefinitions).then((negatedFormula: Fmt.Expression) =>
+        new FmtHLM.MetaRefExpression_forall(formula.parameters, negatedFormula));
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
       let resultCases: CachedPromise<FmtHLM.ObjectContents_StructuralCase[]> = CachedPromise.resolve([]);
       for (let structuralCase of formula.cases) {
@@ -1397,13 +1350,8 @@ export class HLMUtils extends GenericUtils {
           })
         );
       }
-      return resultCases.then((cases: FmtHLM.ObjectContents_StructuralCase[]) => {
-        let result = new FmtHLM.MetaRefExpression_structural;
-        result.term = formula.term;
-        result.construction = formula.construction;
-        result.cases = cases;
-        return CachedPromise.resolve(result);
-      });
+      return resultCases.then((cases: FmtHLM.ObjectContents_StructuralCase[]) =>
+        new FmtHLM.MetaRefExpression_structural(formula.term, formula.construction, cases));
     } else if (formula instanceof Fmt.DefinitionRefExpression && !(formula.path.parentPath instanceof Fmt.Path) && followDefinitions) {
       return this.getDefinition(formula.path).then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Predicate && definition.contents.properties) {
@@ -1412,31 +1360,23 @@ export class HLMUtils extends GenericUtils {
             return this.substitutePath(negationArg, formula.path, [definition]);
           }
         }
-        let result = new FmtHLM.MetaRefExpression_not;
-        result.formula = formula;
-        return result;
+        return new FmtHLM.MetaRefExpression_not(formula);
       });
     } else {
-      let result = new FmtHLM.MetaRefExpression_not;
-      result.formula = formula;
-      return CachedPromise.resolve(result);
+      return CachedPromise.resolve(new FmtHLM.MetaRefExpression_not(formula));
     }
   }
 
-  negateFormulas(formulas: Fmt.Expression[] | undefined, followDefinitions: boolean): CachedPromise<Fmt.Expression[] | undefined> {
-    if (formulas) {
-      let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-      for (let formula of formulas) {
-        result = result.then((negatedFormulas: Fmt.Expression[]) =>
-          this.negateFormula(formula, followDefinitions).then((negatedFormula: Fmt.Expression) =>
-            negatedFormulas.concat(negatedFormula)
-          )
-        );
-      }
-      return result;
-    } else {
-      return CachedPromise.resolve(undefined);
+  negateFormulas(formulas: Fmt.Expression[], followDefinitions: boolean): CachedPromise<Fmt.Expression[]> {
+    let result: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+    for (let formula of formulas) {
+      result = result.then((negatedFormulas: Fmt.Expression[]) =>
+        this.negateFormula(formula, followDefinitions).then((negatedFormula: Fmt.Expression) =>
+          negatedFormulas.concat(negatedFormula)
+        )
+      );
     }
+    return result;
   }
 
   isTrivialTautology(formula: Fmt.Expression, followDefinitions: boolean): CachedPromise<boolean> {
@@ -1725,32 +1665,23 @@ export class HLMUtils extends GenericUtils {
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       // TODO special support for embeddings (e.g. prove that an integer is a natural number)
       if (formula._set instanceof FmtHLM.MetaRefExpression_enumeration) {
-        let result = new FmtHLM.MetaRefExpression_or;
-        result.formulas = formula._set.terms?.map((term: Fmt.Expression) => {
-          let equality = new FmtHLM.MetaRefExpression_equals;
-          equality.terms = [formula.element, term];
-          return equality;
-        });
+        let formulas = formula._set.terms?.map((term: Fmt.Expression) =>
+          new FmtHLM.MetaRefExpression_equals(formula.element, term)) ?? [];
+        let result = new FmtHLM.MetaRefExpression_or(...formulas);
         return CachedPromise.resolve([{
           formula: result
         }]);
       } else if (formula._set instanceof FmtHLM.MetaRefExpression_subset) {
         let paramType = formula._set.parameter.type as FmtHLM.MetaRefExpression_Element;
-        let elementConstraint = new FmtHLM.MetaRefExpression_in;
-        elementConstraint.element = formula.element;
-        elementConstraint._set = paramType._set;
+        let elementConstraint = new FmtHLM.MetaRefExpression_in(formula.element, paramType._set);
         let subsetFormula = FmtUtils.substituteVariable(formula._set.formula, formula._set.parameter, formula.element);
-        let result = new FmtHLM.MetaRefExpression_and;
-        result.formulas = [elementConstraint, subsetFormula];
+        let result = new FmtHLM.MetaRefExpression_and(elementConstraint, subsetFormula);
         return CachedPromise.resolve([{
           formula: result
         }]);
       } else if (formula._set instanceof FmtHLM.MetaRefExpression_extendedSubset) {
-        let equality = new FmtHLM.MetaRefExpression_equals;
-        equality.terms = [formula.element, formula._set.term];
-        let result = new FmtHLM.MetaRefExpression_exists;
-        result.parameters = formula._set.parameters;
-        result.formula = equality;
+        let equality = new FmtHLM.MetaRefExpression_equals(formula.element, formula._set.term);
+        let result = new FmtHLM.MetaRefExpression_exists(formula._set.parameters, equality);
         return CachedPromise.resolve([{
           formula: result
         }]);
@@ -1762,9 +1693,8 @@ export class HLMUtils extends GenericUtils {
           if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
             for (let item of definition.contents.definition) {
               resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) => {
-                let newFormula = new FmtHLM.MetaRefExpression_in;
-                newFormula.element = formula.element;
-                newFormula._set = this.substitutePath(item, path, [definition]);
+                let set = this.substitutePath(item, path, [definition]);
+                let newFormula = new FmtHLM.MetaRefExpression_in(formula.element, set);
                 let newFormulaDefinitionsPromise = this.getFormulaDefinitions(newFormula, side);
                 if (newFormulaDefinitionsPromise) {
                   return newFormulaDefinitionsPromise.then((newFormulaDefinitions: HLMFormulaDefinition[]) =>
@@ -1782,17 +1712,12 @@ export class HLMUtils extends GenericUtils {
         });
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
-      let result = new FmtHLM.MetaRefExpression_forall;
-      result.parameters = new Fmt.ParameterList;
-      let paramType = new FmtHLM.MetaRefExpression_Element;
-      paramType._set = formula.subset;
+      let paramType = new FmtHLM.MetaRefExpression_Element(formula.subset);
       let param = this.createParameter(paramType, 'x');
-      result.parameters.push(param);
+      let parameters = new Fmt.ParameterList(param);
       let variableRef = new Fmt.VariableRefExpression(param);
-      let resultFormula = new FmtHLM.MetaRefExpression_in;
-      resultFormula.element = variableRef;
-      resultFormula._set = formula.superset;
-      result.formula = resultFormula;
+      let resultFormula = new FmtHLM.MetaRefExpression_in(variableRef, formula.superset);
+      let result = new FmtHLM.MetaRefExpression_forall(parameters, resultFormula);
       return CachedPromise.resolve([{
         formula: result
       }]);
@@ -1810,14 +1735,12 @@ export class HLMUtils extends GenericUtils {
             if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
               let contents = definition.contents;
               let paramType = contents.parameter.type as FmtHLM.MetaRefExpression_Element;
-              let elementCondition = new FmtHLM.MetaRefExpression_in;
-              elementCondition.element = otherTerm;
-              elementCondition._set = this.substitutePath(paramType._set, path, [definition]);
+              let set = this.substitutePath(paramType._set, path, [definition]);
+              let elementCondition = new FmtHLM.MetaRefExpression_in(otherTerm, set);
               return contents.definition.map((item: Fmt.Expression) => {
                 let substitutedItem = this.substitutePath(item, path, [definition]);
                 substitutedItem = FmtUtils.substituteVariable(substitutedItem, contents.parameter, otherTerm);
-                let conjunction = new FmtHLM.MetaRefExpression_and;
-                conjunction.formulas = [elementCondition, substitutedItem];
+                let conjunction = new FmtHLM.MetaRefExpression_and(elementCondition, substitutedItem);
                 return {
                   formula: conjunction,
                   definitionRef: definitionRef
@@ -1829,36 +1752,22 @@ export class HLMUtils extends GenericUtils {
         }
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
-      let uniquenessFormula = new FmtHLM.MetaRefExpression_forall;
-      uniquenessFormula.parameters = new Fmt.ParameterList;
+      let parameters = new Fmt.ParameterList;
       let replacedParameters: Fmt.ReplacedParameter[] = [];
-      formula.parameters.clone(uniquenessFormula.parameters, replacedParameters);
+      formula.parameters.clone(parameters, replacedParameters);
       let equalities: Fmt.Expression[] = [];
       for (let param of formula.parameters) {
         if (param.type instanceof FmtHLM.MetaRefExpression_Element) {
-          let equality = new FmtHLM.MetaRefExpression_equals;
           let originalVariableRef = new Fmt.VariableRefExpression(param);
           let substitutedVariableRef = new Fmt.VariableRefExpression(param.findReplacement(replacedParameters));
-          equality.terms = [substitutedVariableRef, originalVariableRef];
+          let equality = new FmtHLM.MetaRefExpression_equals(substitutedVariableRef, originalVariableRef);
           equalities.push(equality);
         }
       }
-      if (equalities.length === 1) {
-        uniquenessFormula.formula = equalities[0];
-      } else {
-        let equalityConjunction = new FmtHLM.MetaRefExpression_and;
-        equalityConjunction.formulas = equalities;
-        uniquenessFormula.formula = equalityConjunction;
-      }
-      let result = new FmtHLM.MetaRefExpression_exists;
-      result.parameters = formula.parameters;
-      if (formula.formula) {
-        let resultFormula = new FmtHLM.MetaRefExpression_and;
-        resultFormula.formulas = [formula.formula, uniquenessFormula];
-        result.formula = resultFormula;
-      } else {
-        result.formula = uniquenessFormula;
-      }
+      let equalityFormula = equalities.length === 1 ? equalities[0] : new FmtHLM.MetaRefExpression_and(...equalities);
+      let uniquenessFormula = new FmtHLM.MetaRefExpression_forall(parameters, equalityFormula);
+      let resultFormula = formula.formula ? new FmtHLM.MetaRefExpression_and(formula.formula, uniquenessFormula) : uniquenessFormula;
+      let result = new FmtHLM.MetaRefExpression_exists(formula.parameters, resultFormula);
       return CachedPromise.resolve([{
         formula: result
       }]);
@@ -1879,8 +1788,7 @@ export class HLMUtils extends GenericUtils {
         let term = formula.terms[side];
         if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
           let getValueFormula = (value: Fmt.Expression) => {
-            let valueFormula = new FmtHLM.MetaRefExpression_setEquals;
-            valueFormula.terms = formula.terms.slice();
+            let valueFormula = new FmtHLM.MetaRefExpression_setEquals(...formula.terms);
             valueFormula.terms[side] = value;
             return valueFormula;
           };
@@ -1889,17 +1797,15 @@ export class HLMUtils extends GenericUtils {
       } else if (formula instanceof FmtHLM.MetaRefExpression_equals && side >= 0 && side < formula.terms.length) {
         let term = formula.terms[side];
         let getValueFormula = (value: Fmt.Expression) => {
-          let valueFormula = new FmtHLM.MetaRefExpression_equals;
-          valueFormula.terms = formula.terms.slice();
+          let valueFormula = new FmtHLM.MetaRefExpression_equals(...formula.terms);
           valueFormula.terms[side] = value;
           return valueFormula;
         };
         if (term instanceof FmtHLM.MetaRefExpression_cases) {
           let result = term.cases.map((item: FmtHLM.ObjectContents_Case): HLMFormulaCase => {
-            let parameters = new Fmt.ParameterList;
-            parameters.push(this.createConstraintParameter(item.formula, '_1'));
+            let constraintParam = this.createConstraintParameter(item.formula, '_1');
             return {
-              parameters: parameters,
+              parameters: new Fmt.ParameterList(constraintParam),
               formula: getValueFormula(item.value)
             };
           });
@@ -1911,8 +1817,7 @@ export class HLMUtils extends GenericUtils {
         let term = formula.formulas[side];
         if (term instanceof FmtHLM.MetaRefExpression_structural) {
           let getValueFormula = (value: Fmt.Expression) => {
-            let valueFormula = new FmtHLM.MetaRefExpression_equiv;
-            valueFormula.formulas = formula.formulas.slice();
+            let valueFormula = new FmtHLM.MetaRefExpression_equiv(...formula.formulas);
             valueFormula.formulas[side] = value;
             return valueFormula;
           };
@@ -2010,14 +1915,12 @@ export class HLMUtils extends GenericUtils {
   }
 
   createElementParameter(defaultName: string, usedNames: Set<string>): Fmt.Parameter {
-    let elementType = new FmtHLM.MetaRefExpression_Element;
-    elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    let elementType = new FmtHLM.MetaRefExpression_Element(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
     return this.createParameter(elementType, defaultName, usedNames);
   }
 
   createConstraintParameter(constraint: Fmt.Expression, name: string): Fmt.Parameter {
-    let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-    constraintType.formula = constraint;
+    let constraintType = new FmtHLM.MetaRefExpression_Constraint(constraint);
     return this.createParameter(constraintType, name);
   }
 

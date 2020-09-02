@@ -4159,9 +4159,7 @@ class TutorialStates {
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
       let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
-      let equality = new FmtHLM.MetaRefExpression_equals;
-      equality.terms = [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)];
-      contents.claim = equality;
+      contents.claim = new FmtHLM.MetaRefExpression_equals(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
     }
   };
 
@@ -5181,18 +5179,19 @@ class TutorialStates {
   }
 
   private addSetParameter(definition: Fmt.Definition, name: string): void {
-    this.addParameter(definition, name, new FmtHLM.MetaRefExpression_Set);
+    let type = new FmtHLM.MetaRefExpression_Set;
+    this.addParameter(definition, name, type);
   }
 
   private addSubsetParameter(definition: Fmt.Definition, name: string): void {
-    let type = new FmtHLM.MetaRefExpression_Subset;
-    type.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    let superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    let type = new FmtHLM.MetaRefExpression_Subset(superset);
     this.addParameter(definition, name, type);
   }
 
   private addElementParameter(definition: Fmt.Definition, name: string): void {
-    let type = new FmtHLM.MetaRefExpression_Element;
-    type._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    let set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    let type = new FmtHLM.MetaRefExpression_Element(set);
     this.addParameter(definition, name, type);
   }
 

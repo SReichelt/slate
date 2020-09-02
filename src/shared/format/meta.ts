@@ -286,7 +286,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
     if (this.members) {
       result.members = new Fmt.ParameterList;
-      if (this.members.substituteExpression(fn, result.members!, replacedParameters)) {
+      if (this.members.substituteExpression(fn, result.members, replacedParameters)) {
         changed = true;
       }
     }
@@ -406,7 +406,9 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
 }
 
 export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
-  resultType?: Fmt.Expression;
+  constructor(public resultType?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'DefinitionType';
@@ -424,14 +426,18 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_DefinitionType;
     let changed = false;
+    let resultTypeResult: Fmt.Expression | undefined = undefined;
     if (this.resultType) {
-      result.resultType = this.resultType.substitute(fn, replacedParameters);
-      if (result.resultType !== this.resultType) {
+      resultTypeResult = this.resultType.substitute(fn, replacedParameters);
+      if (resultTypeResult !== this.resultType) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_DefinitionType(resultTypeResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -597,7 +603,9 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
 }
 
 export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
-  variableType?: Fmt.Expression;
+  constructor(public variableType?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'ParameterType';
@@ -615,14 +623,18 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ParameterType;
     let changed = false;
+    let variableTypeResult: Fmt.Expression | undefined = undefined;
     if (this.variableType) {
-      result.variableType = this.variableType.substitute(fn, replacedParameters);
-      if (result.variableType !== this.variableType) {
+      variableTypeResult = this.variableType.substitute(fn, replacedParameters);
+      if (variableTypeResult !== this.variableType) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ParameterType(variableTypeResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -866,7 +878,9 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
-  type?: Fmt.Expression;
+  constructor(public type?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'SingleParameter';
@@ -884,14 +898,18 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_SingleParameter;
     let changed = false;
+    let typeResult: Fmt.Expression | undefined = undefined;
     if (this.type) {
-      result.type = this.type.substitute(fn, replacedParameters);
-      if (result.type !== this.type) {
+      typeResult = this.type.substitute(fn, replacedParameters);
+      if (typeResult !== this.type) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_SingleParameter(typeResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 

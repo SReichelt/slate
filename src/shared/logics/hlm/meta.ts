@@ -81,7 +81,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     let changed = false;
     if (this.properties) {
       result.properties = new Fmt.ArgumentList;
-      if (this.properties.substituteExpression(fn, result.properties!, replacedParameters)) {
+      if (this.properties.substituteExpression(fn, result.properties, replacedParameters)) {
         changed = true;
       }
     }
@@ -178,7 +178,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.embedding) {
       result.embedding = new ObjectContents_Embedding;
-      if (this.embedding.substituteExpression(fn, result.embedding!, replacedParameters)) {
+      if (this.embedding.substituteExpression(fn, result.embedding, replacedParameters)) {
         changed = true;
       }
     }
@@ -259,9 +259,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let parameterExprParameters = new Fmt.ParameterList;
-    parameterExprParameters.push(this.parameter);
-    let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
+    let parameterExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.parameter));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'target' : undefined, this.target, false));
     if (this.full !== undefined) {
@@ -317,7 +315,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     }
     if (this.wellDefinednessProof) {
       result.wellDefinednessProof = new ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof!, replacedParameters)) {
+      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -399,13 +397,13 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.equalityDefinition) {
       result.equalityDefinition = new ObjectContents_EqualityDefinition;
-      if (this.equalityDefinition.substituteExpression(fn, result.equalityDefinition!, replacedParameters)) {
+      if (this.equalityDefinition.substituteExpression(fn, result.equalityDefinition, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rewrite) {
       result.rewrite = new ObjectContents_RewriteDefinition;
-      if (this.rewrite.substituteExpression(fn, result.rewrite!, replacedParameters)) {
+      if (this.rewrite.substituteExpression(fn, result.rewrite, replacedParameters)) {
         changed = true;
       }
     }
@@ -608,13 +606,13 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     let changed = false;
     if (this.leftParameters) {
       result.leftParameters = new Fmt.ParameterList;
-      if (this.leftParameters.substituteExpression(fn, result.leftParameters!, replacedParameters)) {
+      if (this.leftParameters.substituteExpression(fn, result.leftParameters, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rightParameters) {
       result.rightParameters = new Fmt.ParameterList;
-      if (this.rightParameters.substituteExpression(fn, result.rightParameters!, replacedParameters)) {
+      if (this.rightParameters.substituteExpression(fn, result.rightParameters, replacedParameters)) {
         changed = true;
       }
     }
@@ -632,7 +630,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -640,19 +638,19 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     }
     if (this.reflexivityProof) {
       result.reflexivityProof = new ObjectContents_Proof;
-      if (this.reflexivityProof.substituteExpression(fn, result.reflexivityProof!, replacedParameters)) {
+      if (this.reflexivityProof.substituteExpression(fn, result.reflexivityProof, replacedParameters)) {
         changed = true;
       }
     }
     if (this.symmetryProof) {
       result.symmetryProof = new ObjectContents_Proof;
-      if (this.symmetryProof.substituteExpression(fn, result.symmetryProof!, replacedParameters)) {
+      if (this.symmetryProof.substituteExpression(fn, result.symmetryProof, replacedParameters)) {
         changed = true;
       }
     }
     if (this.transitivityProof) {
       result.transitivityProof = new ObjectContents_Proof;
-      if (this.transitivityProof.substituteExpression(fn, result.transitivityProof!, replacedParameters)) {
+      if (this.transitivityProof.substituteExpression(fn, result.transitivityProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -901,7 +899,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       result.equalityProofs = [];
       for (let item of this.equalityProofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equalityProofs.push(newItem);
@@ -915,7 +913,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     }
     if (this.setRestrictionProof) {
       result.setRestrictionProof = new ObjectContents_Proof;
-      if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof!, replacedParameters)) {
+      if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -1130,7 +1128,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       result.equalityProofs = [];
       for (let item of this.equalityProofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equalityProofs.push(newItem);
@@ -1144,7 +1142,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     }
     if (this.setRestrictionProof) {
       result.setRestrictionProof = new ObjectContents_Proof;
-      if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof!, replacedParameters)) {
+      if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -1266,9 +1264,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
 
   toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
     super.toArgumentList(argumentList, outputAllNames, reportFn);
-    let parameterExprParameters = new Fmt.ParameterList;
-    parameterExprParameters.push(this.parameter);
-    let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
+    let parameterExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.parameter));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
     let definitionExprItems: Fmt.Expression[] = [];
     for (let item of this.definition) {
@@ -1340,7 +1336,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -1348,7 +1344,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
     if (this.wellDefinednessProof) {
       result.wellDefinednessProof = new ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof!, replacedParameters)) {
+      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -1480,13 +1476,13 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.variables) {
       result.variables = new Fmt.ParameterList;
-      if (this.variables.substituteExpression(fn, result.variables!, replacedParameters)) {
+      if (this.variables.substituteExpression(fn, result.variables, replacedParameters)) {
         changed = true;
       }
     }
     if (this.references) {
       result.references = new Fmt.ArgumentList;
-      if (this.references.substituteExpression(fn, result.references!, replacedParameters)) {
+      if (this.references.substituteExpression(fn, result.references, replacedParameters)) {
         changed = true;
       }
     }
@@ -1622,7 +1618,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -1761,7 +1757,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       result.proofs = [];
       for (let item of this.proofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.proofs.push(newItem);
@@ -1907,7 +1903,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
+        if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -2093,7 +2089,9 @@ export class MetaRefExpression_Nat extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Prop extends Fmt.MetaRefExpression {
-  auto?: Fmt.Expression;
+  constructor(public auto?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Prop';
@@ -2111,14 +2109,18 @@ export class MetaRefExpression_Prop extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Prop;
     let changed = false;
+    let autoResult: Fmt.Expression | undefined = undefined;
     if (this.auto) {
-      result.auto = this.auto.substitute(fn, replacedParameters);
-      if (result.auto !== this.auto) {
+      autoResult = this.auto.substitute(fn, replacedParameters);
+      if (autoResult !== this.auto) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Prop(autoResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2134,8 +2136,9 @@ export class MetaRefExpression_Prop extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
-  auto?: Fmt.Expression;
-  embedSubsets?: Fmt.Expression;
+  constructor(public auto?: Fmt.Expression, public embedSubsets?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Set';
@@ -2157,20 +2160,25 @@ export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Set;
     let changed = false;
+    let autoResult: Fmt.Expression | undefined = undefined;
     if (this.auto) {
-      result.auto = this.auto.substitute(fn, replacedParameters);
-      if (result.auto !== this.auto) {
+      autoResult = this.auto.substitute(fn, replacedParameters);
+      if (autoResult !== this.auto) {
         changed = true;
       }
     }
+    let embedSubsetsResult: Fmt.Expression | undefined = undefined;
     if (this.embedSubsets) {
-      result.embedSubsets = this.embedSubsets.substitute(fn, replacedParameters);
-      if (result.embedSubsets !== this.embedSubsets) {
+      embedSubsetsResult = this.embedSubsets.substitute(fn, replacedParameters);
+      if (embedSubsetsResult !== this.embedSubsets) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Set(autoResult, embedSubsetsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2189,9 +2197,9 @@ export class MetaRefExpression_Set extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
-  superset: Fmt.Expression;
-  auto?: Fmt.Expression;
-  embedSubsets?: Fmt.Expression;
+  constructor(public superset: Fmt.Expression, public auto?: Fmt.Expression, public embedSubsets?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Subset';
@@ -2215,26 +2223,29 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Subset;
     let changed = false;
-    if (this.superset) {
-      result.superset = this.superset.substitute(fn, replacedParameters);
-      if (result.superset !== this.superset) {
-        changed = true;
-      }
+    let supersetResult = this.superset.substitute(fn, replacedParameters);
+    if (supersetResult !== this.superset) {
+      changed = true;
     }
+    let autoResult: Fmt.Expression | undefined = undefined;
     if (this.auto) {
-      result.auto = this.auto.substitute(fn, replacedParameters);
-      if (result.auto !== this.auto) {
+      autoResult = this.auto.substitute(fn, replacedParameters);
+      if (autoResult !== this.auto) {
         changed = true;
       }
     }
+    let embedSubsetsResult: Fmt.Expression | undefined = undefined;
     if (this.embedSubsets) {
-      result.embedSubsets = this.embedSubsets.substitute(fn, replacedParameters);
-      if (result.embedSubsets !== this.embedSubsets) {
+      embedSubsetsResult = this.embedSubsets.substitute(fn, replacedParameters);
+      if (embedSubsetsResult !== this.embedSubsets) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Subset(supersetResult, autoResult, embedSubsetsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2256,8 +2267,9 @@ export class MetaRefExpression_Subset extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
-  _set: Fmt.Expression;
-  auto?: Fmt.Expression;
+  constructor(public _set: Fmt.Expression, public auto?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Element';
@@ -2277,20 +2289,22 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Element;
     let changed = false;
-    if (this._set) {
-      result._set = this._set.substitute(fn, replacedParameters);
-      if (result._set !== this._set) {
-        changed = true;
-      }
+    let _setResult = this._set.substitute(fn, replacedParameters);
+    if (_setResult !== this._set) {
+      changed = true;
     }
+    let autoResult: Fmt.Expression | undefined = undefined;
     if (this.auto) {
-      result.auto = this.auto.substitute(fn, replacedParameters);
-      if (result.auto !== this.auto) {
+      autoResult = this.auto.substitute(fn, replacedParameters);
+      if (autoResult !== this.auto) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Element(_setResult, autoResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2309,7 +2323,9 @@ export class MetaRefExpression_Element extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
-  formula: Fmt.Expression;
+  constructor(public formula: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Constraint';
@@ -2325,14 +2341,15 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Constraint;
     let changed = false;
-    if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
-        changed = true;
-      }
+    let formulaResult = this.formula.substitute(fn, replacedParameters);
+    if (formulaResult !== this.formula) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Constraint(formulaResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2350,8 +2367,9 @@ export class MetaRefExpression_Constraint extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
-  sourceParameters: Fmt.ParameterList;
-  targetParameters: Fmt.ParameterList;
+  constructor(public sourceParameters: Fmt.ParameterList, public targetParameters: Fmt.ParameterList) {
+    super();
+  }
 
   getName(): string {
     return 'Binder';
@@ -2381,20 +2399,19 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Binder;
     let changed = false;
-    if (this.sourceParameters) {
-      result.sourceParameters = new Fmt.ParameterList;
-      if (this.sourceParameters.substituteExpression(fn, result.sourceParameters!, replacedParameters)) {
-        changed = true;
-      }
+    let sourceParametersResult = new Fmt.ParameterList;
+    if (this.sourceParameters.substituteExpression(fn, sourceParametersResult, replacedParameters)) {
+      changed = true;
     }
-    if (this.targetParameters) {
-      result.targetParameters = new Fmt.ParameterList;
-      if (this.targetParameters.substituteExpression(fn, result.targetParameters!, replacedParameters)) {
-        changed = true;
-      }
+    let targetParametersResult = new Fmt.ParameterList;
+    if (this.targetParameters.substituteExpression(fn, targetParametersResult, replacedParameters)) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Binder(sourceParametersResult, targetParametersResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2413,7 +2430,9 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
-  _set: Fmt.Expression;
+  constructor(public _set: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'SetDef';
@@ -2429,14 +2448,15 @@ export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_SetDef;
     let changed = false;
-    if (this._set) {
-      result._set = this._set.substitute(fn, replacedParameters);
-      if (result._set !== this._set) {
-        changed = true;
-      }
+    let _setResult = this._set.substitute(fn, replacedParameters);
+    if (_setResult !== this._set) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_SetDef(_setResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2452,7 +2472,9 @@ export class MetaRefExpression_SetDef extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
-  element: Fmt.Expression;
+  constructor(public element: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Def';
@@ -2468,14 +2490,15 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Def;
     let changed = false;
-    if (this.element) {
-      result.element = this.element.substitute(fn, replacedParameters);
-      if (result.element !== this.element) {
-        changed = true;
-      }
+    let elementResult = this.element.substitute(fn, replacedParameters);
+    if (elementResult !== this.element) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Def(elementResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2680,7 +2703,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     }
     if (this.subsetProof) {
       result.subsetProof = new ObjectContents_Proof;
-      if (this.subsetProof.substituteExpression(fn, result.subsetProof!, replacedParameters)) {
+      if (this.subsetProof.substituteExpression(fn, result.subsetProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -2767,7 +2790,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     }
     if (this.elementProof) {
       result.elementProof = new ObjectContents_Proof;
-      if (this.elementProof.substituteExpression(fn, result.elementProof!, replacedParameters)) {
+      if (this.elementProof.substituteExpression(fn, result.elementProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -2826,7 +2849,7 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
     let changed = false;
     if (this.proof) {
       result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
+      if (this.proof.substituteExpression(fn, result.proof, replacedParameters)) {
         changed = true;
       }
     }
@@ -2890,13 +2913,13 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
     let changed = false;
     if (this.sourceParameters) {
       result.sourceParameters = new Fmt.ParameterList;
-      if (this.sourceParameters.substituteExpression(fn, result.sourceParameters!, replacedParameters)) {
+      if (this.sourceParameters.substituteExpression(fn, result.sourceParameters, replacedParameters)) {
         changed = true;
       }
     }
     if (this.targetArguments) {
       result.targetArguments = new Fmt.ArgumentList;
-      if (this.targetArguments.substituteExpression(fn, result.targetArguments!, replacedParameters)) {
+      if (this.targetArguments.substituteExpression(fn, result.targetArguments, replacedParameters)) {
         changed = true;
       }
     }
@@ -2920,6 +2943,13 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
 export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
   terms?: Fmt.Expression[];
 
+  constructor(...terms: Fmt.Expression[]) {
+    super();
+    if (terms.length) {
+      this.terms = terms;
+    }
+  }
+
   getName(): string {
     return 'enumeration';
   }
@@ -2937,7 +2967,7 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
       if (!this.terms) {
         this.terms = [];
       }
-      this.terms!.push(termsRaw);
+      this.terms.push(termsRaw);
       index++;
     }
   }
@@ -2952,18 +2982,21 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_enumeration;
     let changed = false;
+    let termsResult: Fmt.Expression[] = [];
     if (this.terms) {
-      result.terms = [];
       for (let item of this.terms) {
         let newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
-        result.terms.push(newItem);
+        termsResult.push(newItem);
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_enumeration(...termsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -2988,8 +3021,9 @@ export class MetaRefExpression_enumeration extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
-  parameter: Fmt.Parameter;
-  formula: Fmt.Expression;
+  constructor(public parameter: Fmt.Parameter, public formula: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'subset';
@@ -3007,28 +3041,25 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let parameterExprParameters = new Fmt.ParameterList;
-    parameterExprParameters.push(this.parameter);
-    let parameterExpr = new Fmt.ParameterExpression(parameterExprParameters);
+    let parameterExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.parameter));
     argumentList.push(new Fmt.Argument(undefined, parameterExpr, false));
     argumentList.push(new Fmt.Argument(undefined, this.formula, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_subset;
     let changed = false;
-    if (this.parameter) {
-      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
-      if (result.parameter !== this.parameter) {
-        changed = true;
-      }
+    let parameterResult = this.parameter.substituteExpression(fn, replacedParameters);
+    if (parameterResult !== this.parameter) {
+      changed = true;
     }
-    if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
-        changed = true;
-      }
+    let formulaResult = this.formula.substitute(fn, replacedParameters);
+    if (formulaResult !== this.formula) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_subset(parameterResult, formulaResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3047,8 +3078,9 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
-  parameters: Fmt.ParameterList;
-  term: Fmt.Expression;
+  constructor(public parameters: Fmt.ParameterList, public term: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'extendedSubset';
@@ -3072,20 +3104,19 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_extendedSubset;
     let changed = false;
-    if (this.parameters) {
-      result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
+    let parametersResult = new Fmt.ParameterList;
+    if (this.parameters.substituteExpression(fn, parametersResult, replacedParameters)) {
+      changed = true;
     }
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
-        changed = true;
-      }
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_extendedSubset(parametersResult, termResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3104,9 +3135,9 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-  construction: Fmt.Expression;
-  cases: ObjectContents_StructuralCase[];
+  constructor(public term: Fmt.Expression, public construction: Fmt.Expression, public cases: ObjectContents_StructuralCase[]) {
+    super();
+  }
 
   getName(): string {
     return 'setStructuralCases';
@@ -3144,30 +3175,27 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_setStructuralCases;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
+    }
+    let constructionResult = this.construction.substitute(fn, replacedParameters);
+    if (constructionResult !== this.construction) {
+      changed = true;
+    }
+    let casesResult: ObjectContents_StructuralCase[] = [];
+    for (let item of this.cases) {
+      let newItem = new ObjectContents_StructuralCase;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
+      casesResult.push(newItem);
     }
-    if (this.construction) {
-      result.construction = this.construction.substitute(fn, replacedParameters);
-      if (result.construction !== this.construction) {
-        changed = true;
-      }
+    if (fn && !changed) {
+      return fn(this);
     }
-    if (this.cases) {
-      result.cases = [];
-      for (let item of this.cases) {
-        let newItem = new ObjectContents_StructuralCase;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.cases.push(newItem);
-      }
-    }
+    let result = new MetaRefExpression_setStructuralCases(termResult, constructionResult, casesResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3198,7 +3226,9 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
 }
 
 export class MetaRefExpression_setAssociative extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
+  constructor(public term: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'setAssociative';
@@ -3214,14 +3244,15 @@ export class MetaRefExpression_setAssociative extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_setAssociative;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
-        changed = true;
-      }
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_setAssociative(termResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3237,8 +3268,9 @@ export class MetaRefExpression_setAssociative extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
-  cases: ObjectContents_Case[];
-  totalityProof?: ObjectContents_Proof;
+  constructor(public cases: ObjectContents_Case[], public totalityProof?: ObjectContents_Proof) {
+    super();
+  }
 
   getName(): string {
     return 'cases';
@@ -3284,24 +3316,26 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_cases;
     let changed = false;
-    if (this.cases) {
-      result.cases = [];
-      for (let item of this.cases) {
-        let newItem = new ObjectContents_Case;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.cases.push(newItem);
+    let casesResult: ObjectContents_Case[] = [];
+    for (let item of this.cases) {
+      let newItem = new ObjectContents_Case;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        changed = true;
       }
+      casesResult.push(newItem);
     }
+    let totalityProofResult: ObjectContents_Proof | undefined = undefined;
     if (this.totalityProof) {
-      result.totalityProof = new ObjectContents_Proof;
-      if (this.totalityProof.substituteExpression(fn, result.totalityProof!, replacedParameters)) {
+      totalityProofResult = new ObjectContents_Proof;
+      if (this.totalityProof.substituteExpression(fn, totalityProofResult, replacedParameters)) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_cases(casesResult, totalityProofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3329,9 +3363,9 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-  construction: Fmt.Expression;
-  cases: ObjectContents_StructuralCase[];
+  constructor(public term: Fmt.Expression, public construction: Fmt.Expression, public cases: ObjectContents_StructuralCase[]) {
+    super();
+  }
 
   getName(): string {
     return 'structuralCases';
@@ -3369,30 +3403,27 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_structuralCases;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
+    }
+    let constructionResult = this.construction.substitute(fn, replacedParameters);
+    if (constructionResult !== this.construction) {
+      changed = true;
+    }
+    let casesResult: ObjectContents_StructuralCase[] = [];
+    for (let item of this.cases) {
+      let newItem = new ObjectContents_StructuralCase;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
+      casesResult.push(newItem);
     }
-    if (this.construction) {
-      result.construction = this.construction.substitute(fn, replacedParameters);
-      if (result.construction !== this.construction) {
-        changed = true;
-      }
+    if (fn && !changed) {
+      return fn(this);
     }
-    if (this.cases) {
-      result.cases = [];
-      for (let item of this.cases) {
-        let newItem = new ObjectContents_StructuralCase;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.cases.push(newItem);
-      }
-    }
+    let result = new MetaRefExpression_structuralCases(termResult, constructionResult, casesResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3423,9 +3454,9 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-  _set: Fmt.Expression;
-  proof?: ObjectContents_Proof;
+  constructor(public term: Fmt.Expression, public _set: Fmt.Expression, public proof?: ObjectContents_Proof) {
+    super();
+  }
 
   getName(): string {
     return 'asElementOf';
@@ -3455,26 +3486,26 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_asElementOf;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
-        changed = true;
-      }
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
     }
-    if (this._set) {
-      result._set = this._set.substitute(fn, replacedParameters);
-      if (result._set !== this._set) {
-        changed = true;
-      }
+    let _setResult = this._set.substitute(fn, replacedParameters);
+    if (_setResult !== this._set) {
+      changed = true;
     }
+    let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
+      proofResult = new ObjectContents_Proof;
+      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_asElementOf(termResult, _setResult, proofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3496,7 +3527,9 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_associative extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
+  constructor(public term: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'associative';
@@ -3512,14 +3545,15 @@ export class MetaRefExpression_associative extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_associative;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
-        changed = true;
-      }
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_associative(termResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3535,7 +3569,9 @@ export class MetaRefExpression_associative extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_not extends Fmt.MetaRefExpression {
-  formula: Fmt.Expression;
+  constructor(public formula: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'not';
@@ -3551,14 +3587,15 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_not;
     let changed = false;
-    if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
-        changed = true;
-      }
+    let formulaResult = this.formula.substitute(fn, replacedParameters);
+    if (formulaResult !== this.formula) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_not(formulaResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3575,6 +3612,13 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
 
 export class MetaRefExpression_and extends Fmt.MetaRefExpression {
   formulas?: Fmt.Expression[];
+
+  constructor(...formulas: Fmt.Expression[]) {
+    super();
+    if (formulas.length) {
+      this.formulas = formulas;
+    }
+  }
 
   getName(): string {
     return 'and';
@@ -3593,7 +3637,7 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
       if (!this.formulas) {
         this.formulas = [];
       }
-      this.formulas!.push(formulasRaw);
+      this.formulas.push(formulasRaw);
       index++;
     }
   }
@@ -3608,18 +3652,21 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_and;
     let changed = false;
+    let formulasResult: Fmt.Expression[] = [];
     if (this.formulas) {
-      result.formulas = [];
       for (let item of this.formulas) {
         let newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
-        result.formulas.push(newItem);
+        formulasResult.push(newItem);
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_and(...formulasResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3646,6 +3693,13 @@ export class MetaRefExpression_and extends Fmt.MetaRefExpression {
 export class MetaRefExpression_or extends Fmt.MetaRefExpression {
   formulas?: Fmt.Expression[];
 
+  constructor(...formulas: Fmt.Expression[]) {
+    super();
+    if (formulas.length) {
+      this.formulas = formulas;
+    }
+  }
+
   getName(): string {
     return 'or';
   }
@@ -3663,7 +3717,7 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
       if (!this.formulas) {
         this.formulas = [];
       }
-      this.formulas!.push(formulasRaw);
+      this.formulas.push(formulasRaw);
       index++;
     }
   }
@@ -3678,18 +3732,21 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_or;
     let changed = false;
+    let formulasResult: Fmt.Expression[] = [];
     if (this.formulas) {
-      result.formulas = [];
       for (let item of this.formulas) {
         let newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
-        result.formulas.push(newItem);
+        formulasResult.push(newItem);
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_or(...formulasResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3716,6 +3773,11 @@ export class MetaRefExpression_or extends Fmt.MetaRefExpression {
 export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
   formulas: Fmt.Expression[];
 
+  constructor(...formulas: Fmt.Expression[]) {
+    super();
+    this.formulas = formulas;
+  }
+
   getName(): string {
     return 'equiv';
   }
@@ -3728,7 +3790,7 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
       if (formulasRaw === undefined) {
         break;
       }
-      this.formulas!.push(formulasRaw);
+      this.formulas.push(formulasRaw);
       index++;
     }
   }
@@ -3741,18 +3803,19 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_equiv;
     let changed = false;
-    if (this.formulas) {
-      result.formulas = [];
-      for (let item of this.formulas) {
-        let newItem = item.substitute(fn, replacedParameters);
-        if (newItem !== item) {
-          changed = true;
-        }
-        result.formulas.push(newItem);
+    let formulasResult: Fmt.Expression[] = [];
+    for (let item of this.formulas) {
+      let newItem = item.substitute(fn, replacedParameters);
+      if (newItem !== item) {
+        changed = true;
       }
+      formulasResult.push(newItem);
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_equiv(...formulasResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3777,8 +3840,9 @@ export class MetaRefExpression_equiv extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
-  parameters: Fmt.ParameterList;
-  formula: Fmt.Expression;
+  constructor(public parameters: Fmt.ParameterList, public formula: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'forall';
@@ -3802,20 +3866,19 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_forall;
     let changed = false;
-    if (this.parameters) {
-      result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
+    let parametersResult = new Fmt.ParameterList;
+    if (this.parameters.substituteExpression(fn, parametersResult, replacedParameters)) {
+      changed = true;
     }
-    if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
-        changed = true;
-      }
+    let formulaResult = this.formula.substitute(fn, replacedParameters);
+    if (formulaResult !== this.formula) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_forall(parametersResult, formulaResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3834,8 +3897,9 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
-  parameters: Fmt.ParameterList;
-  formula?: Fmt.Expression;
+  constructor(public parameters: Fmt.ParameterList, public formula?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'exists';
@@ -3861,20 +3925,22 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_exists;
     let changed = false;
-    if (this.parameters) {
-      result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
+    let parametersResult = new Fmt.ParameterList;
+    if (this.parameters.substituteExpression(fn, parametersResult, replacedParameters)) {
+      changed = true;
     }
+    let formulaResult: Fmt.Expression | undefined = undefined;
     if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
+      formulaResult = this.formula.substitute(fn, replacedParameters);
+      if (formulaResult !== this.formula) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_exists(parametersResult, formulaResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3893,8 +3959,9 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
-  parameters: Fmt.ParameterList;
-  formula?: Fmt.Expression;
+  constructor(public parameters: Fmt.ParameterList, public formula?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'existsUnique';
@@ -3920,20 +3987,22 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_existsUnique;
     let changed = false;
-    if (this.parameters) {
-      result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
+    let parametersResult = new Fmt.ParameterList;
+    if (this.parameters.substituteExpression(fn, parametersResult, replacedParameters)) {
+      changed = true;
     }
+    let formulaResult: Fmt.Expression | undefined = undefined;
     if (this.formula) {
-      result.formula = this.formula.substitute(fn, replacedParameters);
-      if (result.formula !== this.formula) {
+      formulaResult = this.formula.substitute(fn, replacedParameters);
+      if (formulaResult !== this.formula) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_existsUnique(parametersResult, formulaResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -3952,8 +4021,9 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_in extends Fmt.MetaRefExpression {
-  element: Fmt.Expression;
-  _set: Fmt.Expression;
+  constructor(public element: Fmt.Expression, public _set: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'in';
@@ -3971,20 +4041,19 @@ export class MetaRefExpression_in extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_in;
     let changed = false;
-    if (this.element) {
-      result.element = this.element.substitute(fn, replacedParameters);
-      if (result.element !== this.element) {
-        changed = true;
-      }
+    let elementResult = this.element.substitute(fn, replacedParameters);
+    if (elementResult !== this.element) {
+      changed = true;
     }
-    if (this._set) {
-      result._set = this._set.substitute(fn, replacedParameters);
-      if (result._set !== this._set) {
-        changed = true;
-      }
+    let _setResult = this._set.substitute(fn, replacedParameters);
+    if (_setResult !== this._set) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_in(elementResult, _setResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4003,8 +4072,9 @@ export class MetaRefExpression_in extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
-  subset: Fmt.Expression;
-  superset: Fmt.Expression;
+  constructor(public subset: Fmt.Expression, public superset: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'sub';
@@ -4022,20 +4092,19 @@ export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_sub;
     let changed = false;
-    if (this.subset) {
-      result.subset = this.subset.substitute(fn, replacedParameters);
-      if (result.subset !== this.subset) {
-        changed = true;
-      }
+    let subsetResult = this.subset.substitute(fn, replacedParameters);
+    if (subsetResult !== this.subset) {
+      changed = true;
     }
-    if (this.superset) {
-      result.superset = this.superset.substitute(fn, replacedParameters);
-      if (result.superset !== this.superset) {
-        changed = true;
-      }
+    let supersetResult = this.superset.substitute(fn, replacedParameters);
+    if (supersetResult !== this.superset) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_sub(subsetResult, supersetResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4056,6 +4125,11 @@ export class MetaRefExpression_sub extends Fmt.MetaRefExpression {
 export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
   terms: Fmt.Expression[];
 
+  constructor(...terms: Fmt.Expression[]) {
+    super();
+    this.terms = terms;
+  }
+
   getName(): string {
     return 'setEquals';
   }
@@ -4068,7 +4142,7 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
       if (termsRaw === undefined) {
         break;
       }
-      this.terms!.push(termsRaw);
+      this.terms.push(termsRaw);
       index++;
     }
   }
@@ -4081,18 +4155,19 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_setEquals;
     let changed = false;
-    if (this.terms) {
-      result.terms = [];
-      for (let item of this.terms) {
-        let newItem = item.substitute(fn, replacedParameters);
-        if (newItem !== item) {
-          changed = true;
-        }
-        result.terms.push(newItem);
+    let termsResult: Fmt.Expression[] = [];
+    for (let item of this.terms) {
+      let newItem = item.substitute(fn, replacedParameters);
+      if (newItem !== item) {
+        changed = true;
       }
+      termsResult.push(newItem);
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_setEquals(...termsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4119,6 +4194,11 @@ export class MetaRefExpression_setEquals extends Fmt.MetaRefExpression {
 export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
   terms: Fmt.Expression[];
 
+  constructor(...terms: Fmt.Expression[]) {
+    super();
+    this.terms = terms;
+  }
+
   getName(): string {
     return 'equals';
   }
@@ -4131,7 +4211,7 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
       if (termsRaw === undefined) {
         break;
       }
-      this.terms!.push(termsRaw);
+      this.terms.push(termsRaw);
       index++;
     }
   }
@@ -4144,18 +4224,19 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_equals;
     let changed = false;
-    if (this.terms) {
-      result.terms = [];
-      for (let item of this.terms) {
-        let newItem = item.substitute(fn, replacedParameters);
-        if (newItem !== item) {
-          changed = true;
-        }
-        result.terms.push(newItem);
+    let termsResult: Fmt.Expression[] = [];
+    for (let item of this.terms) {
+      let newItem = item.substitute(fn, replacedParameters);
+      if (newItem !== item) {
+        changed = true;
       }
+      termsResult.push(newItem);
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_equals(...termsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4180,9 +4261,9 @@ export class MetaRefExpression_equals extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-  construction: Fmt.Expression;
-  cases: ObjectContents_StructuralCase[];
+  constructor(public term: Fmt.Expression, public construction: Fmt.Expression, public cases: ObjectContents_StructuralCase[]) {
+    super();
+  }
 
   getName(): string {
     return 'structural';
@@ -4220,30 +4301,27 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_structural;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
+    }
+    let constructionResult = this.construction.substitute(fn, replacedParameters);
+    if (constructionResult !== this.construction) {
+      changed = true;
+    }
+    let casesResult: ObjectContents_StructuralCase[] = [];
+    for (let item of this.cases) {
+      let newItem = new ObjectContents_StructuralCase;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
+      casesResult.push(newItem);
     }
-    if (this.construction) {
-      result.construction = this.construction.substitute(fn, replacedParameters);
-      if (result.construction !== this.construction) {
-        changed = true;
-      }
+    if (fn && !changed) {
+      return fn(this);
     }
-    if (this.cases) {
-      result.cases = [];
-      for (let item of this.cases) {
-        let newItem = new ObjectContents_StructuralCase;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.cases.push(newItem);
-      }
-    }
+    let result = new MetaRefExpression_structural(termResult, constructionResult, casesResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4359,7 +4437,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     result._to = this._to;
     if (this.parameters) {
       result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
+      if (this.parameters.substituteExpression(fn, result.parameters, replacedParameters)) {
         changed = true;
       }
     }
@@ -4371,7 +4449,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     }
     if (this.steps) {
       result.steps = new Fmt.ParameterList;
-      if (this.steps.substituteExpression(fn, result.steps!, replacedParameters)) {
+      if (this.steps.substituteExpression(fn, result.steps, replacedParameters)) {
         changed = true;
       }
     }
@@ -4406,8 +4484,9 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
 }
 
 export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
-  variable: Fmt.Expression;
-  result?: Fmt.Expression;
+  constructor(public variable: Fmt.Expression, public result?: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Consider';
@@ -4427,20 +4506,22 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Consider;
     let changed = false;
-    if (this.variable) {
-      result.variable = this.variable.substitute(fn, replacedParameters);
-      if (result.variable !== this.variable) {
-        changed = true;
-      }
+    let variableResult = this.variable.substitute(fn, replacedParameters);
+    if (variableResult !== this.variable) {
+      changed = true;
     }
+    let resultResult: Fmt.Expression | undefined = undefined;
     if (this.result) {
-      result.result = this.result.substitute(fn, replacedParameters);
-      if (result.result !== this.result) {
+      resultResult = this.result.substitute(fn, replacedParameters);
+      if (resultResult !== this.result) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Consider(variableResult, resultResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4459,8 +4540,9 @@ export class MetaRefExpression_Consider extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_State extends Fmt.MetaRefExpression {
-  statement: Fmt.Expression;
-  proof?: ObjectContents_Proof;
+  constructor(public statement: Fmt.Expression, public proof?: ObjectContents_Proof) {
+    super();
+  }
 
   getName(): string {
     return 'State';
@@ -4488,20 +4570,22 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_State;
     let changed = false;
-    if (this.statement) {
-      result.statement = this.statement.substitute(fn, replacedParameters);
-      if (result.statement !== this.statement) {
-        changed = true;
-      }
+    let statementResult = this.statement.substitute(fn, replacedParameters);
+    if (statementResult !== this.statement) {
+      changed = true;
     }
+    let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
+      proofResult = new ObjectContents_Proof;
+      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_State(statementResult, proofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4520,8 +4604,9 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
-  side?: Fmt.BN;
-  result: Fmt.Expression;
+  constructor(public side: Fmt.BN | undefined, public result: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'UseDef';
@@ -4549,15 +4634,15 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_UseDef;
     let changed = false;
-    result.side = this.side;
-    if (this.result) {
-      result.result = this.result.substitute(fn, replacedParameters);
-      if (result.result !== this.result) {
-        changed = true;
-      }
+    let resultResult = this.result.substitute(fn, replacedParameters);
+    if (resultResult !== this.result) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_UseDef(this.side, resultResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4578,8 +4663,9 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
-  side?: Fmt.BN;
-  caseProofs: ObjectContents_Proof[];
+  constructor(public side: Fmt.BN | undefined, public caseProofs: ObjectContents_Proof[]) {
+    super();
+  }
 
   getName(): string {
     return 'UseCases';
@@ -4625,19 +4711,19 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_UseCases;
     let changed = false;
-    result.side = this.side;
-    if (this.caseProofs) {
-      result.caseProofs = [];
-      for (let item of this.caseProofs) {
-        let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.caseProofs.push(newItem);
+    let caseProofsResult: ObjectContents_Proof[] = [];
+    for (let item of this.caseProofs) {
+      let newItem = new ObjectContents_Proof;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        changed = true;
       }
+      caseProofsResult.push(newItem);
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_UseCases(this.side, caseProofsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4669,6 +4755,11 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
 export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
   arguments: Fmt.ArgumentList;
 
+  constructor(args: Fmt.ArgumentList) {
+    super();
+    this.arguments = args;
+  }
+
   getName(): string {
     return 'UseForAll';
   }
@@ -4689,14 +4780,15 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_UseForAll;
     let changed = false;
-    if (this.arguments) {
-      result.arguments = new Fmt.ArgumentList;
-      if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
-        changed = true;
-      }
+    let argumentsResult = new Fmt.ArgumentList;
+    if (this.arguments.substituteExpression(fn, argumentsResult, replacedParameters)) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_UseForAll(argumentsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4712,7 +4804,9 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
-  parameters: Fmt.ParameterList;
+  constructor(public parameters: Fmt.ParameterList) {
+    super();
+  }
 
   getName(): string {
     return 'UseExists';
@@ -4734,14 +4828,15 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_UseExists;
     let changed = false;
-    if (this.parameters) {
-      result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
-        changed = true;
-      }
+    let parametersResult = new Fmt.ParameterList;
+    if (this.parameters.substituteExpression(fn, parametersResult, replacedParameters)) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_UseExists(parametersResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4757,9 +4852,9 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
-  source: Fmt.Parameter;
-  sourceSide: Fmt.BN;
-  result: Fmt.Expression;
+  constructor(public source: Fmt.Parameter, public sourceSide: Fmt.BN, public result: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Substitute';
@@ -4783,9 +4878,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
 
   toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     argumentList.length = 0;
-    let sourceExprParameters = new Fmt.ParameterList;
-    sourceExprParameters.push(this.source);
-    let sourceExpr = new Fmt.ParameterExpression(sourceExprParameters);
+    let sourceExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.source));
     argumentList.push(new Fmt.Argument(undefined, sourceExpr, false));
     let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
     argumentList.push(new Fmt.Argument(undefined, sourceSideExpr, false));
@@ -4793,21 +4886,19 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Substitute;
     let changed = false;
-    if (this.source) {
-      result.source = this.source.substituteExpression(fn, replacedParameters);
-      if (result.source !== this.source) {
-        changed = true;
-      }
+    let sourceResult = this.source.substituteExpression(fn, replacedParameters);
+    if (sourceResult !== this.source) {
+      changed = true;
     }
-    result.sourceSide = this.sourceSide;
-    if (this.result) {
-      result.result = this.result.substitute(fn, replacedParameters);
-      if (result.result !== this.result) {
-        changed = true;
-      }
+    let resultResult = this.result.substitute(fn, replacedParameters);
+    if (resultResult !== this.result) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Substitute(sourceResult, this.sourceSide, resultResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4831,7 +4922,9 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
-  result: Fmt.Expression;
+  constructor(public result: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'Unfold';
@@ -4847,14 +4940,15 @@ export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_Unfold;
     let changed = false;
-    if (this.result) {
-      result.result = this.result.substitute(fn, replacedParameters);
-      if (result.result !== this.result) {
-        changed = true;
-      }
+    let resultResult = this.result.substitute(fn, replacedParameters);
+    if (resultResult !== this.result) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_Unfold(resultResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4870,9 +4964,9 @@ export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
-  theorem: Fmt.Expression;
-  input?: Fmt.Parameter;
-  result: Fmt.Expression;
+  constructor(public theorem: Fmt.Expression, public input: Fmt.Parameter | undefined, public result: Fmt.Expression) {
+    super();
+  }
 
   getName(): string {
     return 'UseTheorem';
@@ -4895,35 +4989,33 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
     argumentList.length = 0;
     argumentList.push(new Fmt.Argument(undefined, this.theorem, false));
     if (this.input !== undefined) {
-      let inputExprParameters = new Fmt.ParameterList;
-      inputExprParameters.push(this.input);
-      let inputExpr = new Fmt.ParameterExpression(inputExprParameters);
+      let inputExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.input));
       argumentList.push(new Fmt.Argument('input', inputExpr, true));
     }
     argumentList.push(new Fmt.Argument('result', this.result, false));
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_UseTheorem;
     let changed = false;
-    if (this.theorem) {
-      result.theorem = this.theorem.substitute(fn, replacedParameters);
-      if (result.theorem !== this.theorem) {
-        changed = true;
-      }
+    let theoremResult = this.theorem.substitute(fn, replacedParameters);
+    if (theoremResult !== this.theorem) {
+      changed = true;
     }
+    let inputResult: Fmt.Parameter | undefined = undefined;
     if (this.input) {
-      result.input = this.input.substituteExpression(fn, replacedParameters);
-      if (result.input !== this.input) {
+      inputResult = this.input.substituteExpression(fn, replacedParameters);
+      if (inputResult !== this.input) {
         changed = true;
       }
     }
-    if (this.result) {
-      result.result = this.result.substitute(fn, replacedParameters);
-      if (result.result !== this.result) {
-        changed = true;
-      }
+    let resultResult = this.result.substitute(fn, replacedParameters);
+    if (resultResult !== this.result) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_UseTheorem(theoremResult, inputResult, resultResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -4945,8 +5037,9 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
-  side?: Fmt.BN;
-  proof?: ObjectContents_Proof;
+  constructor(public side?: Fmt.BN, public proof?: ObjectContents_Proof) {
+    super();
+  }
 
   getName(): string {
     return 'ProveDef';
@@ -4984,15 +5077,18 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveDef;
     let changed = false;
-    result.side = this.side;
+    let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
+      proofResult = new ObjectContents_Proof;
+      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveDef(this.side, proofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5013,7 +5109,9 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpression {
-  proof: ObjectContents_Proof;
+  constructor(public proof: ObjectContents_Proof) {
+    super();
+  }
 
   getName(): string {
     return 'ProveByContradiction';
@@ -5035,14 +5133,15 @@ export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpressio
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveByContradiction;
     let changed = false;
-    if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
-        changed = true;
-      }
+    let proofResult = new ObjectContents_Proof;
+    if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveByContradiction(proofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5058,7 +5157,9 @@ export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpressio
 }
 
 export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
-  proof: ObjectContents_Proof;
+  constructor(public proof: ObjectContents_Proof) {
+    super();
+  }
 
   getName(): string {
     return 'ProveForAll';
@@ -5080,14 +5181,15 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveForAll;
     let changed = false;
-    if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
-        changed = true;
-      }
+    let proofResult = new ObjectContents_Proof;
+    if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveForAll(proofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5104,7 +5206,11 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
 
 export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
   arguments: Fmt.ArgumentList;
-  proof?: ObjectContents_Proof;
+
+  constructor(args: Fmt.ArgumentList, public proof?: ObjectContents_Proof) {
+    super();
+    this.arguments = args;
+  }
 
   getName(): string {
     return 'ProveExists';
@@ -5138,20 +5244,22 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveExists;
     let changed = false;
-    if (this.arguments) {
-      result.arguments = new Fmt.ArgumentList;
-      if (this.arguments.substituteExpression(fn, result.arguments!, replacedParameters)) {
-        changed = true;
-      }
+    let argumentsResult = new Fmt.ArgumentList;
+    if (this.arguments.substituteExpression(fn, argumentsResult, replacedParameters)) {
+      changed = true;
     }
+    let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      result.proof = new ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof!, replacedParameters)) {
+      proofResult = new ObjectContents_Proof;
+      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveExists(argumentsResult, proofResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5170,7 +5278,9 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
-  proofs: ObjectContents_Proof[];
+  constructor(public proofs: ObjectContents_Proof[]) {
+    super();
+  }
 
   getName(): string {
     return 'ProveEquivalence';
@@ -5204,18 +5314,19 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveEquivalence;
     let changed = false;
-    if (this.proofs) {
-      result.proofs = [];
-      for (let item of this.proofs) {
-        let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.proofs.push(newItem);
+    let proofsResult: ObjectContents_Proof[] = [];
+    for (let item of this.proofs) {
+      let newItem = new ObjectContents_Proof;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        changed = true;
       }
+      proofsResult.push(newItem);
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveEquivalence(proofsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5240,8 +5351,9 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
-  side?: Fmt.BN;
-  caseProofs: ObjectContents_Proof[];
+  constructor(public side: Fmt.BN | undefined, public caseProofs: ObjectContents_Proof[]) {
+    super();
+  }
 
   getName(): string {
     return 'ProveCases';
@@ -5287,19 +5399,19 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveCases;
     let changed = false;
-    result.side = this.side;
-    if (this.caseProofs) {
-      result.caseProofs = [];
-      for (let item of this.caseProofs) {
-        let newItem = new ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.caseProofs.push(newItem);
+    let caseProofsResult: ObjectContents_Proof[] = [];
+    for (let item of this.caseProofs) {
+      let newItem = new ObjectContents_Proof;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        changed = true;
       }
+      caseProofsResult.push(newItem);
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveCases(this.side, caseProofsResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5329,9 +5441,9 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
-  term: Fmt.Expression;
-  construction: Fmt.Expression;
-  cases: ObjectContents_StructuralCase[];
+  constructor(public term: Fmt.Expression, public construction: Fmt.Expression, public cases: ObjectContents_StructuralCase[]) {
+    super();
+  }
 
   getName(): string {
     return 'ProveByInduction';
@@ -5369,30 +5481,27 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_ProveByInduction;
     let changed = false;
-    if (this.term) {
-      result.term = this.term.substitute(fn, replacedParameters);
-      if (result.term !== this.term) {
+    let termResult = this.term.substitute(fn, replacedParameters);
+    if (termResult !== this.term) {
+      changed = true;
+    }
+    let constructionResult = this.construction.substitute(fn, replacedParameters);
+    if (constructionResult !== this.construction) {
+      changed = true;
+    }
+    let casesResult: ObjectContents_StructuralCase[] = [];
+    for (let item of this.cases) {
+      let newItem = new ObjectContents_StructuralCase;
+      if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
+      casesResult.push(newItem);
     }
-    if (this.construction) {
-      result.construction = this.construction.substitute(fn, replacedParameters);
-      if (result.construction !== this.construction) {
-        changed = true;
-      }
+    if (fn && !changed) {
+      return fn(this);
     }
-    if (this.cases) {
-      result.cases = [];
-      for (let item of this.cases) {
-        let newItem = new ObjectContents_StructuralCase;
-        if (item.substituteExpression(fn, newItem!, replacedParameters)) {
-          changed = true;
-        }
-        result.cases.push(newItem);
-      }
-    }
+    let result = new MetaRefExpression_ProveByInduction(termResult, constructionResult, casesResult);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -5484,7 +5593,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     }
     if (this.exclusivityProof) {
       result.exclusivityProof = new ObjectContents_Proof;
-      if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof!, replacedParameters)) {
+      if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -5588,7 +5697,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     }
     if (this.parameters) {
       result.parameters = new Fmt.ParameterList;
-      if (this.parameters.substituteExpression(fn, result.parameters!, replacedParameters)) {
+      if (this.parameters.substituteExpression(fn, result.parameters, replacedParameters)) {
         changed = true;
       }
     }
@@ -5606,7 +5715,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     }
     if (this.wellDefinednessProof) {
       result.wellDefinednessProof = new ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof!, replacedParameters)) {
+      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
     }

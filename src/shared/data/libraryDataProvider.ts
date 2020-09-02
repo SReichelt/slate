@@ -479,9 +479,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     return this.fetchSection(localSectionFileName, false, true).then((sectionDefinition: LibraryDefinition) => {
       let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
       let newSubsectionRef = new Fmt.DefinitionRefExpression(new Fmt.Path(name));
-      let newSubsection = new FmtLibrary.MetaRefExpression_subsection;
-      newSubsection.ref = newSubsectionRef;
-      newSubsection.title = title || '';
+      let newSubsection = new FmtLibrary.MetaRefExpression_subsection(newSubsectionRef, title);
       if (position === undefined) {
         sectionContents.items.push(newSubsection);
       } else {
@@ -584,10 +582,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       .then((sectionDefinition: LibraryDefinition) => {
         let sectionContents = sectionDefinition.definition.contents as FmtLibrary.ObjectContents_Section;
         let newItemRef = new Fmt.DefinitionRefExpression(new Fmt.Path(name));
-        let newItem = new FmtLibrary.MetaRefExpression_item;
-        newItem.ref = newItemRef;
-        newItem.title = title;
-        newItem.type = type;
+        let newItem = new FmtLibrary.MetaRefExpression_item(newItemRef, type, title);
         if (position === undefined) {
           position = sectionContents.items.length;
           sectionContents.items.push(newItem);

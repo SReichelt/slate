@@ -61,11 +61,8 @@ export const fullFormulaSelection: FormulaSelection = {
 };
 
 function addNegations(expressions: Fmt.Expression[]): Fmt.Expression[] {
-  let negatedExpressions = expressions.map((expression: Fmt.Expression) => {
-    let negatedExpression = new FmtHLM.MetaRefExpression_not;
-    negatedExpression.formula = expression;
-    return negatedExpression;
-  });
+  let negatedExpressions = expressions.map((expression: Fmt.Expression) =>
+    new FmtHLM.MetaRefExpression_not(expression));
   return expressions.concat(negatedExpressions);
 };
 
@@ -162,21 +159,18 @@ export class HLMEditHandler extends GenericEditHandler {
     semanticLink.onMenuOpened = () => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
-      let elementType = new FmtHLM.MetaRefExpression_Element;
-      elementType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+      let elementType = new FmtHLM.MetaRefExpression_Element(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
       rows.push(this.getParameterPlaceholderItem(elementType, inForEach ? 'i' : 'x', onRenderParam, onInsertParam));
 
       if (parameterSelection.allowSets) {
-        let subsetType = new FmtHLM.MetaRefExpression_Subset;
-        subsetType.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+        let subsetType = new FmtHLM.MetaRefExpression_Subset(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
         rows.push(this.getParameterPlaceholderItem(subsetType, 'S', onRenderParam, onInsertParam));
 
         rows.push(this.getParameterPlaceholderItem(new FmtHLM.MetaRefExpression_Set, 'S', onRenderParam, onInsertParam));
       }
 
       if (parameterSelection.allowConstraint) {
-        let constraintType = new FmtHLM.MetaRefExpression_Constraint;
-        constraintType.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
+        let constraintType = new FmtHLM.MetaRefExpression_Constraint(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
         rows.push(this.getParameterPlaceholderItem(constraintType, '_1', onRenderParam, onInsertParam));
       }
 
@@ -191,21 +185,17 @@ export class HLMEditHandler extends GenericEditHandler {
         }
 
         if (parameterSelection.allowDefinition) {
-          let elementDefinitionType = new FmtHLM.MetaRefExpression_Def;
-          elementDefinitionType.element = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
+          let elementDefinitionType = new FmtHLM.MetaRefExpression_Def(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
           advancedSubMenuRows.push(this.getParameterPlaceholderItem(elementDefinitionType, 'x', onRenderParam, onInsertParam));
 
-          let setDefinitionType = new FmtHLM.MetaRefExpression_SetDef;
-          setDefinitionType._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+          let setDefinitionType = new FmtHLM.MetaRefExpression_SetDef(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
           advancedSubMenuRows.push(this.getParameterPlaceholderItem(setDefinitionType, 'S', onRenderParam, onInsertParam));
 
           advancedSubMenuRows.push(new Menu.ExpressionMenuSeparator);
         }
 
         if (parameterSelection.allowBinder) {
-          let binderType = new FmtHLM.MetaRefExpression_Binder;
-          binderType.sourceParameters = new Fmt.ParameterList;
-          binderType.targetParameters = new Fmt.ParameterList;
+          let binderType = new FmtHLM.MetaRefExpression_Binder(new Fmt.ParameterList, new Fmt.ParameterList);
           advancedSubMenuRows.push(this.getParameterPlaceholderItem(binderType, '_1', onRenderParam, onInsertParam));
         }
 
@@ -419,13 +409,10 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getSubsetRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let subsetExpression = new FmtHLM.MetaRefExpression_subset;
-    subsetExpression.parameter = this.utils.createElementParameter('x', this.getUsedParameterNames());
-    subsetExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
+    let subsetParameter = this.utils.createElementParameter('x', this.getUsedParameterNames());
+    let subsetExpression = new FmtHLM.MetaRefExpression_subset(subsetParameter, new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
 
-    let extendedSubsetExpression = new FmtHLM.MetaRefExpression_extendedSubset;
-    extendedSubsetExpression.parameters = new Fmt.ParameterList;
-    extendedSubsetExpression.term = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
+    let extendedSubsetExpression = new FmtHLM.MetaRefExpression_extendedSubset(new Fmt.ParameterList, new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
 
     let subsetRow = new Menu.StandardExpressionMenuRow('Subset');
     subsetRow.subMenu = new Menu.ExpressionMenu(CachedPromise.resolve([
@@ -436,13 +423,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getSetCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let createStructuralExpression = (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) => {
-      let structuralExpression = new FmtHLM.MetaRefExpression_setStructuralCases;
-      structuralExpression.term = term;
-      structuralExpression.construction = construction;
-      structuralExpression.cases = cases;
-      return structuralExpression;
-    };
+    let createStructuralExpression = (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) =>
+      new FmtHLM.MetaRefExpression_setStructuralCases(term, construction, cases);
 
     let casesRow = new Menu.StandardExpressionMenuRow('Cases');
     casesRow.subMenu = new Menu.ExpressionMenu(this.getStructuralCaseItems(createStructuralExpression, expressionEditInfo, onRenderTerm, HLMExpressionType.SetTerm));
@@ -450,24 +432,18 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getElementCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let createStructuralExpression = (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) => {
-      let structuralExpression = new FmtHLM.MetaRefExpression_structuralCases;
-      structuralExpression.term = term;
-      structuralExpression.construction = construction;
-      structuralExpression.cases = cases;
-      return structuralExpression;
-    };
+    let createStructuralExpression = (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) =>
+      new FmtHLM.MetaRefExpression_structuralCases(term, construction, cases);
 
     let menuItems = this.getStructuralCaseItems(createStructuralExpression, expressionEditInfo, onRenderTerm, HLMExpressionType.ElementTerm)
       .then((items: Menu.ExpressionMenuItem[]) => {
-        let caseExpression = new FmtHLM.MetaRefExpression_cases;
         let positiveCase = new FmtHLM.ObjectContents_Case;
         positiveCase.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
         positiveCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
         let negativeCase = new FmtHLM.ObjectContents_Case;
         negativeCase.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
         negativeCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
-        caseExpression.cases = [positiveCase, negativeCase];
+        let caseExpression = new FmtHLM.MetaRefExpression_cases([positiveCase, negativeCase]);
         return items.concat(this.getExpressionItem(caseExpression, expressionEditInfo, onRenderTerm));
       });
 
@@ -479,10 +455,10 @@ export class HLMEditHandler extends GenericEditHandler {
   private getConnectiveRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn, formulaSelection: FormulaSelection): Menu.ExpressionMenuRow {
     let leftPlaceholder = expressionEditInfo.expression || new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
     let rightPlaceholder = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
-    let andExpression = new FmtHLM.MetaRefExpression_and;
-    andExpression.formulas = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulas ? [...expressionEditInfo.expression.formulas, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
-    let orExpression = new FmtHLM.MetaRefExpression_or;
-    orExpression.formulas = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulas ? [...expressionEditInfo.expression.formulas, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
+    let andFormulas = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_and && expressionEditInfo.expression.formulas ? [...expressionEditInfo.expression.formulas, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
+    let andExpression = new FmtHLM.MetaRefExpression_and(...andFormulas);
+    let orFormulas = expressionEditInfo.expression instanceof FmtHLM.MetaRefExpression_or && expressionEditInfo.expression.formulas ? [...expressionEditInfo.expression.formulas, rightPlaceholder] : [leftPlaceholder, rightPlaceholder];
+    let orExpression = new FmtHLM.MetaRefExpression_or(...orFormulas);
 
     let mainList = new Menu.ExpressionMenuItemList(CachedPromise.resolve([
       this.getExpressionItem(andExpression, expressionEditInfo, onRenderFormula),
@@ -499,8 +475,7 @@ export class HLMEditHandler extends GenericEditHandler {
       connectiveMenuRows.push(truthValueList);
     }
     if (formulaSelection.allowEquiv) {
-      let equivExpression = new FmtHLM.MetaRefExpression_equiv;
-      equivExpression.formulas = [leftPlaceholder, rightPlaceholder];
+      let equivExpression = new FmtHLM.MetaRefExpression_equiv(leftPlaceholder, rightPlaceholder);
       let equivList = new Menu.ExpressionMenuItemList(CachedPromise.resolve([
         this.getExpressionItem(equivExpression, expressionEditInfo, onRenderFormula)
       ]));
@@ -512,17 +487,10 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getQuantifierRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let forallExpression = new FmtHLM.MetaRefExpression_forall;
-    forallExpression.parameters = new Fmt.ParameterList;
-    forallExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
-    let existsExpression = new FmtHLM.MetaRefExpression_exists;
-    existsExpression.parameters = new Fmt.ParameterList;
-    existsExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
-    let existsUniqueExpression = new FmtHLM.MetaRefExpression_existsUnique;
-    existsUniqueExpression.parameters = new Fmt.ParameterList;
-    existsUniqueExpression.formula = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
-    let negatedExistsExpression = new FmtHLM.MetaRefExpression_not;
-    negatedExistsExpression.formula = existsExpression;
+    let forallExpression = new FmtHLM.MetaRefExpression_forall(new Fmt.ParameterList, new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+    let existsExpression = new FmtHLM.MetaRefExpression_exists(new Fmt.ParameterList, new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+    let existsUniqueExpression = new FmtHLM.MetaRefExpression_existsUnique(new Fmt.ParameterList, new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+    let negatedExistsExpression = new FmtHLM.MetaRefExpression_not(existsExpression);
 
     let mainList = new Menu.ExpressionMenuItemList(CachedPromise.resolve([
       this.getExpressionItem(forallExpression, expressionEditInfo, onRenderFormula),
@@ -541,24 +509,14 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getRelationRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let equalsExpression = new FmtHLM.MetaRefExpression_equals;
-    equalsExpression.terms = [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)];
-    let inExpression = new FmtHLM.MetaRefExpression_in;
-    inExpression.element = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
-    inExpression._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    let subExpression = new FmtHLM.MetaRefExpression_sub;
-    subExpression.subset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    subExpression.superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    let setEqualsExpression = new FmtHLM.MetaRefExpression_setEquals;
-    setEqualsExpression.terms = [new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm)];
-    let negatedEqualsExpression = new FmtHLM.MetaRefExpression_not;
-    negatedEqualsExpression.formula = equalsExpression;
-    let negatedInExpression = new FmtHLM.MetaRefExpression_not;
-    negatedInExpression.formula = inExpression;
-    let negatedSubExpression = new FmtHLM.MetaRefExpression_not;
-    negatedSubExpression.formula = subExpression;
-    let negatedSetEqualsExpression = new FmtHLM.MetaRefExpression_not;
-    negatedSetEqualsExpression.formula = setEqualsExpression;
+    let equalsExpression = new FmtHLM.MetaRefExpression_equals(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
+    let inExpression = new FmtHLM.MetaRefExpression_in(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
+    let subExpression = new FmtHLM.MetaRefExpression_sub(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
+    let setEqualsExpression = new FmtHLM.MetaRefExpression_setEquals(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
+    let negatedEqualsExpression = new FmtHLM.MetaRefExpression_not(equalsExpression);
+    let negatedInExpression = new FmtHLM.MetaRefExpression_not(inExpression);
+    let negatedSubExpression = new FmtHLM.MetaRefExpression_not(subExpression);
+    let negatedSetEqualsExpression = new FmtHLM.MetaRefExpression_not(setEqualsExpression);
 
     let mainList = new Menu.ExpressionMenuItemList(CachedPromise.resolve([
       this.getExpressionItem(equalsExpression, expressionEditInfo, onRenderFormula),
@@ -587,13 +545,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getFormulaCasesRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let createStructuralExpression = (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) => {
-      let structuralExpression = new FmtHLM.MetaRefExpression_structural;
-      structuralExpression.term = term;
-      structuralExpression.construction = construction;
-      structuralExpression.cases = cases;
-      return structuralExpression;
-    };
+    let createStructuralExpression = (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) =>
+      new FmtHLM.MetaRefExpression_structural(term, construction, cases);
 
     let casesRow = new Menu.StandardExpressionMenuRow('Cases');
     casesRow.subMenu = new Menu.ExpressionMenu(this.getStructuralCaseItems(createStructuralExpression, expressionEditInfo, onRenderFormula, HLMExpressionType.Formula));
@@ -1019,8 +972,7 @@ export class HLMEditHandler extends GenericEditHandler {
       let onInsertProperty = (formula: Fmt.Expression | undefined) => {
         if (formula) {
           for (let propertyFormula of getPropertyFormulas(formula)) {
-            let newParamType = new FmtHLM.MetaRefExpression_Constraint;
-            newParamType.formula = propertyFormula;
+            let newParamType = new FmtHLM.MetaRefExpression_Constraint(propertyFormula);
             let newParam = this.utils.createParameter(newParamType, '_1', this.getUsedParameterNames());
             onInsertParam(newParam);
             context = new Ctx.ParameterContext(newParam, context!);

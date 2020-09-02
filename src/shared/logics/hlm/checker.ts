@@ -465,8 +465,7 @@ export class HLMDefinitionChecker {
       innerDefinition.parameters.clone(parameters1);
       let parameters2 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters2);
-      let parameters = new Fmt.ParameterList;
-      parameters.push(...parameters1, ...parameters2);
+      let parameters = new Fmt.ParameterList(...parameters1, ...parameters2);
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
       this.checkProof(equalityDefinition, equalityDefinition.symmetryProof, parameters, goal, context);
@@ -478,8 +477,7 @@ export class HLMDefinitionChecker {
       innerDefinition.parameters.clone(parameters2);
       let parameters3 = new Fmt.ParameterList;
       innerDefinition.parameters.clone(parameters3);
-      let parameters = new Fmt.ParameterList;
-      parameters.push(...parameters1, ...parameters2, ...parameters3);
+      let parameters = new Fmt.ParameterList(...parameters1, ...parameters2, ...parameters3);
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3));
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters3);
@@ -545,13 +543,11 @@ export class HLMDefinitionChecker {
     let rightTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, rightParam);
     let parameters = new Fmt.ParameterList;
     parameters.push(leftParam, rightParam);
-    let constraint = new FmtHLM.MetaRefExpression_equals;
-    constraint.terms = [leftTerm, rightTerm];
+    let constraint = new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
     this.addProofConstraint(parameters, constraint);
     let leftVariableRef = new Fmt.VariableRefExpression(leftParam);
     let rightVariableRef = new Fmt.VariableRefExpression(rightParam);
-    let goal = new FmtHLM.MetaRefExpression_equals;
-    goal.terms = [leftVariableRef, rightVariableRef];
+    let goal = new FmtHLM.MetaRefExpression_equals(leftVariableRef, rightVariableRef);
     this.checkProof(embedding, embedding.wellDefinednessProof, parameters, goal, context);
   }
 
@@ -573,10 +569,9 @@ export class HLMDefinitionChecker {
 
   private checkImplicitOperatorWellDefinednessProof(contents: FmtHLM.ObjectContents_ImplicitOperator, context: HLMCheckerContext): void {
     let param = contents.parameter.clone();
-    let goal = new FmtHLM.MetaRefExpression_existsUnique;
-    goal.parameters = new Fmt.ParameterList;
-    goal.parameters.push(param);
-    goal.formula = this.utils.substituteParameter(contents.definition[0], contents.parameter, param);
+    let parameters = new Fmt.ParameterList(param);
+    let formula = this.utils.substituteParameter(contents.definition[0], contents.parameter, param);
+    let goal = new FmtHLM.MetaRefExpression_existsUnique(parameters, formula);
     this.checkProof(contents, contents.wellDefinednessProof, undefined, goal, context);
   }
 
@@ -807,9 +802,7 @@ export class HLMDefinitionChecker {
         this.checkSetTerm(subsetArg._set, this.getAutoArgumentContext(type.auto, context));
         let checkSubset = this.checkSubset(subsetArg._set, superset, context).then((isTrivialSubset: boolean) => {
           if (!isTrivialSubset || subsetArg.subsetProof) {
-            let subsetFormula = new FmtHLM.MetaRefExpression_sub;
-            subsetFormula.subset = subsetArg._set;
-            subsetFormula.superset = superset;
+            let subsetFormula = new FmtHLM.MetaRefExpression_sub(subsetArg._set, superset);
             this.checkProof(object, subsetArg.subsetProof, undefined, subsetFormula, context);
           }
         });
@@ -824,9 +817,7 @@ export class HLMDefinitionChecker {
         this.checkElementTerm(elementArg.element, this.getAutoArgumentContext(type.auto, context));
         let checkElement = this.checkElement(elementArg.element, set, context).then((isTrivialElement: boolean) => {
           if (!isTrivialElement || elementArg.elementProof) {
-            let elementFormula = new FmtHLM.MetaRefExpression_in;
-            elementFormula.element = elementArg.element;
-            elementFormula._set = set;
+            let elementFormula = new FmtHLM.MetaRefExpression_in(elementArg.element, set);
             this.checkProof(object, elementArg.elementProof, undefined, elementFormula, context);
           }
         });
@@ -923,19 +914,14 @@ export class HLMDefinitionChecker {
         for (let newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
         }
-        let newTerm = new FmtHLM.MetaRefExpression_setStructuralCases;
-        newTerm.term = term.term;
-        newTerm.construction = term.construction;
-        newTerm.cases = newCases;
+        let newTerm = new FmtHLM.MetaRefExpression_setStructuralCases(term.term, term.construction, newCases);
         return {
           originalExpression: term,
           filledExpression: newTerm
         };
       };
       let getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext) => {
-        let result = new FmtHLM.MetaRefExpression_sub;
-        result.subset = leftValue;
-        result.superset = rightValue;
+        let result = new FmtHLM.MetaRefExpression_sub(leftValue, rightValue);
         // TODO support well-definedness proofs in cases where the goal can be written as an isomorphism condition
         this.checkFormula(result, wellDefinednessContext);
         return result;
@@ -982,8 +968,7 @@ export class HLMDefinitionChecker {
         this.checkFormula(item.formula, context);
         this.checkElementTerm(item.value, context);
         let exclusivityParameters = new Fmt.ParameterList;
-        let exclusivityConstraint = new FmtHLM.MetaRefExpression_or;
-        exclusivityConstraint.formulas = formulas.slice();
+        let exclusivityConstraint = new FmtHLM.MetaRefExpression_or(...formulas);
         this.addProofConstraint(exclusivityParameters, exclusivityConstraint);
         let exclusivityGoalPromise = this.utils.negateFormula(item.formula, true);
         let checkProof = exclusivityGoalPromise.then((exclusivityGoal: Fmt.Expression) =>
@@ -992,8 +977,7 @@ export class HLMDefinitionChecker {
         formulas.push(item.formula);
         values.push(item.value);
       }
-      let totalityGoal = new FmtHLM.MetaRefExpression_or;
-      totalityGoal.formulas = formulas;
+      let totalityGoal = new FmtHLM.MetaRefExpression_or(...formulas);
       this.checkProof(term, term.totalityProof, undefined, totalityGoal, context);
       this.checkElementCompatibility(term, values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
@@ -1003,18 +987,14 @@ export class HLMDefinitionChecker {
         for (let newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
         }
-        let newTerm = new FmtHLM.MetaRefExpression_structuralCases;
-        newTerm.term = term.term;
-        newTerm.construction = term.construction;
-        newTerm.cases = newCases;
+        let newTerm = new FmtHLM.MetaRefExpression_structuralCases(term.term, term.construction, newCases);
         return {
           originalExpression: term,
           filledExpression: newTerm
         };
       };
       let getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext) => {
-        let result = new FmtHLM.MetaRefExpression_equals;
-        result.terms = [leftValue, rightValue];
+        let result = new FmtHLM.MetaRefExpression_equals(leftValue, rightValue);
         // TODO support well-definedness proofs in cases where the goal can be written as an isomorphism condition
         this.checkFormula(result, wellDefinednessContext);
         return result;
@@ -1025,9 +1005,7 @@ export class HLMDefinitionChecker {
       this.checkSetTerm(term._set, context);
       let checkElement = this.checkElement(term.term, term._set, context).then((isTrivialElement: boolean) => {
         if (!isTrivialElement || term.proof) {
-          let elementFormula = new FmtHLM.MetaRefExpression_in;
-          elementFormula.element = term.term;
-          elementFormula._set = term._set;
+          let elementFormula = new FmtHLM.MetaRefExpression_in(term.term, term._set);
           this.checkProof(term, term.proof, undefined, elementFormula, context);
         }
       });
@@ -1109,10 +1087,7 @@ export class HLMDefinitionChecker {
         for (let newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
         }
-        let newFormula = new FmtHLM.MetaRefExpression_structural;
-        newFormula.term = formula.term;
-        newFormula.construction = formula.construction;
-        newFormula.cases = newCases;
+        let newFormula = new FmtHLM.MetaRefExpression_structural(formula.term, formula.construction, newCases);
         return {
           originalExpression: formula,
           filledExpression: newFormula
@@ -1401,10 +1376,7 @@ export class HLMDefinitionChecker {
   }
 
   private getSetTermEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression): Fmt.Expression => {
-    let goal = new FmtHLM.MetaRefExpression_sub;
-    goal.subset = from;
-    goal.superset = to;
-    return goal;
+    return new FmtHLM.MetaRefExpression_sub(from, to);
   };
 
   private checkElementTermEquivalenceList(object: Object, list: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
@@ -1414,9 +1386,7 @@ export class HLMDefinitionChecker {
   }
 
   private getElementTermEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression): Fmt.Expression => {
-    let goal = new FmtHLM.MetaRefExpression_equals;
-    goal.terms = [from, to];
-    return goal;
+    return new FmtHLM.MetaRefExpression_equals(from, to);
   };
 
   private checkFormulaEquivalenceList(object: Object, list: Fmt.Expression[], equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
@@ -1735,9 +1705,8 @@ export class HLMDefinitionChecker {
           let index = this.utils.translateIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
             newGoal = goalToNegate.formulas[index];
-            let newGoalToNegate = new FmtHLM.MetaRefExpression_or;
-            newGoalToNegate.formulas = goalToNegate.formulas.slice();
-            newGoalToNegate.formulas.splice(index, 1);
+            let newGoalToNegate = new FmtHLM.MetaRefExpression_or(...goalToNegate.formulas);
+            newGoalToNegate.formulas!.splice(index, 1);
             goalToNegate = newGoalToNegate;
           }
         }
@@ -1833,10 +1802,7 @@ export class HLMDefinitionChecker {
             let subProofExpression = subProof.toExpression(true);
             newCase.value = subProofExpression;
           }
-          let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction;
-          newProveByInduction.term = proveByInduction.term;
-          newProveByInduction.construction = proveByInduction.construction;
-          newProveByInduction.cases = newCases;
+          let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction(proveByInduction.term, proveByInduction.construction, newCases);
           return {
             originalExpression: proveByInduction,
             filledExpression: newProveByInduction
@@ -1889,8 +1855,7 @@ export class HLMDefinitionChecker {
         }
       }
       return constraintsPromise.then((constraints: Fmt.Expression[]) => {
-        let constraint = new FmtHLM.MetaRefExpression_and;
-        constraint.formulas = constraints;
+        let constraint = new FmtHLM.MetaRefExpression_and(...constraints);
         return this.utils.triviallyImplies(constraint, goal, true);
       });
     } else {

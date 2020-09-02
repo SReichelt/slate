@@ -125,6 +125,14 @@ class MetaDeclarationGenerator {
     }
   }
 
+  private getParameterMemberType(parameter: Fmt.Parameter): string {
+    let memberType = this.getMemberType(parameter.type);
+    if (parameter.list) {
+      memberType += '[]';
+    }
+    return memberType;
+  }
+
   private getEffectiveType(type: Fmt.Expression, list: boolean = false): Fmt.Expression {
     if (type instanceof Fmt.IndexedExpression) {
       let bodyType = this.getEffectiveType(type.body);
@@ -230,16 +238,16 @@ class MetaDeclarationGenerator {
     return outFileStr;
   }
 
-  private outputReadCode(argName: string, argIndex: number, memberName: string, type: Fmt.Expression, optional: boolean, list: boolean, indent: string): string {
+  private outputReadCode(argName: string, argIndex: number, target: string, type: Fmt.Expression, optional: boolean, list: boolean, indent: string): string {
     let outFileStr = '';
     let variableName = argName + 'Raw';
     if (list) {
       if (optional) {
-        outFileStr += `${indent}if (this.${memberName}) {\n`;
-        outFileStr += `${indent}  this.${memberName} = undefined;\n`;
+        outFileStr += `${indent}if (${target}) {\n`;
+        outFileStr += `${indent}  ${target} = undefined;\n`;
         outFileStr += `${indent}}\n`;
       } else {
-        outFileStr += `${indent}this.${memberName} = [];\n`;
+        outFileStr += `${indent}${target} = [];\n`;
       }
       outFileStr += `${indent}let index = ${argIndex};\n`;
       outFileStr += `${indent}for (;;) {\n`;
@@ -248,11 +256,11 @@ class MetaDeclarationGenerator {
       outFileStr += `${indent}    break;\n`;
       outFileStr += `${indent}  }\n`;
       if (optional) {
-        outFileStr += `${indent}  if (!this.${memberName}) {\n`;
-        outFileStr += `${indent}    this.${memberName} = [];\n`;
+        outFileStr += `${indent}  if (!${target}) {\n`;
+        outFileStr += `${indent}    ${target} = [];\n`;
         outFileStr += `${indent}  }\n`;
       }
-      outFileStr += this.outputReadConvCode(argName, variableName, `this.${memberName}!`, type, true, `${indent}  `);
+      outFileStr += this.outputReadConvCode(argName, variableName, `${target}`, type, true, `${indent}  `);
       outFileStr += `${indent}  index++;\n`;
       outFileStr += `${indent}}\n`;
     } else {
@@ -260,13 +268,13 @@ class MetaDeclarationGenerator {
         outFileStr += `${indent}let ${variableName} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
         if (optional) {
           outFileStr += `${indent}if (${variableName} !== undefined) {\n`;
-          outFileStr += this.outputReadConvCode(argName, variableName, `this.${memberName}`, type, false, `${indent}  `);
+          outFileStr += this.outputReadConvCode(argName, variableName, `${target}`, type, false, `${indent}  `);
           outFileStr += `${indent}}\n`;
         } else {
-          outFileStr += this.outputReadConvCode(argName, variableName, `this.${memberName}`, type, false, indent);
+          outFileStr += this.outputReadConvCode(argName, variableName, `${target}`, type, false, indent);
         }
       } else {
-        outFileStr += `${indent}this.${memberName} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
+        outFileStr += `${indent}${target} = argumentList.get${optional ? 'Optional' : ''}Value('${argName}', ${argIndex});\n`;
       }
     }
     return outFileStr;
@@ -304,9 +312,7 @@ class MetaDeclarationGenerator {
           outFileStr += `${indent}let ${variableName} = new Fmt.StringExpression(${source});\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
-          outFileStr += `${indent}let ${variableName}Parameters = new Fmt.ParameterList;\n`;
-          outFileStr += `${indent}${variableName}Parameters.push(${source});\n`;
-          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression(${variableName}Parameters);\n`;
+          outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression(new Fmt.ParameterList(${source}));\n`;
           outFileStr += `${indent}${outputBegin}${variableName}${outputEnd};\n`;
         } else if (type instanceof FmtMeta.MetaRefExpression_ParameterList) {
           outFileStr += `${indent}let ${variableName} = new Fmt.ParameterExpression(${source});\n`;
@@ -379,25 +385,32 @@ class MetaDeclarationGenerator {
     return outFileStr;
   }
 
-  private outputSubstitutionCode(source: string, target: string, type: Fmt.Expression, targetIsList: boolean, indent: string): string {
+  private outputSubstitutionCode(source: string, target: string, type: Fmt.Expression, defineTarget: boolean, targetIsList: boolean, listInitRequired: boolean, indent: string): string {
     let outFileStr = '';
     let subTarget = target;
     let init = target;
     if (targetIsList) {
       subTarget = this.makeUniqueName('newItem', type);
       init = `let ${subTarget}`;
+    } else if (defineTarget) {
+      init = `let ${init}`;
     }
     if (type instanceof Fmt.IndexedExpression) {
-      outFileStr += `${indent}${init} = [];\n`;
+      if (listInitRequired) {
+        if (targetIsList || defineTarget) {
+          init += `: ${this.getMemberType(type)}`;
+        }
+        outFileStr += `${indent}${init} = [];\n`;
+      }
       let item = this.makeUniqueName('item', type.body);
       outFileStr += `${indent}for (let ${item} of ${source}) {\n`;
-      outFileStr += this.outputSubstitutionCode(item, subTarget, type.body, true, `${indent}  `);
+      outFileStr += this.outputSubstitutionCode(item, subTarget, type.body, false, true, true, `${indent}  `);
       outFileStr += `${indent}}\n`;
     } else {
       let contentType = this.getMemberContentType(type);
       if (contentType && (!contentType.startsWith('Fmt.') || contentType.endsWith('List'))) {
         outFileStr += `${indent}${init} = new ${contentType};\n`;
-        outFileStr += `${indent}if (${source}.substituteExpression(fn, ${subTarget}!, replacedParameters)) {\n`;
+        outFileStr += `${indent}if (${source}.substituteExpression(fn, ${subTarget}, replacedParameters)) {\n`;
         outFileStr += `${indent}  changed = true;\n`;
         outFileStr += `${indent}}\n`;
       } else {
@@ -503,251 +516,342 @@ class MetaDeclarationGenerator {
 
   private outputDeclarations(): string {
     let outFileStr = '';
-    let metaModel = this.inFile.definitions[0];
-
     for (let definition of this.inFile.definitions) {
       if (definition.type instanceof FmtMeta.MetaRefExpression_MetaModel) {
         continue;
       }
-
       if (this.hasObjectContents(definition)) {
-        let superDefinition = this.getSuperDefinition(definition);
-        if (superDefinition && !this.hasObjectContents(superDefinition)) {
-          superDefinition = undefined;
-        }
-        let superClass = superDefinition ? `ObjectContents_${superDefinition.name}` : `Fmt.ObjectContents`;
-        outFileStr += `export class ObjectContents_${definition.name} extends ${superClass} {\n`;
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            let memberType = this.getMemberType(member.type);
-            let optional = member.optional || member.defaultValue !== undefined;
-            outFileStr += `  ${memberName}${optional ? '?' : ''}: ${memberType};\n`;
-          }
-          outFileStr += `\n`;
-        }
-        outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
-        if (superDefinition) {
-          outFileStr += `    super.fromArgumentList(argumentList, reportFn);\n`;
-        }
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-          let argIndex = 0;
-          if (superDefinition) {
-            argIndex += this.getMemberCount(superDefinition);
-          }
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            let optional = member.optional || member.defaultValue !== undefined;
-            outFileStr += this.outputReadCode(member.name, argIndex, memberName, member.type, optional, false, `    `);
-            argIndex++;
-          }
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {\n`;
-        if (superDefinition) {
-          outFileStr += `    super.toArgumentList(argumentList, outputAllNames, reportFn);\n`;
-        } else {
-          outFileStr += `    argumentList.length = 0;\n`;
-        }
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-          let named = 1;
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            let optional = member.optional || member.defaultValue !== undefined;
-            if (optional) {
-              named = 2;
-            }
-            outFileStr += this.outputWriteCode(member.name, `this.${memberName}`, member.type, optional, false, named, `    `);
-          }
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        if (this.canOmitBraces(definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members && definition.contents.members.length) {
-          let firstMemberName = translateMemberName(definition.contents.members[0].name);
-          outFileStr += `  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {\n`;
-          outFileStr += `    if (expression instanceof Fmt.CompoundExpression) {\n`;
-          outFileStr += `      super.fromExpression(expression, reportFn);\n`;
-          outFileStr += `    } else {\n`;
-          outFileStr += `      this.${firstMemberName} = expression;\n`;
-          outFileStr += `    }\n`;
-          outFileStr += `  }\n`;
-          outFileStr += `\n`;
-          outFileStr += `  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {\n`;
-          outFileStr += `    if (outputAllNames`;
-          let first = true;
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            if (first) {
-              outFileStr += ` || this.${memberName} instanceof Fmt.CompoundExpression`;
-              first = false;
-            } else {
-              outFileStr += ` || this.${memberName}`;
-            }
-          }
-          outFileStr += `) {\n`;
-          outFileStr += `      return super.toExpression(outputAllNames, reportFn);\n`;
-          outFileStr += `    } else {\n`;
-          outFileStr += `      return this.${firstMemberName};\n`;
-          outFileStr += `    }\n`;
-          outFileStr += `  }\n`;
-          outFileStr += `\n`;
-        }
-        outFileStr += `  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_${definition.name} {\n`;
-        outFileStr += `    let result = new ObjectContents_${definition.name};\n`;
-        outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;
-        outFileStr += `    return result;\n`;
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  traverse(fn: Fmt.ExpressionTraversalFn): void {\n`;
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            if (!(member.type instanceof FmtMeta.MetaRefExpression_Int || member.type instanceof FmtMeta.MetaRefExpression_String)) {
-              outFileStr += `    if (this.${memberName}) {\n`;
-              outFileStr += this.outputTraversalCode(`this.${memberName}`, member.type, '      ');
-              outFileStr += `    }\n`;
-            }
-          }
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
-        if (superDefinition) {
-          outFileStr += `    let changed = super.substituteExpression(fn, result, replacedParameters);\n`;
-        } else {
-          outFileStr += `    let changed = false;\n`;
-        }
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            if (member.type instanceof FmtMeta.MetaRefExpression_Int || member.type instanceof FmtMeta.MetaRefExpression_String) {
-              outFileStr += `    result.${memberName} = this.${memberName};\n`;
-            } else {
-              outFileStr += `    if (this.${memberName}) {\n`;
-              outFileStr += this.outputSubstitutionCode(`this.${memberName}`, `result.${memberName}`, member.type, false, '      ');
-              outFileStr += `    }\n`;
-            }
-          }
-        }
-        outFileStr += `    return changed;\n`;
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  isEquivalentTo(objectContents: ObjectContents_${definition.name}, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
-        outFileStr += `    if (this === objectContents && !replacedParameters.length) {\n`;
-        outFileStr += `      return true;\n`;
-        outFileStr += `    }\n`;
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
-          for (let member of definition.contents.members) {
-            let memberName = translateMemberName(member.name);
-            outFileStr += this.outputComparisonCode(`this.${memberName}`, `objectContents.${memberName}`, member.type, '    ');
-          }
-        }
-        if (superDefinition) {
-          outFileStr += `    return super.isEquivalentTo(objectContents, fn, replacedParameters);\n`;
-        } else {
-          outFileStr += `    return true;\n`;
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `}\n\n`;
+        outFileStr += this.outputObjectContents(definition);
       }
-
       if (this.isVisibleType(definition)) {
-        outFileStr += `export class MetaRefExpression_${definition.name} extends Fmt.MetaRefExpression {\n`;
-        if (definition.parameters.length) {
-          for (let parameter of definition.parameters) {
-            let memberName = translateMemberName(parameter.name);
-            let memberType = this.getMemberType(parameter.type);
-            let optional = parameter.optional || parameter.defaultValue !== undefined;
-            if (parameter.list) {
-              memberType += '[]';
-            }
-            outFileStr += `  ${memberName}${optional ? '?' : ''}: ${memberType};\n`;
-          }
-          outFileStr += `\n`;
-        }
-        outFileStr += `  getName(): string {\n`;
-        outFileStr += `    return '${definition.name}';\n`;
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
-        let argIndex = 0;
-        for (let parameter of definition.parameters) {
-          let memberName = translateMemberName(parameter.name);
-          let optional = parameter.optional || parameter.defaultValue !== undefined;
-          outFileStr += this.outputReadCode(parameter.name, argIndex, memberName, parameter.type, optional, parameter.list, `    `);
-          argIndex++;
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
-        outFileStr += `    argumentList.length = 0;\n`;
-        let named = 0;
-        for (let parameter of definition.parameters) {
-          let memberName = translateMemberName(parameter.name);
-          let optional = parameter.optional || parameter.defaultValue !== undefined;
-          if (optional && !parameter.list) {
-            named = 2;
-          }
-          outFileStr += this.outputWriteCode(parameter.name, `this.${memberName}`, parameter.type, optional, parameter.list, named, `    `);
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
-        if (definition.parameters.length) {
-          outFileStr += `    let result = new MetaRefExpression_${definition.name};\n`;
-          outFileStr += `    let changed = false;\n`;
-          for (let parameter of definition.parameters) {
-            let memberName = translateMemberName(parameter.name);
-            if ((parameter.type instanceof FmtMeta.MetaRefExpression_Int || parameter.type instanceof FmtMeta.MetaRefExpression_String) && !parameter.list) {
-              outFileStr += `    result.${memberName} = this.${memberName};\n`;
-            } else {
-              outFileStr += `    if (this.${memberName}) {\n`;
-              outFileStr += this.outputSubstitutionCode(`this.${memberName}`, `result.${memberName}`, this.getEffectiveType(parameter.type, parameter.list), false, '      ');
-              outFileStr += `    }\n`;
-            }
-          }
-          outFileStr += `    return this.getSubstitutionResult(fn, result, changed);\n`;
-        } else {
-          outFileStr += `    if (fn) {\n`;
-          outFileStr += `      return fn(this);\n`;
-          outFileStr += `    } else {\n`;
-          outFileStr += `      return new MetaRefExpression_${definition.name};\n`;
-          outFileStr += `    }\n`;
-        }
-        outFileStr += `  }\n`;
-        outFileStr += `\n`;
-        outFileStr += `  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {\n`;
-        outFileStr += `    if (!(expression instanceof MetaRefExpression_${definition.name})) {\n`;
-        outFileStr += `      return false;\n`;
-        outFileStr += `    }\n`;
-        for (let parameter of definition.parameters) {
-          let memberName = translateMemberName(parameter.name);
-          outFileStr += this.outputComparisonCode(`this.${memberName}`, `expression.${memberName}`, this.getEffectiveType(parameter.type, parameter.list), '    ');
-        }
-        outFileStr += `    return true;\n`;
-        outFileStr += `  }\n`;
-        if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes && definition.contents.innerDefinitionTypes.length) {
-          outFileStr += `\n`;
-          outFileStr += `  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {\n`;
-          outFileStr += `    const innerDefinitionTypes: Fmt.MetaDefinitionList = ${this.outputDefinitionList(definition.contents.innerDefinitionTypes, (metaModel.contents as FmtMeta.ObjectContents_MetaModel).expressionTypes)};\n`;
-          outFileStr += `    return new Fmt.StandardMetaDefinitionFactory(innerDefinitionTypes);\n`;
-          outFileStr += `  }\n`;
-        }
-        if (this.hasObjectContents(definition)) {
-          outFileStr += `\n`;
-          outFileStr += `  createDefinitionContents(): Fmt.ObjectContents | undefined {\n`;
-          outFileStr += `    return new ObjectContents_${definition.name};\n`;
-          outFileStr += `  }\n`;
-        }
-        if (definition.contents instanceof FmtMeta.ObjectContents_ParameterType && definition.contents.canOmit instanceof FmtMeta.MetaRefExpression_true) {
-          outFileStr += `\n`;
-          outFileStr += `  canOmit(): boolean { return true; }\n`;
-        }
-        outFileStr += `}\n\n`;
+        outFileStr += this.outputMetaRefExpression(definition);
       }
     }
+    return outFileStr;
+  }
 
+  private outputObjectContents(definition: Fmt.Definition): string {
+    let outFileStr = '';
+    let superDefinition = this.getSuperDefinition(definition);
+    if (superDefinition && !this.hasObjectContents(superDefinition)) {
+      superDefinition = undefined;
+    }
+    let superClass = superDefinition ? `ObjectContents_${superDefinition.name}` : `Fmt.ObjectContents`;
+    outFileStr += `export class ObjectContents_${definition.name} extends ${superClass} {\n`;
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        let memberType = this.getMemberType(member.type);
+        let optional = member.optional || member.defaultValue !== undefined;
+        outFileStr += `  ${memberName}${optional ? '?' : ''}: ${memberType};\n`;
+      }
+      outFileStr += `\n`;
+    }
+    outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
+    if (superDefinition) {
+      outFileStr += `    super.fromArgumentList(argumentList, reportFn);\n`;
+    }
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+      let argIndex = 0;
+      if (superDefinition) {
+        argIndex += this.getMemberCount(superDefinition);
+      }
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        let optional = member.optional || member.defaultValue !== undefined;
+        outFileStr += this.outputReadCode(member.name, argIndex, `this.${memberName}`, member.type, optional, false, `    `);
+        argIndex++;
+      }
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {\n`;
+    if (superDefinition) {
+      outFileStr += `    super.toArgumentList(argumentList, outputAllNames, reportFn);\n`;
+    } else {
+      outFileStr += `    argumentList.length = 0;\n`;
+    }
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+      let named = 1;
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        let optional = member.optional || member.defaultValue !== undefined;
+        if (optional) {
+          named = 2;
+        }
+        outFileStr += this.outputWriteCode(member.name, `this.${memberName}`, member.type, optional, false, named, `    `);
+      }
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    if (this.canOmitBraces(definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members && definition.contents.members.length) {
+      let firstMemberName = translateMemberName(definition.contents.members[0].name);
+      outFileStr += `  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {\n`;
+      outFileStr += `    if (expression instanceof Fmt.CompoundExpression) {\n`;
+      outFileStr += `      super.fromExpression(expression, reportFn);\n`;
+      outFileStr += `    } else {\n`;
+      outFileStr += `      this.${firstMemberName} = expression;\n`;
+      outFileStr += `    }\n`;
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
+      outFileStr += `  toExpression(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.Expression {\n`;
+      outFileStr += `    if (outputAllNames`;
+      let first = true;
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        if (first) {
+          outFileStr += ` || this.${memberName} instanceof Fmt.CompoundExpression`;
+          first = false;
+        } else {
+          outFileStr += ` || this.${memberName}`;
+        }
+      }
+      outFileStr += `) {\n`;
+      outFileStr += `      return super.toExpression(outputAllNames, reportFn);\n`;
+      outFileStr += `    } else {\n`;
+      outFileStr += `      return this.${firstMemberName};\n`;
+      outFileStr += `    }\n`;
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
+    }
+    outFileStr += `  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_${definition.name} {\n`;
+    outFileStr += `    let result = new ObjectContents_${definition.name};\n`;
+    outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;
+    outFileStr += `    return result;\n`;
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  traverse(fn: Fmt.ExpressionTraversalFn): void {\n`;
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        if (!(member.type instanceof FmtMeta.MetaRefExpression_Int || member.type instanceof FmtMeta.MetaRefExpression_String)) {
+          outFileStr += `    if (this.${memberName}) {\n`;
+          outFileStr += this.outputTraversalCode(`this.${memberName}`, member.type, '      ');
+          outFileStr += `    }\n`;
+        }
+      }
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
+    if (superDefinition) {
+      outFileStr += `    let changed = super.substituteExpression(fn, result, replacedParameters);\n`;
+    } else {
+      outFileStr += `    let changed = false;\n`;
+    }
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        if (member.type instanceof FmtMeta.MetaRefExpression_Int || member.type instanceof FmtMeta.MetaRefExpression_String) {
+          outFileStr += `    result.${memberName} = this.${memberName};\n`;
+        } else {
+          outFileStr += `    if (this.${memberName}) {\n`;
+          outFileStr += this.outputSubstitutionCode(`this.${memberName}`, `result.${memberName}`, member.type, false, false, true, '      ');
+          outFileStr += `    }\n`;
+        }
+      }
+    }
+    outFileStr += `    return changed;\n`;
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  isEquivalentTo(objectContents: ObjectContents_${definition.name}, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
+    outFileStr += `    if (this === objectContents && !replacedParameters.length) {\n`;
+    outFileStr += `      return true;\n`;
+    outFileStr += `    }\n`;
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+      for (let member of definition.contents.members) {
+        let memberName = translateMemberName(member.name);
+        outFileStr += this.outputComparisonCode(`this.${memberName}`, `objectContents.${memberName}`, member.type, '    ');
+      }
+    }
+    if (superDefinition) {
+      outFileStr += `    return super.isEquivalentTo(objectContents, fn, replacedParameters);\n`;
+    } else {
+      outFileStr += `    return true;\n`;
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `}\n\n`;
+    return outFileStr;
+  }
+
+  private outputMetaRefExpression(definition: Fmt.Definition): string {
+    let outFileStr = '';
+    outFileStr += `export class MetaRefExpression_${definition.name} extends Fmt.MetaRefExpression {\n`;
+    if (definition.parameters.length) {
+      for (let parameter of definition.parameters) {
+        let memberName = translateMemberName(parameter.name);
+        if (parameter.list || memberName === 'arguments') {
+          let memberType = this.getParameterMemberType(parameter);
+          let optional = parameter.optional || parameter.defaultValue !== undefined;
+          outFileStr += `  ${memberName}${optional ? '?' : ''}: ${memberType};\n`;
+          outFileStr += `\n`;
+        }
+      }
+      outFileStr += `  constructor(`;
+      let mandatoryParamCount = 0;
+      let paramIndex = 0;
+      for (let parameter of definition.parameters) {
+        let optional = parameter.optional || parameter.defaultValue !== undefined;
+        paramIndex++;
+        if (!optional) {
+          mandatoryParamCount = paramIndex;
+        }
+      }
+      paramIndex = 0;
+      for (let parameter of definition.parameters) {
+        if (paramIndex) {
+          outFileStr += `, `;
+        }
+        let memberName = translateMemberName(parameter.name);
+        let paramName = memberName === 'arguments' ? 'args' : memberName;
+        let memberType = this.getParameterMemberType(parameter);
+        let optional = parameter.optional || parameter.defaultValue !== undefined;
+        if (parameter.list) {
+          outFileStr += `...`;
+        } else if (paramName === memberName) {
+          outFileStr += `public `;
+        }
+        outFileStr += paramName;
+        if (paramIndex < mandatoryParamCount) {
+          outFileStr += `: ${memberType}`;
+          if (optional) {
+            outFileStr += ` | undefined`;
+          }
+        } else {
+          if (optional && !parameter.list) {
+            outFileStr += `?`;
+          }
+          outFileStr += `: ${memberType}`;
+        }
+        paramIndex++;
+      }
+      outFileStr += `) {\n`;
+      outFileStr += `    super();\n`;
+      for (let parameter of definition.parameters) {
+        let memberName = translateMemberName(parameter.name);
+        let paramName = memberName === 'arguments' ? 'args' : memberName;
+        if (parameter.list || paramName !== memberName) {
+          let optional = parameter.optional || parameter.defaultValue !== undefined;
+          if (optional) {
+            outFileStr += `    if (${paramName}.length) {\n`;
+            outFileStr += `      this.${memberName} = ${paramName};\n`;
+            outFileStr += `    }\n`;
+          } else {
+            outFileStr += `    this.${memberName} = ${paramName};\n`;
+          }
+        }
+      }
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
+    }
+    outFileStr += `  getName(): string {\n`;
+    outFileStr += `    return '${definition.name}';\n`;
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
+    let argIndex = 0;
+    for (let parameter of definition.parameters) {
+      let memberName = translateMemberName(parameter.name);
+      let optional = parameter.optional || parameter.defaultValue !== undefined;
+      outFileStr += this.outputReadCode(parameter.name, argIndex, `this.${memberName}`, parameter.type, optional, parameter.list, `    `);
+      argIndex++;
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
+    outFileStr += `    argumentList.length = 0;\n`;
+    let named = 0;
+    for (let parameter of definition.parameters) {
+      let memberName = translateMemberName(parameter.name);
+      let optional = parameter.optional || parameter.defaultValue !== undefined;
+      if (optional && !parameter.list) {
+        named = 2;
+      }
+      outFileStr += this.outputWriteCode(parameter.name, `this.${memberName}`, parameter.type, optional, parameter.list, named, `    `);
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
+    if (definition.parameters.length) {
+      outFileStr += `    let changed = false;\n`;
+      for (let parameter of definition.parameters) {
+        let memberName = translateMemberName(parameter.name);
+        if (!(parameter.type instanceof FmtMeta.MetaRefExpression_Int || parameter.type instanceof FmtMeta.MetaRefExpression_String) || parameter.list) {
+          let memberType = this.getParameterMemberType(parameter);
+          let optional = parameter.optional || parameter.defaultValue !== undefined;
+          if (optional) {
+            if (parameter.list) {
+              outFileStr += `    let ${memberName}Result: ${memberType} = [];\n`;
+            } else {
+              outFileStr += `    let ${memberName}Result: ${memberType} | undefined = undefined;\n`;
+            }
+            outFileStr += `    if (this.${memberName}) {\n`;
+            outFileStr += this.outputSubstitutionCode(`this.${memberName}`, `${memberName}Result`, this.getEffectiveType(parameter.type, parameter.list), false, false, !parameter.list, `      `);
+            outFileStr += `    }\n`;
+          } else {
+            outFileStr += this.outputSubstitutionCode(`this.${memberName}`, `${memberName}Result`, this.getEffectiveType(parameter.type, parameter.list), true, false, true, `    `);
+          }
+        }
+      }
+      outFileStr += `    if (fn && !changed) {\n`;
+      outFileStr += `      return fn(this);\n`;
+      outFileStr += `    }\n`;
+      outFileStr += `    let result = new MetaRefExpression_${definition.name}(`;
+      let paramIndex = 0;
+      for (let parameter of definition.parameters) {
+        if (paramIndex) {
+          outFileStr += `, `;
+        }
+        let memberName = translateMemberName(parameter.name);
+        if (parameter.list) {
+          outFileStr += `...${memberName}Result`;
+        } else if (parameter.type instanceof FmtMeta.MetaRefExpression_Int || parameter.type instanceof FmtMeta.MetaRefExpression_String) {
+          outFileStr += `this.${memberName}`;
+        } else {
+          outFileStr += `${memberName}Result`;
+        }
+        paramIndex++;
+      }
+      outFileStr += `);\n`;
+      outFileStr += `    return this.getSubstitutionResult(fn, result, changed);\n`;
+    } else {
+      outFileStr += `    if (fn) {\n`;
+      outFileStr += `      return fn(this);\n`;
+      outFileStr += `    } else {\n`;
+      outFileStr += `      return new MetaRefExpression_${definition.name};\n`;
+      outFileStr += `    }\n`;
+    }
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
+    outFileStr += `  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {\n`;
+    outFileStr += `    if (!(expression instanceof MetaRefExpression_${definition.name})) {\n`;
+    outFileStr += `      return false;\n`;
+    outFileStr += `    }\n`;
+    for (let parameter of definition.parameters) {
+      let memberName = translateMemberName(parameter.name);
+      outFileStr += this.outputComparisonCode(`this.${memberName}`, `expression.${memberName}`, this.getEffectiveType(parameter.type, parameter.list), '    ');
+    }
+    outFileStr += `    return true;\n`;
+    outFileStr += `  }\n`;
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType && definition.contents.innerDefinitionTypes && definition.contents.innerDefinitionTypes.length) {
+      let metaModel = this.inFile.definitions[0];
+      outFileStr += `\n`;
+      outFileStr += `  getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {\n`;
+      outFileStr += `    const innerDefinitionTypes: Fmt.MetaDefinitionList = ${this.outputDefinitionList(definition.contents.innerDefinitionTypes, (metaModel.contents as FmtMeta.ObjectContents_MetaModel).expressionTypes)};\n`;
+      outFileStr += `    return new Fmt.StandardMetaDefinitionFactory(innerDefinitionTypes);\n`;
+      outFileStr += `  }\n`;
+    }
+    if (this.hasObjectContents(definition)) {
+      outFileStr += `\n`;
+      outFileStr += `  createDefinitionContents(): Fmt.ObjectContents | undefined {\n`;
+      outFileStr += `    return new ObjectContents_${definition.name};\n`;
+      outFileStr += `  }\n`;
+    }
+    if (definition.contents instanceof FmtMeta.ObjectContents_ParameterType && definition.contents.canOmit instanceof FmtMeta.MetaRefExpression_true) {
+      outFileStr += `\n`;
+      outFileStr += `  canOmit(): boolean { return true; }\n`;
+    }
+    outFileStr += `}\n\n`;
     return outFileStr;
   }
 

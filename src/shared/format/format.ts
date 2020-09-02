@@ -1043,7 +1043,7 @@ export class DocumentationItem {
 }
 
 export interface MetaDefinitionList {
-  [name: string]: {new(): MetaRefExpression} | null;
+  [name: string]: Function | null;
 }
 
 export interface MetaDefinitionFactory {
@@ -1059,7 +1059,7 @@ export class StandardMetaDefinitionFactory implements MetaDefinitionFactory {
     if (!metaDefinitionClass) {
       throw new Error(`Meta object "${name}" not found`);
     }
-    return new metaDefinitionClass;
+    return Object.create(metaDefinitionClass.prototype);
   }
 
   allowArbitraryReferences(): boolean {

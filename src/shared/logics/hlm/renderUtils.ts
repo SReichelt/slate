@@ -202,9 +202,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
         let expression = binderArgValue.arguments[0].value;
         let nestedArgumentsExpression = binderArgValue.arguments[1].value;
         if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
-          let allParameters: Fmt.Parameter[] = [];
-          allParameters.push(...parameters);
-          allParameters.push(...expression.parameters);
+          let allParameters = [...parameters, ...expression.parameters];
           let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
           if (newNestedArguments !== nestedArgumentsExpression.arguments) {
             binderArg = binderArg.clone();

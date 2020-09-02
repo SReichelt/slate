@@ -184,9 +184,9 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_item extends Fmt.MetaRefExpression {
-  ref: Fmt.Expression;
-  type?: string;
-  title?: string;
+  constructor(public ref: Fmt.Expression, public type?: string, public title?: string) {
+    super();
+  }
 
   getName(): string {
     return 'item';
@@ -226,16 +226,15 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_item;
     let changed = false;
-    if (this.ref) {
-      result.ref = this.ref.substitute(fn, replacedParameters);
-      if (result.ref !== this.ref) {
-        changed = true;
-      }
+    let refResult = this.ref.substitute(fn, replacedParameters);
+    if (refResult !== this.ref) {
+      changed = true;
     }
-    result.type = this.type;
-    result.title = this.title;
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_item(refResult, this.type, this.title);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
@@ -257,8 +256,9 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
-  ref: Fmt.Expression;
-  title: string;
+  constructor(public ref: Fmt.Expression, public title: string) {
+    super();
+  }
 
   getName(): string {
     return 'subsection';
@@ -282,15 +282,15 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
-    let result = new MetaRefExpression_subsection;
     let changed = false;
-    if (this.ref) {
-      result.ref = this.ref.substitute(fn, replacedParameters);
-      if (result.ref !== this.ref) {
-        changed = true;
-      }
+    let refResult = this.ref.substitute(fn, replacedParameters);
+    if (refResult !== this.ref) {
+      changed = true;
     }
-    result.title = this.title;
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_subsection(refResult, this.title);
     return this.getSubstitutionResult(fn, result, changed);
   }
 
