@@ -50,10 +50,8 @@ export abstract class PathItem implements Comparable<PathItem> {
       return true;
     }
     let origReplacedParametersLength = replacedParameters.length;
-    if (this.parentPath || pathItem.parentPath) {
-      if (!(this.parentPath && pathItem.parentPath && this.parentPath.isEquivalentTo(pathItem.parentPath, fn, replacedParameters))) {
-        return false;
-      }
+    if (!areObjectsEquivalent(this.parentPath, pathItem.parentPath, fn, replacedParameters)) {
+      return false;
     }
     if (this.matches(pathItem, fn, replacedParameters)) {
       return true;
@@ -92,9 +90,7 @@ export class ParentPathItem extends PathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
       if (newParentPath !== this.parentPath || !fn) {
-        let result = new ParentPathItem;
-        result.parentPath = newParentPath;
-        return result;
+        return new ParentPathItem(newParentPath);
       }
     } else if (!fn) {
       return new ParentPathItem;
@@ -112,9 +108,7 @@ export class IdentityPathItem extends PathItem {
     if (this.parentPath) {
       let newParentPath = this.parentPath.substituteExpression(fn, replacedParameters);
       if (newParentPath !== this.parentPath || !fn) {
-        let result = new IdentityPathItem;
-        result.parentPath = newParentPath;
-        return result;
+        return new IdentityPathItem(newParentPath);
       }
     } else if (!fn) {
       return new IdentityPathItem;
@@ -136,7 +130,7 @@ export class Path extends NamedPathItem {
   }
 
   substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Path {
-    let changed = false;
+    let changed = !fn;
     let parentPath: PathItem | undefined = undefined;
     if (this.parentPath) {
       parentPath = this.parentPath.substituteExpression(fn, replacedParameters);
@@ -144,14 +138,15 @@ export class Path extends NamedPathItem {
         changed = true;
       }
     }
-    let args = new ArgumentList;
-    if (this.arguments.substituteExpression(fn, args, replacedParameters)) {
+    let args = this.arguments.substituteExpression(fn, replacedParameters);
+    if (args !== this.arguments) {
       changed = true;
     }
-    if (changed || !fn) {
+    if (changed) {
       return new Path(this.name, args, parentPath);
+    } else {
+      return this;
     }
-    return this;
   }
 
   protected matches(pathItem: PathItem, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -172,8 +167,8 @@ export class Definition {
 
   clone(replacedParameters: ReplacedParameter[] = []): Definition {
     let type = this.type.clone(replacedParameters);
-    let result = new Definition(this.name, type, new ParameterList);
-    this.parameters.clone(result.parameters, replacedParameters);
+    let parameters = this.parameters.clone(replacedParameters);
+    let result = new Definition(this.name, type, parameters);
     for (let innerDefinition of this.innerDefinitions) {
       result.innerDefinitions.push(innerDefinition.clone(replacedParameters));
     }
@@ -367,8 +362,8 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
     }
   }
 
-  clone(result: ParameterList, replacedParameters: ReplacedParameter[] = []): void {
-    this.substituteExpression(undefined, result, replacedParameters);
+  clone(replacedParameters: ReplacedParameter[] = []): ParameterList {
+    return this.substituteExpression(undefined, replacedParameters);
   }
 
   traverse(fn: ExpressionTraversalFn): void {
@@ -377,9 +372,12 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
     }
   }
 
-  // TODO return parameter list instead
-  substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: ParameterList, replacedParameters: ReplacedParameter[] = []): boolean {
-    let changed = false;
+  substituteExpression(fn: ExpressionSubstitutionFn | undefined, replacedParameters: ReplacedParameter[] = []): ParameterList {
+    if (fn && !this.length) {
+      return this;
+    }
+    let result = new ParameterList;
+    let changed = !fn;
     let previousParameter: ReplacedParameter | undefined = undefined;
     for (let parameter of this) {
       let newParameter = parameter.substituteExpression(fn, replacedParameters, previousParameter);
@@ -392,7 +390,7 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
         replacement: newParameter
       };
     }
-    return changed;
+    return changed ? result : this;
   }
 
   isEquivalentTo(parameters: ParameterList, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
@@ -518,9 +516,8 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
     }
   }
 
-  // TODO return argument list instead
-  clone(result: ArgumentList, replacedParameters: ReplacedParameter[] = []): void {
-    this.substituteExpression(undefined, result, replacedParameters);
+  clone(replacedParameters: ReplacedParameter[] = []): ArgumentList {
+    return this.substituteExpression(undefined, replacedParameters);
   }
 
   traverse(fn: ExpressionTraversalFn): void {
@@ -529,9 +526,12 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
     }
   }
 
-  // TODO return argument list instead
-  substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: ArgumentList, replacedParameters: ReplacedParameter[] = []): boolean {
-    let changed = false;
+  substituteExpression(fn: ExpressionSubstitutionFn | undefined, replacedParameters: ReplacedParameter[] = []): ArgumentList {
+    if (fn && !this.length) {
+      return this;
+    }
+    let result = new ArgumentList;
+    let changed = !fn;
     for (let argument of this) {
       let newArgument = argument.substituteExpression(fn, replacedParameters);
       if (newArgument !== argument) {
@@ -539,7 +539,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
       }
       result.push(newArgument);
     }
-    return changed;
+    return changed ? result : this;
   }
 
   isEquivalentTo(args: ArgumentList, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
@@ -581,23 +581,20 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
 
 export abstract class ObjectContents {
   abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
-  // TODO return argument list instead
-  abstract toArgumentList(argumentList: ArgumentList, outputAllNames: boolean, reportFn?: ReportConversionFn): void;
+  abstract toArgumentList(outputAllNames: boolean, reportFn?: ReportConversionFn): ArgumentList;
 
   fromExpression(expression: Expression, reportFn?: ReportConversionFn): void {
     if (expression instanceof CompoundExpression) {
       this.fromArgumentList(expression.arguments, reportFn);
     } else {
-      let argumentList = new ArgumentList;
-      argumentList.push(new Argument(undefined, expression));
+      let argumentList = new ArgumentList(new Argument(undefined, expression));
       this.fromArgumentList(argumentList, reportFn);
     }
   }
 
   toExpression(outputAllNames: boolean, reportFn?: ReportConversionFn): Expression {
-    let expression = new CompoundExpression(new ArgumentList);
-    this.toArgumentList(expression.arguments, outputAllNames, reportFn);
-    return expression;
+    let argumentList = this.toArgumentList(outputAllNames, reportFn);
+    return new CompoundExpression(argumentList);
   }
 
   abstract clone(replacedParameters?: ReplacedParameter[]): ObjectContents;
@@ -605,8 +602,7 @@ export abstract class ObjectContents {
   abstract traverse(fn: ExpressionTraversalFn): void;
 
   toString(): string {
-    let argumentList = new ArgumentList;
-    this.toArgumentList(argumentList, false);
+    let argumentList = this.toArgumentList(false);
     return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
   }
 }
@@ -619,9 +615,8 @@ export class GenericObjectContents extends ObjectContents {
     this.arguments.push(...argumentList);
   }
 
-  toArgumentList(argumentList: ArgumentList, outputAllNames: boolean, reportFn?: ReportConversionFn): void {
-    argumentList.length = 0;
-    argumentList.push(...this.arguments);
+  toArgumentList(outputAllNames: boolean, reportFn?: ReportConversionFn): ArgumentList {
+    return this.arguments;
   }
 
   clone(replacedParameters: ReplacedParameter[] = []): GenericObjectContents {
@@ -634,9 +629,9 @@ export class GenericObjectContents extends ObjectContents {
     this.arguments.traverse(fn);
   }
 
-  // TODO return object contents instead
   substituteExpression(fn: ExpressionSubstitutionFn | undefined, result: GenericObjectContents, replacedParameters?: ReplacedParameter[]): boolean {
-    return this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
+    result.arguments = this.arguments.substituteExpression(fn, replacedParameters);
+    return result.arguments !== this.arguments;
   }
 }
 
@@ -654,15 +649,6 @@ export abstract class Expression implements Comparable<Expression> {
   }
 
   abstract substitute(fn?: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): Expression;
-
-  protected getSubstitutionResult(fn: ExpressionSubstitutionFn | undefined, expression: Expression, changed: boolean): Expression {
-    if (fn) {
-      return fn(changed ? expression : this);
-    } else {
-      // Special case used by clone(). Don't return 'this', even if unchanged.
-      return expression;
-    }
-  }
 
   isEquivalentTo(expression: Expression, fn?: ExpressionUnificationFn, replacedParameters: ReplacedParameter[] = []): boolean {
     if (this === expression && !replacedParameters.length) {
@@ -747,7 +733,7 @@ export class VariableRefExpression extends Expression {
 export abstract class MetaRefExpression extends Expression {
   abstract getName(): string;
   abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
-  abstract toArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
+  abstract toArgumentList(reportFn?: ReportConversionFn): ArgumentList;
 
   getMetaInnerDefinitionTypes(): MetaDefinitionFactory | undefined { return undefined; }
   createDefinitionContents(): ObjectContents | undefined { return undefined; }
@@ -771,9 +757,8 @@ export class GenericMetaRefExpression extends MetaRefExpression {
     this.arguments.push(...argumentList);
   }
 
-  toArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void {
-    argumentList.length = 0;
-    argumentList.push(...this.arguments);
+  toArgumentList(reportFn?: ReportConversionFn): ArgumentList {
+    return this.arguments;
   }
 
   getMetaInnerDefinitionTypes(): MetaDefinitionFactory | undefined {
@@ -785,9 +770,12 @@ export class GenericMetaRefExpression extends MetaRefExpression {
   }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new GenericMetaRefExpression(this.name, new ArgumentList);
-    let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
-    return this.getSubstitutionResult(fn, result, changed);
+    let args = this.arguments.substituteExpression(fn, replacedParameters);
+    if (fn && args === this.arguments) {
+      return fn(this);
+    }
+    let result = new GenericMetaRefExpression(this.name, args);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -823,9 +811,12 @@ export class ParameterExpression extends Expression {
   }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new ParameterExpression(new ParameterList);
-    let changed = this.parameters.substituteExpression(fn, result.parameters, replacedParameters);
-    return this.getSubstitutionResult(fn, result, changed);
+    let parameters = this.parameters.substituteExpression(fn, replacedParameters);
+    if (fn && parameters === this.parameters) {
+      return fn(this);
+    }
+    let result = new ParameterExpression(parameters);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -843,9 +834,12 @@ export class CompoundExpression extends Expression {
   }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let result = new CompoundExpression(new ArgumentList);
-    let changed = this.arguments.substituteExpression(fn, result.arguments, replacedParameters);
-    return this.getSubstitutionResult(fn, result, changed);
+    let args = this.arguments.substituteExpression(fn, replacedParameters);
+    if (fn && args === this.arguments) {
+      return fn(this);
+    }
+    let result = new CompoundExpression(args);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -902,11 +896,11 @@ export class IndexedExpression extends Expression implements Index {
   }
 
   substitute(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Expression {
-    let changed = !fn;
+    let changed = false;
     let resultIndex: Index = {};
     if (this.arguments) {
-      resultIndex.arguments = new ArgumentList;
-      if (this.arguments.substituteExpression(fn, resultIndex.arguments, replacedParameters)) {
+      resultIndex.arguments = this.arguments.substituteExpression(fn, replacedParameters);
+      if (resultIndex.arguments !== this.arguments) {
         changed = true;
       }
     }
@@ -918,8 +912,11 @@ export class IndexedExpression extends Expression implements Index {
     if (body !== this.body) {
       changed = true;
     }
+    if (fn && !changed) {
+      return fn(this);
+    }
     let result = new IndexedExpression(body, resultIndex);
-    return this.getSubstitutionResult(fn, result, changed);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
@@ -929,8 +926,7 @@ export class IndexedExpression extends Expression implements Index {
       if (this.isAffectedByReplacedParameters(replacedParameters)) {
         testExpression = new IndexedExpression(this.body, {});
         if (this.arguments) {
-          testExpression.arguments = new ArgumentList;
-          testExpression.arguments.push(...this.arguments);
+          testExpression.arguments = new ArgumentList(...this.arguments);
         }
         this.assignParameters(testExpression, replacedParameters);
       }
@@ -950,10 +946,9 @@ export class IndexedExpression extends Expression implements Index {
         let paramIndex = this.parameters.indexOf(replacedParameter.original);
         if (paramIndex >= 0) {
           if (!result.parameters) {
-            result.parameters = new ParameterList;
-            result.parameters!.push(...this.parameters);
+            result.parameters = new ParameterList(...this.parameters);
           }
-          result.parameters![paramIndex] = replacedParameter.replacement;
+          result.parameters[paramIndex] = replacedParameter.replacement;
           if (result.arguments) {
             for (let argIndex = 0; argIndex < result.arguments.length; argIndex++) {
               let arg = result.arguments[argIndex];

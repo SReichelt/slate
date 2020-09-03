@@ -23,8 +23,8 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
-    argumentList.length = 0;
+  toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
     let logicExpr = new Fmt.StringExpression(this.logic);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'logic' : undefined, logicExpr, false));
     let itemsExprItems: Fmt.Expression[] = [];
@@ -33,6 +33,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
     let itemsExpr = new Fmt.ArrayExpression(itemsExprItems);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'items' : undefined, itemsExpr, false));
+    return argumentList;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
@@ -96,8 +97,9 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    argumentList.length = 0;
+  toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
+    return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -125,8 +127,9 @@ export class ObjectContents_Library extends ObjectContents_Section {
     super.fromArgumentList(argumentList, reportFn);
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {
-    super.toArgumentList(argumentList, outputAllNames, reportFn);
+  toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = super.toArgumentList(outputAllNames, reportFn);
+    return argumentList;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
@@ -159,8 +162,9 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    argumentList.length = 0;
+  toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
+    return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -212,8 +216,8 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    argumentList.length = 0;
+  toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.ref, false));
     if (this.type !== undefined) {
       let typeExpr = new Fmt.StringExpression(this.type);
@@ -223,6 +227,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
       let titleExpr = new Fmt.StringExpression(this.title);
       argumentList.push(new Fmt.Argument('title', titleExpr, true));
     }
+    return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -235,7 +240,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
       return fn(this);
     }
     let result = new MetaRefExpression_item(refResult, this.type, this.title);
-    return this.getSubstitutionResult(fn, result, changed);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
@@ -274,11 +279,12 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
     }
   }
 
-  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    argumentList.length = 0;
+  toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.ref, false));
     let titleExpr = new Fmt.StringExpression(this.title);
     argumentList.push(new Fmt.Argument(undefined, titleExpr, false));
+    return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
@@ -291,7 +297,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
       return fn(this);
     }
     let result = new MetaRefExpression_subsection(refResult, this.title);
-    return this.getSubstitutionResult(fn, result, changed);
+    return fn ? fn(result) : result;
   }
 
   protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {

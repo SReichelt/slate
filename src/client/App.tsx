@@ -1079,9 +1079,8 @@ class App extends React.Component<AppProps, AppState> {
       let editedDefinition = this.state.tutorialState?.editedDefinition;
       if (editedDefinition) {
         editedDefinition.definition.contents = undefined;
-        editedDefinition.definition.parameters.length = 0;
         let replacedParameters: Fmt.ReplacedParameter[] = [];
-        definition.parameters.clone(editedDefinition.definition.parameters, replacedParameters);
+        editedDefinition.definition.parameters = definition.parameters.clone(replacedParameters);
         editedDefinition.definition.contents = definition.contents?.clone(replacedParameters);
         this.state.interactionHandler?.expressionChanged();
       }

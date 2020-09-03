@@ -1752,9 +1752,8 @@ export class HLMUtils extends GenericUtils {
         }
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
-      let parameters = new Fmt.ParameterList;
       let replacedParameters: Fmt.ReplacedParameter[] = [];
-      formula.parameters.clone(parameters, replacedParameters);
+      let parameters = formula.parameters.clone(replacedParameters);
       let equalities: Fmt.Expression[] = [];
       for (let param of formula.parameters) {
         if (param.type instanceof FmtHLM.MetaRefExpression_Element) {
@@ -1928,8 +1927,7 @@ export class HLMUtils extends GenericUtils {
     let substitutionContext = new SubstitutionContext;
     this.addTargetPathSubstitution(targetPath, substitutionContext);
     let substitutedSource = this.applySubstitutionContextToParameterList(source, substitutionContext);
-    let result = new Fmt.ParameterList;
-    substitutedSource.clone(result);
+    let result = substitutedSource.clone();
     if (usedNames) {
       this.adaptParameterNames(result, usedNames);
     }

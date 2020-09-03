@@ -408,7 +408,7 @@ class MetaDeclarationGenerator {
       outFileStr += `${indent}}\n`;
     } else {
       let contentType = this.getMemberContentType(type);
-      if (contentType && (!contentType.startsWith('Fmt.') || contentType.endsWith('List'))) {
+      if (contentType && !contentType.startsWith('Fmt.')) {
         outFileStr += `${indent}${init} = new ${contentType};\n`;
         outFileStr += `${indent}if (${source}.substituteExpression(fn, ${subTarget}, replacedParameters)) {\n`;
         outFileStr += `${indent}  changed = true;\n`;
@@ -565,11 +565,11 @@ class MetaDeclarationGenerator {
     }
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): void {\n`;
+    outFileStr += `  toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {\n`;
     if (superDefinition) {
-      outFileStr += `    super.toArgumentList(argumentList, outputAllNames, reportFn);\n`;
+      outFileStr += `    let argumentList = super.toArgumentList(outputAllNames, reportFn);\n`;
     } else {
-      outFileStr += `    argumentList.length = 0;\n`;
+      outFileStr += `    let argumentList = new Fmt.ArgumentList;\n`;
     }
     if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
       let named = 1;
@@ -582,6 +582,7 @@ class MetaDeclarationGenerator {
         outFileStr += this.outputWriteCode(member.name, `this.${memberName}`, member.type, optional, false, named, `    `);
       }
     }
+    outFileStr += `    return argumentList;\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
     if (this.canOmitBraces(definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members && definition.contents.members.length) {
@@ -758,8 +759,8 @@ class MetaDeclarationGenerator {
     }
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  toArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
-    outFileStr += `    argumentList.length = 0;\n`;
+    outFileStr += `  toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {\n`;
+    outFileStr += `    let argumentList = new Fmt.ArgumentList;\n`;
     let named = 0;
     for (let parameter of definition.parameters) {
       let memberName = translateMemberName(parameter.name);
@@ -769,6 +770,7 @@ class MetaDeclarationGenerator {
       }
       outFileStr += this.outputWriteCode(parameter.name, `this.${memberName}`, parameter.type, optional, parameter.list, named, `    `);
     }
+    outFileStr += `    return argumentList;\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
     outFileStr += `  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {\n`;
@@ -813,7 +815,7 @@ class MetaDeclarationGenerator {
         paramIndex++;
       }
       outFileStr += `);\n`;
-      outFileStr += `    return this.getSubstitutionResult(fn, result, changed);\n`;
+      outFileStr += `    return fn ? fn(result) : result;\n`;
     } else {
       outFileStr += `    if (fn) {\n`;
       outFileStr += `      return fn(this);\n`;

@@ -108,8 +108,7 @@ export class EditAnalysis {
     if (contents instanceof Fmt.GenericObjectContents) {
       this.analyzeArgumentList(contents.arguments, undefined, context);
     } else {
-      let args = new Fmt.ArgumentList;
-      contents.toArgumentList(args, true);
+      let args = contents.toArgumentList(true);
       let onApply = () => contents.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
     }
@@ -145,8 +144,7 @@ export class EditAnalysis {
     if (expression instanceof Fmt.GenericMetaRefExpression) {
       this.analyzeArgumentList(expression.arguments, undefined, context);
     } else {
-      let args = new Fmt.ArgumentList;
-      expression.toArgumentList(args);
+      let args = expression.toArgumentList();
       let onApply = () => expression.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
     }

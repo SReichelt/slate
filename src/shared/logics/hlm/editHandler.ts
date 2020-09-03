@@ -1112,11 +1112,9 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
     let result = new FmtHLM.ObjectContents_EqualityDefinition;
-    let leftParameters = new Fmt.ParameterList;
-    parameters.clone(leftParameters);
+    let leftParameters = parameters.clone();
     result.leftParameters = leftParameters;
-    let rightParameters = new Fmt.ParameterList;
-    parameters.clone(rightParameters);
+    let rightParameters = parameters.clone();
     this.addApostrophes(rightParameters);
     result.rightParameters = rightParameters;
     result.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)];

@@ -455,28 +455,22 @@ export class HLMDefinitionChecker {
       this.checkIsomorphicProperty(equalityDefinition.leftParameters, equalityDefinition.rightParameters, equalityDefinition.definition[0], context);
     }
     if (!isomorphic || equalityDefinition.reflexivityProof) {
-      let parameters = new Fmt.ParameterList;
-      innerDefinition.parameters.clone(parameters);
+      let parameters = innerDefinition.parameters.clone();
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters, parameters);
       this.checkProof(equalityDefinition, equalityDefinition.reflexivityProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.symmetryProof) {
-      let parameters1 = new Fmt.ParameterList;
-      innerDefinition.parameters.clone(parameters1);
-      let parameters2 = new Fmt.ParameterList;
-      innerDefinition.parameters.clone(parameters2);
+      let parameters1 = innerDefinition.parameters.clone();
+      let parameters2 = innerDefinition.parameters.clone();
       let parameters = new Fmt.ParameterList(...parameters1, ...parameters2);
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
       this.checkProof(equalityDefinition, equalityDefinition.symmetryProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.transitivityProof) {
-      let parameters1 = new Fmt.ParameterList;
-      innerDefinition.parameters.clone(parameters1);
-      let parameters2 = new Fmt.ParameterList;
-      innerDefinition.parameters.clone(parameters2);
-      let parameters3 = new Fmt.ParameterList;
-      innerDefinition.parameters.clone(parameters3);
+      let parameters1 = innerDefinition.parameters.clone();
+      let parameters2 = innerDefinition.parameters.clone();
+      let parameters3 = innerDefinition.parameters.clone();
       let parameters = new Fmt.ParameterList(...parameters1, ...parameters2, ...parameters3);
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3));
@@ -1162,12 +1156,14 @@ export class HLMDefinitionChecker {
       caseContext = this.getParameterContext(constraintParam, caseContext);
       checkCase(structuralCase.value, caseContext);
       if ((getWellDefinednessProofGoal && constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
-        let clonedParameters = new Fmt.ParameterList;
+        let clonedParameters: Fmt.ParameterList;
         let replacedParameters: Fmt.ReplacedParameter[] = [];
         let clonedValue = structuralCase.value;
         if (structuralCase.parameters) {
-          structuralCase.parameters.clone(clonedParameters, replacedParameters);
+          clonedParameters = structuralCase.parameters.clone(replacedParameters);
           clonedValue = this.utils.substituteParameters(structuralCase.value, structuralCase.parameters, clonedParameters);
+        } else {
+          clonedParameters = new Fmt.ParameterList;
         }
         clonedParameters.push(constraintParam.clone(replacedParameters));
         let goalContext = this.getParameterListContext(clonedParameters, caseContext);
@@ -1258,8 +1254,7 @@ export class HLMDefinitionChecker {
             let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
             newCase._constructor = constructorExpression;
             if (substitutedParameters.length) {
-              let clonedParameters = new Fmt.ParameterList;
-              substitutedParameters.clone(clonedParameters);
+              let clonedParameters = substitutedParameters.clone();
               newCase.parameters = clonedParameters;
               newParameterLists.push(clonedParameters);
             }
