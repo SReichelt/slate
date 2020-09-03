@@ -167,13 +167,11 @@ export class HLMUtils extends GenericUtils {
         let addNewIndices = (expression: Fmt.Expression) => {
           let index: Fmt.Index = {
             parameters: binderArg.sourceParameters,
-            arguments: new Fmt.ArgumentList
+            arguments: this.getParameterArguments(binderArg.sourceParameters, context, undefined, addIndices)
           };
-          this.getParameterArguments(index.arguments!, binderArg.sourceParameters, context, undefined, addIndices);
           return new Fmt.IndexedExpression(addIndices ? addIndices(expression) : expression, index);
         };
-        binderArg.targetArguments = new Fmt.ArgumentList;
-        this.getParameterArguments(binderArg.targetArguments, type.targetParameters, newContext, targetInnerParameters, addNewIndices);
+        binderArg.targetArguments = this.getParameterArguments(type.targetParameters, newContext, targetInnerParameters, addNewIndices);
         value = binderArg.toExpression(false);
       } else {
         let variableRefExpression = new Fmt.VariableRefExpression(param);
@@ -204,19 +202,20 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  // TODO return argument list instead
-  getParameterArguments(args: Fmt.ArgumentList, parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], addIndices?: (expression: Fmt.Expression) => Fmt.Expression): void {
+  getParameterArguments(parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.ArgumentList {
+    let result = new Fmt.ArgumentList;
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
       let targetParam = targetParameters ? targetParameters[paramIndex] : undefined;
       let arg = this.getParameterArgument(param, context, targetParam, addIndices);
       if (arg) {
-        args.push(arg);
+        result.push(arg);
       }
     }
+    return result;
   }
 
-  isTrueeFormula(formula: Fmt.Expression): boolean {
+  isTrueFormula(formula: Fmt.Expression): boolean {
     return (formula instanceof FmtHLM.MetaRefExpression_and && !formula.formulas);
   }
 
@@ -243,10 +242,10 @@ export class HLMUtils extends GenericUtils {
       result = constructorContents.rewrite.value;
       result = this.substitutePath(result, constructionPath, [constructionDefinition]);
     } else {
-      let resultPath = new Fmt.Path(constructorPath.name, undefined, constructionPath);
       let context = new SubstitutionContext;
       this.addTargetPathSubstitution(constructionPath.parentPath, context);
-      this.getParameterArguments(resultPath.arguments, constructorDefinition.parameters, context, structuralCase.parameters);
+      let resultArgs = this.getParameterArguments(constructorDefinition.parameters, context, structuralCase.parameters);
+      let resultPath = new Fmt.Path(constructorPath.name, resultArgs, constructionPath);
       result = new Fmt.DefinitionRefExpression(resultPath);
     }
     if (constructorDefinition.parameters.length) {

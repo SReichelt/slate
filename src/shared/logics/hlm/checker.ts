@@ -488,10 +488,10 @@ export class HLMDefinitionChecker {
   private checkRewriteDefinition(innerDefinition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_RewriteDefinition, context: HLMCheckerContext): void {
     this.checkElementTerm(rewriteDefinition.value, context);
     let substitutionContext = new HLMSubstitutionContext;
-    let constructionPath = new Fmt.Path(this.definition.name);
-    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
-    let constructorPath = new Fmt.Path(innerDefinition.name, undefined, constructionPath);
-    this.utils.getParameterArguments(constructorPath.arguments, innerDefinition.parameters, substitutionContext);
+    let constructionArgs = this.utils.getParameterArguments(this.definition.parameters, substitutionContext);
+    let constructionPath = new Fmt.Path(this.definition.name, constructionArgs);
+    let constructorArgs = this.utils.getParameterArguments(innerDefinition.parameters, substitutionContext);
+    let constructorPath = new Fmt.Path(innerDefinition.name, constructorArgs, constructionPath);
     let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
     this.checkElementCompatibility(rewriteDefinition.value, [constructorExpression, rewriteDefinition.value], context);
     // TODO check whether rewrite definition matches referenced theorem
@@ -505,8 +505,8 @@ export class HLMDefinitionChecker {
     }
     this.checkElementTerm(embedding.target, innerContext);
     let substitutionContext = new HLMSubstitutionContext;
-    let constructionPath = new Fmt.Path(this.definition.name);
-    this.utils.getParameterArguments(constructionPath.arguments, this.definition.parameters, substitutionContext);
+    let constructionArgs = this.utils.getParameterArguments(this.definition.parameters, substitutionContext);
+    let constructionPath = new Fmt.Path(this.definition.name, constructionArgs);
     let constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
     this.checkCompatibility(embedding.target, [embedding.target], [constructionExpression], innerContext);
     this.checkEmbeddingWellDefinednessProof(embedding, context);

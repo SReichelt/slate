@@ -2233,8 +2233,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let definitionNotation = this.renderUtils.getDefinitionNotation(definition);
       if (definitionNotation) {
           let substitutionContext = new HLMSubstitutionContext;
-        let path = new Fmt.Path(definition.name);
-        this.utils.getParameterArguments(path.arguments, definition.parameters, substitutionContext);
+        let args = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+        let path = new Fmt.Path(definition.name, args);
         let term = new Fmt.DefinitionRefExpression(path);
         let type = new FmtHLM.MetaRefExpression_Element(term);
         let parameter = this.utils.createParameter(type, definitionNotation.parameter.name);
@@ -2269,10 +2269,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let constructorDefinitionNotation = this.renderUtils.getDefinitionNotation(constructorDefinition);
         if (constructorDefinitionNotation) {
           let substitutionContext = new HLMSubstitutionContext;
-          let parentPath = new Fmt.Path(definition.name);
-          this.utils.getParameterArguments(parentPath.arguments, definition.parameters, substitutionContext);
-          let path = new Fmt.Path(constructorDefinition.name);
-          this.utils.getParameterArguments(path.arguments, constructorDefinition.parameters, substitutionContext);
+          let parentArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+          let parentPath = new Fmt.Path(definition.name, parentArgs);
+          let args = this.utils.getParameterArguments(constructorDefinition.parameters, substitutionContext);
+          let path = new Fmt.Path(constructorDefinition.name, args);
           path.parentPath = parentPath;
           let term = new Fmt.DefinitionRefExpression(path);
           let type = new FmtHLM.MetaRefExpression_Def(term);
