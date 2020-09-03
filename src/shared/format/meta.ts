@@ -10,6 +10,12 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   functions?: Fmt.Expression[];
   lookup?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_MetaModel {
+    let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let definitionTypesRaw = argumentList.getValue('definitionTypes', 0);
     if (definitionTypesRaw instanceof Fmt.ArrayExpression) {
@@ -67,7 +73,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MetaModel {
-    let result = new ObjectContents_MetaModel;
+    let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -219,6 +225,12 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   members?: Fmt.ParameterList;
   exports?: Fmt.Expression[];
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinedType {
+    let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.superType = argumentList.getOptionalValue('superType', 0);
     let membersRaw = argumentList.getOptionalValue('members', 1);
@@ -260,7 +272,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinedType {
-    let result = new ObjectContents_DefinedType;
+    let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -335,6 +347,12 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
 export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   innerDefinitionTypes?: Fmt.Expression[];
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionType {
+    let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     let innerDefinitionTypesRaw = argumentList.getOptionalValue('innerDefinitionTypes', 3);
@@ -361,7 +379,7 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionType {
-    let result = new ObjectContents_DefinitionType;
+    let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -462,6 +480,12 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExpressionType {
+    let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
   }
@@ -472,7 +496,7 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExpressionType {
-    let result = new ObjectContents_ExpressionType;
+    let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -531,6 +555,12 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   argumentType?: Fmt.Expression;
   canOmit?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ParameterType {
+    let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     this.optional = argumentList.getOptionalValue('optional', 3);
@@ -553,7 +583,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ParameterType {
-    let result = new ObjectContents_ParameterType;
+    let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }

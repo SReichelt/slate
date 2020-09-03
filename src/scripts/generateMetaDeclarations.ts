@@ -547,6 +547,12 @@ class MetaDeclarationGenerator {
       }
       outFileStr += `\n`;
     }
+    outFileStr += `  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_${definition.name} {\n`;
+    outFileStr += `    let result: ObjectContents_${definition.name} = Object.create(ObjectContents_${definition.name}.prototype);\n`;
+    outFileStr += `    result.fromArgumentList(argumentList, reportFn);\n`;
+    outFileStr += `    return result;\n`;
+    outFileStr += `  }\n`;
+    outFileStr += `\n`;
     outFileStr += `  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {\n`;
     if (superDefinition) {
       outFileStr += `    super.fromArgumentList(argumentList, reportFn);\n`;
@@ -586,6 +592,12 @@ class MetaDeclarationGenerator {
     outFileStr += `  }\n`;
     outFileStr += `\n`;
     if (this.canOmitBraces(definition) && definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members && definition.contents.members.length) {
+      outFileStr += `  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_${definition.name} {\n`;
+      outFileStr += `    let result: ObjectContents_${definition.name} = Object.create(ObjectContents_${definition.name}.prototype);\n`;
+      outFileStr += `    result.fromExpression(expression, reportFn);\n`;
+      outFileStr += `    return result;\n`;
+      outFileStr += `  }\n`;
+      outFileStr += `\n`;
       let firstMemberName = translateMemberName(definition.contents.members[0].name);
       outFileStr += `  fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {\n`;
       outFileStr += `    if (expression instanceof Fmt.CompoundExpression) {\n`;
@@ -616,7 +628,7 @@ class MetaDeclarationGenerator {
       outFileStr += `\n`;
     }
     outFileStr += `  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_${definition.name} {\n`;
-    outFileStr += `    let result = new ObjectContents_${definition.name};\n`;
+    outFileStr += `    let result: ObjectContents_${definition.name} = Object.create(ObjectContents_${definition.name}.prototype);\n`;
     outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;
     outFileStr += `    return result;\n`;
     outFileStr += `  }\n`;

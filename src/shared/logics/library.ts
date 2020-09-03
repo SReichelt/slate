@@ -8,6 +8,12 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
   logic: string;
   items: Fmt.Expression[];
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Section {
+    let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let logicRaw = argumentList.getValue('logic', 0);
     if (logicRaw instanceof Fmt.StringExpression) {
@@ -37,7 +43,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
-    let result = new ObjectContents_Section;
+    let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -123,6 +129,12 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Library extends ObjectContents_Section {
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Library {
+    let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
   }
@@ -133,7 +145,7 @@ export class ObjectContents_Library extends ObjectContents_Section {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
-    let result = new ObjectContents_Library;
+    let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }

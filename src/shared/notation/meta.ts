@@ -11,6 +11,12 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
   elements?: ObjectContents_TemplateElements;
   context?: ObjectContents_TemplateContext;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Template {
+    let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.notation = argumentList.getOptionalValue('notation', 0);
     this.symbol = argumentList.getOptionalValue('symbol', 1);
@@ -56,7 +62,7 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Template {
-    let result = new ObjectContents_Template;
+    let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -178,6 +184,12 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
   article?: Fmt.Expression;
   isFeature?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateElements {
+    let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.operand = argumentList.getOptionalValue('operand', 0);
     this.property = argumentList.getOptionalValue('property', 1);
@@ -211,7 +223,7 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateElements {
-    let result = new ObjectContents_TemplateElements;
+    let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -310,6 +322,12 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
   definitionNotation?: Fmt.Expression;
   argument?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateContext {
+    let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.operator = argumentList.getOptionalValue('operator', 0);
     this.predicate = argumentList.getOptionalValue('predicate', 1);
@@ -335,7 +353,7 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateContext {
-    let result = new ObjectContents_TemplateContext;
+    let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1088,6 +1106,12 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   originalParameterValue: Fmt.Expression;
   abbreviation: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_NotationAbbreviation {
+    let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let parametersRaw = argumentList.getValue('parameters', 0);
     if (parametersRaw instanceof Fmt.ParameterExpression) {
@@ -1111,7 +1135,7 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_NotationAbbreviation {
-    let result = new ObjectContents_NotationAbbreviation;
+    let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1187,6 +1211,12 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
   pluralName?: Fmt.Expression;
   nameOptional?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionNotation {
+    let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let parameterRaw = argumentList.getValue('parameter', 0);
     if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
@@ -1220,7 +1250,7 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionNotation {
-    let result = new ObjectContents_DefinitionNotation;
+    let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }

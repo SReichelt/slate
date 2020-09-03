@@ -11,6 +11,12 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
   abbreviations?: Fmt.Expression[];
   definitionNotation?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Definition {
+    let result: ObjectContents_Definition = Object.create(ObjectContents_Definition.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let propertiesRaw = argumentList.getOptionalValue('properties', 0);
     if (propertiesRaw !== undefined) {
@@ -56,7 +62,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Definition {
-    let result = new ObjectContents_Definition;
+    let result: ObjectContents_Definition = Object.create(ObjectContents_Definition.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -143,6 +149,12 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
 export class ObjectContents_Construction extends ObjectContents_Definition {
   embedding?: ObjectContents_Embedding;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Construction {
+    let result: ObjectContents_Construction = Object.create(ObjectContents_Construction.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     let embeddingRaw = argumentList.getOptionalValue('embedding', 4);
@@ -165,7 +177,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Construction {
-    let result = new ObjectContents_Construction;
+    let result: ObjectContents_Construction = Object.create(ObjectContents_Construction.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -242,6 +254,12 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
   full?: Fmt.Expression;
   wellDefinednessProof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Embedding {
+    let result: ObjectContents_Embedding = Object.create(ObjectContents_Embedding.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let parameterRaw = argumentList.getValue('parameter', 0);
     if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
@@ -277,7 +295,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Embedding {
-    let result = new ObjectContents_Embedding;
+    let result: ObjectContents_Embedding = Object.create(ObjectContents_Embedding.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -350,6 +368,12 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
   equalityDefinition?: ObjectContents_EqualityDefinition;
   rewrite?: ObjectContents_RewriteDefinition;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Constructor {
+    let result: ObjectContents_Constructor = Object.create(ObjectContents_Constructor.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     let equalityDefinitionRaw = argumentList.getOptionalValue('equalityDefinition', 4);
@@ -384,7 +408,7 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Constructor {
-    let result = new ObjectContents_Constructor;
+    let result: ObjectContents_Constructor = Object.create(ObjectContents_Constructor.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -471,6 +495,12 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   symmetryProof?: ObjectContents_Proof;
   transitivityProof?: ObjectContents_Proof;
   isomorphic?: Fmt.Expression;
+
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_EqualityDefinition {
+    let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let leftParametersRaw = argumentList.getValue('leftParameters', 0);
@@ -573,7 +603,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EqualityDefinition {
-    let result = new ObjectContents_EqualityDefinition;
+    let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -724,6 +754,12 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
   value: Fmt.Expression;
   theorem?: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_RewriteDefinition {
+    let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.value = argumentList.getValue('value', 0);
     this.theorem = argumentList.getOptionalValue('theorem', 1);
@@ -736,6 +772,12 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('theorem', this.theorem, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_RewriteDefinition {
+    let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
@@ -755,7 +797,7 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_RewriteDefinition {
-    let result = new ObjectContents_RewriteDefinition;
+    let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -805,6 +847,12 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
   equalityProofs?: ObjectContents_Proof[];
   setRestriction?: Fmt.Expression;
   setRestrictionProof?: ObjectContents_Proof;
+
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_SetOperator {
+    let result: ObjectContents_SetOperator = Object.create(ObjectContents_SetOperator.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
@@ -868,7 +916,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetOperator {
-    let result = new ObjectContents_SetOperator;
+    let result: ObjectContents_SetOperator = Object.create(ObjectContents_SetOperator.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1001,6 +1049,12 @@ export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Operator extends ObjectContents_Definition {
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Operator {
+    let result: ObjectContents_Operator = Object.create(ObjectContents_Operator.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
   }
@@ -1011,7 +1065,7 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Operator {
-    let result = new ObjectContents_Operator;
+    let result: ObjectContents_Operator = Object.create(ObjectContents_Operator.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1037,6 +1091,12 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
   equalityProofs?: ObjectContents_Proof[];
   setRestriction?: Fmt.Expression;
   setRestrictionProof?: ObjectContents_Proof;
+
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExplicitOperator {
+    let result: ObjectContents_ExplicitOperator = Object.create(ObjectContents_ExplicitOperator.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
@@ -1100,7 +1160,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExplicitOperator {
-    let result = new ObjectContents_ExplicitOperator;
+    let result: ObjectContents_ExplicitOperator = Object.create(ObjectContents_ExplicitOperator.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1238,6 +1298,12 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
   equivalenceProofs?: ObjectContents_Proof[];
   wellDefinednessProof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ImplicitOperator {
+    let result: ObjectContents_ImplicitOperator = Object.create(ObjectContents_ImplicitOperator.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     let parameterRaw = argumentList.getValue('parameter', 4);
@@ -1304,7 +1370,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ImplicitOperator {
-    let result = new ObjectContents_ImplicitOperator;
+    let result: ObjectContents_ImplicitOperator = Object.create(ObjectContents_ImplicitOperator.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1440,6 +1506,12 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
   variables?: Fmt.ParameterList;
   references?: Fmt.ArgumentList;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_MacroOperator {
+    let result: ObjectContents_MacroOperator = Object.create(ObjectContents_MacroOperator.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     let variablesRaw = argumentList.getOptionalValue('variables', 4);
@@ -1474,7 +1546,7 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MacroOperator {
-    let result = new ObjectContents_MacroOperator;
+    let result: ObjectContents_MacroOperator = Object.create(ObjectContents_MacroOperator.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1556,6 +1628,12 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
   definition: Fmt.Expression[];
   equivalenceProofs?: ObjectContents_Proof[];
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Predicate {
+    let result: ObjectContents_Predicate = Object.create(ObjectContents_Predicate.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
     let definitionRaw = argumentList.getValue('definition', 4);
@@ -1602,7 +1680,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Predicate {
-    let result = new ObjectContents_Predicate;
+    let result: ObjectContents_Predicate = Object.create(ObjectContents_Predicate.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1714,6 +1792,12 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
   claim: Fmt.Expression;
   proofs?: ObjectContents_Proof[];
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_StandardTheorem {
+    let result: ObjectContents_StandardTheorem = Object.create(ObjectContents_StandardTheorem.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.claim = argumentList.getValue('claim', 0);
     let proofsRaw = argumentList.getOptionalValue('proofs', 1);
@@ -1749,7 +1833,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StandardTheorem {
-    let result = new ObjectContents_StandardTheorem;
+    let result: ObjectContents_StandardTheorem = Object.create(ObjectContents_StandardTheorem.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -1846,6 +1930,12 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   conditions: Fmt.Expression[];
   equivalenceProofs?: ObjectContents_Proof[];
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_EquivalenceTheorem {
+    let result: ObjectContents_EquivalenceTheorem = Object.create(ObjectContents_EquivalenceTheorem.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let conditionsRaw = argumentList.getValue('conditions', 0);
     if (conditionsRaw instanceof Fmt.ArrayExpression) {
@@ -1891,7 +1981,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EquivalenceTheorem {
-    let result = new ObjectContents_EquivalenceTheorem;
+    let result: ObjectContents_EquivalenceTheorem = Object.create(ObjectContents_EquivalenceTheorem.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -2551,6 +2641,12 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
 export class ObjectContents_PropArg extends Fmt.ObjectContents {
   formula: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_PropArg {
+    let result: ObjectContents_PropArg = Object.create(ObjectContents_PropArg.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.formula = argumentList.getValue('formula', 0);
   }
@@ -2559,6 +2655,12 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     let argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(outputAllNames ? 'formula' : undefined, this.formula, false));
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_PropArg {
+    let result: ObjectContents_PropArg = Object.create(ObjectContents_PropArg.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
@@ -2578,7 +2680,7 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_PropArg {
-    let result = new ObjectContents_PropArg;
+    let result: ObjectContents_PropArg = Object.create(ObjectContents_PropArg.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -2614,6 +2716,12 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
 export class ObjectContents_SetArg extends Fmt.ObjectContents {
   _set: Fmt.Expression;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_SetArg {
+    let result: ObjectContents_SetArg = Object.create(ObjectContents_SetArg.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this._set = argumentList.getValue('set', 0);
   }
@@ -2622,6 +2730,12 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
     let argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(outputAllNames ? 'set' : undefined, this._set, false));
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_SetArg {
+    let result: ObjectContents_SetArg = Object.create(ObjectContents_SetArg.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
@@ -2641,7 +2755,7 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetArg {
-    let result = new ObjectContents_SetArg;
+    let result: ObjectContents_SetArg = Object.create(ObjectContents_SetArg.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -2678,6 +2792,12 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
   _set: Fmt.Expression;
   subsetProof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_SubsetArg {
+    let result: ObjectContents_SubsetArg = Object.create(ObjectContents_SubsetArg.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this._set = argumentList.getValue('set', 0);
     let subsetProofRaw = argumentList.getOptionalValue('subsetProof', 1);
@@ -2700,6 +2820,12 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     return argumentList;
   }
 
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_SubsetArg {
+    let result: ObjectContents_SubsetArg = Object.create(ObjectContents_SubsetArg.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
+  }
+
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
     if (expression instanceof Fmt.CompoundExpression) {
       super.fromExpression(expression, reportFn);
@@ -2717,7 +2843,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SubsetArg {
-    let result = new ObjectContents_SubsetArg;
+    let result: ObjectContents_SubsetArg = Object.create(ObjectContents_SubsetArg.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -2766,6 +2892,12 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
   element: Fmt.Expression;
   elementProof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ElementArg {
+    let result: ObjectContents_ElementArg = Object.create(ObjectContents_ElementArg.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.element = argumentList.getValue('element', 0);
     let elementProofRaw = argumentList.getOptionalValue('elementProof', 1);
@@ -2788,6 +2920,12 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     return argumentList;
   }
 
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ElementArg {
+    let result: ObjectContents_ElementArg = Object.create(ObjectContents_ElementArg.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
+  }
+
   fromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): void {
     if (expression instanceof Fmt.CompoundExpression) {
       super.fromExpression(expression, reportFn);
@@ -2805,7 +2943,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ElementArg {
-    let result = new ObjectContents_ElementArg;
+    let result: ObjectContents_ElementArg = Object.create(ObjectContents_ElementArg.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -2853,6 +2991,12 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
 export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
   proof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstraintArg {
+    let result: ObjectContents_ConstraintArg = Object.create(ObjectContents_ConstraintArg.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getOptionalValue('proof', 0);
     if (proofRaw !== undefined) {
@@ -2874,7 +3018,7 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstraintArg {
-    let result = new ObjectContents_ConstraintArg;
+    let result: ObjectContents_ConstraintArg = Object.create(ObjectContents_ConstraintArg.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -2911,6 +3055,12 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
   sourceParameters: Fmt.ParameterList;
   targetArguments: Fmt.ArgumentList;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_BinderArg {
+    let result: ObjectContents_BinderArg = Object.create(ObjectContents_BinderArg.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let sourceParametersRaw = argumentList.getValue('sourceParameters', 0);
     if (sourceParametersRaw instanceof Fmt.ParameterExpression) {
@@ -2936,7 +3086,7 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_BinderArg {
-    let result = new ObjectContents_BinderArg;
+    let result: ObjectContents_BinderArg = Object.create(ObjectContents_BinderArg.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -4420,6 +4570,12 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
   goal?: Fmt.Expression;
   steps: Fmt.ParameterList;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Proof {
+    let result: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let fromRaw = argumentList.getOptionalValue('from', 0);
     if (fromRaw !== undefined) {
@@ -4477,7 +4633,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Proof {
-    let result = new ObjectContents_Proof;
+    let result: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -5615,6 +5771,12 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
   value: Fmt.Expression;
   exclusivityProof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Case {
+    let result: ObjectContents_Case = Object.create(ObjectContents_Case.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.formula = argumentList.getValue('formula', 0);
     this.value = argumentList.getValue('value', 1);
@@ -5640,7 +5802,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Case {
-    let result = new ObjectContents_Case;
+    let result: ObjectContents_Case = Object.create(ObjectContents_Case.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -5704,6 +5866,12 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
   rewrite?: Fmt.Expression;
   wellDefinednessProof?: ObjectContents_Proof;
 
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_StructuralCase {
+    let result: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this._constructor = argumentList.getValue('constructor', 0);
     let parametersRaw = argumentList.getOptionalValue('parameters', 1);
@@ -5745,7 +5913,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StructuralCase {
-    let result = new ObjectContents_StructuralCase;
+    let result: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
