@@ -4,9 +4,12 @@ import * as Fmt from '../format/format';
 import * as Ctx from '../format/context';
 import * as Meta from '../format/metaModel';
 
+/* eslint-disable no-shadow */
+
 export class ObjectContents_Section extends Fmt.ObjectContents {
-  logic: string;
-  items: Fmt.Expression[];
+  constructor(public logic: string, public items: Fmt.Expression[]) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Section {
     let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
@@ -40,6 +43,12 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     let itemsExpr = new Fmt.ArrayExpression(itemsExprItems);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'items' : undefined, itemsExpr, false));
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Section {
+    let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
@@ -124,7 +133,7 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_Section;
+    return Object.create(ObjectContents_Section.prototype);
   }
 }
 
@@ -142,6 +151,12 @@ export class ObjectContents_Library extends ObjectContents_Section {
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
     let argumentList = super.toArgumentList(outputAllNames, reportFn);
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Library {
+    let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
@@ -195,7 +210,7 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_Library;
+    return Object.create(ObjectContents_Library.prototype);
   }
 }
 
@@ -339,7 +354,7 @@ class ParameterTypeContext extends Ctx.DerivedContext {
 }
 
 class ArgumentTypeContext extends Ctx.DerivedContext {
-  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {
+  constructor(public objectContentsClass: Function, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }

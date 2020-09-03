@@ -952,7 +952,7 @@ class TutorialStates {
       let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'S');
-      this.setSetArgValue(functions.path.arguments, 'X', variableRef);
+      this.setArgValue(functions.path.arguments, 'X', variableRef);
     }
   };
 
@@ -1042,7 +1042,7 @@ class TutorialStates {
       let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'T');
-      this.setSetArgValue(functions.path.arguments, 'Y', variableRef);
+      this.setArgValue(functions.path.arguments, 'Y', variableRef);
     }
   };
 
@@ -1354,7 +1354,7 @@ class TutorialStates {
       let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'S');
-      this.setSetArgValue(functions.path.arguments, 'X', variableRef);
+      this.setArgValue(functions.path.arguments, 'X', variableRef);
     }
   };
 
@@ -1444,7 +1444,7 @@ class TutorialStates {
       let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'S');
-      this.setSetArgValue(functions.path.arguments, 'Y', variableRef);
+      this.setArgValue(functions.path.arguments, 'Y', variableRef);
     }
   };
 
@@ -2082,7 +2082,7 @@ class TutorialStates {
       let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
       let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'f');
-      this.setElementArgValue(composition.path.arguments, 'g', variableRef);
+      this.setArgValue(composition.path.arguments, 'g', variableRef);
     }
   };
 
@@ -2175,13 +2175,13 @@ class TutorialStates {
       let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
       let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
       let variableRef1 = this.createVariableRefExpression(definition, 'g');
-      this.setElementArgValue(composition.path.arguments, 'f', variableRef1);
+      this.setArgValue(composition.path.arguments, 'f', variableRef1);
       let variableRef2 = this.createVariableRefExpression(definition, 'S');
-      this.setSetArgValue(composition.path.arguments, 'X', variableRef2);
+      this.setArgValue(composition.path.arguments, 'X', variableRef2);
       let variableRef3 = this.createVariableRefExpression(definition, 'S');
-      this.setSetArgValue(composition.path.arguments, 'Y', variableRef3);
+      this.setArgValue(composition.path.arguments, 'Y', variableRef3);
       let variableRef4 = this.createVariableRefExpression(definition, 'T');
-      this.setSetArgValue(composition.path.arguments, 'Z', variableRef4);
+      this.setArgValue(composition.path.arguments, 'Z', variableRef4);
     }
   };
 
@@ -2370,10 +2370,10 @@ class TutorialStates {
         this.createElementArg('n')
       ]]);
       let variableRef1 = this.createVariableRefExpression(definition, 'g');
-      this.setElementArgValue(power.path.arguments, 'f', variableRef1);
+      this.setArgValue(power.path.arguments, 'f', variableRef1);
       let variableRef2 = this.createVariableRefExpression(definition, 'S');
-      this.setSetArgValue(power.path.arguments, 'X', variableRef2);
-      this.setElementArgValue(composition.path.arguments, 'f', power);
+      this.setArgValue(power.path.arguments, 'X', variableRef2);
+      this.setArgValue(composition.path.arguments, 'f', power);
     }
   };
 
@@ -2473,7 +2473,7 @@ class TutorialStates {
       let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
       let power = this.getElementArgValue(composition.path.arguments, 'f') as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'n');
-      this.setElementArgValue(power.path.arguments, 'n', variableRef);
+      this.setArgValue(power.path.arguments, 'n', variableRef);
     }
   };
 
@@ -3802,7 +3802,7 @@ class TutorialStates {
       let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
-      this.setSetArgValue(functions.path.arguments, 'X', naturalNumbers);
+      this.setArgValue(functions.path.arguments, 'X', naturalNumbers);
     }
   };
 
@@ -3886,7 +3886,7 @@ class TutorialStates {
       let type = param.type as FmtHLM.MetaRefExpression_Element;
       let functions = type._set as Fmt.DefinitionRefExpression;
       let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
-      this.setSetArgValue(functions.path.arguments, 'Y', naturalNumbers);
+      this.setArgValue(functions.path.arguments, 'Y', naturalNumbers);
     }
   };
 
@@ -4328,7 +4328,7 @@ class TutorialStates {
       let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
       let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'f');
-      this.setSetArgValue(operator.path.arguments, 'f', variableRef);
+      this.setArgValue(operator.path.arguments, 'f', variableRef);
     }
   };
 
@@ -4509,8 +4509,8 @@ class TutorialStates {
         this.createSetArg('X')
       ]]);
       let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
-      this.setSetArgValue(identity.path.arguments, 'X', naturalNumbers);
-      this.setSetArgValue(operator.path.arguments, 'g', identity);
+      this.setArgValue(identity.path.arguments, 'X', naturalNumbers);
+      this.setArgValue(operator.path.arguments, 'g', identity);
     }
   };
 
@@ -4601,7 +4601,7 @@ class TutorialStates {
       let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
       let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
       let variableRef = this.createVariableRefExpression(definition, 'n');
-      this.setSetArgValue(operator.path.arguments, 'n', variableRef);
+      this.setArgValue(operator.path.arguments, 'n', variableRef);
     }
   };
 
@@ -4677,9 +4677,9 @@ class TutorialStates {
       equality.terms[1] = this.createVariableRefExpression(definition, 'f');
       let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
       let naturalNumbers1 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
-      this.setSetArgValue(operator.path.arguments, 'S', naturalNumbers1);
+      this.setArgValue(operator.path.arguments, 'S', naturalNumbers1);
       let naturalNumbers2 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
-      this.setSetArgValue(operator.path.arguments, 'T', naturalNumbers2);
+      this.setArgValue(operator.path.arguments, 'T', naturalNumbers2);
     }
   };
 
@@ -5235,73 +5235,38 @@ class TutorialStates {
     return new Fmt.DefinitionRefExpression(parentPath as Fmt.Path);
   }
 
-  private createArg(name: string, value: Fmt.ObjectContents): Fmt.Argument {
-    let valueExpression = value.toExpression(false);
-    return new Fmt.Argument(name, valueExpression);
+  private createPlaceholderArg(name: string, expressionType: HLMExpressionType): Fmt.Argument {
+    return new Fmt.Argument(name, new Fmt.PlaceholderExpression(expressionType));
   }
 
   private createSetArg(name: string): Fmt.Argument {
-    let contents = new FmtHLM.ObjectContents_SetArg;
-    contents._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    return this.createArg(name, contents);
-  }
-
-  private createSubsetArg(name: string): Fmt.Argument {
-    let contents = new FmtHLM.ObjectContents_SubsetArg;
-    contents._set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    return this.createArg(name, contents);
+    return this.createPlaceholderArg(name, HLMExpressionType.SetTerm);
   }
 
   private createElementArg(name: string): Fmt.Argument {
-    let contents = new FmtHLM.ObjectContents_ElementArg;
-    contents.element = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    return this.createArg(name, contents);
-  }
-
-  private getArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
-    let valueExpression = argumentList.getValue(name);
-    value.fromExpression(valueExpression);
+    return this.createPlaceholderArg(name, HLMExpressionType.ElementTerm);
   }
 
   private getSetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
-    let contents = new FmtHLM.ObjectContents_SetArg;
-    this.getArgValue(argumentList, name, contents);
+    let valueExpression = argumentList.getValue(name);
+    let contents = FmtHLM.ObjectContents_SetArg.createFromExpression(valueExpression);
     return contents._set;
   }
 
   private getSubsetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
-    let contents = new FmtHLM.ObjectContents_SubsetArg;
-    this.getArgValue(argumentList, name, contents);
+    let valueExpression = argumentList.getValue(name);
+    let contents = FmtHLM.ObjectContents_SubsetArg.createFromExpression(valueExpression);
     return contents._set;
   }
 
   private getElementArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
-    let contents = new FmtHLM.ObjectContents_ElementArg;
-    this.getArgValue(argumentList, name, contents);
+    let valueExpression = argumentList.getValue(name);
+    let contents = FmtHLM.ObjectContents_ElementArg.createFromExpression(valueExpression);
     return contents.element;
   }
 
-  private setArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.ObjectContents): void {
-    let valueExpression = value.toExpression(false);
-    argumentList.setValue(name, undefined, valueExpression);
-  }
-
-  private setSetArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
-    let contents = new FmtHLM.ObjectContents_SetArg;
-    contents._set = value;
-    this.setArgValue(argumentList, name, contents);
-  }
-
-  private setSubsetArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
-    let contents = new FmtHLM.ObjectContents_SubsetArg;
-    contents._set = value;
-    this.setArgValue(argumentList, name, contents);
-  }
-
-  private setElementArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
-    let contents = new FmtHLM.ObjectContents_ElementArg;
-    contents.element = value;
-    this.setArgValue(argumentList, name, contents);
+  private setArgValue(argumentList: Fmt.ArgumentList, name: string, value: Fmt.Expression): void {
+    argumentList.setValue(name, undefined, value);
   }
 }
 

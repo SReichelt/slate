@@ -10,21 +10,13 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
     definitionType: Logic.LogicDefinitionType.Operator,
     name: 'Operator',
     createTypeExpression: () => new FmtHLM.MetaRefExpression_ExplicitOperator,
-    createObjectContents: () => {
-      let result = new FmtHLM.ObjectContents_ExplicitOperator;
-      result.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)];
-      return result;
-    }
+    createObjectContents: () => new FmtHLM.ObjectContents_ExplicitOperator(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)])
   },
   {
     definitionType: Logic.LogicDefinitionType.SetOperator,
     name: 'Set Operator',
     createTypeExpression: () => new FmtHLM.MetaRefExpression_SetOperator,
-    createObjectContents: () => {
-      let result = new FmtHLM.ObjectContents_SetOperator;
-      result.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm)];
-      return result;
-    }
+    createObjectContents: () => new FmtHLM.ObjectContents_SetOperator(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm)])
   },
   {
     definitionType: Logic.LogicDefinitionType.Construction,
@@ -36,21 +28,13 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
     definitionType: Logic.LogicDefinitionType.Predicate,
     name: 'Predicate',
     createTypeExpression: () => new FmtHLM.MetaRefExpression_Predicate,
-    createObjectContents: () => {
-      let result = new FmtHLM.ObjectContents_Predicate;
-      result.definition = [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)];
-      return result;
-    }
+    createObjectContents: () => new FmtHLM.ObjectContents_Predicate(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)])
   },
   {
     definitionType: Logic.LogicDefinitionType.Theorem,
     name: 'Theorem',
     createTypeExpression: () => new FmtHLM.MetaRefExpression_StandardTheorem,
-    createObjectContents: () => {
-      let result = new FmtHLM.ObjectContents_StandardTheorem;
-      result.claim = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
-      return result;
-    }
+    createObjectContents: () => new FmtHLM.ObjectContents_StandardTheorem(new Fmt.PlaceholderExpression(HLMExpressionType.Formula))
   }
 ];
 

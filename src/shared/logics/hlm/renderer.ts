@@ -1847,8 +1847,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let innerDefinitionContents = definition.contents;
       if (innerDefinitionContents instanceof FmtHLM.ObjectContents_Definition && innerDefinitionContents.abbreviations) {
         for (let abbreviationExpression of innerDefinitionContents.abbreviations) {
-          let abbreviation = new FmtNotation.ObjectContents_NotationAbbreviation;
-          abbreviation.fromExpression(abbreviationExpression);
+          let abbreviation = FmtNotation.ObjectContents_NotationAbbreviation.createFromExpression(abbreviationExpression);
           let [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(abbreviation.originalParameter);
           if (variableRefExpression && !indexContext) {
             let abbreviationArgs: RenderedTemplateArguments = {...args};
@@ -2763,13 +2762,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (type.construction instanceof Fmt.DefinitionRefExpression) {
           let path = type.construction.path;
           let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
-            let subProof = new FmtHLM.ObjectContents_Proof;
-            subProof.fromExpression(structuralCase.value as Fmt.Expression);
+            let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
             if (structuralCase.parameters) {
               if (subProof.parameters) {
-                let originalParameters = subProof.parameters.slice();
-                subProof.parameters = new Fmt.ParameterList;
-                subProof.parameters!.push(...structuralCase.parameters, ...originalParameters);
+                subProof.parameters = new Fmt.ParameterList(...structuralCase.parameters, ...subProof.parameters);
               } else {
                 subProof.parameters = structuralCase.parameters;
               }
@@ -3333,8 +3329,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let index = 0;
         for (let item of arg.value.arguments) {
           if (item.name === 'proof' || (item.name && item.name.endsWith('Proof'))) {
-            let proof = new FmtHLM.ObjectContents_Proof;
-            proof.fromExpression(item.value);
+            let proof = FmtHLM.ObjectContents_Proof.createFromExpression(item.value);
             this.addProofParts(proof, result);
           } else if (item.name === 'arguments') {
             let value = item.value as Fmt.CompoundExpression;
@@ -3412,8 +3407,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addGenericExpressionParts(type.construction, result);
       for (let structuralCase of type.cases) {
         this.addGenericExpressionParts(structuralCase._constructor, result);
-        let proof = new FmtHLM.ObjectContents_Proof;
-        proof.fromExpression(structuralCase.value);
+        let proof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
         this.addProofParts(proof, result);
       }
     }

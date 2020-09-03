@@ -4,12 +4,12 @@ import * as Fmt from '../format/format';
 import * as Ctx from '../format/context';
 import * as Meta from '../format/metaModel';
 
+/* eslint-disable no-shadow */
+
 export class ObjectContents_Template extends Fmt.ObjectContents {
-  notation?: Fmt.Expression;
-  symbol?: Fmt.Expression;
-  useSymbol?: Fmt.Expression;
-  elements?: ObjectContents_TemplateElements;
-  context?: ObjectContents_TemplateContext;
+  constructor(public notation?: Fmt.Expression, public symbol?: Fmt.Expression, public useSymbol?: Fmt.Expression, public elements?: ObjectContents_TemplateElements, public context?: ObjectContents_TemplateContext) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Template {
     let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
@@ -23,15 +23,13 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     this.useSymbol = argumentList.getOptionalValue('useSymbol', 2);
     let elementsRaw = argumentList.getOptionalValue('elements', 3);
     if (elementsRaw !== undefined) {
-      let newItem = new ObjectContents_TemplateElements;
-      newItem.fromExpression(elementsRaw, reportFn);
+      let newItem = ObjectContents_TemplateElements.createFromExpression(elementsRaw, reportFn);
       this.elements = newItem;
       reportFn?.(elementsRaw, newItem);
     }
     let contextRaw = argumentList.getOptionalValue('context', 4);
     if (contextRaw !== undefined) {
-      let newItem = new ObjectContents_TemplateContext;
-      newItem.fromExpression(contextRaw, reportFn);
+      let newItem = ObjectContents_TemplateContext.createFromExpression(contextRaw, reportFn);
       this.context = newItem;
       reportFn?.(contextRaw, newItem);
     }
@@ -59,6 +57,12 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
       reportFn?.(contextExpr, this.context);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Template {
+    let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Template {
@@ -106,13 +110,13 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
       }
     }
     if (this.elements) {
-      result.elements = new ObjectContents_TemplateElements;
+      result.elements = Object.create(ObjectContents_TemplateElements.prototype) as ObjectContents_TemplateElements;
       if (this.elements.substituteExpression(fn, result.elements, replacedParameters)) {
         changed = true;
       }
     }
     if (this.context) {
-      result.context = new ObjectContents_TemplateContext;
+      result.context = Object.create(ObjectContents_TemplateContext.prototype) as ObjectContents_TemplateContext;
       if (this.context.substituteExpression(fn, result.context, replacedParameters)) {
         changed = true;
       }
@@ -172,17 +176,14 @@ export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_Template;
+    return Object.create(ObjectContents_Template.prototype);
   }
 }
 
 export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
-  operand?: Fmt.Expression;
-  property?: Fmt.Expression;
-  singular?: Fmt.Expression;
-  plural?: Fmt.Expression;
-  article?: Fmt.Expression;
-  isFeature?: Fmt.Expression;
+  constructor(public operand?: Fmt.Expression, public property?: Fmt.Expression, public singular?: Fmt.Expression, public plural?: Fmt.Expression, public article?: Fmt.Expression, public isFeature?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateElements {
     let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
@@ -220,6 +221,12 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('isFeature', this.isFeature, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateElements {
+    let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateElements {
@@ -317,10 +324,9 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
-  operator?: Fmt.Expression;
-  predicate?: Fmt.Expression;
-  definitionNotation?: Fmt.Expression;
-  argument?: Fmt.Expression;
+  constructor(public operator?: Fmt.Expression, public predicate?: Fmt.Expression, public definitionNotation?: Fmt.Expression, public argument?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateContext {
     let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
@@ -350,6 +356,12 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('argument', this.argument, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateContext {
+    let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateContext {
@@ -1101,10 +1113,9 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
-  parameters: Fmt.ParameterList;
-  originalParameter: Fmt.Expression;
-  originalParameterValue: Fmt.Expression;
-  abbreviation: Fmt.Expression;
+  constructor(public parameters: Fmt.ParameterList, public originalParameter: Fmt.Expression, public originalParameterValue: Fmt.Expression, public abbreviation: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_NotationAbbreviation {
     let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
@@ -1132,6 +1143,12 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
     argumentList.push(new Fmt.Argument(outputAllNames ? 'originalParameterValue' : undefined, this.originalParameterValue, false));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'abbreviation' : undefined, this.abbreviation, false));
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_NotationAbbreviation {
+    let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_NotationAbbreviation {
@@ -1205,11 +1222,9 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
-  parameter: Fmt.Parameter;
-  notation?: Fmt.Expression;
-  singularName?: Fmt.Expression;
-  pluralName?: Fmt.Expression;
-  nameOptional?: Fmt.Expression;
+  constructor(public parameter: Fmt.Parameter, public notation?: Fmt.Expression, public singularName?: Fmt.Expression, public pluralName?: Fmt.Expression, public nameOptional?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionNotation {
     let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
@@ -1247,6 +1262,12 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('nameOptional', this.nameOptional, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionNotation {
+    let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionNotation {
@@ -1344,7 +1365,7 @@ class ParameterTypeContext extends Ctx.DerivedContext {
 }
 
 class ArgumentTypeContext extends Ctx.DerivedContext {
-  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {
+  constructor(public objectContentsClass: Function, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }

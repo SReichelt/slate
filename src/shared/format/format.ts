@@ -10,7 +10,9 @@ export type ExpressionUnificationFn = (left: Expression, right: Expression, repl
 export type ReportConversionFn = (raw: Expression, converted: ObjectContents) => void;
 
 export class File {
-  constructor(public metaModelPath: Path, public definitions: DefinitionList = new DefinitionList) {}
+  definitions: DefinitionList = new DefinitionList;
+
+  constructor(public metaModelPath: Path) {}
 
   clone(): File {
     let result = new File(this.metaModelPath);

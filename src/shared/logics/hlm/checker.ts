@@ -789,10 +789,17 @@ export class HLMDefinitionChecker {
   private checkArgumentValue(object: Object, param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, argumentList: Fmt.ArgumentList, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let missingArgument = false;
     let type = param.type;
-    if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+    if (type instanceof FmtHLM.MetaRefExpression_Set) {
+      if (rawArg) {
+        let setArg = FmtHLM.ObjectContents_SetArg.createFromExpression(rawArg);
+        this.checkSetTerm(setArg._set, this.getAutoArgumentContext(type.auto, context));
+      } else {
+        missingArgument = true;
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
       if (rawArg) {
         let superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
-        let subsetArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SubsetArg);
+        let subsetArg = FmtHLM.ObjectContents_SubsetArg.createFromExpression(rawArg);
         this.checkSetTerm(subsetArg._set, this.getAutoArgumentContext(type.auto, context));
         let checkSubset = this.checkSubset(subsetArg._set, superset, context).then((isTrivialSubset: boolean) => {
           if (!isTrivialSubset || subsetArg.subsetProof) {
@@ -807,7 +814,7 @@ export class HLMDefinitionChecker {
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
       if (rawArg) {
         let set = this.utils.applySubstitutionContext(type._set, substitutionContext);
-        let elementArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ElementArg);
+        let elementArg = FmtHLM.ObjectContents_ElementArg.createFromExpression(rawArg);
         this.checkElementTerm(elementArg.element, this.getAutoArgumentContext(type.auto, context));
         let checkElement = this.checkElement(elementArg.element, set, context).then((isTrivialElement: boolean) => {
           if (!isTrivialElement || elementArg.elementProof) {
@@ -821,25 +828,18 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Prop) {
       if (rawArg) {
-        let propArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_PropArg);
+        let propArg = FmtHLM.ObjectContents_PropArg.createFromExpression(rawArg);
         this.checkFormula(propArg.formula, this.getAutoArgumentContext(type.auto, context));
-      } else {
-        missingArgument = true;
-      }
-    } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
-      if (rawArg) {
-        let setArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_SetArg);
-        this.checkSetTerm(setArg._set, this.getAutoArgumentContext(type.auto, context));
       } else {
         missingArgument = true;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
       let constraint = this.utils.applySubstitutionContext(type.formula, substitutionContext);
-      let constraintArg = rawArg ? this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_ConstraintArg) : undefined;
+      let constraintArg = rawArg ? FmtHLM.ObjectContents_ConstraintArg.createFromExpression(rawArg) : undefined;
       this.checkProof(object, constraintArg?.proof, undefined, constraint, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       if (rawArg) {
-        let binderArg = this.utils.convertArgument(rawArg, FmtHLM.ObjectContents_BinderArg);
+        let binderArg = FmtHLM.ObjectContents_BinderArg.createFromExpression(rawArg);
         let expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
         if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
           this.error(binderArg.sourceParameters, 'Parameter list must match binder');
@@ -1249,19 +1249,15 @@ export class HLMDefinitionChecker {
           let newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
           let newParameterLists: Fmt.ParameterList[] = [];
           let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
-            let newCase = new FmtHLM.ObjectContents_StructuralCase;
             let constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
             let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
-            newCase._constructor = constructorExpression;
+            let clonedParameters: Fmt.ParameterList | undefined = undefined;
             if (substitutedParameters.length) {
-              let clonedParameters = substitutedParameters.clone();
-              newCase.parameters = clonedParameters;
+              clonedParameters = substitutedParameters.clone();
               newParameterLists.push(clonedParameters);
             }
-            if ((constructorDefinition.contents as FmtHLM.ObjectContents_Constructor).rewrite) {
-              newCase.rewrite = new FmtHLM.MetaRefExpression_true;
-            }
-            newCases.push(newCase);
+            let rewrite = constructorContents.rewrite ? new FmtHLM.MetaRefExpression_true : undefined;
+            newCases.push(new FmtHLM.ObjectContents_StructuralCase(constructorExpression, clonedParameters, new Fmt.PlaceholderExpression(undefined), rewrite));
           };
           return this.forAllConstructors(filledConstruction, addCase)
             .then(() => {
@@ -1777,12 +1773,10 @@ export class HLMDefinitionChecker {
         let proveByInduction = type;
         let goal = context.goal;
         let checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
-          let subProof = new FmtHLM.ObjectContents_Proof;
-          subProof.fromExpression(structuralCase.value);
+          let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
           let parameters: Fmt.ParameterList | undefined = undefined;
           if (subProof.parameters) {
-            parameters = new Fmt.ParameterList;
-            parameters!.push(constraintParam);
+            parameters = new Fmt.ParameterList(constraintParam);
           }
           let caseGoal = this.utils.getInductionProofGoal(goal, proveByInduction.term, structuralCaseTerm);
           this.checkProof(structuralCase.value, subProof, parameters, caseGoal, caseContext);
@@ -1792,10 +1786,8 @@ export class HLMDefinitionChecker {
         };
         let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
           for (let newCase of newCases) {
-            let subProof = new FmtHLM.ObjectContents_Proof;
-            subProof.steps = new Fmt.ParameterList;
-            let subProofExpression = subProof.toExpression(true);
-            newCase.value = subProofExpression;
+            let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, undefined, undefined, new Fmt.ParameterList);
+            newCase.value = subProof.toExpression(true);
           }
           let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction(proveByInduction.term, proveByInduction.construction, newCases);
           return {

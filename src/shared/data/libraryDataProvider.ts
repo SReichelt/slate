@@ -506,10 +506,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private createLocalSection(metaModelPath: Fmt.Path): LibraryDefinition {
     let file = new Fmt.File(metaModelPath);
     let definition = new Fmt.Definition(this.childName, new FmtLibrary.MetaRefExpression_Section, new Fmt.ParameterList);
-    let contents = new FmtLibrary.ObjectContents_Section;
-    contents.logic = this.logic.name;
-    contents.items = [];
-    definition.contents = contents;
+    definition.contents = new FmtLibrary.ObjectContents_Section(this.logic.name, []);
     file.definitions.push(definition);
     let name = this.getLocalSectionFileName();
     return this.createLocalDefinition(name, true, file, definition, FmtLibrary.getMetaModel);

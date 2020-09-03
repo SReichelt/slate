@@ -3,13 +3,14 @@
 import * as Fmt from '../../format/format';
 import * as Ctx from '../../format/context';
 import * as Meta from '../../format/metaModel';
+
+/* eslint-disable no-shadow */
 import * as FmtNotation from '../../notation/meta';
 
 export class ObjectContents_Definition extends Fmt.ObjectContents {
-  properties?: Fmt.ArgumentList;
-  notation?: Fmt.Expression;
-  abbreviations?: Fmt.Expression[];
-  definitionNotation?: Fmt.Expression;
+  constructor(public properties?: Fmt.ArgumentList, public notation?: Fmt.Expression, public abbreviations?: Fmt.Expression[], public definitionNotation?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Definition {
     let result: ObjectContents_Definition = Object.create(ObjectContents_Definition.prototype);
@@ -59,6 +60,12 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('definitionNotation', this.definitionNotation, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Definition {
+    let result: ObjectContents_Definition = Object.create(ObjectContents_Definition.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Definition {
@@ -147,7 +154,9 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_Construction extends ObjectContents_Definition {
-  embedding?: ObjectContents_Embedding;
+  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public embedding?: ObjectContents_Embedding) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Construction {
     let result: ObjectContents_Construction = Object.create(ObjectContents_Construction.prototype);
@@ -159,8 +168,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     super.fromArgumentList(argumentList, reportFn);
     let embeddingRaw = argumentList.getOptionalValue('embedding', 4);
     if (embeddingRaw !== undefined) {
-      let newItem = new ObjectContents_Embedding;
-      newItem.fromExpression(embeddingRaw, reportFn);
+      let newItem = ObjectContents_Embedding.createFromExpression(embeddingRaw, reportFn);
       this.embedding = newItem;
       reportFn?.(embeddingRaw, newItem);
     }
@@ -174,6 +182,12 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
       reportFn?.(embeddingExpr, this.embedding);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Construction {
+    let result: ObjectContents_Construction = Object.create(ObjectContents_Construction.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Construction {
@@ -191,7 +205,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Construction, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.embedding) {
-      result.embedding = new ObjectContents_Embedding;
+      result.embedding = Object.create(ObjectContents_Embedding.prototype) as ObjectContents_Embedding;
       if (this.embedding.substituteExpression(fn, result.embedding, replacedParameters)) {
         changed = true;
       }
@@ -244,15 +258,14 @@ export class MetaRefExpression_Construction extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_Construction;
+    return Object.create(ObjectContents_Construction.prototype);
   }
 }
 
 export class ObjectContents_Embedding extends Fmt.ObjectContents {
-  parameter: Fmt.Parameter;
-  target: Fmt.Expression;
-  full?: Fmt.Expression;
-  wellDefinednessProof?: ObjectContents_Proof;
+  constructor(public parameter: Fmt.Parameter, public target: Fmt.Expression, public full?: Fmt.Expression, public wellDefinednessProof?: ObjectContents_Proof) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Embedding {
     let result: ObjectContents_Embedding = Object.create(ObjectContents_Embedding.prototype);
@@ -271,8 +284,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     this.full = argumentList.getOptionalValue('full', 2);
     let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 3);
     if (wellDefinednessProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(wellDefinednessProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(wellDefinednessProofRaw, reportFn);
       this.wellDefinednessProof = newItem;
       reportFn?.(wellDefinednessProofRaw, newItem);
     }
@@ -292,6 +304,12 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Embedding {
+    let result: ObjectContents_Embedding = Object.create(ObjectContents_Embedding.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Embedding {
@@ -336,7 +354,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
       }
     }
     if (this.wellDefinednessProof) {
-      result.wellDefinednessProof = new ObjectContents_Proof;
+      result.wellDefinednessProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
@@ -365,8 +383,9 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_Constructor extends ObjectContents_Definition {
-  equalityDefinition?: ObjectContents_EqualityDefinition;
-  rewrite?: ObjectContents_RewriteDefinition;
+  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public equalityDefinition?: ObjectContents_EqualityDefinition, public rewrite?: ObjectContents_RewriteDefinition) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Constructor {
     let result: ObjectContents_Constructor = Object.create(ObjectContents_Constructor.prototype);
@@ -378,15 +397,13 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     super.fromArgumentList(argumentList, reportFn);
     let equalityDefinitionRaw = argumentList.getOptionalValue('equalityDefinition', 4);
     if (equalityDefinitionRaw !== undefined) {
-      let newItem = new ObjectContents_EqualityDefinition;
-      newItem.fromExpression(equalityDefinitionRaw, reportFn);
+      let newItem = ObjectContents_EqualityDefinition.createFromExpression(equalityDefinitionRaw, reportFn);
       this.equalityDefinition = newItem;
       reportFn?.(equalityDefinitionRaw, newItem);
     }
     let rewriteRaw = argumentList.getOptionalValue('rewrite', 5);
     if (rewriteRaw !== undefined) {
-      let newItem = new ObjectContents_RewriteDefinition;
-      newItem.fromExpression(rewriteRaw, reportFn);
+      let newItem = ObjectContents_RewriteDefinition.createFromExpression(rewriteRaw, reportFn);
       this.rewrite = newItem;
       reportFn?.(rewriteRaw, newItem);
     }
@@ -407,6 +424,12 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     return argumentList;
   }
 
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Constructor {
+    let result: ObjectContents_Constructor = Object.create(ObjectContents_Constructor.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
+  }
+
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Constructor {
     let result: ObjectContents_Constructor = Object.create(ObjectContents_Constructor.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
@@ -425,13 +448,13 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Constructor, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.equalityDefinition) {
-      result.equalityDefinition = new ObjectContents_EqualityDefinition;
+      result.equalityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype) as ObjectContents_EqualityDefinition;
       if (this.equalityDefinition.substituteExpression(fn, result.equalityDefinition, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rewrite) {
-      result.rewrite = new ObjectContents_RewriteDefinition;
+      result.rewrite = Object.create(ObjectContents_RewriteDefinition.prototype) as ObjectContents_RewriteDefinition;
       if (this.rewrite.substituteExpression(fn, result.rewrite, replacedParameters)) {
         changed = true;
       }
@@ -482,19 +505,14 @@ export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_Constructor;
+    return Object.create(ObjectContents_Constructor.prototype);
   }
 }
 
 export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
-  leftParameters: Fmt.ParameterList;
-  rightParameters: Fmt.ParameterList;
-  definition: Fmt.Expression[];
-  equivalenceProofs?: ObjectContents_Proof[];
-  reflexivityProof?: ObjectContents_Proof;
-  symmetryProof?: ObjectContents_Proof;
-  transitivityProof?: ObjectContents_Proof;
-  isomorphic?: Fmt.Expression;
+  constructor(public leftParameters: Fmt.ParameterList, public rightParameters: Fmt.ParameterList, public definition: Fmt.Expression[], public equivalenceProofs?: ObjectContents_Proof[], public reflexivityProof?: ObjectContents_Proof, public symmetryProof?: ObjectContents_Proof, public transitivityProof?: ObjectContents_Proof, public isomorphic?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_EqualityDefinition {
     let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
@@ -526,8 +544,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.equivalenceProofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -537,22 +554,19 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     }
     let reflexivityProofRaw = argumentList.getOptionalValue('reflexivityProof', 4);
     if (reflexivityProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(reflexivityProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(reflexivityProofRaw, reportFn);
       this.reflexivityProof = newItem;
       reportFn?.(reflexivityProofRaw, newItem);
     }
     let symmetryProofRaw = argumentList.getOptionalValue('symmetryProof', 5);
     if (symmetryProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(symmetryProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(symmetryProofRaw, reportFn);
       this.symmetryProof = newItem;
       reportFn?.(symmetryProofRaw, newItem);
     }
     let transitivityProofRaw = argumentList.getOptionalValue('transitivityProof', 6);
     if (transitivityProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(transitivityProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(transitivityProofRaw, reportFn);
       this.transitivityProof = newItem;
       reportFn?.(transitivityProofRaw, newItem);
     }
@@ -600,6 +614,12 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('isomorphic', this.isomorphic, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_EqualityDefinition {
+    let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EqualityDefinition {
@@ -666,7 +686,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     if (this.equivalenceProofs) {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -674,19 +694,19 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
       }
     }
     if (this.reflexivityProof) {
-      result.reflexivityProof = new ObjectContents_Proof;
+      result.reflexivityProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.reflexivityProof.substituteExpression(fn, result.reflexivityProof, replacedParameters)) {
         changed = true;
       }
     }
     if (this.symmetryProof) {
-      result.symmetryProof = new ObjectContents_Proof;
+      result.symmetryProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.symmetryProof.substituteExpression(fn, result.symmetryProof, replacedParameters)) {
         changed = true;
       }
     }
     if (this.transitivityProof) {
-      result.transitivityProof = new ObjectContents_Proof;
+      result.transitivityProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.transitivityProof.substituteExpression(fn, result.transitivityProof, replacedParameters)) {
         changed = true;
       }
@@ -751,8 +771,9 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
-  value: Fmt.Expression;
-  theorem?: Fmt.Expression;
+  constructor(public value: Fmt.Expression, public theorem?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_RewriteDefinition {
     let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
@@ -843,10 +864,9 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_SetOperator extends ObjectContents_Definition {
-  definition: Fmt.Expression[];
-  equalityProofs?: ObjectContents_Proof[];
-  setRestriction?: Fmt.Expression;
-  setRestrictionProof?: ObjectContents_Proof;
+  constructor(properties: Fmt.ArgumentList | undefined, notation: Fmt.Expression | undefined, abbreviations: Fmt.Expression[] | undefined, definitionNotation: Fmt.Expression | undefined, public definition: Fmt.Expression[], public equalityProofs?: ObjectContents_Proof[], public setRestriction?: Fmt.Expression, public setRestrictionProof?: ObjectContents_Proof) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_SetOperator {
     let result: ObjectContents_SetOperator = Object.create(ObjectContents_SetOperator.prototype);
@@ -867,8 +887,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
         this.equalityProofs = [];
         for (let item of equalityProofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.equalityProofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -879,8 +898,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     this.setRestriction = argumentList.getOptionalValue('setRestriction', 6);
     let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 7);
     if (setRestrictionProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(setRestrictionProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(setRestrictionProofRaw, reportFn);
       this.setRestrictionProof = newItem;
       reportFn?.(setRestrictionProofRaw, newItem);
     }
@@ -913,6 +931,12 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       reportFn?.(setRestrictionProofExpr, this.setRestrictionProof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_SetOperator {
+    let result: ObjectContents_SetOperator = Object.create(ObjectContents_SetOperator.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetOperator {
@@ -955,7 +979,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     if (this.equalityProofs) {
       result.equalityProofs = [];
       for (let item of this.equalityProofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -969,7 +993,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       }
     }
     if (this.setRestrictionProof) {
-      result.setRestrictionProof = new ObjectContents_Proof;
+      result.setRestrictionProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof, replacedParameters)) {
         changed = true;
       }
@@ -1044,7 +1068,7 @@ export class MetaRefExpression_SetOperator extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_SetOperator;
+    return Object.create(ObjectContents_SetOperator.prototype);
   }
 }
 
@@ -1062,6 +1086,12 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
     let argumentList = super.toArgumentList(outputAllNames, reportFn);
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Operator {
+    let result: ObjectContents_Operator = Object.create(ObjectContents_Operator.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Operator {
@@ -1087,10 +1117,9 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
 }
 
 export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
-  definition: Fmt.Expression[];
-  equalityProofs?: ObjectContents_Proof[];
-  setRestriction?: Fmt.Expression;
-  setRestrictionProof?: ObjectContents_Proof;
+  constructor(properties: Fmt.ArgumentList | undefined, notation: Fmt.Expression | undefined, abbreviations: Fmt.Expression[] | undefined, definitionNotation: Fmt.Expression | undefined, public definition: Fmt.Expression[], public equalityProofs?: ObjectContents_Proof[], public setRestriction?: Fmt.Expression, public setRestrictionProof?: ObjectContents_Proof) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExplicitOperator {
     let result: ObjectContents_ExplicitOperator = Object.create(ObjectContents_ExplicitOperator.prototype);
@@ -1111,8 +1140,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       if (equalityProofsRaw instanceof Fmt.ArrayExpression) {
         this.equalityProofs = [];
         for (let item of equalityProofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.equalityProofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -1123,8 +1151,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     this.setRestriction = argumentList.getOptionalValue('setRestriction', 6);
     let setRestrictionProofRaw = argumentList.getOptionalValue('setRestrictionProof', 7);
     if (setRestrictionProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(setRestrictionProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(setRestrictionProofRaw, reportFn);
       this.setRestrictionProof = newItem;
       reportFn?.(setRestrictionProofRaw, newItem);
     }
@@ -1157,6 +1184,12 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       reportFn?.(setRestrictionProofExpr, this.setRestrictionProof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExplicitOperator {
+    let result: ObjectContents_ExplicitOperator = Object.create(ObjectContents_ExplicitOperator.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExplicitOperator {
@@ -1199,7 +1232,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     if (this.equalityProofs) {
       result.equalityProofs = [];
       for (let item of this.equalityProofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -1213,7 +1246,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       }
     }
     if (this.setRestrictionProof) {
-      result.setRestrictionProof = new ObjectContents_Proof;
+      result.setRestrictionProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof, replacedParameters)) {
         changed = true;
       }
@@ -1288,15 +1321,14 @@ export class MetaRefExpression_ExplicitOperator extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_ExplicitOperator;
+    return Object.create(ObjectContents_ExplicitOperator.prototype);
   }
 }
 
 export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
-  parameter: Fmt.Parameter;
-  definition: Fmt.Expression[];
-  equivalenceProofs?: ObjectContents_Proof[];
-  wellDefinednessProof?: ObjectContents_Proof;
+  constructor(properties: Fmt.ArgumentList | undefined, notation: Fmt.Expression | undefined, abbreviations: Fmt.Expression[] | undefined, definitionNotation: Fmt.Expression | undefined, public parameter: Fmt.Parameter, public definition: Fmt.Expression[], public equivalenceProofs?: ObjectContents_Proof[], public wellDefinednessProof?: ObjectContents_Proof) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ImplicitOperator {
     let result: ObjectContents_ImplicitOperator = Object.create(ObjectContents_ImplicitOperator.prototype);
@@ -1323,8 +1355,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.equivalenceProofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -1334,8 +1365,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
     let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 7);
     if (wellDefinednessProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(wellDefinednessProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(wellDefinednessProofRaw, reportFn);
       this.wellDefinednessProof = newItem;
       reportFn?.(wellDefinednessProofRaw, newItem);
     }
@@ -1367,6 +1397,12 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ImplicitOperator {
+    let result: ObjectContents_ImplicitOperator = Object.create(ObjectContents_ImplicitOperator.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ImplicitOperator {
@@ -1415,7 +1451,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     if (this.equivalenceProofs) {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -1423,7 +1459,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       }
     }
     if (this.wellDefinednessProof) {
-      result.wellDefinednessProof = new ObjectContents_Proof;
+      result.wellDefinednessProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
@@ -1498,13 +1534,14 @@ export class MetaRefExpression_ImplicitOperator extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_ImplicitOperator;
+    return Object.create(ObjectContents_ImplicitOperator.prototype);
   }
 }
 
 export class ObjectContents_MacroOperator extends ObjectContents_Operator {
-  variables?: Fmt.ParameterList;
-  references?: Fmt.ArgumentList;
+  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public variables?: Fmt.ParameterList, public references?: Fmt.ArgumentList) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_MacroOperator {
     let result: ObjectContents_MacroOperator = Object.create(ObjectContents_MacroOperator.prototype);
@@ -1543,6 +1580,12 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
       argumentList.push(new Fmt.Argument('references', referencesExpr, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_MacroOperator {
+    let result: ObjectContents_MacroOperator = Object.create(ObjectContents_MacroOperator.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MacroOperator {
@@ -1620,13 +1663,14 @@ export class MetaRefExpression_MacroOperator extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_MacroOperator;
+    return Object.create(ObjectContents_MacroOperator.prototype);
   }
 }
 
 export class ObjectContents_Predicate extends ObjectContents_Definition {
-  definition: Fmt.Expression[];
-  equivalenceProofs?: ObjectContents_Proof[];
+  constructor(properties: Fmt.ArgumentList | undefined, notation: Fmt.Expression | undefined, abbreviations: Fmt.Expression[] | undefined, definitionNotation: Fmt.Expression | undefined, public definition: Fmt.Expression[], public equivalenceProofs?: ObjectContents_Proof[]) {
+    super(properties, notation, abbreviations, definitionNotation);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Predicate {
     let result: ObjectContents_Predicate = Object.create(ObjectContents_Predicate.prototype);
@@ -1647,8 +1691,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.equivalenceProofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -1677,6 +1720,12 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       argumentList.push(new Fmt.Argument('equivalenceProofs', equivalenceProofsExpr, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Predicate {
+    let result: ObjectContents_Predicate = Object.create(ObjectContents_Predicate.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Predicate {
@@ -1713,7 +1762,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
     if (this.equivalenceProofs) {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -1784,13 +1833,14 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_Predicate;
+    return Object.create(ObjectContents_Predicate.prototype);
   }
 }
 
 export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
-  claim: Fmt.Expression;
-  proofs?: ObjectContents_Proof[];
+  constructor(public claim: Fmt.Expression, public proofs?: ObjectContents_Proof[]) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_StandardTheorem {
     let result: ObjectContents_StandardTheorem = Object.create(ObjectContents_StandardTheorem.prototype);
@@ -1805,8 +1855,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       if (proofsRaw instanceof Fmt.ArrayExpression) {
         this.proofs = [];
         for (let item of proofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.proofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -1830,6 +1879,12 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('proofs', proofsExpr, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_StandardTheorem {
+    let result: ObjectContents_StandardTheorem = Object.create(ObjectContents_StandardTheorem.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StandardTheorem {
@@ -1860,7 +1915,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
     if (this.proofs) {
       result.proofs = [];
       for (let item of this.proofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -1922,13 +1977,14 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_StandardTheorem;
+    return Object.create(ObjectContents_StandardTheorem.prototype);
   }
 }
 
 export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
-  conditions: Fmt.Expression[];
-  equivalenceProofs?: ObjectContents_Proof[];
+  constructor(public conditions: Fmt.Expression[], public equivalenceProofs?: ObjectContents_Proof[]) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_EquivalenceTheorem {
     let result: ObjectContents_EquivalenceTheorem = Object.create(ObjectContents_EquivalenceTheorem.prototype);
@@ -1948,8 +2004,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       if (equivalenceProofsRaw instanceof Fmt.ArrayExpression) {
         this.equivalenceProofs = [];
         for (let item of equivalenceProofsRaw.items) {
-          let newItem = new ObjectContents_Proof;
-          newItem.fromExpression(item, reportFn);
+          let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
           this.equivalenceProofs.push(newItem);
           reportFn?.(item, newItem);
         }
@@ -1978,6 +2033,12 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('equivalenceProofs', equivalenceProofsExpr, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_EquivalenceTheorem {
+    let result: ObjectContents_EquivalenceTheorem = Object.create(ObjectContents_EquivalenceTheorem.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EquivalenceTheorem {
@@ -2014,7 +2075,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
     if (this.equivalenceProofs) {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
-        let newItem = new ObjectContents_Proof;
+        let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
         if (item.substituteExpression(fn, newItem, replacedParameters)) {
           changed = true;
         }
@@ -2085,7 +2146,7 @@ export class MetaRefExpression_EquivalenceTheorem extends Fmt.MetaRefExpression 
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_EquivalenceTheorem;
+    return Object.create(ObjectContents_EquivalenceTheorem.prototype);
   }
 }
 
@@ -2639,7 +2700,9 @@ export class MetaRefExpression_Def extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_PropArg extends Fmt.ObjectContents {
-  formula: Fmt.Expression;
+  constructor(public formula: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_PropArg {
     let result: ObjectContents_PropArg = Object.create(ObjectContents_PropArg.prototype);
@@ -2714,7 +2777,9 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_SetArg extends Fmt.ObjectContents {
-  _set: Fmt.Expression;
+  constructor(public _set: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_SetArg {
     let result: ObjectContents_SetArg = Object.create(ObjectContents_SetArg.prototype);
@@ -2789,8 +2854,9 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
-  _set: Fmt.Expression;
-  subsetProof?: ObjectContents_Proof;
+  constructor(public _set: Fmt.Expression, public subsetProof?: ObjectContents_Proof) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_SubsetArg {
     let result: ObjectContents_SubsetArg = Object.create(ObjectContents_SubsetArg.prototype);
@@ -2802,8 +2868,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     this._set = argumentList.getValue('set', 0);
     let subsetProofRaw = argumentList.getOptionalValue('subsetProof', 1);
     if (subsetProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(subsetProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(subsetProofRaw, reportFn);
       this.subsetProof = newItem;
       reportFn?.(subsetProofRaw, newItem);
     }
@@ -2866,7 +2931,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
       }
     }
     if (this.subsetProof) {
-      result.subsetProof = new ObjectContents_Proof;
+      result.subsetProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.subsetProof.substituteExpression(fn, result.subsetProof, replacedParameters)) {
         changed = true;
       }
@@ -2889,8 +2954,9 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_ElementArg extends Fmt.ObjectContents {
-  element: Fmt.Expression;
-  elementProof?: ObjectContents_Proof;
+  constructor(public element: Fmt.Expression, public elementProof?: ObjectContents_Proof) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ElementArg {
     let result: ObjectContents_ElementArg = Object.create(ObjectContents_ElementArg.prototype);
@@ -2902,8 +2968,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     this.element = argumentList.getValue('element', 0);
     let elementProofRaw = argumentList.getOptionalValue('elementProof', 1);
     if (elementProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(elementProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(elementProofRaw, reportFn);
       this.elementProof = newItem;
       reportFn?.(elementProofRaw, newItem);
     }
@@ -2966,7 +3031,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
       }
     }
     if (this.elementProof) {
-      result.elementProof = new ObjectContents_Proof;
+      result.elementProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.elementProof.substituteExpression(fn, result.elementProof, replacedParameters)) {
         changed = true;
       }
@@ -2989,7 +3054,9 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
-  proof?: ObjectContents_Proof;
+  constructor(public proof?: ObjectContents_Proof) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstraintArg {
     let result: ObjectContents_ConstraintArg = Object.create(ObjectContents_ConstraintArg.prototype);
@@ -3000,8 +3067,7 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getOptionalValue('proof', 0);
     if (proofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(proofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
       this.proof = newItem;
       reportFn?.(proofRaw, newItem);
     }
@@ -3015,6 +3081,12 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
       reportFn?.(proofExpr, this.proof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstraintArg {
+    let result: ObjectContents_ConstraintArg = Object.create(ObjectContents_ConstraintArg.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstraintArg {
@@ -3032,7 +3104,7 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstraintArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.proof) {
-      result.proof = new ObjectContents_Proof;
+      result.proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.proof.substituteExpression(fn, result.proof, replacedParameters)) {
         changed = true;
       }
@@ -3052,8 +3124,9 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_BinderArg extends Fmt.ObjectContents {
-  sourceParameters: Fmt.ParameterList;
-  targetArguments: Fmt.ArgumentList;
+  constructor(public sourceParameters: Fmt.ParameterList, public targetArguments: Fmt.ArgumentList) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_BinderArg {
     let result: ObjectContents_BinderArg = Object.create(ObjectContents_BinderArg.prototype);
@@ -3083,6 +3156,12 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
     let targetArgumentsExpr = new Fmt.CompoundExpression(this.targetArguments);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'targetArguments' : undefined, targetArgumentsExpr, false));
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_BinderArg {
+    let result: ObjectContents_BinderArg = Object.create(ObjectContents_BinderArg.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_BinderArg {
@@ -3344,8 +3423,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        let newItem = new ObjectContents_StructuralCase;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_StructuralCase.createFromExpression(item, reportFn);
         this.cases.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -3381,7 +3459,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     }
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
-      let newItem = new ObjectContents_StructuralCase;
+      let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -3477,8 +3555,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        let newItem = new ObjectContents_Case;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_Case.createFromExpression(item, reportFn);
         this.cases.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -3487,8 +3564,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     }
     let totalityProofRaw = argumentList.getOptionalValue('totalityProof', 1);
     if (totalityProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(totalityProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(totalityProofRaw, reportFn);
       this.totalityProof = newItem;
       reportFn?.(totalityProofRaw, newItem);
     }
@@ -3516,7 +3592,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     let changed = false;
     let casesResult: ObjectContents_Case[] = [];
     for (let item of this.cases) {
-      let newItem = new ObjectContents_Case;
+      let newItem: ObjectContents_Case = Object.create(ObjectContents_Case.prototype) as ObjectContents_Case;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -3524,7 +3600,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     }
     let totalityProofResult: ObjectContents_Proof | undefined = undefined;
     if (this.totalityProof) {
-      totalityProofResult = new ObjectContents_Proof;
+      totalityProofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.totalityProof.substituteExpression(fn, totalityProofResult, replacedParameters)) {
         changed = true;
       }
@@ -3575,8 +3651,7 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        let newItem = new ObjectContents_StructuralCase;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_StructuralCase.createFromExpression(item, reportFn);
         this.cases.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -3612,7 +3687,7 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     }
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
-      let newItem = new ObjectContents_StructuralCase;
+      let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -3665,8 +3740,7 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
     this._set = argumentList.getValue('set', 1);
     let proofRaw = argumentList.getOptionalValue('proof', 2);
     if (proofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(proofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
       this.proof = newItem;
       reportFn?.(proofRaw, newItem);
     }
@@ -3696,7 +3770,7 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
     }
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      proofResult = new ObjectContents_Proof;
+      proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
@@ -4487,8 +4561,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        let newItem = new ObjectContents_StructuralCase;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_StructuralCase.createFromExpression(item, reportFn);
         this.cases.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -4524,7 +4597,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     }
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
-      let newItem = new ObjectContents_StructuralCase;
+      let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -4564,11 +4637,9 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Proof extends Fmt.ObjectContents {
-  _from?: Fmt.BN;
-  _to?: Fmt.BN;
-  parameters?: Fmt.ParameterList;
-  goal?: Fmt.Expression;
-  steps: Fmt.ParameterList;
+  constructor(public _from: Fmt.BN | undefined, public _to: Fmt.BN | undefined, public parameters: Fmt.ParameterList | undefined, public goal: Fmt.Expression | undefined, public steps: Fmt.ParameterList) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Proof {
     let result: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype);
@@ -4630,6 +4701,12 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     let stepsExpr = new Fmt.ParameterExpression(this.steps);
     argumentList.push(new Fmt.Argument('steps', stepsExpr, false));
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Proof {
+    let result: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Proof {
@@ -4772,8 +4849,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     this.statement = argumentList.getValue('statement', 0);
     let proofRaw = argumentList.getOptionalValue('proof', 1);
     if (proofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(proofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
       this.proof = newItem;
       reportFn?.(proofRaw, newItem);
     }
@@ -4798,7 +4874,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     }
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      proofResult = new ObjectContents_Proof;
+      proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
@@ -4906,8 +4982,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     if (caseProofsRaw instanceof Fmt.ArrayExpression) {
       this.caseProofs = [];
       for (let item of caseProofsRaw.items) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
         this.caseProofs.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -4937,7 +5012,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     let changed = false;
     let caseProofsResult: ObjectContents_Proof[] = [];
     for (let item of this.caseProofs) {
-      let newItem = new ObjectContents_Proof;
+      let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -5284,8 +5359,7 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     }
     let proofRaw = argumentList.getOptionalValue('proof', 1);
     if (proofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(proofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
       this.proof = newItem;
       reportFn?.(proofRaw, newItem);
     }
@@ -5309,7 +5383,7 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     let changed = false;
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      proofResult = new ObjectContents_Proof;
+      proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
@@ -5348,8 +5422,7 @@ export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpressio
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getValue('proof', 0);
-    let newItem = new ObjectContents_Proof;
-    newItem.fromExpression(proofRaw, reportFn);
+    let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
     this.proof = newItem;
     reportFn?.(proofRaw, newItem);
   }
@@ -5364,7 +5437,7 @@ export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpressio
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let proofResult = new ObjectContents_Proof;
+    let proofResult: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
     if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
       changed = true;
     }
@@ -5397,8 +5470,7 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     let proofRaw = argumentList.getValue('proof', 0);
-    let newItem = new ObjectContents_Proof;
-    newItem.fromExpression(proofRaw, reportFn);
+    let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
     this.proof = newItem;
     reportFn?.(proofRaw, newItem);
   }
@@ -5413,7 +5485,7 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let proofResult = new ObjectContents_Proof;
+    let proofResult: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
     if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
       changed = true;
     }
@@ -5456,8 +5528,7 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
     }
     let proofRaw = argumentList.getOptionalValue('proof', 1);
     if (proofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(proofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
       this.proof = newItem;
       reportFn?.(proofRaw, newItem);
     }
@@ -5483,7 +5554,7 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
     }
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
-      proofResult = new ObjectContents_Proof;
+      proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
         changed = true;
       }
@@ -5523,8 +5594,7 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
     if (proofsRaw instanceof Fmt.ArrayExpression) {
       this.proofs = [];
       for (let item of proofsRaw.items) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
         this.proofs.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -5550,7 +5620,7 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
     let changed = false;
     let proofsResult: ObjectContents_Proof[] = [];
     for (let item of this.proofs) {
-      let newItem = new ObjectContents_Proof;
+      let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -5605,8 +5675,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     if (caseProofsRaw instanceof Fmt.ArrayExpression) {
       this.caseProofs = [];
       for (let item of caseProofsRaw.items) {
-        let newItem = new ObjectContents_Proof;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_Proof.createFromExpression(item, reportFn);
         this.caseProofs.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -5636,7 +5705,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     let changed = false;
     let caseProofsResult: ObjectContents_Proof[] = [];
     for (let item of this.caseProofs) {
-      let newItem = new ObjectContents_Proof;
+      let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -5690,8 +5759,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
     if (casesRaw instanceof Fmt.ArrayExpression) {
       this.cases = [];
       for (let item of casesRaw.items) {
-        let newItem = new ObjectContents_StructuralCase;
-        newItem.fromExpression(item, reportFn);
+        let newItem = ObjectContents_StructuralCase.createFromExpression(item, reportFn);
         this.cases.push(newItem);
         reportFn?.(item, newItem);
       }
@@ -5727,7 +5795,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
     }
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
-      let newItem = new ObjectContents_StructuralCase;
+      let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
       if (item.substituteExpression(fn, newItem, replacedParameters)) {
         changed = true;
       }
@@ -5767,9 +5835,9 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Case extends Fmt.ObjectContents {
-  formula: Fmt.Expression;
-  value: Fmt.Expression;
-  exclusivityProof?: ObjectContents_Proof;
+  constructor(public formula: Fmt.Expression, public value: Fmt.Expression, public exclusivityProof?: ObjectContents_Proof) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Case {
     let result: ObjectContents_Case = Object.create(ObjectContents_Case.prototype);
@@ -5782,8 +5850,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     this.value = argumentList.getValue('value', 1);
     let exclusivityProofRaw = argumentList.getOptionalValue('exclusivityProof', 2);
     if (exclusivityProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(exclusivityProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(exclusivityProofRaw, reportFn);
       this.exclusivityProof = newItem;
       reportFn?.(exclusivityProofRaw, newItem);
     }
@@ -5799,6 +5866,12 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
       reportFn?.(exclusivityProofExpr, this.exclusivityProof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Case {
+    let result: ObjectContents_Case = Object.create(ObjectContents_Case.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Case {
@@ -5834,7 +5907,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
       }
     }
     if (this.exclusivityProof) {
-      result.exclusivityProof = new ObjectContents_Proof;
+      result.exclusivityProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof, replacedParameters)) {
         changed = true;
       }
@@ -5860,11 +5933,9 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
-  _constructor: Fmt.Expression;
-  parameters?: Fmt.ParameterList;
-  value: Fmt.Expression;
-  rewrite?: Fmt.Expression;
-  wellDefinednessProof?: ObjectContents_Proof;
+  constructor(public _constructor: Fmt.Expression, public parameters: Fmt.ParameterList | undefined, public value: Fmt.Expression, public rewrite?: Fmt.Expression, public wellDefinednessProof?: ObjectContents_Proof) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_StructuralCase {
     let result: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype);
@@ -5886,8 +5957,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     this.rewrite = argumentList.getOptionalValue('rewrite', 3);
     let wellDefinednessProofRaw = argumentList.getOptionalValue('wellDefinednessProof', 4);
     if (wellDefinednessProofRaw !== undefined) {
-      let newItem = new ObjectContents_Proof;
-      newItem.fromExpression(wellDefinednessProofRaw, reportFn);
+      let newItem = ObjectContents_Proof.createFromExpression(wellDefinednessProofRaw, reportFn);
       this.wellDefinednessProof = newItem;
       reportFn?.(wellDefinednessProofRaw, newItem);
     }
@@ -5910,6 +5980,12 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       reportFn?.(wellDefinednessProofExpr, this.wellDefinednessProof);
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_StructuralCase {
+    let result: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StructuralCase {
@@ -5963,7 +6039,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       }
     }
     if (this.wellDefinednessProof) {
-      result.wellDefinednessProof = new ObjectContents_Proof;
+      result.wellDefinednessProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
       if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
@@ -6007,7 +6083,7 @@ class ParameterTypeContext extends Ctx.DerivedContext {
 }
 
 class ArgumentTypeContext extends Ctx.DerivedContext {
-  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {
+  constructor(public objectContentsClass: Function, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }

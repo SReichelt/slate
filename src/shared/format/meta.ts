@@ -4,11 +4,12 @@ import * as Fmt from './format';
 import * as Ctx from './context';
 import * as Meta from './metaModel';
 
+/* eslint-disable no-shadow */
+
 export class ObjectContents_MetaModel extends Fmt.ObjectContents {
-  definitionTypes: Fmt.Expression[];
-  expressionTypes?: Fmt.Expression[];
-  functions?: Fmt.Expression[];
-  lookup?: Fmt.Expression;
+  constructor(public definitionTypes: Fmt.Expression[], public expressionTypes?: Fmt.Expression[], public functions?: Fmt.Expression[], public lookup?: Fmt.Expression) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_MetaModel {
     let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
@@ -70,6 +71,12 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('lookup', this.lookup, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_MetaModel {
+    let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MetaModel {
@@ -216,14 +223,14 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_MetaModel;
+    return Object.create(ObjectContents_MetaModel.prototype);
   }
 }
 
 export class ObjectContents_DefinedType extends Fmt.ObjectContents {
-  superType?: Fmt.Expression;
-  members?: Fmt.ParameterList;
-  exports?: Fmt.Expression[];
+  constructor(public superType?: Fmt.Expression, public members?: Fmt.ParameterList, public exports?: Fmt.Expression[]) {
+    super();
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinedType {
     let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
@@ -269,6 +276,12 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('exports', exportsExpr, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinedType {
+    let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinedType {
@@ -345,7 +358,9 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
-  innerDefinitionTypes?: Fmt.Expression[];
+  constructor(superType?: Fmt.Expression, members?: Fmt.ParameterList, exports?: Fmt.Expression[], public innerDefinitionTypes?: Fmt.Expression[]) {
+    super(superType, members, exports);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionType {
     let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
@@ -376,6 +391,12 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
       argumentList.push(new Fmt.Argument('innerDefinitionTypes', innerDefinitionTypesExpr, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionType {
+    let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionType {
@@ -475,7 +496,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_DefinitionType;
+    return Object.create(ObjectContents_DefinitionType.prototype);
   }
 }
 
@@ -493,6 +514,12 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
     let argumentList = super.toArgumentList(outputAllNames, reportFn);
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExpressionType {
+    let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExpressionType {
@@ -546,14 +573,14 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_ExpressionType;
+    return Object.create(ObjectContents_ExpressionType.prototype);
   }
 }
 
 export class ObjectContents_ParameterType extends ObjectContents_ExpressionType {
-  optional?: Fmt.Expression;
-  argumentType?: Fmt.Expression;
-  canOmit?: Fmt.Expression;
+  constructor(superType?: Fmt.Expression, members?: Fmt.ParameterList, exports?: Fmt.Expression[], public optional?: Fmt.Expression, public argumentType?: Fmt.Expression, public canOmit?: Fmt.Expression) {
+    super(superType, members, exports);
+  }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ParameterType {
     let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
@@ -580,6 +607,12 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
       argumentList.push(new Fmt.Argument('canOmit', this.canOmit, true));
     }
     return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ParameterType {
+    let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ParameterType {
@@ -688,7 +721,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
   }
 
   createDefinitionContents(): Fmt.ObjectContents | undefined {
-    return new ObjectContents_ParameterType;
+    return Object.create(ObjectContents_ParameterType.prototype);
   }
 }
 
@@ -1014,7 +1047,7 @@ class ParameterTypeContext extends Ctx.DerivedContext {
 }
 
 class ArgumentTypeContext extends Ctx.DerivedContext {
-  constructor(public objectContentsClass: {new(): Fmt.ObjectContents}, parentContext: Ctx.Context) {
+  constructor(public objectContentsClass: Function, parentContext: Ctx.Context) {
     super(parentContext);
   }
 }
