@@ -3643,7 +3643,7 @@ References.
 exports[`render hlm library: 1.7.2.14 Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
 "Proposition 1.7.2.14.  Let S be a set. Then:
 
-  |𝒫(S)| = 2^|S|
+  |𝒫(S)| = |𝓟𝓻𝓹(S)| = 2^|S|
 
 No proof.
 
@@ -3782,7 +3782,7 @@ References.
 exports[`render hlm library: 1.7.2.22.2 Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20sum 1`] = `
 "Definition 1.7.2.22.2.  Let I be a set, let κ_i be a cardinal number for each i ∈ I, let ≃ be a dependent equality on (κ_i) (i ∈ I). We define:
 
-  ∑_(i ∈ I)^≃ κ_i := |⨄_(j ∈ I)^≃ (κ_j)|
+  ∑_(i ∈ I)^≃ κ_i := |⨄_(i ∈ I)^≃ (κ_i)|
 
 Remarks.
 
@@ -3808,7 +3808,7 @@ References.
 exports[`render hlm library: 1.7.2.22.4 Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20product 1`] = `
 "Definition 1.7.2.22.4.  Let I be a set, let κ_i be a cardinal number for each i ∈ I. We define:
 
-  ∏_(i ∈ I) κ_i := |∏_(j ∈ I) (κ_j)|
+  ∏_(i ∈ I) κ_i := |∏_(i ∈ I) (κ_i)|
 
 Remarks.
 
