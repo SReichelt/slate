@@ -507,7 +507,8 @@ div.display-math {
   position: relative;
   bottom: 0.3em;
   left: 0.5pt;
-  min-width: 1ch;
+  min-width: 0.6em;
+  text-align: right;
 }
 
 .radical-degree-bottom-cell {
@@ -521,6 +522,11 @@ div.display-math {
   width: 1ex;
   min-width: 1ex;
   position: relative;
+  overflow: visible;
+}
+
+.radical-diagonal svg {
+  overflow: visible;
 }
 
 .radical-radicand {

@@ -798,9 +798,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               </span>
               <span className={'radical-degree-bottom-row'}>
                 <span className={'radical-degree-bottom-cell'}>
-                  <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                    <line x1="0" y1="0.35" x2="0.4" y2="0.1" stroke="var(--foreground-color)" strokeWidth="0.05" strokeLinecap="square"/>
-                    <line x1="0.5" y1="0.12" x2="1" y2="1" stroke="var(--foreground-color)" strokeWidth="0.2" strokeLinecap="square"/>
+                  <svg viewBox="0 0 1 1" preserveAspectRatio="xMaxYMax">
+                    <line x1="0.1" y1="0.35" x2="0.4" y2="0.1" stroke="var(--foreground-color)" strokeWidth="0.08" strokeLinecap="square"/>
+                    <line x1="0.45" y1="0.15" x2="1.05" y2="1" stroke="var(--foreground-color)" strokeWidth="0.2" strokeLinecap="square"/>
                   </svg>
                 </span>
               </span>
@@ -808,7 +808,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
           <span className={'radical-diagonal'}>
             <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-              <line x1="0" y1="1" x2="0.95" y2="0" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square"/>
+              <line x1="0" y1="0.965" x2="1.025" y2="0.025" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="round"/>
             </svg>
           </span>
           <span className={'radical-radicand'}>
