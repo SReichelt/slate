@@ -75,6 +75,13 @@ export class GenericUtils {
     }
   }
 
+  applySubstitutionContexts(expression: Fmt.Expression, contexts: SubstitutionContext[]): Fmt.Expression {
+    for (let context of contexts) {
+      expression = this.applySubstitutionContext(expression, context);
+    }
+    return expression;
+  }
+
   applySubstitutionContextToParameter(parameter: Fmt.Parameter, context: SubstitutionContext | undefined): Fmt.Parameter {
     if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
       return parameter.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());

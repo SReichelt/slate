@@ -25,6 +25,13 @@ export interface HLMUnfoldParameters {
   requiredUnfoldLocation?: Fmt.Expression;
 }
 
+const unfoldOutside: HLMUnfoldParameters = {
+  followDefinitions: true,
+  unfoldArguments: false,
+  substituteStructuralCases: false,
+  extractStructuralCases: false
+};
+
 export interface HLMTypeSearchParameters extends HLMUnfoldParameters {
   followSupersets?: boolean;
   followEmbeddings?: boolean;
@@ -36,6 +43,26 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
   followSupersets: true,
   followEmbeddings: false,
   followAllAlternatives: false,
+  unfoldArguments: false,
+  substituteStructuralCases: false,
+  extractStructuralCases: false
+};
+
+const findFinalSuperset: HLMTypeSearchParameters = {
+  followDefinitions: true,
+  followSupersets: true,
+  followEmbeddings: false,
+  followAllAlternatives: false,
+  unfoldArguments: false,
+  substituteStructuralCases: false,
+  extractStructuralCases: false
+};
+
+const followEmbedding: HLMTypeSearchParameters = {
+  followDefinitions: true,
+  followSupersets: false,
+  followEmbeddings: true,
+  followAllAlternatives: true,
   unfoldArguments: false,
   substituteStructuralCases: false,
   extractStructuralCases: false
@@ -1146,11 +1173,59 @@ export class HLMUtils extends GenericUtils {
   }
 
   getFinalSet(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters): CachedPromise<Fmt.Expression> {
-    return this.getFinalSetInternal(term, typeSearchParameters, []);
+    let visitedDefinitions: Fmt.DefinitionRefExpression[] = [];
+    return this.getDeclaredSetInternal(term, visitedDefinitions).then((set: Fmt.Expression) => this.getFinalSupersetInternal(set, typeSearchParameters, visitedDefinitions));
   }
 
-  private getFinalSetInternal(term: Fmt.Expression, typeSearchParameters: HLMTypeSearchParameters, visitedDefinitions: Fmt.DefinitionRefExpression[]): CachedPromise<Fmt.Expression> {
-    return this.getDeclaredSetInternal(term, visitedDefinitions).then((set: Fmt.Expression) => this.getFinalSupersetInternal(set, typeSearchParameters, visitedDefinitions));
+  getCommonFinalSuperset(terms: Fmt.Expression[]): CachedPromise<Fmt.Expression | undefined> {
+    let finalSetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+    for (let term of terms) {
+      finalSetsPromise = finalSetsPromise.then((currentFinalSets: Fmt.Expression[]) =>
+        this.getFinalSet(term, findFinalSuperset).then((finalSet: Fmt.Expression) =>
+          currentFinalSets.concat(finalSet)));
+    }
+    return finalSetsPromise.then((finalSets: Fmt.Expression[]) => this.getCommonSupersetInternal(finalSets));
+  }
+
+  private getCommonSupersetInternal(terms: Fmt.Expression[]): CachedPromise<Fmt.Expression | undefined> {
+    let resultPromise: CachedPromise<Fmt.Expression | undefined> = CachedPromise.resolve(undefined);
+    for (let term of terms) {
+      let termIsCommonSupersetPromise = CachedPromise.resolve(true);
+      for (let otherTerm of terms) {
+        if (otherTerm !== term) {
+          termIsCommonSupersetPromise = termIsCommonSupersetPromise.and(() => this.isDeclaredSubsetOf(otherTerm, term));
+        }
+      }
+      resultPromise = resultPromise.or(() => termIsCommonSupersetPromise.then((termIsCommonSuperset: boolean) =>
+        (termIsCommonSuperset ? term : undefined)));
+    }
+    return resultPromise;
+  }
+
+  getCommonFinalSet(terms: Fmt.Expression[]): CachedPromise<Fmt.Expression | undefined> {
+    let declaredSetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+    for (let term of terms) {
+      declaredSetsPromise = declaredSetsPromise.then((currentDeclaredSets: Fmt.Expression[]) =>
+        this.getDeclaredSet(term).then((declaredSet: Fmt.Expression) =>
+          currentDeclaredSets.concat(declaredSet)));
+    }
+    return declaredSetsPromise.then((declaredSets: Fmt.Expression[]) => this.getCommonFinalSuperset(declaredSets));
+  }
+
+  private fullyUnfoldElementTermOutside(term: Fmt.Expression): CachedPromise<Fmt.Expression[]> {
+    return this.getNextElementTerms(term, unfoldOutside).then((nextTerms: Fmt.Expression[] | undefined) => {
+      if (nextTerms) {
+        let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+        for (let nextTerm of nextTerms) {
+          resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
+            this.fullyUnfoldElementTermOutside(nextTerm).then((unfoldedNextTerms: Fmt.Expression[]) =>
+              currentResult.concat(unfoldedNextTerms)));
+        }
+        return resultPromise;
+      } else {
+        return [term];
+      }
+    });
   }
 
   private getTargetUtils(path: Fmt.Path, definition: Fmt.Definition): HLMUtils {
@@ -1395,16 +1470,7 @@ export class HLMUtils extends GenericUtils {
   private isDeclaredSubsetOf(subset: Fmt.Expression, superset: Fmt.Expression): CachedPromise<boolean> {
     return this.isExplicitlyDeclaredSubsetOf(subset, superset)
       .or(() => {
-        let supersetSearchParameters: HLMTypeSearchParameters = {
-          followDefinitions: true,
-          followSupersets: false,
-          followEmbeddings: true,
-          followAllAlternatives: true,
-          unfoldArguments: false,
-          substituteStructuralCases: false,
-          extractStructuralCases: false
-        };
-        return this.getNextSetTerms(superset, supersetSearchParameters).then((nextSupersets: Fmt.Expression[] | undefined) => {
+        return this.getNextSetTerms(superset, followEmbedding).then((nextSupersets: Fmt.Expression[] | undefined) => {
           let result = CachedPromise.resolve(false);
           if (nextSupersets) {
             for (let nextSuperset of nextSupersets) {
@@ -1659,7 +1725,56 @@ export class HLMUtils extends GenericUtils {
       }]);
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals && formula.terms.length === 2) {
       if (side === undefined) {
-        // TODO constructor equality
+        let left = formula.terms[0];
+        let right = formula.terms[1];
+        return this.fullyUnfoldElementTermOutside(left).then((unfoldedLeftTerms: Fmt.Expression[]) =>
+          this.fullyUnfoldElementTermOutside(right).then((unfoldedRightTerms: Fmt.Expression[]) => {
+            let resultPromise: CachedPromise<HLMFormulaDefinition[]> = CachedPromise.resolve([]);
+            for (let unfoldedLeft of unfoldedLeftTerms) {
+              if (unfoldedLeft instanceof Fmt.DefinitionRefExpression && unfoldedLeft.path.parentPath instanceof Fmt.Path) {
+                for (let unfoldedRight of unfoldedRightTerms) {
+                  if (unfoldedRight instanceof Fmt.DefinitionRefExpression && unfoldedRight.path.parentPath instanceof Fmt.Path) {
+                    if (unfoldedLeft.path.parentPath.isEquivalentTo(unfoldedRight.path.parentPath) && unfoldedLeft.path.name === unfoldedRight.path.name) {
+                      let definitionRef = unfoldedLeft;
+                      let constructionPath = unfoldedLeft.path.parentPath;
+                      let leftPath = unfoldedLeft.path;
+                      let rightPath = unfoldedRight.path;
+                      resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) =>
+                        this.getOuterDefinition(definitionRef).then((constructionDefinition: Fmt.Definition) => {
+                          let formulas: Fmt.Expression[] = [];
+                          if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction) {
+                            let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(definitionRef.path.name);
+                            if (constructorDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {
+                              let equalityDefinition = constructorDefinition.contents.equalityDefinition;
+                              if (equalityDefinition) {
+                                let pathSubstitutionContext = new HLMSubstitutionContext;
+                                this.addTargetPathSubstitution(constructionPath.parentPath, pathSubstitutionContext);
+                                let leftSubstitutionContext = new HLMSubstitutionContext;
+                                this.addParameterListSubstitution(equalityDefinition.leftParameters, constructorDefinition.parameters, leftSubstitutionContext);
+                                this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, leftPath.arguments], constructionPath.parentPath, leftSubstitutionContext);
+                                let rightSubstitutionContext = new HLMSubstitutionContext;
+                                this.addParameterListSubstitution(equalityDefinition.rightParameters, constructorDefinition.parameters, rightSubstitutionContext);
+                                this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, rightPath.arguments], constructionPath.parentPath, rightSubstitutionContext);
+                                formulas = equalityDefinition.definition.map((equalityFormula: Fmt.Expression) =>
+                                  this.applySubstitutionContexts(equalityFormula, [pathSubstitutionContext, leftSubstitutionContext, rightSubstitutionContext]));
+                              } else {
+                                formulas = [new FmtHLM.MetaRefExpression_and];
+                              }
+                            }
+                          }
+                          return currentResult.concat(formulas.map((equalityFormula: Fmt.Expression) => ({
+                            formula: equalityFormula,
+                            definitionRef: definitionRef
+                          })));
+                        }));
+                    }
+                  }
+                }
+              }
+            }
+            // TODO if resultPromise is empty, create structural case terms on the left and right, for convenience
+            return resultPromise;
+          }));
       } else if (side >= 0 && side < formula.terms.length) {
         // TODO embedding
         let term = formula.terms[side];
