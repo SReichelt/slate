@@ -531,6 +531,7 @@ export class HLMDefinitionChecker {
   }
 
   private checkEmbeddingWellDefinednessProof(embedding: FmtHLM.ObjectContents_Embedding, context: HLMCheckerContext): void {
+    // TODO check "full" property of embedding
     let leftParam = embedding.parameter.clone();
     let rightParam = leftParam.shallowClone();
     let leftTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, leftParam);
