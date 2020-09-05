@@ -235,6 +235,22 @@ export class HLMUtils extends GenericUtils {
     return (formula instanceof FmtHLM.MetaRefExpression_or && !formula.formulas);
   }
 
+  createConjunction(formulas: Fmt.Expression[]): Fmt.Expression {
+    if (formulas.length === 1) {
+      return formulas[0];
+    } else {
+      return new FmtHLM.MetaRefExpression_and(...formulas);
+    }
+  }
+
+  createDisjunction(formulas: Fmt.Expression[]): Fmt.Expression {
+    if (formulas.length === 1) {
+      return formulas[0];
+    } else {
+      return new FmtHLM.MetaRefExpression_or(...formulas);
+    }
+  }
+
   getStructuralCaseTerm(constructionPath: Fmt.Path, structuralCase: FmtHLM.ObjectContents_StructuralCase): CachedPromise<Fmt.Expression> {
     let constructionDefinitionPromise = this.libraryDataAccessor.fetchItem(constructionPath, false);
     let resultPromise = constructionDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
@@ -1416,32 +1432,9 @@ export class HLMUtils extends GenericUtils {
       }
       return resultPromise;
     } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
-      let resultPromise = CachedPromise.resolve(false);
       if (formula.formulas) {
-        let formulas = formula.formulas;
-        for (let item of formulas) {
-          resultPromise = resultPromise.or(() => this.isTrivialTautology(item, followDefinitions));
-          if (item !== formulas[0]) {
-            resultPromise = resultPromise.or(() => {
-              return this.negateFormula(item, followDefinitions).then((negatedItem: Fmt.Expression) => {
-                for (let previousItem of formulas) {
-                  if (previousItem === item) {
-                    break;
-                  }
-                  if (this.areExpressionsSyntacticallyEquivalent(negatedItem, previousItem)) {
-                    return true;
-                  }
-                  if (previousItem instanceof FmtHLM.MetaRefExpression_not && this.areExpressionsSyntacticallyEquivalent(item, formula)) {
-                    return true;
-                  }
-                }
-                return false;
-              });
-            });
-          }
-        }
+        return this.containsContradictoryFormulas(formula.formulas, followDefinitions);
       }
-      return resultPromise;
     } else if (formula instanceof FmtHLM.MetaRefExpression_equiv) {
       for (let index = 0; index + 1 < formula.formulas.length; index++) {
         if (!this.areExpressionsSyntacticallyEquivalent(formula.formulas[index], formula.formulas[formula.formulas.length - 1])) {
@@ -1480,7 +1473,37 @@ export class HLMUtils extends GenericUtils {
   }
 
   isTrivialContradiction(formula: Fmt.Expression, followDefinitions: boolean): CachedPromise<boolean> {
+    if (formula instanceof FmtHLM.MetaRefExpression_and && formula.formulas) {
+      // Avoid negating all formulas, as that can obscure contradictions between them.
+      return this.containsContradictoryFormulas(formula.formulas, followDefinitions);
+    }
     return this.negateFormula(formula, followDefinitions).then((negatedFormula: Fmt.Expression) => this.isTrivialTautology(negatedFormula, followDefinitions));
+  }
+
+  private containsContradictoryFormulas(formulas: Fmt.Expression[], followDefinitions: boolean): CachedPromise<boolean> {
+    let resultPromise = CachedPromise.resolve(false);
+    for (let item of formulas) {
+      resultPromise = resultPromise.or(() => this.isTrivialTautology(item, followDefinitions));
+      if (item !== formulas[0]) {
+        resultPromise = resultPromise.or(() => {
+          return this.negateFormula(item, followDefinitions).then((negatedItem: Fmt.Expression) => {
+            for (let previousItem of formulas) {
+              if (previousItem === item) {
+                break;
+              }
+              if (this.areExpressionsSyntacticallyEquivalent(negatedItem, previousItem)) {
+                return true;
+              }
+              if (previousItem instanceof FmtHLM.MetaRefExpression_not && this.areExpressionsSyntacticallyEquivalent(item, previousItem.formula)) {
+                return true;
+              }
+            }
+            return false;
+          });
+        });
+      }
+    }
+    return resultPromise;
   }
 
   private isDeclaredSubsetOf(subset: Fmt.Expression, superset: Fmt.Expression): CachedPromise<boolean> {
@@ -1608,19 +1631,19 @@ export class HLMUtils extends GenericUtils {
   // * different variants of associative expressions
   private areExpressionsSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
     let fn = (leftPart: Fmt.Expression, rightPart: Fmt.Expression) => {
-      if ((leftPart instanceof FmtHLM.MetaRefExpression_setAssociative || leftPart instanceof FmtHLM.MetaRefExpression_associative)
-          && !(rightPart instanceof FmtHLM.MetaRefExpression_setAssociative || rightPart instanceof FmtHLM.MetaRefExpression_associative)) {
+      if ((leftPart instanceof FmtHLM.MetaRefExpression_setAssociative || leftPart instanceof FmtHLM.MetaRefExpression_associative || leftPart instanceof FmtHLM.MetaRefExpression_asElementOf)
+          && !(rightPart instanceof FmtHLM.MetaRefExpression_setAssociative || rightPart instanceof FmtHLM.MetaRefExpression_associative || rightPart instanceof FmtHLM.MetaRefExpression_asElementOf)) {
         if (this.areExpressionsSyntacticallyEquivalent(leftPart.term, rightPart)) {
           return true;
         }
-      } else if ((rightPart instanceof FmtHLM.MetaRefExpression_setAssociative || rightPart instanceof FmtHLM.MetaRefExpression_associative)
-                 && !(leftPart instanceof FmtHLM.MetaRefExpression_setAssociative || leftPart instanceof FmtHLM.MetaRefExpression_associative)) {
+      } else if ((rightPart instanceof FmtHLM.MetaRefExpression_setAssociative || rightPart instanceof FmtHLM.MetaRefExpression_associative || rightPart instanceof FmtHLM.MetaRefExpression_asElementOf)
+                 && !(leftPart instanceof FmtHLM.MetaRefExpression_setAssociative || leftPart instanceof FmtHLM.MetaRefExpression_associative || leftPart instanceof FmtHLM.MetaRefExpression_asElementOf)) {
         if (this.areExpressionsSyntacticallyEquivalent(leftPart, rightPart.term)) {
           return true;
         }
       } else if (((leftPart instanceof FmtHLM.MetaRefExpression_setEquals && rightPart instanceof FmtHLM.MetaRefExpression_setEquals)
-           || (leftPart instanceof FmtHLM.MetaRefExpression_equals && rightPart instanceof FmtHLM.MetaRefExpression_equals))
-          && leftPart.terms.length === rightPart.terms.length) {
+                  || (leftPart instanceof FmtHLM.MetaRefExpression_equals && rightPart instanceof FmtHLM.MetaRefExpression_equals))
+                 && leftPart.terms.length === rightPart.terms.length) {
         let leftTerms = [...leftPart.terms];
         let rightTerms = [...rightPart.terms];
         for (let leftTerm of leftTerms) {
@@ -1629,6 +1652,24 @@ export class HLMUtils extends GenericUtils {
             if (this.areExpressionsSyntacticallyEquivalent(leftTerm, rightTerms[rightIndex])) {
               found = true;
               rightTerms.splice(rightIndex, 1);
+              break;
+            }
+          }
+          if (!found) {
+            return false;
+          }
+        }
+        return true;
+      } else if ((leftPart instanceof FmtHLM.MetaRefExpression_equiv && rightPart instanceof FmtHLM.MetaRefExpression_equiv)
+                 && leftPart.formulas.length === rightPart.formulas.length) {
+        let leftFormulas = [...leftPart.formulas];
+        let rightFormulas = [...rightPart.formulas];
+        for (let leftFormula of leftFormulas) {
+          let found = false;
+          for (let rightIndex = 0; rightIndex < rightFormulas.length; rightIndex++) {
+            if (this.areExpressionsSyntacticallyEquivalent(leftFormula, rightFormulas[rightIndex])) {
+              found = true;
+              rightFormulas.splice(rightIndex, 1);
               break;
             }
           }
@@ -1708,7 +1749,7 @@ export class HLMUtils extends GenericUtils {
           equalities.push(equality);
         }
       }
-      let equalityFormula = equalities.length === 1 ? equalities[0] : new FmtHLM.MetaRefExpression_and(...equalities);
+      let equalityFormula = this.createConjunction(equalities);
       let uniquenessFormula = new FmtHLM.MetaRefExpression_forall(parameters, equalityFormula);
       let resultFormula = formula.formula ? new FmtHLM.MetaRefExpression_and(formula.formula, uniquenessFormula) : uniquenessFormula;
       let result = new FmtHLM.MetaRefExpression_exists(formula.parameters, resultFormula);
@@ -1724,7 +1765,7 @@ export class HLMUtils extends GenericUtils {
     if (set instanceof FmtHLM.MetaRefExpression_enumeration) {
       let formulas = set.terms?.map((term: Fmt.Expression) =>
         new FmtHLM.MetaRefExpression_equals(element, term)) ?? [];
-      let result = new FmtHLM.MetaRefExpression_or(...formulas);
+      let result = this.createDisjunction(formulas);
       return CachedPromise.resolve([{
         formula: result
       }]);
@@ -1773,6 +1814,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   private getTermEqualityDefinitions(left: Fmt.Expression, right: Fmt.Expression): CachedPromise<HLMFormulaDefinition[]> {
+    // TODO if equality exactly matches an embedding definition, prefer that (see warning in finite.slate)
     return this.fullyUnfoldElementTermOutside(left).then((unfoldedLeftTerms: Fmt.Expression[]) =>
       this.fullyUnfoldElementTermOutside(right).then((unfoldedRightTerms: Fmt.Expression[]) => {
         let resultPromise: CachedPromise<HLMFormulaDefinition[]> = CachedPromise.resolve([]);

@@ -963,7 +963,7 @@ export class HLMDefinitionChecker {
         this.checkFormula(item.formula, context);
         this.checkElementTerm(item.value, context);
         let exclusivityParameters = new Fmt.ParameterList;
-        let exclusivityConstraint = new FmtHLM.MetaRefExpression_or(...formulas);
+        let exclusivityConstraint = this.utils.createDisjunction(formulas);
         this.addProofConstraint(exclusivityParameters, exclusivityConstraint);
         let exclusivityGoalPromise = this.utils.negateFormula(item.formula, true);
         let checkProof = exclusivityGoalPromise.then((exclusivityGoal: Fmt.Expression) =>
@@ -972,7 +972,7 @@ export class HLMDefinitionChecker {
         formulas.push(item.formula);
         values.push(item.value);
       }
-      let totalityGoal = new FmtHLM.MetaRefExpression_or(...formulas);
+      let totalityGoal = this.utils.createDisjunction(formulas);
       this.checkProof(term, term.totalityProof, undefined, totalityGoal, context);
       this.checkElementCompatibility(term, values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
@@ -1435,10 +1435,10 @@ export class HLMDefinitionChecker {
       let stepContext: HLMCheckerProofStepContext = {
         ...context,
         parameters: parameters,
-        goal: goals.length ? goals[0] : undefined,
+        goal: this.utils.createDisjunction(goals),
         previousResult: undefined
       };
-      let getMessage = () => parameters && goals.length ? 'Proof required' : `Proof of ${goals[0]} required`;
+      let getMessage = () => parameters || !goals.length ? 'Proof required' : `Proof of ${goals.join(' or ')} required`;
       this.checkTrivialProvability(object, stepContext, getMessage);
     }
   }
@@ -1701,9 +1701,13 @@ export class HLMDefinitionChecker {
           let index = this.utils.translateIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
             newGoal = goalToNegate.formulas[index];
-            let newGoalToNegate = new FmtHLM.MetaRefExpression_or(...goalToNegate.formulas);
-            newGoalToNegate.formulas!.splice(index, 1);
-            goalToNegate = newGoalToNegate;
+            if (goalToNegate.formulas.length === 2) {
+              goalToNegate = goalToNegate.formulas[1 - index];
+            } else {
+              let newGoalToNegate = new FmtHLM.MetaRefExpression_or(...goalToNegate.formulas);
+              newGoalToNegate.formulas!.splice(index, 1);
+              goalToNegate = newGoalToNegate;
+            }
           }
         }
         let check = this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
@@ -1847,7 +1851,7 @@ export class HLMDefinitionChecker {
         }
       }
       return constraintsPromise.then((constraints: Fmt.Expression[]) => {
-        let constraint = new FmtHLM.MetaRefExpression_and(...constraints);
+        let constraint = this.utils.createConjunction(constraints);
         return this.utils.triviallyImplies(constraint, goal, true);
       });
     } else {
