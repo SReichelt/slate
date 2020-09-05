@@ -2501,8 +2501,7 @@ Proof.
       ⇒^def |M| ∈ ℕ
      * Assume |M| = 0. Then M is empty by definition.
      * Let k ∈ ℕ such that |M| = k + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
-       We have k + 1 = |M|.
-        ⇒^def ∃ f : ℕ_(<(k+1)) ↔ M
+       |M| = k + 1 ⇒^def ∃ f : M ↔ ℕ_(<(k+1))
        1.7.1.18 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
 3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M: Trivial.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):

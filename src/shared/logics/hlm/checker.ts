@@ -1527,8 +1527,12 @@ export class HLMDefinitionChecker {
           let previousResultDefinitionsPromise = this.utils.getFormulaDefinitions(context.previousResult, this.utils.translateIndex(useDef.side));
           if (previousResultDefinitionsPromise) {
             let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
-              let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
-              this.checkUnfolding(sources, useDef.result, false);
+              if (previousResultDefinitions.length) {
+                let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
+                this.checkUnfolding(sources, useDef.result, false);
+              } else {
+                this.error(step, `${context.previousResult} does not have any definition`);
+              }
             });
             this.addPendingCheck(step, checkDefinition);
           } else {
@@ -1881,7 +1885,15 @@ export class HLMDefinitionChecker {
       }
       let check = resultPromise.then((result: boolean) => {
         if (!result) {
-          this.error(target, sources.length === 1 ? `${sources[0]} does not unfold to ${target}` : `None of the identified expressions unfold to ${target}`);
+          let message: string;
+          if (sources.length === 1) {
+            message = `${sources[0]} does not unfold to ${target}`;
+          } else if (sources.length) {
+            message = `Neither ${sources.join(' nor ')} unfolds to ${target}`;
+          } else {
+            message = 'No source found';
+          }
+          this.error(target, message);
         }
       });
       this.addPendingCheck(target, check);
@@ -1909,7 +1921,7 @@ export class HLMDefinitionChecker {
     }
     let check = resultPromise.then((result: boolean) => {
       if (!result) {
-        this.error(object, targets.length === 1 ? `${source} does not trivially imply ${targets[0]}` : `${source} does not trivially imply any of the conditions`);
+        this.error(object, `${source} does not trivially imply ${targets.join(' or ')}`);
       }
     });
     this.addPendingCheck(object, check);

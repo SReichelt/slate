@@ -1218,8 +1218,14 @@ export class HLMUtils extends GenericUtils {
         let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         for (let nextTerm of nextTerms) {
           resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
-            this.fullyUnfoldElementTermOutside(nextTerm).then((unfoldedNextTerms: Fmt.Expression[]) =>
-              currentResult.concat(unfoldedNextTerms)));
+            this.fullyUnfoldElementTermOutside(nextTerm).then((unfoldedNextTerms: Fmt.Expression[]) => {
+              for (let unfoldedNextTerm of unfoldedNextTerms) {
+                if (!currentResult.some((resultTerm: Fmt.Expression) => unfoldedNextTerm.isEquivalentTo(resultTerm))) {
+                  currentResult = currentResult.concat(unfoldedNextTerm);
+                }
+              }
+              return currentResult;
+            }));
         }
         return resultPromise;
       } else {
