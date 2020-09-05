@@ -1750,8 +1750,8 @@ export class HLMUtils extends GenericUtils {
         if (definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
           for (let item of definition.contents.definition) {
             resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) => {
-              let set = this.substitutePath(item, path, [definition]);
-              let newFormula = new FmtHLM.MetaRefExpression_in(element, set);
+              let unfoldedSet = this.substitutePath(item, path, [definition]);
+              let newFormula = new FmtHLM.MetaRefExpression_in(element, unfoldedSet);
               let newFormulaDefinitionsPromise = this.getFormulaDefinitions(newFormula, side);
               if (newFormulaDefinitionsPromise) {
                 return newFormulaDefinitionsPromise.then((newFormulaDefinitions: HLMFormulaDefinition[]) =>
