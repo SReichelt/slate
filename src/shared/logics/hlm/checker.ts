@@ -43,7 +43,6 @@ interface HLMCheckerContext {
 }
 
 interface HLMCheckerProofStepContext extends HLMCheckerContext, HLMProofStepContext {
-  parameters?: Fmt.ParameterList;
 }
 
 interface HLMCheckerCompatibilityStatus {
@@ -732,14 +731,27 @@ export class HLMDefinitionChecker {
     } else {
       this.error(type, 'Invalid parameter type');
     }
-    return this.getParameterContext(param, context);
-  }
-
-  private getParameterContext<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): ContextType {
     return {
       ...context,
       context: new Ctx.ParameterContext(param, context.context)
     };
+  }
+
+  private getParameterContext<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): ContextType {
+    let type = param.type;
+    if (type instanceof FmtHLM.MetaRefExpression_Binder) {
+      let sourceContext = this.getParameterListContext(type.sourceParameters, context);
+      let resultContext = this.getParameterListContext(type.targetParameters, sourceContext);
+      return {
+        ...resultContext,
+        binderSourceParameters: [...resultContext.binderSourceParameters, ...type.sourceParameters]
+      };
+    } else {
+      return {
+        ...context,
+        context: new Ctx.ParameterContext(param, context.context)
+      };
+    }
   }
 
   private checkElementParameter<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): [Fmt.Expression | undefined, ContextType] {
@@ -1396,51 +1408,51 @@ export class HLMDefinitionChecker {
   }
 
   private checkMultiGoalProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goals: Fmt.Expression[], context: HLMCheckerContext): void {
-    // TODO remove all trivially provable conjunction parts from the goal, and replace trivial provability check below with check for "true"
-    // TODO likewise, remove all trivially disprovable disjunction parts, possibly resulting in a goal of "false"
-    if (proof) {
-      // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
-      if (!(object instanceof Fmt.Expression)) {
-        object = proof;
-      }
-      if (proof.parameters) {
-        if (!parameters || !proof.parameters.isEquivalentTo(parameters)) {
+    if (parameters) {
+      if (proof) {
+        if (!proof.parameters) {
+          this.error(proof, 'Parameter list required');
+          return;
+        } else if (!proof.parameters.isEquivalentTo(parameters)) {
           this.error(proof.parameters, 'Invalid proof parameters');
           return;
         }
         context = this.getParameterListContext(proof.parameters, context);
-      } else if (parameters) {
-        this.error(proof, 'Parameter list required');
-        return;
-      }
-      if (proof.goal) {
-        this.checkFormula(proof.goal, context);
-        if (parameters && proof.parameters) {
-          goals = goals.map((goal: Fmt.Expression) => this.utils.substituteParameters(goal, parameters, proof.parameters!));
-        }
-        this.checkUnfolding(goals, proof.goal, true);
-      }
-      let stepContext: HLMCheckerProofStepContext = {
-        ...context,
-        parameters: proof.parameters,
-        goal: proof.goal ?? (goals.length ? goals[0] : undefined),
-        previousResult: undefined
-      };
-      this.utils.updateInitialProofStepContext(proof, stepContext);
-      this.checkProofSteps(object, proof.steps, stepContext);
-    } else if (this.options.warnAboutMissingProofs) {
-      if (parameters) {
+        goals = goals.map((goal: Fmt.Expression) => this.utils.substituteParameters(goal, parameters, proof.parameters!));
+      } else {
         context = this.getParameterListContext(parameters, context);
       }
-      let stepContext: HLMCheckerProofStepContext = {
-        ...context,
-        parameters: parameters,
-        goal: this.utils.createDisjunction(goals),
-        previousResult: undefined
-      };
-      let getMessage = () => parameters || !goals.length ? 'Proof required' : `Proof of ${goals.join(' or ')} required`;
-      this.checkTrivialProvability(object, stepContext, getMessage);
+    } else if (proof?.parameters) {
+      this.error(proof.parameters, 'Superfluous proof parameters');
+      return;
     }
+    let checkProof = this.stripConstraintsFromFormulas(goals, true, !proof, !proof, context).then((newGoals: Fmt.Expression[]) => {
+      if (proof) {
+        this.checkProofValidity(object, proof, newGoals, context);
+      } else if (this.options.warnAboutMissingProofs
+                 && !newGoals.some((goal: Fmt.Expression) => this.utils.isTrueFormula(goal))) {
+        this.message(object, parameters || !goals.length ? 'Proof required' : `Proof of ${goals.join(' or ')} required`, Logic.DiagnosticSeverity.Warning);
+      }
+    });
+    this.addPendingCheck(object, checkProof);
+  }
+
+  private checkProofValidity(object: Object, proof: FmtHLM.ObjectContents_Proof, goals: Fmt.Expression[], context: HLMCheckerContext): void {
+    if (proof.goal) {
+      this.checkFormula(proof.goal, context);
+      this.checkUnfolding(goals, proof.goal, true);
+    }
+    let stepContext: HLMCheckerProofStepContext = {
+      ...context,
+      goal: proof.goal ?? goals.length ? goals[0] : undefined,
+      previousResult: undefined
+    };
+    this.utils.updateInitialProofStepContext(proof, stepContext);
+    // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
+    if (!(object instanceof Fmt.Expression)) {
+      object = proof;
+    }
+    this.checkProofSteps(object, proof.steps, stepContext);
   }
 
   private checkProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
@@ -1492,8 +1504,16 @@ export class HLMDefinitionChecker {
       }
     }
     if (!completed) {
-      let getMessage = () => `Proof of ${context.goal} is incomplete`;
-      this.checkTrivialProvability(object, context, getMessage);
+      if (context.goal) {
+        let check = this.isTriviallyProvable(context.goal, context).then((result: boolean) => {
+          if (!result) {
+            this.message(object, `Proof of ${context.goal} is incomplete`, Logic.DiagnosticSeverity.Warning);
+          }
+        });
+        this.addPendingCheck(object, check);
+      } else {
+        this.message(object, `Proof is incomplete`, Logic.DiagnosticSeverity.Warning);
+      }
     }
   }
 
@@ -1530,7 +1550,8 @@ export class HLMDefinitionChecker {
             let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
               if (previousResultDefinitions.length) {
                 let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
-                this.checkUnfolding(sources, useDef.result, false);
+                this.stripConstraintsFromFormulas(sources, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
+                  this.checkUnfolding(strippedSources, useDef.result, false));
               } else {
                 this.error(step, `${context.previousResult} does not have any definition`);
               }
@@ -1592,7 +1613,9 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
       if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists || context.previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
-        if (!type.parameters.isEquivalentTo(context.previousResult.parameters)) {
+        if (type.parameters.isEquivalentTo(context.previousResult.parameters)) {
+          context = this.getParameterListContext(type.parameters, context);
+        } else {
           this.error(type.parameters, 'Proof step parameters must match existential quantifier');
         }
       } else {
@@ -1603,7 +1626,6 @@ export class HLMDefinitionChecker {
       if (context.previousResult) {
         let sourceContext: HLMCheckerProofStepContext = {
           ...context,
-          parameters: undefined,
           goal: undefined,
           previousResult: undefined
         };
@@ -1648,15 +1670,17 @@ export class HLMDefinitionChecker {
               if (useTheorem.input) {
                 let inputContext: HLMCheckerProofStepContext = {
                   ...context,
-                  parameters: undefined,
                   goal: undefined,
                   previousResult: undefined
                 };
                 let inputResultContext = this.checkProofStep(useTheorem.input, inputContext);
                 if (inputResultContext?.previousResult) {
+                  let previousResult = inputResultContext.previousResult;
                   let conditions = definition.contents.conditions.map((condition: Fmt.Expression) => this.utils.substitutePath(condition, theorem.path, [definition]));
-                  this.checkImplication(step, inputResultContext.previousResult, conditions);
-                  this.checkUnfolding(conditions, useTheorem.result, false);
+                  this.stripConstraintsFromFormulas(conditions, true, false, true, context).then((strippedConditions: Fmt.Expression[]) =>
+                    this.checkImplication(step, previousResult, strippedConditions));
+                  this.stripConstraintsFromFormulas(conditions, false, true, true, context).then((strippedConditions: Fmt.Expression[]) =>
+                    this.checkUnfolding(strippedConditions, useTheorem.result, false));
                 } else {
                   this.error(step, 'Invalid input proof step');
                 }
@@ -1665,7 +1689,8 @@ export class HLMDefinitionChecker {
               }
             } else {
               let claim = this.utils.substitutePath(definition.contents.claim, theorem.path, [definition]);
-              this.checkUnfolding([claim], useTheorem.result, false);
+              this.stripConstraintsFromFormula(claim, false, true, true, context).then((strippedClaim: Fmt.Expression) =>
+                this.checkUnfolding([strippedClaim], useTheorem.result, false));
             }
           } else {
             this.error(step, 'Referenced definition must be a construction or set operator');
@@ -1824,39 +1849,77 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkTrivialProvability(object: Object, context: HLMCheckerProofStepContext, getMessage: () => string): void {
-    let check = this.isTriviallyProvable(context).then((result: boolean) => {
-      if (!result) {
-        this.message(object, getMessage(), Logic.DiagnosticSeverity.Warning);
+  private isTriviallyProvable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+    // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
+    let constraintsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+    for (let variableInfo of context.context.getVariables()) {
+      if (!variableInfo.indexParameterLists && context.binderSourceParameters.indexOf(variableInfo.parameter) < 0) {
+        constraintsPromise = constraintsPromise.then((currentConstraints: Fmt.Expression[]) => {
+          let constraint = this.utils.getParameterConstraint(variableInfo.parameter, context);
+          if (constraint) {
+            return currentConstraints.concat(constraint);
+          } else {
+            return currentConstraints;
+          }
+        });
       }
+    }
+    return constraintsPromise.then((constraints: Fmt.Expression[]) => {
+      let constraint = this.utils.createConjunction(constraints);
+      return this.utils.triviallyImplies(constraint, goal, true);
     });
-    this.addPendingCheck(object, check);
   }
 
-  private isTriviallyProvable(context: HLMCheckerProofStepContext): CachedPromise<boolean> {
-    if (context.goal) {
-      let goal = context.goal;
-      // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
-      let constraintsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-      for (let variableInfo of context.context.getVariables()) {
-        if (!variableInfo.indexParameterLists && context.binderSourceParameters.indexOf(variableInfo.parameter) < 0) {
-          constraintsPromise = constraintsPromise.then((currentConstraints: Fmt.Expression[]) => {
-            let constraint = this.utils.getParameterConstraint(variableInfo.parameter, context);
-            if (constraint) {
-              return currentConstraints.concat(constraint);
-            } else {
-              return currentConstraints;
-            }
-          });
+  private isTriviallyDisprovable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+    return this.utils.negateFormula(goal, true).then((negatedGoal: Fmt.Expression) =>
+      this.isTriviallyProvable(negatedGoal, context));
+  }
+
+  private stripConstraintsFromFormulas(formulas: Fmt.Expression[], stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext): CachedPromise<Fmt.Expression[]> {
+    let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+    for (let formula of formulas) {
+      resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
+        this.stripConstraintsFromFormula(formula, stripPositive, stripNegative, allowTrivialResult, context).then((strippedFormula: Fmt.Expression) =>
+          currentResult.concat(strippedFormula)));
+    }
+    return resultPromise;
+  }
+
+  private stripConstraintsFromFormula(formula: Fmt.Expression,  stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext, negate: boolean = false): CachedPromise<Fmt.Expression> {
+    let intermediatePromise = CachedPromise.resolve(formula);
+    if (allowTrivialResult) {
+      if (negate) {
+        if (stripNegative) {
+          intermediatePromise = this.isTriviallyDisprovable(formula, context).then((result: boolean) =>
+            (result ? new FmtHLM.MetaRefExpression_or : formula));
+        }
+      } else {
+        if (stripPositive) {
+          intermediatePromise = this.isTriviallyProvable(formula, context).then((result: boolean) =>
+            (result ? new FmtHLM.MetaRefExpression_and : formula));
         }
       }
-      return constraintsPromise.then((constraints: Fmt.Expression[]) => {
-        let constraint = this.utils.createConjunction(constraints);
-        return this.utils.triviallyImplies(constraint, goal, true);
-      });
-    } else {
-      return CachedPromise.resolve(false);
     }
+    return intermediatePromise.then((intermediateFormula: Fmt.Expression) => {
+      if (intermediateFormula instanceof FmtHLM.MetaRefExpression_and && intermediateFormula.formulas) {
+        let resultItemsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+        for (let item of intermediateFormula.formulas) {
+          resultItemsPromise = resultItemsPromise.then((currentResultItems: Fmt.Expression[]) =>
+            this.stripConstraintsFromFormula(item, stripPositive, stripNegative, true, context, negate).then((strippedItem: Fmt.Expression) =>
+              (this.utils.isTrueFormula(strippedItem) ? currentResultItems : currentResultItems.concat(strippedItem))));
+        }
+        return resultItemsPromise.then((resultItems: Fmt.Expression[]) => this.utils.createConjunction(resultItems));
+      } else if (intermediateFormula instanceof FmtHLM.MetaRefExpression_or && intermediateFormula.formulas) {
+        let resultItemsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+        for (let item of intermediateFormula.formulas) {
+          resultItemsPromise = resultItemsPromise.then((currentResultItems: Fmt.Expression[]) =>
+            this.stripConstraintsFromFormula(item, stripPositive, stripNegative, true, context, !negate).then((strippedItem: Fmt.Expression) =>
+              (this.utils.isFalseFormula(strippedItem) ? currentResultItems : currentResultItems.concat(strippedItem))));
+        }
+        return resultItemsPromise.then((resultItems: Fmt.Expression[]) => this.utils.createDisjunction(resultItems));
+      }
+      return intermediateFormula;
+    });
   }
 
   private addProofConstraint(parameters: Fmt.ParameterList, formula: Fmt.Expression): void {

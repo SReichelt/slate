@@ -449,7 +449,7 @@ export class Reader {
         let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
         let [expression, indexParameterLists] = this.readExpressionAfterIdentifier(identifier, identifierRange, valueContext);
         this.markEnd(argStart, expression, valueContext, valueContext.metaModel.functions, identifierRange);
-        expression = this.readExpressionIndices(expression, indexParameterLists, argStart, context);
+        expression = this.readExpressionIndices(expression, indexParameterLists, argStart, valueContext);
         arg.value = expression;
       }
     } else {
@@ -508,9 +508,9 @@ export class Reader {
       if (!expression) {
         expression = new Fmt.GenericMetaRefExpression(name, new Fmt.ArgumentList);
       }
-      context = new Ctx.ParentInfoContext(expression, context);
+      let argumentsContext = new Ctx.ParentInfoContext(expression, context);
       let args = new Fmt.ArgumentList;
-      this.readOptionalArgumentList(args, context);
+      this.readOptionalArgumentList(args, argumentsContext);
       try {
         let reportFn = this.rangeHandler?.reportConversion?.bind(this.rangeHandler);
         (expression as Fmt.MetaRefExpression).fromArgumentList(args, reportFn);
@@ -521,8 +521,8 @@ export class Reader {
       // Other expressions not allowed in this case.
     } else if (this.tryReadChar('$')) {
       let definitionRefExpression = new Fmt.DefinitionRefExpression(new Fmt.Path(''));
-      context = new Ctx.ParentInfoContext(definitionRefExpression, context);
-      definitionRefExpression.path = this.readPath(context);
+      let pathContext = new Ctx.ParentInfoContext(definitionRefExpression, context);
+      definitionRefExpression.path = this.readPath(pathContext);
       expression = definitionRefExpression;
     } else {
       let identifier = this.tryReadIdentifier();
@@ -533,14 +533,14 @@ export class Reader {
         // Other expressions not allowed in this case.
       } else if (this.tryReadChar('{')) {
         let compoundExpression = new Fmt.CompoundExpression(new Fmt.ArgumentList);
-        context = new Ctx.ParentInfoContext(compoundExpression, context);
-        this.readArguments(compoundExpression.arguments, context);
+        let argumentsContext = new Ctx.ParentInfoContext(compoundExpression, context);
+        this.readArguments(compoundExpression.arguments, argumentsContext);
         this.readChar('}');
         expression = compoundExpression;
       } else if (this.tryReadChar('#')) {
         let parameterExpression = new Fmt.ParameterExpression(new Fmt.ParameterList);
-        context = new Ctx.ParentInfoContext(parameterExpression, context);
-        this.readParameterList(parameterExpression.parameters, context);
+        let parametersContext = new Ctx.ParentInfoContext(parameterExpression, context);
+        this.readParameterList(parameterExpression.parameters, parametersContext);
         expression = parameterExpression;
       } else if (this.tryReadChar('[')) {
         let items = this.readExpressions(context);

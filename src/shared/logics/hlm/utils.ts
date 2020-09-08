@@ -239,7 +239,27 @@ export class HLMUtils extends GenericUtils {
     if (formulas.length === 1) {
       return formulas[0];
     } else {
-      return new FmtHLM.MetaRefExpression_and(...formulas);
+      let resultFormulas: Fmt.Expression[] | undefined = undefined;
+      let index = 0;
+      for (let formula of formulas) {
+        if (this.isFalseFormula(formula)) {
+          return formula;
+        } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
+          if (formula.formulas) {
+            if (!resultFormulas) {
+              resultFormulas = formulas.splice(0, index);
+            }
+            resultFormulas.push(...formula.formulas);
+          }
+        } else if (resultFormulas) {
+          resultFormulas.push(formula);
+        }
+        index++;
+      }
+      if (!resultFormulas) {
+        resultFormulas = formulas;
+      }
+      return new FmtHLM.MetaRefExpression_and(...resultFormulas);
     }
   }
 
@@ -247,7 +267,27 @@ export class HLMUtils extends GenericUtils {
     if (formulas.length === 1) {
       return formulas[0];
     } else {
-      return new FmtHLM.MetaRefExpression_or(...formulas);
+      let resultFormulas: Fmt.Expression[] | undefined = undefined;
+      let index = 0;
+      for (let formula of formulas) {
+        if (this.isTrueFormula(formula)) {
+          return formula;
+        } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
+          if (formula.formulas) {
+            if (!resultFormulas) {
+              resultFormulas = formulas.splice(0, index);
+            }
+            resultFormulas.push(...formula.formulas);
+          }
+        } else if (resultFormulas) {
+          resultFormulas.push(formula);
+        }
+        index++;
+      }
+      if (!resultFormulas) {
+        resultFormulas = formulas;
+      }
+      return new FmtHLM.MetaRefExpression_or(...resultFormulas);
     }
   }
 
@@ -1483,10 +1523,10 @@ export class HLMUtils extends GenericUtils {
   private containsContradictoryFormulas(formulas: Fmt.Expression[], followDefinitions: boolean): CachedPromise<boolean> {
     let resultPromise = CachedPromise.resolve(false);
     for (let item of formulas) {
-      resultPromise = resultPromise.or(() => this.isTrivialTautology(item, followDefinitions));
+      resultPromise = resultPromise.or(() => this.isTrivialContradiction(item, followDefinitions));
       if (item !== formulas[0]) {
-        resultPromise = resultPromise.or(() => {
-          return this.negateFormula(item, followDefinitions).then((negatedItem: Fmt.Expression) => {
+        resultPromise = resultPromise.or(() =>
+          this.negateFormula(item, followDefinitions).then((negatedItem: Fmt.Expression) => {
             for (let previousItem of formulas) {
               if (previousItem === item) {
                 break;
@@ -1499,8 +1539,7 @@ export class HLMUtils extends GenericUtils {
               }
             }
             return false;
-          });
-        });
+          }));
       }
     }
     return resultPromise;
@@ -1734,7 +1773,7 @@ export class HLMUtils extends GenericUtils {
         let term = formula.terms[side];
         if (term instanceof Fmt.DefinitionRefExpression) {
           let otherTerm = formula.terms[1 - side];
-          return this.getImplicitOperatorDefinition(term, otherTerm);
+          return this.getImplicitOperatorDefinition(term, otherTerm, side);
         }
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
@@ -1937,7 +1976,7 @@ export class HLMUtils extends GenericUtils {
     return resultPromise;
   }
 
-  private getImplicitOperatorDefinition(term: Fmt.DefinitionRefExpression, otherTerm: Fmt.Expression): CachedPromise<HLMFormulaDefinition[]> {
+  private getImplicitOperatorDefinition(term: Fmt.DefinitionRefExpression, otherTerm: Fmt.Expression, side: number): CachedPromise<HLMFormulaDefinition[]> {
     let path = term.path;
     return this.getOuterDefinition(term).then((definition: Fmt.Definition) => {
       if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
@@ -1948,6 +1987,9 @@ export class HLMUtils extends GenericUtils {
         return contents.definition.map((item: Fmt.Expression) => {
           let substitutedItem = this.substitutePath(item, path, [definition]);
           substitutedItem = FmtUtils.substituteVariable(substitutedItem, contents.parameter, otherTerm);
+          if (substitutedItem instanceof FmtHLM.MetaRefExpression_equals && side < substitutedItem.terms.length) {
+            substitutedItem = new FmtHLM.MetaRefExpression_equals(substitutedItem.terms[side], ...substitutedItem.terms.slice(0, side), ...substitutedItem.terms.slice(side + 1, substitutedItem.terms.length));
+          }
           let conjunction = new FmtHLM.MetaRefExpression_and(elementCondition, substitutedItem);
           return {
             formula: conjunction,
