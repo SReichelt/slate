@@ -69,7 +69,8 @@ Equivalence.
 5⇒3. Assume |S| ≤ 0. Then ∄ x ∈ S:
      |S| ≤ 0 ⇒^def ∃ φ : |S| → 0 : φ is injective
      Let x ∈ S.
-     We have φ(x) ∈ ∅ ⇒^def ⭍.
+     We have φ(x) ∈ ℕ_(<0) ⇒^def φ(x) < 0
+      ⇒^def ⭍.
 
 Remarks.
 
@@ -101,10 +102,9 @@ Equivalence.
      Choose l := k, g := f^-1.
 3⇒1. Let l ∈ ℕ, g : ℕ_(<l) ↔ S be a bijection. Then |S| is finite:
      We show that |S| ∈ ℕ:
-     We have |ℕ_(<l)| = |S|:
+     We have l = |S|:
        We show that ∃ s : ℕ_(<l) ↔ S:
        Choose s := g.
-      ⇒^[l = |ℕ_(<l)|] l = |S|
      l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
      f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
