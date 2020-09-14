@@ -156,6 +156,9 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: Workspa
                 // After certain events like file renaming, we want to avoid registering intermediate errors.
                 return;
             }
+            if (!event.contentChanges.length) {
+                return;
+            }
             let changedDocument = event.document;
             if (changedDocument.languageId === languageId) {
                 let fileName = changedDocument.uri.fsPath;

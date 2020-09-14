@@ -252,9 +252,14 @@ div.display-math {
   line-height: 80%;
 }
 
-.overunder.shallow.nounder>.overunder-body-row>.overunder-body, .overunder.shallow.nounder>.overunder-over-row>.overunder-over {
+.overunder.shallow.nounder>.overunder-body-row>.overunder-body {
   position: relative;
   top: -0.4em;
+}
+
+.overunder.shallow.nounder>.overunder-over-row>.overunder-over {
+  position: relative;
+  top: -0.2em;
 }
 
 .paren-large {

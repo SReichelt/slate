@@ -1834,6 +1834,36 @@ export class HLMDefinitionChecker {
         this.error(step, 'Goal not set');
       }
       return undefined;
+    } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
+      if (context.goal) {
+        let sourceContext: HLMCheckerProofStepContext = {
+          ...context,
+          goal: undefined,
+          previousResult: undefined
+        };
+        let sourceResultContext = this.checkProofStep(type.source, sourceContext);
+        if (sourceResultContext && (sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
+          let terms = sourceResultContext.previousResult.terms;
+          let sourceIndex = this.utils.translateIndex(type.sourceSide);
+          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < terms.length) {
+            let sourceTerm = terms[sourceIndex];
+            let targetTerms = terms.slice();
+            targetTerms.splice(sourceIndex, 1);
+            if (this.utils.substitutesTo(context.goal, type.goal, sourceTerm, targetTerms)) {
+              this.checkProof(step, type.proof, undefined, type.goal, context);
+            } else {
+              this.error(step, `Substitution from ${context.goal} to ${type.goal} is invalid`);
+            }
+          } else {
+            this.error(step, 'Source side is invalid');
+          }
+        } else {
+          this.error(type.source, 'Source proof step does not result in an equality');
+        }
+      } else {
+        this.error(step, 'Goal not set');
+      }
+      return undefined;
     } else {
       this.error(step, 'Invalid proof step');
       return undefined;
@@ -2037,6 +2067,8 @@ export class HLMDefinitionChecker {
   }
 
   private checkSubset(subset: Fmt.Expression, superset: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+    // I think setting checkSubset to true on the first try improves the way placeholders are filled,
+    // but I'm not sure.
     return this.checkSetCompatibilityInternal(subset, [subset, superset], true, context, initialCompatibilityStatusWithoutElements)
       .then((subsetResult: Fmt.Expression | undefined) => {
         if (subsetResult) {
@@ -2055,6 +2087,8 @@ export class HLMDefinitionChecker {
   }
 
   private checkElement(element: Fmt.Expression, set: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+    // I think setting checkSubset to true on the first try improves the way placeholders are filled,
+    // but I'm not sure.
     return this.utils.getDeclaredSet(element).then((declaredSet: Fmt.Expression) =>
       this.checkSetCompatibilityInternal(element, [declaredSet, set], true, context, initialCompatibilityStatus)
         .then((elementResult: Fmt.Expression | undefined) => {

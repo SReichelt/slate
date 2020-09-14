@@ -18,6 +18,8 @@ import { HLMRenderUtils } from './renderUtils';
 import { HLMDefinitionChecker } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
+export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
+
 export interface ParameterSelection {
   allowSets: boolean;
   allowConstraint: boolean;
@@ -1098,6 +1100,14 @@ export class HLMEditHandler extends GenericEditHandler {
         newTerm.cases.push(newCase);
         expressionEditInfo.onSetValue(newTerm);
       }
+    };
+    return this.getImmediateInsertButton(onInsert);
+  }
+
+  getProofInsertButton(onInsertProof: InsertProofFn): Notation.RenderedExpression {
+    let onInsert = () => {
+      let proof = new FmtHLM.ObjectContents_Proof(undefined, undefined, undefined, undefined, new Fmt.ParameterList);
+      onInsertProof(proof);
     };
     return this.getImmediateInsertButton(onInsert);
   }

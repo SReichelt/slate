@@ -5834,6 +5834,98 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
   }
 }
 
+export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression {
+  constructor(public source: Fmt.Parameter, public sourceSide: Fmt.BN, public goal: Fmt.Expression, public proof?: ObjectContents_Proof) {
+    super();
+  }
+
+  getName(): string {
+    return 'ProveBySubstitution';
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    let sourceRaw = argumentList.getValue('source', 0);
+    if (sourceRaw instanceof Fmt.ParameterExpression && sourceRaw.parameters.length === 1) {
+      this.source = sourceRaw.parameters[0];
+    } else {
+      throw new Error('source: Parameter expression with single parameter expected');
+    }
+    let sourceSideRaw = argumentList.getValue('sourceSide', 1);
+    if (sourceSideRaw instanceof Fmt.IntegerExpression) {
+      this.sourceSide = sourceSideRaw.value;
+    } else {
+      throw new Error('sourceSide: Integer expected');
+    }
+    this.goal = argumentList.getValue('goal', 2);
+    let proofRaw = argumentList.getOptionalValue('proof', 3);
+    if (proofRaw !== undefined) {
+      let newItem = ObjectContents_Proof.createFromExpression(proofRaw, reportFn);
+      this.proof = newItem;
+      reportFn?.(proofRaw, newItem);
+    }
+  }
+
+  toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
+    let sourceExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.source));
+    argumentList.push(new Fmt.Argument(undefined, sourceExpr, false));
+    let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
+    argumentList.push(new Fmt.Argument(undefined, sourceSideExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.goal, false));
+    if (this.proof !== undefined) {
+      let proofExpr = this.proof.toExpression(true, reportFn);
+      argumentList.push(new Fmt.Argument('proof', proofExpr, true));
+      reportFn?.(proofExpr, this.proof);
+    }
+    return argumentList;
+  }
+
+  substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
+    let changed = false;
+    let sourceResult = this.source.substituteExpression(fn, replacedParameters);
+    if (sourceResult !== this.source) {
+      changed = true;
+    }
+    let goalResult = this.goal.substitute(fn, replacedParameters);
+    if (goalResult !== this.goal) {
+      changed = true;
+    }
+    let proofResult: ObjectContents_Proof | undefined = undefined;
+    if (this.proof) {
+      proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
+      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (fn && !changed) {
+      return fn(this);
+    }
+    let result = new MetaRefExpression_ProveBySubstitution(sourceResult, this.sourceSide, goalResult, proofResult);
+    return fn ? fn(result) : result;
+  }
+
+  protected matches(expression: Fmt.Expression, fn: Fmt.ExpressionUnificationFn | undefined, replacedParameters: Fmt.ReplacedParameter[]): boolean {
+    if (!(expression instanceof MetaRefExpression_ProveBySubstitution)) {
+      return false;
+    }
+    if (!Fmt.areObjectsEquivalent(this.source, expression.source, fn, replacedParameters)) {
+      return false;
+    }
+    if (this.sourceSide !== undefined || expression.sourceSide !== undefined) {
+      if (this.sourceSide === undefined || expression.sourceSide === undefined || !this.sourceSide.eq(expression.sourceSide)) {
+        return false;
+      }
+    }
+    if (!Fmt.areObjectsEquivalent(this.goal, expression.goal, fn, replacedParameters)) {
+      return false;
+    }
+    if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
+      return false;
+    }
+    return true;
+  }
+}
+
 export class ObjectContents_Case extends Fmt.ObjectContents {
   constructor(public formula: Fmt.Expression, public value: Fmt.Expression, public exclusivityProof?: ObjectContents_Proof) {
     super();
@@ -6089,7 +6181,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 }
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
-const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Substitute': MetaRefExpression_Substitute, 'Unfold': MetaRefExpression_Unfold, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveByContradiction': MetaRefExpression_ProveByContradiction, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveEquivalence': MetaRefExpression_ProveEquivalence, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction};
+const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Substitute': MetaRefExpression_Substitute, 'Unfold': MetaRefExpression_Unfold, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveByContradiction': MetaRefExpression_ProveByContradiction, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveEquivalence': MetaRefExpression_ProveEquivalence, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction, 'ProveBySubstitution': MetaRefExpression_ProveBySubstitution};
 const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': null};
 
 export class MetaModel extends Meta.MetaModel {
@@ -6535,6 +6627,11 @@ export class MetaModel extends Meta.MetaModel {
       if (parent instanceof MetaRefExpression_ProveByInduction) {
         if (argument.name === 'cases' || (argument.name === undefined && argumentIndex === 2)) {
           context = new ArgumentTypeContext(ObjectContents_StructuralCase, context);
+        }
+      }
+      if (parent instanceof MetaRefExpression_ProveBySubstitution) {
+        if (argument.name === 'proof' || (argument.name === undefined && argumentIndex === 3)) {
+          context = new ArgumentTypeContext(ObjectContents_Proof, context);
         }
       }
     }

@@ -5,7 +5,7 @@ $hlm: %MetaModel {
   expressionTypes = [$Bool, $Nat,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binder,
                      $SetDef, $Def,
-                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $Unfold, $UseTheorem, $ProveDef, $ProveByContradiction, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction],
+                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $Unfold, $UseTheorem, $ProveDef, $ProveByContradiction, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction, $ProveBySubstitution],
   functions = [$true, $false,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
@@ -305,6 +305,9 @@ $ProveCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
   superType = $FinalProofStep
 }
 $ProveByInduction(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Proof)[]): %ParameterType {
+  superType = $FinalProofStep
+}
+$ProveBySubstitution(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, goal: $Formula, proof?: $Proof): %ParameterType($Formula) {
   superType = $FinalProofStep
 }
 
