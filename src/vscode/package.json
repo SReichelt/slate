@@ -91,7 +91,8 @@
 		"typescript": "^3.9.7",
 		"vsce": "^1.79.5",
 		"webpack": "^4.44.1",
-		"webpack-cli": "^3.3.12"
+		"webpack-cli": "^3.3.12",
+		"yazl": "^2.5.1"
 	},
 	"__metadata": {
 		"id": "ea7b3c4b-a00f-4f95-a431-7a74aa78303c",
