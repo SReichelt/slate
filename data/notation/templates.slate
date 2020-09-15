@@ -2144,7 +2144,10 @@ $ProofEquality(source?: %Expr, formula?: %Expr): %Template {
  * The symbol used to denote "contradiction" in proofs.
  */
 $Contradiction: %Template {
-  notation = '⭍'
+  notation = $Style(
+    body = '↯',
+    styleClass = 'contradiction'
+  )
 }
 
 /**

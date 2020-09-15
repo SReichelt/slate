@@ -597,6 +597,11 @@ div.display-math {
   font-size: smaller;
 }
 
+.contradiction {
+  font-family: serif;
+  font-style: italic;
+}
+
 .dummy {
   color: var(--dummy-foreground-color);
 }
