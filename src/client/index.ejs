@@ -17,6 +17,7 @@
       <link href="theme-default.css" rel="stylesheet" />
     <% } %>
     <link href="fonts/MathJax/fonts.css" rel="stylesheet" />
+    <link href="fonts/LatinModern/fonts.css" rel="stylesheet" />
     <% if (htmlWebpackPlugin.options.isStatic) { %>
       <link href="static.css" rel="stylesheet" />
       <link href="<%= htmlWebpackPlugin.options.outputPlaceholder('canonicalURL') %>" rel="canonical" />
@@ -46,18 +47,12 @@
           font-family: 'TeX';
           font-weight: bold;
         }
-        .preload-font-var {
-          font-family: 'TeX-Var';
+        .preload-font-italic {
+          font-family: 'TeX';
           font-style: italic;
         }
         .preload-font-sans {
           font-family: 'TeX-Sans';
-        }
-        .preload-font-calligraphic {
-          font-family: 'TeX-Calligraphic';
-        }
-        .preload-font-large {
-          font-family: 'TeX-Large';
         }
       </style>
       <meta name="description" content="Slate is a project to build a web-based interactive theorem prover with a focus on abstract mathematics. It is optimized for being easy to learn." />
