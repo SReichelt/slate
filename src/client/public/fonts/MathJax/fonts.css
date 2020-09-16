@@ -1,0 +1,87 @@
+@font-face {
+  font-family: 'TeX';
+  src: url('MathJax_Size1-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'TeX';
+  src: url('MathJax_AMS-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'TeX';
+  src: url('MathJax_Main-Regular.woff') format('woff');
+  unicode-range: U+0-2203, U+2206-FFFF;
+}
+
+@font-face {
+  font-family: 'TeX';
+  font-style: italic;
+  src: url('MathJax_Main-Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX';
+  font-weight: bold;
+  src: url('MathJax_Main-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Var';
+  src: url('MathJax_Size1-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'TeX-Var';
+  src: url('MathJax_Main-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Var';
+  font-weight: bold;
+  src: url('MathJax_Main-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Var';
+  font-style: italic;
+  src: url('MathJax_Math-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Var';
+  font-weight: bold;
+  font-style: italic;
+  src: url('MathJax_Math-BoldItalic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Sans';
+  src: url('MathJax_SansSerif-Regular.woff') format('woff');
+  unicode-range: U+30-FFFF;
+}
+
+@font-face {
+  font-family: 'TeX-Calligraphic';
+  src: url('MathJax_Main-Italic.woff') format('woff');
+}
+@font-face {
+  font-family: 'TeX-Calligraphic';
+  src: url('MathJax_Caligraphic-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Fraktur';
+  src: url('MathJax_Fraktur-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-DoubleStruck';
+  src: url('MathJax_AMS-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TeX-Large';
+  src: url('MathJax_Main-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'TeX-Large';
+  src: url('MathJax_Size2-Regular.woff') format('woff');
+}

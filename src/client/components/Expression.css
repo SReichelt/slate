@@ -536,7 +536,7 @@ div.display-math {
 
 .radical-radicand {
   display: table-cell;
-  border-top: solid 1pt;
+  border-top: solid 0.8pt;
   padding-top: 1pt;
   padding-right: 0.3ex;
 }
