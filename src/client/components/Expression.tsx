@@ -803,7 +803,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           </span>
           <span className={'radical-diagonal'}>
             <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-              <line x1="0" y1="0.965" x2="1.025" y2="0.025" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="round"/>
+              <line x1="0" y1="0.965" x2="1.025" y2="0.05" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square"/>
             </svg>
           </span>
           <span className={'radical-radicand'}>

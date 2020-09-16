@@ -437,7 +437,7 @@ div.display-math {
 }
 
 .table.construction>.table-row>.table-cell:not(:first-child) {
-  border-left: solid 1pt;
+  border-left: solid 0.75pt;
   padding-left: 4pt;
   white-space: initial;
 }
@@ -473,7 +473,7 @@ div.display-math {
 }
 
 .fraction-denominator {
-  border-top: solid 0.75pt;
+  border-top: solid 0.6pt;
 }
 
 .radical {
