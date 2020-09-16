@@ -567,27 +567,6 @@ div.display-math {
   padding-left: 1px;
 }
 
-.prime {
-  position: relative;
-  visibility: hidden;
-}
-
-.replacement {
-  display: none;
-}
-
-.prime .replacement {
-  display: initial;
-  position: absolute;
-  left: 0;
-  top: -0.55em;
-  visibility: initial;
-  overflow: visible;
-  white-space: nowrap;
-  font-style: initial;
-  font-size: 70%;
-}
-
 .def-colon {
   vertical-align: .04em;
 }

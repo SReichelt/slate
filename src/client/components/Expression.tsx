@@ -47,12 +47,7 @@ class ExpressionUnicodeConverter implements UnicodeConverter {
   childIndex: number = 0;
 
   outputText(text: string, style?: string | undefined): void {
-    let content: React.ReactNode = text;
-    if (text === '\'') {
-      style = style ? style + ' prime' : 'prime';
-      content = [<span className={'replacement'} key={0}> ′</span>, content];
-    }
-    this.result.push(style ? <span className={style} key={this.childIndex++}>{content}</span> : content);
+    this.result.push(style ? <span className={style} key={this.childIndex++}>{text}</span> : text);
   }
 
   outputLineBreak(): void {

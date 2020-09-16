@@ -18,34 +18,3 @@
   font-style: italic;
   src: url('lmroman10-bolditalic.woff') format('woff');
 }
-
-@font-face {
-  font-family: 'TeX-Var';
-  src: url('lmroman10-regular.woff') format('woff');
-}
-@font-face {
-  font-family: 'TeX-Var';
-  font-style: italic;
-  src: url('lmroman10-italic.woff') format('woff');
-}
-@font-face {
-  font-family: 'TeX-Var';
-  font-weight: bold;
-  src: url('lmroman10-bold.woff') format('woff');
-}
-@font-face {
-  font-family: 'TeX-Var';
-  font-weight: bold;
-  font-style: italic;
-  src: url('lmroman10-bolditalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'TeX-Sans';
-  src: url('lmsans10-regular.woff') format('woff');
-}
-@font-face {
-  font-family: 'TeX-Sans';
-  font-weight: bold;
-  src: url('lmsans10-bold.woff') format('woff');
-}

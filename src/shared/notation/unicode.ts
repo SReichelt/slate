@@ -45,11 +45,6 @@ export function convertUnicode(text: string, renderer: UnicodeConverter, options
         renderer.outputExtraSpace(true);
       }
       break;
-    case '\'':
-      // Output as standalone symbol because it needs special handling.
-      flush();
-      renderer.outputText(c);
-      break;
     default:
       let cp = c.codePointAt(0)!;
       if (options.convertStandardCharacters) {
