@@ -603,6 +603,13 @@ div.display-math {
   font-style: italic!important;
 }
 
+.prime {
+  font-family: 'TeX', sans-serif;
+  font-style: italic;
+  position: relative;
+  left: -1pt;
+}
+
 .sans, .ctor {
   font-family: 'TeX-Sans', sans-serif;
   font-style: normal;

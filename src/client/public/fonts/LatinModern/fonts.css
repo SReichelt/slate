@@ -1,20 +1,24 @@
 @font-face {
   font-family: 'TeX';
   src: url('lmroman10-regular.woff') format('woff');
+  unicode-range: U+0-2214, U+2216-FFFF;
 }
 @font-face {
   font-family: 'TeX';
   font-style: italic;
   src: url('lmroman10-italic.woff') format('woff');
+  unicode-range: U+0-2214, U+2216-FFFF;
 }
 @font-face {
   font-family: 'TeX';
   font-weight: bold;
   src: url('lmroman10-bold.woff') format('woff');
+  unicode-range: U+0-2214, U+2216-FFFF;
 }
 @font-face {
   font-family: 'TeX';
   font-weight: bold;
   font-style: italic;
   src: url('lmroman10-bolditalic.woff') format('woff');
+  unicode-range: U+0-2214, U+2216-FFFF;
 }

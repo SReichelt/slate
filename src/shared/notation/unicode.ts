@@ -45,6 +45,10 @@ export function convertUnicode(text: string, renderer: UnicodeConverter, options
         renderer.outputExtraSpace(true);
       }
       break;
+    case '\'':
+      setStyle('prime');
+      curText += c;
+      break;
     default:
       let cp = c.codePointAt(0)!;
       if (options.convertStandardCharacters) {
