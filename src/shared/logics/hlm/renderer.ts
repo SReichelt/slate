@@ -488,8 +488,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         // Occurs if bound parameter list is empty.
         row.push(new Notation.TextExpression(', '));
       }
-      let insertButton = new Notation.InsertPlaceholderExpression;
-      let semanticLink = new Notation.SemanticLink(insertButton, false, false);
       let stateCopy: ParameterListState = {
         ...state,
         associatedParameterList: undefined,
@@ -517,8 +515,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         allowDefinition: state.fullSentence && !state.inExistsUnique,
         allowBinder: state.associatedDefinition !== undefined && !state.inForEach && !state.inExistsUnique
       };
-      this.editHandler.addParameterMenu(semanticLink, onRenderParam, onInsertParam, paramSelection, state.inForEach);
-      insertButton.semanticLinks = [semanticLink];
+      let insertButton = this.editHandler.getParameterInsertButton(onRenderParam, onInsertParam, paramSelection, state.inForEach);
       row.push(insertButton);
     }
   }
@@ -2444,8 +2441,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         proofNumber++;
       }
       if (this.editHandler && onInsertProof) {
-        let insertButton = this.editHandler.getProofInsertButton(onInsertProof);
-        state.paragraphs.push(insertButton);
+        state.paragraphs.push(this.editHandler.getProofInsertButton(onInsertProof));
       }
     } else {
       this.addNoProofPlaceholder(heading, onInsertProof, state);

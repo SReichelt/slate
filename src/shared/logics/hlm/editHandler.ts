@@ -214,6 +214,11 @@ export class HLMEditHandler extends GenericEditHandler {
     };
   }
 
+  getParameterInsertButton(onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn, parameterSelection: ParameterSelection, inForEach: boolean): Notation.RenderedExpression {
+    return this.getSemanticLinkInsertButton((semanticLink: Notation.SemanticLink) =>
+      this.addParameterMenu(semanticLink, onRenderParam, onInsertParam, parameterSelection, inForEach));
+  }
+
   addSetTermMenu(semanticLink: Notation.SemanticLink, term: Fmt.Expression, onRenderTerm: RenderExpressionFn, termSelection: SetTermSelection): void {
     let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(term);
     if (expressionEditInfo) {
@@ -838,16 +843,12 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   getEmbeddingInsertButton(definitionContents: FmtHLM.ObjectContents_Construction, onRenderEmbedding: (expression: Fmt.Expression, full: boolean) => Notation.RenderedExpression): Notation.RenderedExpression {
-    let insertButton = new Notation.InsertPlaceholderExpression;
-    let semanticLink = new Notation.SemanticLink(insertButton, false, false);
-    semanticLink.onMenuOpened = () => {
+    return this.getMenuInsertButton(() => {
       return new Menu.ExpressionMenu(CachedPromise.resolve([
         this.getEmbeddingRow(definitionContents, false, onRenderEmbedding),
         this.getEmbeddingRow(definitionContents, true, onRenderEmbedding)
       ]));
-    };
-    insertButton.semanticLinks = [semanticLink];
-    return insertButton;
+    });
   }
 
   private getEmbeddingRow(definitionContents: FmtHLM.ObjectContents_Construction, full: boolean, onRenderEmbedding: (expression: Fmt.Expression, full: boolean) => Notation.RenderedExpression): Menu.ExpressionMenuRow {
@@ -872,19 +873,17 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getExpressionInsertButton(parentExpression: Fmt.Expression, onInsertExpression: InsertExpressionFn, onAddMenu: (semanticLink: Notation.SemanticLink, expressionEditInfo: Edit.ExpressionEditInfo) => void): Notation.RenderedExpression {
-    let insertButton = new Notation.InsertPlaceholderExpression;
-    let semanticLink = new Notation.SemanticLink(insertButton, false, false);
-    let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
-    if (parentExpressionEditInfo) {
-      let expressionEditInfo: Edit.ExpressionEditInfo = {
-        optional: false,
-        onSetValue: (newValue) => onInsertExpression(newValue!),
-        context: parentExpressionEditInfo.context
-      };
-      onAddMenu(semanticLink, expressionEditInfo);
-    }
-    insertButton.semanticLinks = [semanticLink];
-    return insertButton;
+    return this.getSemanticLinkInsertButton((semanticLink: Notation.SemanticLink) => {
+      let parentExpressionEditInfo = this.editAnalysis.expressionEditInfo.get(parentExpression);
+      if (parentExpressionEditInfo) {
+        let expressionEditInfo: Edit.ExpressionEditInfo = {
+          optional: false,
+          onSetValue: (newValue) => onInsertExpression(newValue!),
+          context: parentExpressionEditInfo.context
+        };
+        onAddMenu(semanticLink, expressionEditInfo);
+      }
+    });
   }
 
   addEnumerationInsertButton(renderedItems: Notation.RenderedExpression[], term: FmtHLM.MetaRefExpression_enumeration, onRenderTerm: RenderExpressionFn, termSelection: ElementTermSelection): void {
@@ -1110,5 +1109,13 @@ export class HLMEditHandler extends GenericEditHandler {
       onInsertProof(proof);
     };
     return this.getImmediateInsertButton(onInsert);
+  }
+
+  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof): Notation.RenderedExpression {
+    return this.getMenuInsertButton(() => {
+      let rows: Menu.ExpressionMenuRow[] = [];
+
+      return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
+    });
   }
 }
