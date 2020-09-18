@@ -2,8 +2,7 @@
 
 $"Pointed set base point"(i: %Element($"Pointed sets")): %ExplicitOperator {
   definition = [%structuralCases(
-    i,
-    $"Pointed sets",
+    i, $"Pointed sets",
     [{
       constructor = $"Pointed sets"."pointed set",
       parameters = #(

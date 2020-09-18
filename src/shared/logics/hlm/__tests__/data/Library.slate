@@ -3,21 +3,9 @@
 $Library: %Library {
   logic = 'hlm',
   items = [
-    %subsection(
-      $Essentials,
-      'Essentials'
-    ),
-    %subsection(
-      $Syntax,
-      'Syntax'
-    ),
-    %subsection(
-      $Restrictions,
-      'Restrictions'
-    ),
-    %subsection(
-      $Types,
-      'Types'
-    )
+    %subsection($Essentials, 'Essentials'),
+    %subsection($Syntax, 'Syntax'),
+    %subsection($Restrictions, 'Restrictions'),
+    %subsection($Types, 'Types')
   ]
 }

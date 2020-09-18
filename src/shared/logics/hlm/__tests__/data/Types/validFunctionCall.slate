@@ -12,8 +12,8 @@ $validFunctionCall(f: %Element($../Essentials/Functions(
       x = $../Essentials/"Natural numbers".zero
     ),
     $../Essentials/"Pointed sets"."pointed set"(
-        S = $../Essentials/"Natural numbers",
-        s = $../Essentials/"Natural numbers".zero
+      S = $../Essentials/"Natural numbers",
+      s = $../Essentials/"Natural numbers".zero
     )
   )]
 }

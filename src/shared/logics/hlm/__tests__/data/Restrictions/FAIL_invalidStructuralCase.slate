@@ -2,7 +2,6 @@
 
 /**
  * @expectedError Constructor path must match construction path (without arguments)
- *
  * @expectedError Expected reference to constructor "zero"
  */
 $FAIL_invalidStructuralCase(x: %Element($../Essentials/"Natural numbers")): %Predicate {

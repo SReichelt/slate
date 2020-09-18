@@ -3,18 +3,12 @@
 $threeCasesWithNegation(m,n: %Element($../../Essentials/"Natural numbers")): %ExplicitOperator {
   definition = [%cases([
     {
-      formula = $../../Essentials/less(
-        m = m,
-        n = n
-      ),
+      formula = $../../Essentials/less(m = m, n = n),
       value = $../../Essentials/"Natural numbers".zero
     },
     {
       formula = %and(
-        $../../Essentials/"less or equal"(
-          n = m,
-          m = n
-        ),
+        $../../Essentials/"less or equal"(n = m, m = n),
         %equals(m, n)
       ),
       value = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".zero)
@@ -22,16 +16,10 @@ $threeCasesWithNegation(m,n: %Element($../../Essentials/"Natural numbers")): %Ex
     {
       formula = %and(
         %or(
-          $../../Essentials/less(
-            m = m,
-            n = n
-          ),
+          $../../Essentials/less(m = m, n = n),
           %not(%equals(m, n))
         ),
-        $../../Essentials/less(
-          n = m,
-          m = n
-        )
+        $../../Essentials/less(n = m, m = n)
       ),
       value = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".zero))
     }

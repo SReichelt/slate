@@ -124,7 +124,7 @@ export class Writer {
           this.write('$');
           this.writeIdentifier(definition.name, definition, false);
         });
-        this.writeOptionalParameterList(definition.parameters, indent, true);
+        this.writeOptionalParameterList(definition.parameters, indent);
         this.writeType(definition.type, indent);
       });
       this.writeOptionalSpace();
@@ -150,23 +150,26 @@ export class Writer {
     this.writeNewLine();
   }
 
-  writeParameterList(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
+  writeParameterList(parameters: Fmt.ParameterList, indent?: IndentInfo): void {
     this.writeRange(parameters, false, false, false, false, () => {
       this.write('(');
-      this.writeParameters(parameters, indent, multiLine);
+      this.writeParameters(parameters, indent);
       this.write(')');
     });
   }
 
-  writeOptionalParameterList(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
+  writeOptionalParameterList(parameters: Fmt.ParameterList, indent?: IndentInfo): void {
     if (parameters.length) {
-      this.writeParameterList(parameters, indent, multiLine);
+      this.writeParameterList(parameters, indent);
     }
   }
 
-  writeParameters(parameters: Fmt.ParameterList, indent?: IndentInfo, multiLine: boolean = false): void {
+  writeParameters(parameters: Fmt.ParameterList, indent?: IndentInfo): void {
     let groupIndent = indent;
     let lastGroupIndent = indent;
+    let multiLine = (this.newLineStr.length > 0
+                     && parameters.length > 1
+                     && parameters.some((param: Fmt.Parameter) => this.isLargeParameter(param, false)));
     let currentGroup: Fmt.Parameter[] = [];
     let firstGroup = true;
     for (let parameter of parameters) {
@@ -175,9 +178,7 @@ export class Writer {
       }
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
         if (firstGroup) {
-          if (!this.newLineStr) {
-            multiLine = false;
-          } else {
+          if (multiLine) {
             groupIndent = this.indent(groupIndent);
             lastGroupIndent = this.indent(lastGroupIndent, !multiLine);
           }
@@ -264,7 +265,7 @@ export class Writer {
     }
   }
 
-  writeArguments(args: Fmt.ArgumentList, indent?: IndentInfo, blockMode: boolean = false): void {
+  writeArguments(args: Fmt.ArgumentList, indent?: IndentInfo, blockMode: boolean = false, compoundExpression: boolean = false): void {
     let argIndent = indent;
     let lastArgIndent = indent;
     if (!this.newLineStr) {
@@ -272,10 +273,10 @@ export class Writer {
     }
     let multiLine = true;
     if (!blockMode) {
-      if (args.length <= 1 || !this.newLineStr) {
-        multiLine = false;
-      } else {
-        multiLine = args.some((arg: Fmt.Argument) => this.isLargeExpression(arg.value));
+      multiLine = (this.newLineStr.length > 0
+                   && args.length > 1
+                   && args.some((arg: Fmt.Argument) => this.isLargeArgument(arg, compoundExpression)));
+      if (multiLine) {
         argIndent = this.indent(argIndent);
         lastArgIndent = this.indent(lastArgIndent, !multiLine);
       }
@@ -286,10 +287,8 @@ export class Writer {
       let newLine = (multiLine
                      && (blockMode
                          || !prevArg
-                         || (prevArg.name && this.isLongName(prevArg.name))
-                         || this.isLargeExpression(prevArg.value)
-                         || (arg.name && this.isLongName(arg.name))
-                         || this.isLargeExpression(arg.value)));
+                         || this.isLargeArgument(prevArg)
+                         || this.isLargeArgument(arg)));
       if (index) {
         this.write(',');
         if (!newLine) {
@@ -401,10 +400,10 @@ export class Writer {
         this.writePath(expression.path, indent);
       } else if (expression instanceof Fmt.ParameterExpression) {
         this.write('#');
-        this.writeParameterList(expression.parameters, indent, true);
+        this.writeParameterList(expression.parameters, indent);
       } else if (expression instanceof Fmt.CompoundExpression) {
         this.write('{');
-        this.writeArguments(expression.arguments, indent);
+        this.writeArguments(expression.arguments, indent, false, true);
         this.write('}');
       } else if (expression instanceof Fmt.ArrayExpression) {
         this.writeExpressionList(expression.items, indent);
@@ -433,7 +432,7 @@ export class Writer {
             || expression instanceof Fmt.ParameterExpression
             || expression instanceof Fmt.CompoundExpression
             || expression instanceof Fmt.ArrayExpression
-            || (expression instanceof Fmt.IndexedExpression && (expression.arguments !== undefined || this.isLargeExpression(expression.body))));
+            || (expression instanceof Fmt.IndexedExpression && ((expression.arguments !== undefined && expression.arguments.length > 0) || this.isLargeExpression(expression.body))));
   }
 
   private isLongName(name: string): boolean {
@@ -441,6 +440,22 @@ export class Writer {
       name = name.substring(0, name.length - 1);
     }
     return name.length > 1 && String.fromCodePoint(name.codePointAt(0)!) !== name;
+  }
+
+  private isLargeArgument(arg: Fmt.Argument, checkName: boolean = true): boolean {
+    if (checkName && arg.name && this.isLongName(arg.name)) {
+      return true;
+    }
+    return this.isLargeExpression(arg.value);
+  }
+
+  private isLargeParameter(param: Fmt.Parameter, checkName: boolean = true): boolean {
+    if (checkName && this.isLongName(param.name)) {
+      return true;
+    }
+    return (this.isLargeExpression(param.type)
+            || (param.dependencies !== undefined && param.dependencies.some((dependency: Fmt.Expression) => this.isLargeExpression(dependency)))
+            || (param.defaultValue !== undefined && this.isLargeExpression(param.defaultValue)));
   }
 
   writeString(str: string, quoteChar: string, breakLines: boolean): void {
@@ -509,10 +524,14 @@ export class Writer {
   writeDocumentationComment(documentationComment: Fmt.DocumentationComment, indent?: IndentInfo): void {
     this.writeRange(documentationComment, false, false, false, false, () => {
       this.write('/**');
-      let first = true;
+      let prevItem: Fmt.DocumentationItem | undefined = undefined;
       let needEmptyLine = false;
       for (let item of documentationComment.items) {
-        if (!first && !item.parameter) {
+        if (prevItem
+            && (!item.kind
+                || item.kind !== prevItem.kind
+                || prevItem.text.indexOf('\n') >= 0
+                || item.text.indexOf('\n') >= 0)) {
           needEmptyLine = true;
         }
         if (needEmptyLine) {
@@ -535,8 +554,6 @@ export class Writer {
           if (item.parameter) {
             this.write(' ');
             this.writeIdentifier(item.parameter.name, item, true);
-          } else {
-            needEmptyLine = true;
           }
           let indentLength = this.lineLength + 1;
           let textLine = '';
@@ -544,7 +561,7 @@ export class Writer {
             if (c === '\r') {
               // ignore
             } else if (c === '\n') {
-              textLine = textLine.trimRight();
+              textLine = textLine;
               if (textLine.startsWith('@')) {
                 textLine = textLine.substring(1);
               }
@@ -564,15 +581,15 @@ export class Writer {
               textLine += c;
             }
           }
-          textLine = textLine.trimRight();
+          textLine = textLine;
           if (textLine) {
             if (indentLength > this.lineLength) {
               this.write(' '.repeat(indentLength - this.lineLength));
             }
             this.write(textLine);
           }
-          first = false;
         });
+        prevItem = item;
       }
       this.writeNewLine();
       this.writeIndent(indent);

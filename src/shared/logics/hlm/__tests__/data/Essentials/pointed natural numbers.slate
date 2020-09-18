@@ -2,7 +2,7 @@
 
 $"pointed natural numbers": %ExplicitOperator {
   definition = [$"Pointed sets"."pointed set"(
-      S = $"Natural numbers",
-      s = $"Natural numbers".zero
+    S = $"Natural numbers",
+    s = $"Natural numbers".zero
   )]
 }

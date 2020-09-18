@@ -2,7 +2,6 @@
 
 /**
  * @expectedError Type mismatch: element of $../Essentials/"Pointed sets" expected
- *
  * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
  */
 $FAIL_indices(_1: %Binder(
@@ -12,8 +11,11 @@ $FAIL_indices(_1: %Binder(
   ),
   #(a: %Element($../Essentials/"Pointed sets"))
 )): %ExplicitOperator {
-  definition = [a[i = $../Essentials/"Natural numbers".zero, j = $../Essentials/"Pointed sets"."pointed set"(
+  definition = [a[
+    i = $../Essentials/"Natural numbers".zero,
+    j = $../Essentials/"Pointed sets"."pointed set"(
       S = $../Essentials/"Natural numbers",
       s = $../Essentials/"Natural numbers".zero
-  )]]
+    )
+  ]]
 }

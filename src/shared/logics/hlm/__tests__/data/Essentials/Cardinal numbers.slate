@@ -8,10 +8,7 @@ $"Cardinal numbers": %Construction {
     equalityDefinition = {
       leftParameters = #(S: %Set),
       rightParameters = #(T: %Set),
-      definition = [%exists(#(f: %Element($Bijections(
-        X = S,
-        Y = T
-      ))))],
+      definition = [%exists(#(f: %Element($Bijections(X = S, Y = T))))],
       isomorphic = %true
     }
   }

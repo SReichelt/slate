@@ -17,10 +17,7 @@ $FAIL_EqualityDefinitionParameters(S: %Set): %Construction {
         T: %Set,
         t: %Element(S)
       ),
-      definition = [%exists(#(f: %Element($../Essentials/Bijections(
-        X = S,
-        Y = T
-      ))))],
+      definition = [%exists(#(f: %Element($../Essentials/Bijections(X = S, Y = T))))],
       isomorphic = %true
     }
   }

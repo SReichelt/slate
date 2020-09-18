@@ -2,8 +2,7 @@
 
 $sum(m,n: %Element($"Natural numbers")): %ExplicitOperator {
   definition = [%structuralCases(
-    n,
-    $"Natural numbers",
+    n, $"Natural numbers",
     [
       {
         constructor = $"Natural numbers".zero,
@@ -12,10 +11,7 @@ $sum(m,n: %Element($"Natural numbers")): %ExplicitOperator {
       {
         constructor = $"Natural numbers".successor,
         parameters = #(x: %Element($"Natural numbers")),
-        value = $"Natural numbers".successor(n = $sum(
-          m = m,
-          n = x
-        ))
+        value = $"Natural numbers".successor(n = $sum(m = m, n = x))
       }
     ]
   )]

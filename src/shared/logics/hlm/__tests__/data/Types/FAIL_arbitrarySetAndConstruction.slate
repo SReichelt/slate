@@ -2,11 +2,8 @@
 
 /**
  * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
- *
  * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
- *
  * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
- *
  * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
  */
 $FAIL_arbitrarySetAndConstruction(
@@ -15,9 +12,18 @@ $FAIL_arbitrarySetAndConstruction(
   t: %Element($../Essentials/"Natural numbers")
 ): %Predicate {
   definition = [
-    %in(s, $../Essentials/"Natural numbers"),
-    %sub(S, $../Essentials/"Natural numbers"),
-    %setEquals(S, $../Essentials/"Natural numbers"),
+    %in(
+      s,
+      $../Essentials/"Natural numbers"
+    ),
+    %sub(
+      S,
+      $../Essentials/"Natural numbers"
+    ),
+    %setEquals(
+      S,
+      $../Essentials/"Natural numbers"
+    ),
     %equals(s, t)
   ]
 }

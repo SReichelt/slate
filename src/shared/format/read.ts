@@ -779,6 +779,7 @@ export class Reader {
                   inEscapedName = false;
                   inEscapeSequence = false;
                 } else if (atCommentLineStart && c === '@') {
+                  text = text.trimRight();
                   if (kind || text) {
                     if (!itemStart) {
                       itemStart = this.stream.getLocation();
@@ -789,7 +790,7 @@ export class Reader {
                     documentationItems.push({
                       kind: kind,
                       parameterName: name,
-                      text: text.trimRight(),
+                      text: text,
                       range: {
                         start: itemStart,
                         end: itemEnd
@@ -903,6 +904,7 @@ export class Reader {
               }
             }
             if (documentationItems) {
+              text = text.trimRight();
               if (kind || text) {
                 if (!itemStart) {
                   itemStart = this.stream.getLocation();
@@ -913,7 +915,7 @@ export class Reader {
                 documentationItems.push({
                   kind: kind,
                   parameterName: name,
-                  text: text.trimRight(),
+                  text: text,
                   range: {
                     start: itemStart,
                     end: itemEnd

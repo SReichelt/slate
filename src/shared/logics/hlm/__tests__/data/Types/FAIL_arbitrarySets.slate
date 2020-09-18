@@ -2,11 +2,8 @@
 
 /**
  * @expectedError Type mismatch: S and T are incompatible
- *
  * @expectedError Type mismatch: S and T are incompatible
- *
  * @expectedError Type mismatch: S and T are incompatible
- *
  * @expectedError Type mismatch: S and T are incompatible
  */
 $FAIL_arbitrarySets(

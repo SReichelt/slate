@@ -19,7 +19,10 @@ $Functions(
       )),
       definition = [%forall(
         #(x: %Element(X)),
-        %equals(y[x = x], "y'"[x = x])
+        %equals(
+          y[x = x],
+          "y'"[x = x]
+        )
       )],
       isomorphic = %true
     }

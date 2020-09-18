@@ -1,17 +1,11 @@
 %../../../../../../../data/logics/hlm%
 
 $"less or equal"(m,n: %Element($"Natural numbers")): %Predicate {
-  properties = {negation = $less(
-    n = m,
-    m = n
-  )},
+  properties = {negation = $less(n = m, m = n)},
   definition = [%exists(
     #(x: %Element($"Natural numbers")),
     formula = %equals(
-      $sum(
-        m = m,
-        n = x
-      ),
+      $sum(m = m, n = x),
       n
     )
   )]

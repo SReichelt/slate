@@ -2,8 +2,7 @@
 
 $"Pointed set carrier"(i: %Element($"Pointed sets")): %SetOperator {
   definition = [%setStructuralCases(
-    i,
-    $"Pointed sets",
+    i, $"Pointed sets",
     [{
       constructor = $"Pointed sets"."pointed set",
       parameters = #(

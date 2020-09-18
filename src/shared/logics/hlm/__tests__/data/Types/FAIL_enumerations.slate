@@ -2,7 +2,6 @@
 
 /**
  * @expectedError Type mismatch: S and T are incompatible
- *
  * @expectedError Type mismatch: S and S and T are incompatible
  */
 $FAIL_enumerations(
