@@ -122,12 +122,14 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendOuterPaths(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, range: vscode.Range | undefined, result: vscode.CompletionItem[]): void {
-        let prefix = '';
+        let prefix = rangeInfo.object instanceof Fmt.NamedPathItem ? '' : '$';
         if (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.object.parentPath) {
             let parentPathRange = parsedDocument.rangeMap.get(rangeInfo.object.parentPath);
             if (parentPathRange && parentPathRange.range.isEqual(rangeInfo.range)) {
                 prefix = '/';
             }
+        } else {
+            this.appendPathAliases(parsedDocument, range, prefix, result);
         }
         let addParent = false;
         if (parsedDocument.file && rangeInfo.object instanceof Fmt.Path && rangeInfo.object === parsedDocument.file.metaModelPath) {
@@ -141,6 +143,19 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 label: prefix + '..',
                 range: range,
                 kind: vscode.CompletionItemKind.Folder
+            });
+        }
+    }
+
+    private appendPathAliases(parsedDocument: ParsedDocument, range: vscode.Range | undefined, prefix: string, result: vscode.CompletionItem[]): void {
+        for (let pathAlias of parsedDocument.pathAliases) {
+            let documentation = new vscode.MarkdownString;
+            documentation.appendCodeblock('$' + pathAlias.path.toString());
+            result.push({
+                label: prefix + '~' + escapeIdentifier(pathAlias.name),
+                range: range,
+                documentation: documentation,
+                kind: vscode.CompletionItemKind.Constant
             });
         }
     }

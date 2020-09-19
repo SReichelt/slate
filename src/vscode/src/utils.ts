@@ -38,11 +38,15 @@ export function convertRangeInfo(info: FmtReader.ObjectRangeInfo): RangeInfo {
 export class RangeHandler implements FmtReader.RangeHandler {
     rangeList: RangeInfo[] = [];
     rangeMap: Map<Object, RangeInfo> = new Map<Object, RangeInfo>();
+    pathAliases: Fmt.PathAlias[] = [];
 
     reportRange(info: FmtReader.ObjectRangeInfo): void {
         let rangeInfo = convertRangeInfo(info);
         this.rangeList.push(rangeInfo);
         this.rangeMap.set(info.object, rangeInfo);
+        if (info.object instanceof Fmt.PathAlias) {
+            this.pathAliases.push(info.object);
+        }
     }
 
     reportConversion(raw: Fmt.Expression, converted: Fmt.ObjectContents): void {

@@ -280,17 +280,14 @@ export class Reader {
     this.readChar('=');
     this.readChar('$');
     let path = this.readPathOrItem(context, true);
-    let pathAlias: Fmt.PathAlias = {
-      name: name,
-      path: path
-    };
+    let pathAlias = new Fmt.PathAlias(name, path);
     this.markEnd(aliasStart, pathAlias, context, undefined, nameRange);
     return pathAlias;
   }
 
   readPathAlias(context: Ctx.Context): Fmt.PathAlias {
     this.skipWhitespace();
-    return this.tryReadPathAlias(context) || this.error('Path alias expected') || {name: '', path: new Fmt.IdentityPathItem};
+    return this.tryReadPathAlias(context) || this.error('Path alias expected') || new Fmt.PathAlias('', new Fmt.IdentityPathItem);
   }
 
   readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): void {

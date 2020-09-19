@@ -63,6 +63,10 @@ export abstract class PathItem implements Comparable<PathItem> {
   }
 
   protected abstract matches(pathItem: PathItem, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean;
+
+  toString(): string {
+    return writeToString((writer: FmtWriter.Writer) => writer.writePathItem(this, false, false));
+  }
 }
 
 export class NamedPathItem extends PathItem {
@@ -1028,9 +1032,8 @@ export class DocumentationItem {
   }
 }
 
-export interface PathAlias {
-  name: string;
-  path: PathItem;
+export class PathAlias {
+  constructor(public name: string, public path: PathItem) {}
 }
 
 export interface MetaDefinitionList {

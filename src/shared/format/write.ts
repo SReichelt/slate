@@ -67,10 +67,7 @@ export class Writer {
     for (let name of keys) {
       for (let pathInfo of paths.get(name)!) {
         if (pathInfo.occurrences > 1) {
-          this.pathAliases.push({
-            name: name,
-            path: pathInfo.path
-          });
+          this.pathAliases.push(new Fmt.PathAlias(name, pathInfo.path));
           break;
         }
       }
@@ -172,7 +169,7 @@ export class Writer {
     });
   }
 
-  private writePathItem(path: Fmt.PathItem, isLinkRange: boolean, useAliases: boolean): void {
+  writePathItem(path: Fmt.PathItem, isLinkRange: boolean, useAliases: boolean): void {
     this.writeRange(path, false, isLinkRange, false, false, () => {
       let pathAlias = useAliases ? this.findPathAlias(path) : undefined;
       if (pathAlias) {

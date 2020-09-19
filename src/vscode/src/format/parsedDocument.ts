@@ -11,6 +11,7 @@ export interface ParsedDocument {
     hasBrokenReferences: boolean;
     rangeList: RangeInfo[];
     rangeMap: Map<Object, RangeInfo>;
+    pathAliases: Fmt.PathAlias[];
     metaModelDocument?: ParsedDocument;
     metaModelDocuments?: Map<FmtDynamic.DynamicMetaModel, ParsedDocument>;
     objectContentsMap?: Map<Fmt.CompoundExpression, FmtDynamic.DynamicObjectContents>;

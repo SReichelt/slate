@@ -72,6 +72,7 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
         hasBrokenReferences: false,
         rangeList: rangeHandler.rangeList,
         rangeMap: rangeHandler.rangeMap,
+        pathAliases: rangeHandler.pathAliases,
         metaModelDocuments: new Map<FmtDynamic.DynamicMetaModel, ParsedDocument>(),
         objectContentsMap: needExtendedInfo ? new Map<Fmt.CompoundExpression, FmtDynamic.DynamicObjectContents>() : undefined,
         nestedArgumentListsMap: needExtendedInfo ? new Map<Fmt.ArgumentList, NestedArgumentListInfo>() : undefined
@@ -100,7 +101,8 @@ export function parseFile(uri: vscode.Uri, needExtendedInfo: boolean = false, fi
             hasUnfilledPlaceholders: false,
             hasBrokenReferences: false,
             rangeList: metaModelRangeHandler.rangeList,
-            rangeMap: metaModelRangeHandler.rangeMap
+            rangeMap: metaModelRangeHandler.rangeMap,
+            pathAliases: rangeHandler.pathAliases
         };
         let metaModelFileContents = readRangeRaw(parsedMetaModelDocument.uri);
         parsedMetaModelDocument.file = FmtReader.readString(metaModelFileContents, metaModelFileName, FmtMeta.getMetaModel, metaModelRangeHandler);
