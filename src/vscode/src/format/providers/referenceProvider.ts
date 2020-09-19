@@ -6,6 +6,15 @@ import { DefinitionLink, getDefinitionLinks, isDefinitionReferenceToUri, getName
 import { areUrisEqual } from '../../utils';
 import { parseFile } from '../parse';
 
+function containsLocation(locations: vscode.Location[], uri: vscode.Uri, range: vscode.Range): boolean {
+    for (let location of locations) {
+        if (areUrisEqual(uri, location.uri) && range.isEqual(location.range)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 export function findReferences(nameDefinitionLocation: DefinitionLink, includeDeclaration: boolean, returnNameRanges: boolean, token: vscode.CancellationToken, sourceDocument?: vscode.TextDocument): Thenable<vscode.Location[]> {
     return vscode.workspace.findFiles(`**/*${fileExtension}`, undefined, undefined, token).then((originUris: vscode.Uri[]) => {
         let result: vscode.Location[] = [];
@@ -29,7 +38,9 @@ export function findReferences(nameDefinitionLocation: DefinitionLink, includeDe
                         for (let definitionLink of getDefinitionLinks(parsedDocument, rangeInfo, undefined, false, sourceDocument, nameDefinitionLocation.targetUri)) {
                             if (areUrisEqual(definitionLink.targetUri, nameDefinitionLocation.targetUri) && definitionLink.targetSelectionRange && definitionLink.targetSelectionRange.isEqual(nameDefinitionLocation.targetSelectionRange)) {
                                 let range = definitionLink.originSelectionRange && !returnNameRanges ? definitionLink.originSelectionRange : definitionLink.originNameRange;
-                                result.push(new vscode.Location(originUri, range));
+                                if (!containsLocation(result, originUri, range)) {
+                                    result.push(new vscode.Location(originUri, range));
+                                }
                             }
                         }
                     }

@@ -11,6 +11,7 @@ export interface RangeInfo {
     nameRange?: vscode.Range;
     linkRange?: vscode.Range;
     signatureRange?: vscode.Range;
+    pathAlias?: Fmt.PathAlias;
 }
 
 export function convertLocation(location: FmtReader.Location): vscode.Position {
@@ -31,7 +32,8 @@ export function convertRangeInfo(info: FmtReader.ObjectRangeInfo): RangeInfo {
         range: convertRange(info.range),
         nameRange: info.nameRange ? convertRange(info.nameRange) : undefined,
         linkRange: info.linkRange ? convertRange(info.linkRange) : undefined,
-        signatureRange: info.signatureRange ? convertRange(info.signatureRange) : undefined
+        signatureRange: info.signatureRange ? convertRange(info.signatureRange) : undefined,
+        pathAlias: info.pathAlias
     };
 }
 

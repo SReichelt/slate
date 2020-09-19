@@ -297,20 +297,27 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
         if (signatureInfo.referencedDefinition && rangeInfo.nameRange && rangeInfo.linkRange && (!position || rangeInfo.linkRange.contains(position))) {
             let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(signatureInfo.referencedDefinition.definition);
             if (targetRangeInfo) {
-                result.push({
-                    originNameRange: rangeInfo.nameRange,
-                    originObject: rangeInfo.object,
-                    originSelectionRange: rangeInfo.linkRange,
-                    targetUri: signatureInfo.parsedDocument.uri,
-                    targetObject: signatureInfo.referencedDefinition.definition,
-                    targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
-                    targetSelectionRange: targetRangeInfo.nameRange,
-                    name: signatureInfo.referencedDefinition.definition.name,
-                    referencedDefinition: signatureInfo.referencedDefinition
-                });
-                if (position) {
-                    return result;
+                let originNameRange: vscode.Range | undefined = rangeInfo.nameRange;
+                if (rangeInfo.pathAlias && !position) {
+                    let aliasPathRange = parsedDocument.rangeMap.get(rangeInfo.pathAlias.path);
+                    originNameRange = aliasPathRange?.nameRange;
                 }
+                if (originNameRange) {
+                    result.push({
+                        originNameRange: originNameRange,
+                        originObject: rangeInfo.object,
+                        originSelectionRange: rangeInfo.linkRange,
+                        targetUri: signatureInfo.parsedDocument.uri,
+                        targetObject: signatureInfo.referencedDefinition.definition,
+                        targetRange: (preferSignature && targetRangeInfo.signatureRange) || targetRangeInfo.range,
+                        targetSelectionRange: targetRangeInfo.nameRange,
+                        name: signatureInfo.referencedDefinition.definition.name,
+                        referencedDefinition: signatureInfo.referencedDefinition
+                    });
+                }
+            }
+            if (position) {
+                return result;
             }
         }
         if (signatureInfo.parameters && signatureInfo.arguments) {
@@ -364,9 +371,9 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
                     targetSelectionRange: targetRangeInfo.nameRange,
                     name: variable.name
                 });
-                if (position) {
-                    return result;
-                }
+            }
+            if (position) {
+                return result;
             }
         }
     }

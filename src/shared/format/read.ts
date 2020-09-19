@@ -98,6 +98,7 @@ export interface ObjectRangeInfo {
   nameRange?: Range;
   linkRange?: Range;
   signatureRange?: Range;
+  pathAlias?: Fmt.PathAlias;
 }
 
 export interface RangeHandler {
@@ -134,7 +135,7 @@ export class Reader {
   private triedChars: string[] = [];
   private atError = false;
   private metaModel: Meta.MetaModel | undefined;
-  private pathAliases = new Map<string, Fmt.PathItem>();
+  private pathAliases = new Map<string, Fmt.PathAlias>();
   private lastDocumentationComment?: RawDocumentationComment;
 
   constructor(private stream: InputStream, private errorHandler: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private rangeHandler?: RangeHandler) {}
@@ -178,21 +179,22 @@ export class Reader {
       this.skipWhitespace(false);
       let itemStart = this.markStart();
       let identifier: string;
+      let pathAlias: Fmt.PathAlias | undefined = undefined;
       if (!parentPath && this.tryReadChar('~')) {
-        itemStart = linkStart = this.markStart();
         let aliasName = this.readIdentifier();
-        let alias = this.pathAliases.get(aliasName);
-        if (alias) {
-          if (alias instanceof Fmt.NamedPathItem) {
+        pathAlias = this.pathAliases.get(aliasName);
+        if (pathAlias) {
+          let pathAliasPath = pathAlias.path;
+          if (pathAliasPath instanceof Fmt.NamedPathItem) {
             if (this.tryReadChar('/')) {
-              parentPath = alias;
+              parentPath = pathAliasPath;
               continue;
             } else {
-              parentPath = alias.parentPath;
-              identifier = alias.name;
+              parentPath = pathAliasPath.parentPath;
+              identifier = pathAliasPath.name;
             }
           } else {
-            parentPath = alias;
+            parentPath = pathAliasPath;
             this.readChar('/');
             continue;
           }
@@ -215,7 +217,7 @@ export class Reader {
       if (readPathItem || continued) {
         let item: Fmt.PathItem = new Fmt.NamedPathItem(identifier, parentPath);
         let itemRange = this.markEnd(itemStart);
-        this.markEnd(pathStart, item, context, undefined, itemRange);
+        this.markEnd(pathStart, item, context, undefined, itemRange, undefined, undefined, pathAlias);
         if (readPathItem && !continued) {
           return item;
         }
@@ -229,7 +231,7 @@ export class Reader {
           if (context) {
             this.readOptionalArgumentList(path.arguments, context);
           }
-          this.markEnd(pathStart, path, context, undefined, nameRange, linkRange);
+          this.markEnd(pathStart, path, context, undefined, nameRange, linkRange, undefined, pathAlias);
           if (!this.tryReadChar('.')) {
             return path;
           }
@@ -257,10 +259,10 @@ export class Reader {
       this.skipWhitespace();
       let pathAlias = this.tryReadPathAlias(context);
       if (pathAlias) {
-        this.pathAliases.set(pathAlias.name, pathAlias.path);
+        this.pathAliases.set(pathAlias.name, pathAlias);
         while (this.tryReadChar(',')) {
           pathAlias = this.readPathAlias(context);
-          this.pathAliases.set(pathAlias.name, pathAlias.path);
+          this.pathAliases.set(pathAlias.name, pathAlias);
           this.skipWhitespace();
         }
       }
@@ -1084,7 +1086,7 @@ export class Reader {
     return this.markedStart;
   }
 
-  private markEnd(start: Location, object?: Object, context?: Ctx.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, linkRange?: Range, signatureRange?: Range): Range {
+  private markEnd(start: Location, object?: Object, context?: Ctx.Context, metaDefinitions?: Fmt.MetaDefinitionFactory, nameRange?: Range, linkRange?: Range, signatureRange?: Range, pathAlias?: Fmt.PathAlias): Range {
     if (!this.markedEnd) {
       this.markedEnd = this.stream.getLocation();
     }
@@ -1109,7 +1111,8 @@ export class Reader {
         range: range,
         nameRange: nameRange,
         linkRange: linkRange,
-        signatureRange: signatureRange
+        signatureRange: signatureRange,
+        pathAlias: pathAlias
       });
     }
     return range;
