@@ -156,7 +156,7 @@ export class SlateRenameProvider implements vscode.RenameProvider {
                 };
             }
         }
-        return undefined;
+        throw new Error('Cannot rename this object');
     }
 
     updateFileReferences(renamedUris: ReadonlyArray<RenamedUri>): Thenable<vscode.WorkspaceEdit> {

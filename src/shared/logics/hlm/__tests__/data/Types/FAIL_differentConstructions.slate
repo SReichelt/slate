@@ -1,5 +1,10 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~"Natural numbers" = $../Essentials/"Natural numbers",
+  $~"Pointed sets" = $../Essentials/"Pointed sets"
+]
+
 /**
  * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
  * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
@@ -7,22 +12,13 @@
  * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
  */
 $FAIL_differentConstructions(
-  s: %Element($../Essentials/"Pointed sets"),
-  t: %Element($../Essentials/"Natural numbers")
+  s: %Element($~"Pointed sets"),
+  t: %Element($~"Natural numbers")
 ): %Predicate {
   definition = [
-    %in(
-      s,
-      $../Essentials/"Natural numbers"
-    ),
-    %sub(
-      $../Essentials/"Pointed sets",
-      $../Essentials/"Natural numbers"
-    ),
-    %setEquals(
-      $../Essentials/"Pointed sets",
-      $../Essentials/"Natural numbers"
-    ),
+    %in(s, $~"Natural numbers"),
+    %sub($~"Pointed sets", $~"Natural numbers"),
+    %setEquals($~"Pointed sets", $~"Natural numbers"),
     %equals(s, t)
   ]
 }

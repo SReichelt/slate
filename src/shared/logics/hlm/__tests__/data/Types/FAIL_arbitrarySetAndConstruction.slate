@@ -1,5 +1,9 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~"Natural numbers" = $../Essentials/"Natural numbers"
+]
+
 /**
  * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
  * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
@@ -9,21 +13,12 @@
 $FAIL_arbitrarySetAndConstruction(
   S: %Set,
   s: %Element(S),
-  t: %Element($../Essentials/"Natural numbers")
+  t: %Element($~"Natural numbers")
 ): %Predicate {
   definition = [
-    %in(
-      s,
-      $../Essentials/"Natural numbers"
-    ),
-    %sub(
-      S,
-      $../Essentials/"Natural numbers"
-    ),
-    %setEquals(
-      S,
-      $../Essentials/"Natural numbers"
-    ),
+    %in(s, $~"Natural numbers"),
+    %sub(S, $~"Natural numbers"),
+    %setEquals(S, $~"Natural numbers"),
     %equals(s, t)
   ]
 }

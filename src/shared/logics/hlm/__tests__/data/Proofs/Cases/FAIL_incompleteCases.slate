@@ -1,17 +1,22 @@
 %../../../../../../../../data/logics/hlm%
 
+[
+  $~"Natural numbers" = $../../Essentials/"Natural numbers",
+  $~less = $../../Essentials/less
+]
+
 /**
  * @expectedError Incomplete casess
  */
-$FAIL_incompleteCases(m,n: %Element($../../Essentials/"Natural numbers")): %ExplicitOperator {
+$FAIL_incompleteCases(m,n: %Element($~"Natural numbers")): %ExplicitOperator {
   definition = [%cases([
     {
-      formula = $../../Essentials/less(m = m, n = n),
-      value = $../../Essentials/"Natural numbers".zero
+      formula = $~less(m = m, n = n),
+      value = $~"Natural numbers".zero
     },
     {
-      formula = $../../Essentials/less(n = m, m = n),
-      value = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".zero)
+      formula = $~less(n = m, m = n),
+      value = $~"Natural numbers".successor(n = $~"Natural numbers".zero)
     }
   ])]
 }

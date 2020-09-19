@@ -1,13 +1,17 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~"Natural numbers" = $../Essentials/"Natural numbers"
+]
+
 /**
  * @expectedError Type mismatch: $../Essentials/"Pointed sets" and S are incompatible
  */
 $FAIL_constructor(S: %Set): %Predicate {
   definition = [%in(
     $../Essentials/"Pointed sets"."pointed set"(
-      S = $../Essentials/"Natural numbers",
-      s = $../Essentials/"Natural numbers".zero
+      S = $~"Natural numbers",
+      s = $~"Natural numbers".zero
     ),
     S
   )]

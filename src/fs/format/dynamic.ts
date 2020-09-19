@@ -13,7 +13,7 @@ export function getFileNameFromPathStr(sourceFileName: string, pathStr: string):
   return pathStr;
 }
 
-export function getFileNameFromPath(sourceFileName: string, targetPath: Fmt.Path, skipLastItem: boolean = false, addExtension: boolean = true): string {
+export function getFileNameFromPath(sourceFileName: string, targetPath: Fmt.NamedPathItem, skipLastItem: boolean = false, addExtension: boolean = true): string {
   while (targetPath.parentPath instanceof Fmt.Path) {
     targetPath = targetPath.parentPath;
   }

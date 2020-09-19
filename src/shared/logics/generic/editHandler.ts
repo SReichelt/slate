@@ -865,7 +865,7 @@ export abstract class GenericEditHandler {
       if (!newText) {
         return false;
       }
-      // TODO prevent shadowing of other variables
+      // TODO prevent shadowing of other variables (important because writer cannot check it)
       if (newText.endsWith(',')) {
         let newName = newText.substring(0, newText.length - 1);
         if (newName) {
@@ -894,10 +894,7 @@ export abstract class GenericEditHandler {
       for (let otherKind of allKinds) {
         if (otherKind === kind) {
           if (newText) {
-            let item = new Fmt.DocumentationItem;
-            item.kind = kind;
-            item.text = newText;
-            newItems.push(item);
+            newItems.push(new Fmt.DocumentationItem(kind, undefined, newText));
           }
         } else {
           if (definition.documentation) {
@@ -910,10 +907,11 @@ export abstract class GenericEditHandler {
         }
       }
       if (newItems.length) {
-        if (!definition.documentation) {
-          definition.documentation = new Fmt.DocumentationComment;
+        if (definition.documentation) {
+          definition.documentation.items = newItems;
+        } else {
+          definition.documentation = new Fmt.DocumentationComment(newItems);
         }
-        definition.documentation.items = newItems;
       } else {
         definition.documentation = undefined;
       }

@@ -1,27 +1,32 @@
 %../../../../../../../../data/logics/hlm%
 
-$threeCasesWithNegation(m,n: %Element($../../Essentials/"Natural numbers")): %ExplicitOperator {
+[
+  $~"Natural numbers" = $../../Essentials/"Natural numbers",
+  $~less = $../../Essentials/less
+]
+
+$threeCasesWithNegation(m,n: %Element($~"Natural numbers")): %ExplicitOperator {
   definition = [%cases([
     {
-      formula = $../../Essentials/less(m = m, n = n),
-      value = $../../Essentials/"Natural numbers".zero
+      formula = $~less(m = m, n = n),
+      value = $~"Natural numbers".zero
     },
     {
       formula = %and(
         $../../Essentials/"less or equal"(n = m, m = n),
         %equals(m, n)
       ),
-      value = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".zero)
+      value = $~"Natural numbers".successor(n = $~"Natural numbers".zero)
     },
     {
       formula = %and(
         %or(
-          $../../Essentials/less(m = m, n = n),
+          $~less(m = m, n = n),
           %not(%equals(m, n))
         ),
-        $../../Essentials/less(n = m, m = n)
+        $~less(n = m, m = n)
       ),
-      value = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".successor(n = $../../Essentials/"Natural numbers".zero))
+      value = $~"Natural numbers".successor(n = $~"Natural numbers".successor(n = $~"Natural numbers".zero))
     }
   ])]
 }

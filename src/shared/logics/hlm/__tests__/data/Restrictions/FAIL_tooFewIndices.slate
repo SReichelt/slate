@@ -1,14 +1,18 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~"Natural numbers" = $../Essentials/"Natural numbers"
+]
+
 /**
  * @expectedError Too few indices
  */
 $FAIL_tooFewIndices(_1: %Binder(
-  #(i: %Element($../Essentials/"Natural numbers")),
+  #(i: %Element($~"Natural numbers")),
   #(_2: %Binder(
-    #(j: %Element($../Essentials/"Natural numbers")),
+    #(j: %Element($~"Natural numbers")),
     #(a: %Element($../Essentials/"Pointed sets"))
   ))
 )): %ExplicitOperator {
-  definition = [a[j = $../Essentials/"Natural numbers".zero]]
+  definition = [a[j = $~"Natural numbers".zero]]
 }

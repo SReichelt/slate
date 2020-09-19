@@ -788,7 +788,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             <span className={'radical-degree-table'}>
               <span className={'radical-degree-top-row'}>
                 <span className={'radical-degree'}>
-                  <Expression expression={expression.degree ?? new Notation.TextExpression('  ')} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/>
+                  {expression.degree ? <Expression expression={expression.degree} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null}
                 </span>
               </span>
               <span className={'radical-degree-bottom-row'}>

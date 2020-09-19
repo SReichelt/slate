@@ -186,6 +186,7 @@ export class Definition {
   traverse(fn: ExpressionTraversalFn): void {
     this.type.traverse(fn);
     this.parameters.traverse(fn);
+    this.innerDefinitions.traverse(fn);
     this.contents?.traverse(fn);
   }
 
@@ -1007,15 +1008,11 @@ export class PlaceholderExpression extends Expression {
 }
 
 export class DocumentationComment {
-  items: DocumentationItem[];
+  constructor(public items: DocumentationItem[]) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): DocumentationComment {
-    let result = new DocumentationComment;
-    result.items = [];
-    for (let item of this.items) {
-      result.items.push(item.clone(replacedParameters));
-    }
-    return result;
+    let items = this.items.map((item: DocumentationItem) => item.clone(replacedParameters));
+    return new DocumentationComment(items);
   }
 
   toString(): string {
@@ -1024,19 +1021,16 @@ export class DocumentationComment {
 }
 
 export class DocumentationItem {
-  kind?: string;
-  parameter?: Parameter;
-  text: string;
+  constructor(public kind: string | undefined, public parameter: Parameter | undefined, public text: string) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): DocumentationItem {
-    let result = new DocumentationItem;
-    result.kind = this.kind;
-    if (this.parameter) {
-      result.parameter = this.parameter.findReplacement(replacedParameters);
-    }
-    result.text = this.text;
-    return result;
+    return new DocumentationItem(this.kind, this.parameter?.findReplacement(replacedParameters), this.text);
   }
+}
+
+export interface PathAlias {
+  name: string;
+  path: PathItem;
 }
 
 export interface MetaDefinitionList {

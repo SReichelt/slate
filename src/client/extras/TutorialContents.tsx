@@ -2439,6 +2439,7 @@ class TutorialStates {
                                                         key: 0,
                                                         manipulateProps: (props: ExpressionMenuItemProps) => ({
                                                           ...props,
+                                                          // TODO demonstrate how to enter an alternative definition (skippable)
                                                           onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_openMenu))
                                                         }),
                                                         elementAction: this.automateClick()

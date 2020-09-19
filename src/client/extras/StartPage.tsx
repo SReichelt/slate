@@ -129,7 +129,7 @@ function StartPage(props: StartPageProps) {
       </p>
       <div className="tutorial-button-container">
         <Button className="tutorial-button standalone" onClick={props.onStartTutorial} key="tutorial-button">
-          Start the five-minute interactive tutorial
+          Start the built-in five-minute tutorial
         </Button>
       </div>
       <h2>Examples</h2>

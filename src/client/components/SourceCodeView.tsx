@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Fmt from '../../shared/format/format';
 import * as FmtWriter from '../../shared/format/write';
 import * as SourceCodeDisplay from '../../shared/notation/sourceCodeDisplay';
 import Expression from './Expression';
@@ -15,7 +16,7 @@ class SourceCodeView extends LibraryItemBase {
       indent: '',
       outerIndent: ''
     };
-    writer.writeDefinition(this.props.definition.definition, indent);
+    writer.writeFile(this.props.definition.file, indent);
     return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} toolTipPosition="top"/>;
   }
 

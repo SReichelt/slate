@@ -134,6 +134,8 @@ export class Reader {
   private triedChars: string[] = [];
   private atError = false;
   private metaModel: Meta.MetaModel | undefined;
+  private pathAliases = new Map<string, Fmt.PathItem>();
+  private lastDocumentationComment?: RawDocumentationComment;
 
   constructor(private stream: InputStream, private errorHandler: ErrorHandler, private getMetaModel: Meta.MetaModelGetter, private rangeHandler?: RangeHandler) {}
 
@@ -156,67 +158,146 @@ export class Reader {
       this.error(error.message, this.markEnd(fileStart));
       this.metaModel = new Meta.DummyMetaModel(metaModelPath.name);
     }
-    let file = new Fmt.File(metaModelPath);
     try {
+      let file = new Fmt.File(metaModelPath);
       let context = this.metaModel.getRootContext();
-      this.readDefinitions(file.definitions, this.metaModel.definitionTypes, context);
+      this.readFileContents(file, this.metaModel.definitionTypes, context);
       this.markEnd(fileStart, file, context);
+      return file;
     } finally {
+      this.pathAliases.clear();
       this.metaModel = undefined;
     }
-    return file;
   }
 
-  readPath(context: Ctx.Context | undefined): Fmt.Path {
+  private readPathOrItem(context: Ctx.Context | undefined, readPathItem: boolean): Fmt.PathItem {
     let pathStart = this.markStart();
     let linkStart = pathStart;
     let parentPath: Fmt.PathItem | undefined = undefined;
     for (;;) {
       this.skipWhitespace(false);
       let itemStart = this.markStart();
-      if (this.tryReadChar('.')) {
+      let identifier: string;
+      if (!parentPath && this.tryReadChar('~')) {
+        itemStart = linkStart = this.markStart();
+        let aliasName = this.readIdentifier();
+        let alias = this.pathAliases.get(aliasName);
+        if (alias) {
+          if (alias instanceof Fmt.NamedPathItem) {
+            if (this.tryReadChar('/')) {
+              parentPath = alias;
+              continue;
+            } else {
+              parentPath = alias.parentPath;
+              identifier = alias.name;
+            }
+          } else {
+            parentPath = alias;
+            this.readChar('/');
+            continue;
+          }
+        } else {
+          this.error(`Path alias "${aliasName}" not found`, this.markEnd(linkStart));
+          identifier = '';
+        }
+      } else if (this.tryReadChar('.')) {
         let item: Fmt.PathItem = this.tryReadChar('.') ? new Fmt.ParentPathItem(parentPath) : new Fmt.IdentityPathItem(parentPath);
         let itemRange = this.markEnd(itemStart);
         this.markEnd(pathStart, item, context, undefined, itemRange);
         parentPath = item;
         this.readChar('/');
+        continue;
       } else {
-        let identifier = this.readIdentifier();
-        this.skipWhitespace(false);
-        if (this.peekChar() === '/') {
-          let item: Fmt.PathItem = new Fmt.NamedPathItem(identifier, parentPath);
-          let itemRange = this.markEnd(itemStart);
-          this.markEnd(pathStart, item, context, undefined, itemRange);
-          parentPath = item;
-          this.readChar('/');
-        } else {
-          for (;;) {
-            let nameRange = this.markEnd(itemStart);
-            let linkRange = this.markEnd(linkStart);
-            let path = new Fmt.Path(identifier);
-            if (context) {
-              this.readOptionalArgumentList(path.arguments, context);
-            }
-            path.parentPath = parentPath;
-            this.markEnd(pathStart, path, context, undefined, nameRange, linkRange);
-            if (!this.tryReadChar('.')) {
-              return path;
-            }
-            parentPath = path;
-            this.skipWhitespace(false);
-            itemStart = linkStart = this.markStart();
-            identifier = this.readIdentifier();
+        identifier = this.readIdentifier();
+      }
+      this.skipWhitespace(false);
+      let continued = (this.peekChar() === '/');
+      if (readPathItem || continued) {
+        let item: Fmt.PathItem = new Fmt.NamedPathItem(identifier, parentPath);
+        let itemRange = this.markEnd(itemStart);
+        this.markEnd(pathStart, item, context, undefined, itemRange);
+        if (readPathItem && !continued) {
+          return item;
+        }
+        parentPath = item;
+        this.readChar('/');
+      } else {
+        for (;;) {
+          let nameRange = this.markEnd(itemStart);
+          let linkRange = this.markEnd(linkStart);
+          let path = new Fmt.Path(identifier, undefined, parentPath);
+          if (context) {
+            this.readOptionalArgumentList(path.arguments, context);
           }
+          this.markEnd(pathStart, path, context, undefined, nameRange, linkRange);
+          if (!this.tryReadChar('.')) {
+            return path;
+          }
+          parentPath = path;
+          this.skipWhitespace(false);
+          itemStart = linkStart = this.markStart();
+          identifier = this.readIdentifier();
         }
       }
     }
   }
 
+  private readPath(context: Ctx.Context | undefined): Fmt.Path {
+    return this.readPathOrItem(context, false) as Fmt.Path;
+  }
+
+  readFileContents(file: Fmt.File, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): void {
+    this.readPathAliases(context);
+    this.readDefinitions(file.definitions, metaDefinitions, context);
+  }
+
+  readPathAliases(context: Ctx.Context): void {
+    this.skipWhitespace(true, true);
+    if (this.tryReadChar('[')) {
+      this.skipWhitespace();
+      let pathAlias = this.tryReadPathAlias(context);
+      if (pathAlias) {
+        this.pathAliases.set(pathAlias.name, pathAlias.path);
+        while (this.tryReadChar(',')) {
+          pathAlias = this.readPathAlias(context);
+          this.pathAliases.set(pathAlias.name, pathAlias.path);
+          this.skipWhitespace();
+        }
+      }
+      this.readChar(']');
+    }
+  }
+
+  tryReadPathAlias(context: Ctx.Context): Fmt.PathAlias | undefined {
+    let aliasStart = this.markStart();
+    if (!this.tryReadChar('$')) {
+      return undefined;
+    }
+    this.readChar('~');
+    let nameStart = this.markStart();
+    let name = this.readIdentifier();
+    let nameRange = this.markEnd(nameStart);
+    this.readChar('=');
+    this.readChar('$');
+    let path = this.readPathOrItem(context, true);
+    let pathAlias: Fmt.PathAlias = {
+      name: name,
+      path: path
+    };
+    this.markEnd(aliasStart, pathAlias, context, undefined, nameRange);
+    return pathAlias;
+  }
+
+  readPathAlias(context: Ctx.Context): Fmt.PathAlias {
+    this.skipWhitespace();
+    return this.tryReadPathAlias(context) || this.error('Path alias expected') || {name: '', path: new Fmt.IdentityPathItem};
+  }
+
   readDefinitions(definitions: Fmt.Definition[], metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): void {
     let definitionsStart = this.markStart();
     for (;;) {
-      let documentationComment = this.skipWhitespace();
-      let definition = this.tryReadDefinition(documentationComment, metaDefinitions, context);
+      this.skipWhitespace(true, true);
+      let definition = this.tryReadDefinition(metaDefinitions, context);
       if (definition) {
         definitions.push(definition);
       } else {
@@ -226,7 +307,8 @@ export class Reader {
     this.markEnd(definitionsStart, definitions, context, metaDefinitions);
   }
 
-  tryReadDefinition(documentationComment: RawDocumentationComment | undefined, metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Definition | undefined {
+  tryReadDefinition(metaDefinitions: Fmt.MetaDefinitionFactory, context: Ctx.Context): Fmt.Definition | undefined {
+    let documentationComment = this.lastDocumentationComment;
     let definitionStart = this.markStart();
     if (!this.tryReadChar('$')) {
       return undefined;
@@ -241,18 +323,16 @@ export class Reader {
     definition.type = this.readType(metaDefinitions, typeContext);
     let signatureRange = this.markEnd(definitionStart);
     if (documentationComment) {
-      definition.documentation = new Fmt.DocumentationComment;
-      definition.documentation.items = documentationComment.items.map((item) => {
-        let result = new Fmt.DocumentationItem;
-        result.kind = item.kind;
+      let documentationItems = documentationComment.items.map((item) => {
+        let itemParameter: Fmt.Parameter | undefined = undefined;
         if (item.parameterName) {
           try {
-            result.parameter = definition.parameters.getParameter(item.parameterName);
+            itemParameter = definition.parameters.getParameter(item.parameterName);
           } catch (error) {
             this.error(error.message, item.nameRange);
           }
         }
-        result.text = item.text;
+        let result = new Fmt.DocumentationItem(item.kind, itemParameter, item.text);
         this.rangeHandler?.reportRange({
           object: result,
           context: context,
@@ -263,6 +343,7 @@ export class Reader {
         });
         return result;
       });
+      definition.documentation = new Fmt.DocumentationComment(documentationItems);
       this.rangeHandler?.reportRange({
         object: definition.documentation,
         context: context,
@@ -689,8 +770,7 @@ export class Reader {
     return this.tryReadIdentifier() || this.error('Identifier expected') || '';
   }
 
-  private skipWhitespace(allowComments: boolean = true): RawDocumentationComment | undefined {
-    let result: RawDocumentationComment | undefined = undefined;
+  private skipWhitespace(allowComments: boolean = true, handleDocumentationComment: boolean = false): void {
     let c = this.stream.peekChar();
     if (isWhitespaceCharacter(c) || (allowComments && c === '/')) {
       this.markedEnd = this.stream.getLocation();
@@ -710,7 +790,7 @@ export class Reader {
             this.stream.readChar();
             let documentationItems: RawDocumentationItem[] | undefined = undefined;
             c = this.stream.peekChar();
-            if (c === '*') {
+            if (handleDocumentationComment && c === '*') {
               this.stream.readChar();
               documentationItems = [];
             }
@@ -926,7 +1006,7 @@ export class Reader {
                   } : undefined
                 });
               }
-              result = {
+              this.lastDocumentationComment = {
                 items: documentationItems,
                 range: {
                   start: commentStart,
@@ -947,7 +1027,6 @@ export class Reader {
         Object.assign(this.markedStart, this.stream.getLocation());
       }
     }
-    return result;
   }
 
   private tryReadChar(c: string): boolean {
@@ -963,6 +1042,7 @@ export class Reader {
   private readChar(c: string): void {
     this.markedStart = undefined;
     this.markedEnd = undefined;
+    this.lastDocumentationComment = undefined;
     this.skipWhitespace(c !== '/');
     if (!this.tryReadChar(c)) {
       let expected = '';
@@ -993,6 +1073,7 @@ export class Reader {
     this.markedEnd = undefined;
     this.triedChars.length = 0;
     this.atError = false;
+    this.lastDocumentationComment = undefined;
     return this.stream.readChar();
   }
 

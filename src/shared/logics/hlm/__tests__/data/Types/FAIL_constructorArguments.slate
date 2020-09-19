@@ -1,5 +1,9 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~Essentials = $../Essentials
+]
+
 /**
  * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
  */
@@ -7,8 +11,8 @@ $FAIL_constructorArguments(
   S: %Set,
   s: %Element(S)
 ): %ExplicitOperator {
-  definition = [$../Essentials/"Pointed sets"."pointed set"(
-    S = $../Essentials/"Natural numbers",
+  definition = [$~Essentials/"Pointed sets"."pointed set"(
+    S = $~Essentials/"Natural numbers",
     s = s
   )]
 }

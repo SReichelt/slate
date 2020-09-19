@@ -153,6 +153,10 @@ div.display-math {
   padding-bottom: 1pt;
 }
 
+.expr sup, .expr sub {
+  line-height: 50%;
+}
+
 .subsup {
   display: inline-table;
   vertical-align: middle;
@@ -508,9 +512,9 @@ div.display-math {
 .radical-degree {
   display: table-cell;
   font-size: smaller;
-  line-height: 105%;
+  line-height: 100%;
   position: relative;
-  bottom: 0.3em;
+  bottom: 0.25em;
   left: 0.5pt;
   min-width: 0.6em;
   text-align: right;
@@ -537,8 +541,8 @@ div.display-math {
 .radical-radicand {
   display: table-cell;
   border-top: solid 0.8pt;
-  padding-top: 1pt;
-  padding-right: 0.3ex;
+  padding: 0.5pt 1.5pt 0pt 0.5pt;
+  line-height: 100%;
 }
 
 .fraction .fraction, .radical .fraction, .radical .radical {
@@ -555,8 +559,7 @@ div.display-math {
 }
 
 .charcorner-tr.charcorner-large+.space-start::before, .charcorner-tr+sup::before {
-  content: ' '!important;
-  font-size: initial!important;
+  content: ' '!important;
 }
 
 .charcorner-tr+sub::before {

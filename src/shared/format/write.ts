@@ -25,12 +25,19 @@ export interface IndentInfo {
   outerIndent: string;
 }
 
+interface PathInfo {
+  path: Fmt.PathItem;
+  occurrences: number;
+}
+
 export class Writer {
   private lineLength = 0;
+  private pathAliases: Fmt.PathAlias[] = [];
 
   constructor(private stream: OutputStream, private allowPlaceholders: boolean = false, private skipOmittableParameters: boolean = false, private newLineStr: string = '\n', private indentStr: string = '  ', private spaceStr: string = ' ') {}
 
   writeFile(file: Fmt.File, indent: IndentInfo | undefined = {indent: '', outerIndent: ''}): void {
+    this.constructPathAliases(file);
     this.writeRange(file, false, false, false, false, () => {
       this.write('%');
       this.writePath(file.metaModelPath, indent);
@@ -38,19 +45,107 @@ export class Writer {
       this.writeNewLine();
       if (file.definitions.length) {
         this.writeNewLine(true);
-        this.writeDefinitions(file.definitions, indent);
+        this.writeFileContents(file, indent);
       }
     });
   }
 
-  writePath(path: Fmt.Path, indent?: IndentInfo): void {
+  constructPathAliases(file: Fmt.File): void {
+    let paths = new Map<string, PathInfo[]>();
+    file.traverse((expression: Fmt.Expression) => {
+      if (expression instanceof Fmt.DefinitionRefExpression) {
+        let path = expression.path;
+        while (path.parentPath instanceof Fmt.Path) {
+          path = path.parentPath;
+        }
+        this.addToPathAliases(path, paths);
+      }
+    });
+    this.disambiguatePathAliases(paths);
+    let keys = [...paths.keys()];
+    keys.sort();
+    for (let name of keys) {
+      for (let pathInfo of paths.get(name)!) {
+        if (pathInfo.occurrences > 1) {
+          this.pathAliases.push({
+            name: name,
+            path: pathInfo.path
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  private addToPathAliases(path: Fmt.PathItem | undefined, paths: Map<string, PathInfo[]>): void {
+    if (path instanceof Fmt.NamedPathItem && path.parentPath) {
+      let name = path.name;
+      let pathInfos = paths.get(name);
+      if (!pathInfos) {
+        pathInfos = [];
+        paths.set(name, pathInfos);
+      }
+      let pathWithoutArgs = new Fmt.NamedPathItem(path.name, path.parentPath);
+      for (let pathInfo of pathInfos) {
+        if (pathWithoutArgs.isEquivalentTo(pathInfo.path)) {
+          pathInfo.occurrences++;
+          return;
+        }
+      }
+      pathInfos.push({
+        path: pathWithoutArgs,
+        occurrences: 1
+      });
+    }
+  }
+
+  private disambiguatePathAliases(paths: Map<string, PathInfo[]>): void {
+    let adapted: boolean;
+    do {
+      adapted = false;
+      for (let pathInfos of paths.values()) {
+        let usedCount = 0;
+        for (let pathInfo of pathInfos) {
+          if (pathInfo.occurrences > 1) {
+            usedCount++;
+          }
+        }
+        let nameConflict = (usedCount > 1);
+        for (let pathInfo of pathInfos.slice()) {
+          if (nameConflict ? pathInfo.occurrences > 1 : pathInfo.occurrences === 1) {
+            this.addToPathAliases(pathInfo.path.parentPath, paths);
+            pathInfo.occurrences = 0;
+            adapted = true;
+          }
+        }
+        if (adapted) {
+          // Restart because we need a new iterator.
+          break;
+        }
+      }
+    } while (adapted);
+  }
+
+  private findPathAlias(path: Fmt.PathItem): Fmt.PathAlias | undefined {
+    if (path instanceof Fmt.NamedPathItem && path.parentPath && !(path.parentPath instanceof Fmt.Path)) {
+      let pathWithoutArgs = new Fmt.NamedPathItem(path.name, path.parentPath);
+      for (let pathAlias of this.pathAliases) {
+        if (pathWithoutArgs.isEquivalentTo(pathAlias.path)) {
+          return pathAlias;
+        }
+      }
+    }
+    return undefined;
+  }
+
+  writePath(path: Fmt.Path, indent?: IndentInfo, useAliases: boolean = false): void {
     let argumentListIndent = indent;
     let lastArgumentListIndent = indent;
     if (this.hasArguments(path.parentPath)) {
       argumentListIndent = this.indent(indent);
       lastArgumentListIndent = this.indent(indent, true);
     }
-    this.writeFullPath(path, argumentListIndent, lastArgumentListIndent);
+    this.writeFullPath(path, argumentListIndent, lastArgumentListIndent, useAliases);
   }
 
   private hasArguments(pathItem: Fmt.PathItem | undefined): boolean {
@@ -64,40 +159,89 @@ export class Writer {
     }
   }
 
-  private writeFullPath(path: Fmt.Path, argumentListIndent?: IndentInfo, lastArgumentListIndent?: IndentInfo): void {
+  private writeFullPath(path: Fmt.Path, argumentListIndent?: IndentInfo, lastArgumentListIndent?: IndentInfo, useAliases: boolean = false): void {
     this.writeRange(path, false, false, false, false, () => {
       if (path.parentPath instanceof Fmt.Path) {
-        this.writeFullPath(path.parentPath, argumentListIndent, argumentListIndent);
+        this.writeFullPath(path.parentPath, argumentListIndent, argumentListIndent, useAliases);
         this.write('.');
         this.writeIdentifier(path.name, path, true);
       } else {
-        this.writeRange(path, false, true, false, false, () => {
-          if (path.parentPath) {
-            this.writePathItem(path.parentPath);
-            this.write('/');
-          }
-          this.writeIdentifier(path.name, path, false);
-        });
+        this.writePathItem(path, true, useAliases);
       }
       this.writeOptionalArgumentList(path.arguments, lastArgumentListIndent);
     });
   }
 
-  private writePathItem(path: Fmt.PathItem): void {
-    this.writeRange(path, false, false, false, false, () => {
-      if (path.parentPath) {
-        this.writePathItem(path.parentPath);
-        this.write('/');
-      }
-      if (path instanceof Fmt.IdentityPathItem) {
-        this.write('.');
-      } else if (path instanceof Fmt.ParentPathItem) {
-        this.write('..');
-      } else if (path instanceof Fmt.NamedPathItem) {
-        this.writeIdentifier(path.name, path, false);
+  private writePathItem(path: Fmt.PathItem, isLinkRange: boolean, useAliases: boolean): void {
+    this.writeRange(path, false, isLinkRange, false, false, () => {
+      let pathAlias = useAliases ? this.findPathAlias(path) : undefined;
+      if (pathAlias) {
+        this.write('~');
+        this.writeIdentifier(pathAlias.name, path, false);
       } else {
-        this.error('Unsupported path item type');
+        if (path.parentPath) {
+          this.writePathItem(path.parentPath, false, useAliases);
+          this.write('/');
+        }
+        if (path instanceof Fmt.IdentityPathItem) {
+          this.write('.');
+        } else if (path instanceof Fmt.ParentPathItem) {
+          this.write('..');
+        } else if (path instanceof Fmt.NamedPathItem) {
+          this.writeIdentifier(path.name, path, false);
+        } else {
+          this.error('Unsupported path item type');
+        }
       }
+    });
+  }
+
+  writeFileContents(file: Fmt.File, indent?: IndentInfo): void {
+    if (this.pathAliases.length) {
+      this.writePathAliasList(indent);
+      this.writeNewLine();
+      this.writeNewLine(true);
+    }
+    this.writeDefinitions(file.definitions, indent);
+  }
+
+  private writePathAliasList(indent?: IndentInfo): void {
+    this.write('[');
+    this.writePathAliases(indent);
+    this.write(']');
+  }
+
+  private writePathAliases(indent?: IndentInfo): void {
+    let aliasIndent = this.indent(indent);
+    let first = true;
+    for (let pathAlias of this.pathAliases) {
+      if (first) {
+        first = false;
+        this.writeNewLine();
+      } else {
+        this.write(',');
+        this.writeNewLine(true);
+      }
+      this.writeIndent(aliasIndent);
+      this.writePathAlias(pathAlias);
+    }
+    this.writeNewLine();
+    if (indent) {
+      this.write(indent.outerIndent);
+    }
+  }
+
+  private writePathAlias(pathAlias: Fmt.PathAlias): void {
+    this.writeRange(pathAlias, false, false, false, false, () => {
+      this.writeRange(pathAlias, false, false, true, false, () => {
+        this.write('$~');
+        this.writeIdentifier(pathAlias.name, pathAlias, false);
+      });
+      this.writeOptionalSpace();
+      this.write('=');
+      this.writeOptionalSpace();
+      this.write('$');
+      this.writePathItem(pathAlias.path, true, false);
     });
   }
 
@@ -166,7 +310,6 @@ export class Writer {
 
   writeParameters(parameters: Fmt.ParameterList, indent?: IndentInfo): void {
     let groupIndent = indent;
-    let lastGroupIndent = indent;
     let multiLine = (this.newLineStr.length > 0
                      && parameters.length > 1
                      && parameters.some((param: Fmt.Parameter) => this.isLargeParameter(param, false)));
@@ -177,11 +320,8 @@ export class Writer {
         continue;
       }
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
-        if (firstGroup) {
-          if (multiLine) {
-            groupIndent = this.indent(groupIndent);
-            lastGroupIndent = this.indent(lastGroupIndent, !multiLine);
-          }
+        if (firstGroup && multiLine) {
+          groupIndent = this.indent(groupIndent);
         }
         this.writeParameterGroupWithPrefix(currentGroup, groupIndent, multiLine, !firstGroup);
         currentGroup.length = 0;
@@ -193,7 +333,7 @@ export class Writer {
       multiLine = false;
     }
     if (currentGroup.length) {
-      this.writeParameterGroupWithPrefix(currentGroup, lastGroupIndent, multiLine, !firstGroup);
+      this.writeParameterGroupWithPrefix(currentGroup, groupIndent, multiLine, !firstGroup);
     }
     if (multiLine) {
       this.writeNewLine();
@@ -267,7 +407,6 @@ export class Writer {
 
   writeArguments(args: Fmt.ArgumentList, indent?: IndentInfo, blockMode: boolean = false, compoundExpression: boolean = false): void {
     let argIndent = indent;
-    let lastArgIndent = indent;
     if (!this.newLineStr) {
       blockMode = false;
     }
@@ -278,7 +417,6 @@ export class Writer {
                    && args.some((arg: Fmt.Argument) => this.isLargeArgument(arg, compoundExpression)));
       if (multiLine) {
         argIndent = this.indent(argIndent);
-        lastArgIndent = this.indent(lastArgIndent, !multiLine);
       }
     }
     let index = 0;
@@ -301,7 +439,7 @@ export class Writer {
         }
         this.writeIndent(argIndent);
       }
-      this.writeArgument(arg, index === args.length - 1 ? lastArgIndent : argIndent);
+      this.writeArgument(arg, argIndent);
       index++;
       prevArg = arg;
     }
@@ -333,12 +471,10 @@ export class Writer {
 
   writeExpressions(expressions: Fmt.Expression[], indent?: IndentInfo, maxLineLength: number = 0): void {
     let expressionIndent = indent;
-    let lastExpressionIndent = indent;
     if (expressions.length <= 1 || !this.newLineStr) {
       maxLineLength = 0;
     } else {
       expressionIndent = this.indent(expressionIndent);
-      lastExpressionIndent = this.indent(lastExpressionIndent, !maxLineLength);
     }
     let index = 0;
     let remainingLineLength = 0;
@@ -354,7 +490,7 @@ export class Writer {
         this.writeIndent(expressionIndent);
         remainingLineLength = maxLineLength;
       }
-      this.writeExpression(expression, index === expressions.length - 1 ? lastExpressionIndent : expressionIndent);
+      this.writeExpression(expression, expressionIndent);
       index++;
       remainingLineLength--;
     }
@@ -386,7 +522,6 @@ export class Writer {
       } else if (expression instanceof Fmt.StringExpression) {
         this.writeString(expression.value, '\'', true);
       } else if (expression instanceof Fmt.VariableRefExpression) {
-        // TODO disallow references to shadowed variables
         this.writeIdentifier(expression.variable.name, expression, true);
       } else if (expression instanceof Fmt.MetaRefExpression) {
         this.writeRange(expression, false, false, true, false, () => {
@@ -397,7 +532,7 @@ export class Writer {
         this.writeOptionalArgumentList(args, indent);
       } else if (expression instanceof Fmt.DefinitionRefExpression) {
         this.write('$');
-        this.writePath(expression.path, indent);
+        this.writePath(expression.path, indent, true);
       } else if (expression instanceof Fmt.ParameterExpression) {
         this.write('#');
         this.writeParameterList(expression.parameters, indent);
@@ -428,7 +563,7 @@ export class Writer {
 
   private isLargeExpression(expression: Fmt.Expression): boolean {
     return ((expression instanceof Fmt.MetaRefExpression && (expression instanceof Fmt.GenericMetaRefExpression ? expression.arguments.length !== 0 : Object.keys(expression).length !== 0))
-            || (expression instanceof Fmt.DefinitionRefExpression && (expression.path.arguments.length !== 0 || expression.path.parentPath !== undefined))
+            || (expression instanceof Fmt.DefinitionRefExpression && (expression.path.arguments.length !== 0 || (expression.path.parentPath !== undefined && !this.findPathAlias(expression.path))))
             || expression instanceof Fmt.ParameterExpression
             || expression instanceof Fmt.CompoundExpression
             || expression instanceof Fmt.ArrayExpression

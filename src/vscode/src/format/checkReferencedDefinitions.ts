@@ -128,17 +128,19 @@ export function checkReferencedDefinitions(parsedDocument: ParsedDocument, diagn
         if (metaModel instanceof FmtDynamic.DynamicMetaModel) {
             if (rangeInfo.object instanceof Fmt.Path) {
                 let path = rangeInfo.object;
-                let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
-                let referencedDefinition = findReferencedDefinition(parsedDocument, path, rangeInfo.context, sourceDocument);
-                if (referencedDefinition === undefined) {
-                    referenceChecker.error(`Definition "${path.name}" not found`);
-                }
-                if (referencedDefinition && referencedDefinition.arguments && referencedDefinition.arguments.length) {
-                    referenceChecker.referencedDefinition = referencedDefinition;
-                    try {
-                        referenceChecker.checkArgumentsOfReferencedDefinition(referencedDefinition.definition.parameters, referencedDefinition.arguments);
-                    } catch (error) {
-                        referenceChecker.error(error.message);
+                if (path.name) {
+                    let referenceChecker = new ReferenceChecker(parsedDocument, diagnostics, metaModel, rangeInfo.range, sourceDocument);
+                    let referencedDefinition = findReferencedDefinition(parsedDocument, path, rangeInfo.context, sourceDocument);
+                    if (referencedDefinition === undefined) {
+                        referenceChecker.error(`Definition "${path.name}" not found`);
+                    }
+                    if (referencedDefinition && referencedDefinition.arguments && referencedDefinition.arguments.length) {
+                        referenceChecker.referencedDefinition = referencedDefinition;
+                        try {
+                            referenceChecker.checkArgumentsOfReferencedDefinition(referencedDefinition.definition.parameters, referencedDefinition.arguments);
+                        } catch (error) {
+                            referenceChecker.error(error.message);
+                        }
                     }
                 }
             } else if (rangeInfo.object instanceof Fmt.IndexedExpression) {

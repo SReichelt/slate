@@ -84,7 +84,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         if (isEmptyExpression || (rangeInfo.object instanceof Fmt.MetaRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
             this.appendMetaDefinitions(document, parsedDocument, rangeInfo, isEmptyExpression, result);
         }
-        if ((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || (rangeInfo.object instanceof Fmt.Path && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
+        if ((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
             this.appendPaths(document, parsedDocument, rangeInfo, result);
         }
         return signatureInfo !== undefined;
@@ -108,7 +108,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
 
     private appendPaths(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, result: vscode.CompletionItem[]): void {
         let range: vscode.Range | undefined = undefined;
-        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.name) {
+        if (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.object.name) {
             range = rangeInfo.nameRange;
         }
         if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath instanceof Fmt.Path) {
@@ -122,8 +122,8 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendOuterPaths(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, range: vscode.Range | undefined, result: vscode.CompletionItem[]): void {
-        let prefix = rangeInfo.object instanceof Fmt.Path ? '' : '$';
-        if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath) {
+        let prefix = '';
+        if (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.object.parentPath) {
             let parentPathRange = parsedDocument.rangeMap.get(rangeInfo.object.parentPath);
             if (parentPathRange && parentPathRange.range.isEqual(rangeInfo.range)) {
                 prefix = '/';
@@ -189,7 +189,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         let currentDirectory: string | undefined = undefined;
         let referencedDocument: ParsedDocument | undefined = undefined;
         if (lookup instanceof FmtMeta.MetaRefExpression_self) {
-            if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath) {
+            if (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.object.parentPath) {
                 let fileName = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, true);
                 if (fileName && fs.existsSync(fileName)) {
                     currentFile = fileName;
@@ -208,7 +208,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
             }
         }
         else if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
-            if (rangeInfo.object instanceof Fmt.Path) {
+            if (rangeInfo.object instanceof Fmt.NamedPathItem) {
                 currentDirectory = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, true, false);
             }
             else {
@@ -224,17 +224,23 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 referencedDocument = parseFile(vscode.Uri.file(currentFile));
             }
             if (currentDirectory) {
+                let dirStat = fs.statSync(currentDirectory);
+                if (!dirStat.isDirectory()) {
+                    currentDirectory = undefined;
+                }
+            }
+            if (currentDirectory) {
                 for (let fileName of fs.readdirSync(currentDirectory)) {
                     let fullPath = path.join(currentDirectory, fileName);
-                    let stat = fs.statSync(fullPath);
-                    if (stat.isDirectory()) {
+                    let fileStat = fs.statSync(fullPath);
+                    if (fileStat.isDirectory()) {
                         result.push({
                             label: prefix + escapeIdentifier(fileName),
                             range: range,
                             kind: vscode.CompletionItemKind.Folder
                         });
                     }
-                    else if (stat.isFile() && fileName.endsWith(fileExtension)) {
+                    else if (fileStat.isFile() && fileName.endsWith(fileExtension)) {
                         if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
                             try {
                                 let fileDocument = parseFile(vscode.Uri.file(fullPath));
@@ -257,9 +263,12 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                         }
                     }
                 }
+            } else {
+                addParent = false;
             }
         }
         catch (error) {
+            addParent = false;
         }
         if (referencedDocument && referencedDocument.file) {
             for (let definition of referencedDocument.file.definitions) {

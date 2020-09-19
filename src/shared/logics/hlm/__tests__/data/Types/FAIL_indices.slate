@@ -1,21 +1,26 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~"Natural numbers" = $../Essentials/"Natural numbers",
+  $~"Pointed sets" = $../Essentials/"Pointed sets"
+]
+
 /**
  * @expectedError Type mismatch: element of $../Essentials/"Pointed sets" expected
  * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
  */
 $FAIL_indices(_1: %Binder(
   #(
-    i: %Element($../Essentials/"Pointed sets"),
-    j: %Element($../Essentials/"Natural numbers")
+    i: %Element($~"Pointed sets"),
+    j: %Element($~"Natural numbers")
   ),
-  #(a: %Element($../Essentials/"Pointed sets"))
+  #(a: %Element($~"Pointed sets"))
 )): %ExplicitOperator {
   definition = [a[
-    i = $../Essentials/"Natural numbers".zero,
-    j = $../Essentials/"Pointed sets"."pointed set"(
-      S = $../Essentials/"Natural numbers",
-      s = $../Essentials/"Natural numbers".zero
+    i = $~"Natural numbers".zero,
+    j = $~"Pointed sets"."pointed set"(
+      S = $~"Natural numbers",
+      s = $~"Natural numbers".zero
     )
   ]]
 }

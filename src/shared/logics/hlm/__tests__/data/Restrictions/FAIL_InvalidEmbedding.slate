@@ -1,5 +1,10 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~Essentials = $../Essentials,
+  $~"Natural numbers" = $../Essentials/"Natural numbers"
+]
+
 /**
  * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $FAIL_InvalidEmbedding are incompatible
  *
@@ -20,9 +25,9 @@ $FAIL_InvalidEmbedding: %Construction {
         t: %Element(T)
       ),
       definition = [%exists(
-        #(f: %Element($../Essentials/Bijections(X = S, Y = T))),
+        #(f: %Element($~Essentials/Bijections(X = S, Y = T))),
         formula = %equals(
-          $../Essentials/value(X = S, Y = T, f = f, x = s),
+          $~Essentials/value(X = S, Y = T, f = f, x = s),
           t
         )
       )],
@@ -31,10 +36,7 @@ $FAIL_InvalidEmbedding: %Construction {
   }
 
   embedding = {
-    parameter = #(s: %Element($../Essentials/"Natural numbers")),
-    target = $../Essentials/"Pointed sets"."pointed set"(
-      S = $../Essentials/"Natural numbers",
-      s = s
-    )
+    parameter = #(s: %Element($~"Natural numbers")),
+    target = $~Essentials/"Pointed sets"."pointed set"(S = $~"Natural numbers", s = s)
   }
 }

@@ -1,5 +1,10 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~Essentials = $../Essentials,
+  $~"Natural numbers" = $../Essentials/"Natural numbers"
+]
+
 /**
  * @expectedError Type mismatch: %setStructuralCases($../Essentials/"Pointed sets"."pointed set"(S = $../Essentials/"Natural numbers", s = $../Essentials/"Natural numbers".zero), $../Essentials/"Pointed sets", [{constructor = $../Essentials/"Pointed sets"."pointed set", parameters = #(S: %Set, s: %Element(S)), value = S}]) and S are incompatible
  */
@@ -8,9 +13,9 @@ $FAIL_extractFromStructural(
   s: %Element(S)
 ): %Predicate {
   definition = [%equals(
-    $../Essentials/"Pointed set base point"(i = $../Essentials/"Pointed sets"."pointed set"(
-      S = $../Essentials/"Natural numbers",
-      s = $../Essentials/"Natural numbers".zero
+    $~Essentials/"Pointed set base point"(i = $~Essentials/"Pointed sets"."pointed set"(
+      S = $~"Natural numbers",
+      s = $~"Natural numbers".zero
     )),
     s
   )]

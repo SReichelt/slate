@@ -1,5 +1,10 @@
 %../../../../../../../data/logics/hlm%
 
+[
+  $~"Pointed set base point" = $../Essentials/"Pointed set base point",
+  $~"pointed natural numbers with alternative" = $../Essentials/"pointed natural numbers with alternative"
+]
+
 /**
  * @expectedError Type mismatch: %setStructuralCases($../Essentials/"pointed natural numbers with alternative", $../Essentials/"Pointed sets", [{constructor = $../Essentials/"Pointed sets"."pointed set", parameters = #(S: %Set, s: %Element(S)), value = S}]) and S are incompatible
  */
@@ -9,11 +14,11 @@ $FAIL_extractFromPointedNaturalNumbersWithAlternative(
 ): %StandardTheorem {
   claim = %and(
     %equals(
-      $../Essentials/"Pointed set base point"(i = $../Essentials/"pointed natural numbers with alternative"),
+      $~"Pointed set base point"(i = $~"pointed natural numbers with alternative"),
       $../Essentials/"Natural numbers".zero
     ),
     %equals(
-      $../Essentials/"Pointed set base point"(i = $../Essentials/"pointed natural numbers with alternative"),
+      $~"Pointed set base point"(i = $~"pointed natural numbers with alternative"),
       x
     )
   )
