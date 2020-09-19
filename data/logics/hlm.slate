@@ -1,5 +1,9 @@
 %../format/meta%
 
+[
+  $~notation = $../notation/notation
+]
+
 $hlm: %MetaModel {
   definitionTypes = [$Construction, $SetOperator, $ExplicitOperator, $ImplicitOperator, $MacroOperator, $Predicate, $StandardTheorem, $EquivalenceTheorem],
   expressionTypes = [$Bool, $Nat,
@@ -19,9 +23,9 @@ $hlm: %MetaModel {
 $Definition: %DefinitionType {
   members = #(
     properties: %ArgumentList = {},
-    notation?: $../notation/notation/Expr,
-    abbreviations: $../notation/notation/NotationAbbreviation[] = [],
-    definitionNotation?: $../notation/notation/DefinitionNotation
+    notation?: $~notation/Expr,
+    abbreviations: $~notation/NotationAbbreviation[] = [],
+    definitionNotation?: $~notation/DefinitionNotation
   )
 }
 
