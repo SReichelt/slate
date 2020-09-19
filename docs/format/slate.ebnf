@@ -2,9 +2,13 @@
 # Details about whitespace, identifiers, and strings are omitted.
 # .slate files are always encoded in UTF-8.
 
-Document                ::= MetaModelRef Definition*;
+Document                ::= MetaModelRef AliasList? Definition*;
 
-MetaModelRef            ::= '%' ParentPath Identifier '%';
+MetaModelRef            ::= '%' BasePath '%';
+
+AliasList               ::= '[' Aliases ']';
+Aliases                 ::= (Alias (',' Alias)*)?;
+Alias                   ::= '$' AliasIdentifier '=' '$' ParentPath PathItem;
 
 Definition              ::= '$' Identifier ParameterList? ':' Expression '{' Definition* NamedArguments '}';
 
@@ -23,14 +27,15 @@ Expression              ::= IntegerExpression | StringExpression | VariableRefEx
 IntegerExpression       ::= ('+' | '-')? [0-9]+;
 StringExpression        ::= <C-style string enclosed in single quotes>;
 VariableRefExpression   ::= Identifier;
-MetaRefExpression       ::= '%' IdentifierWithArguments;
+MetaRefExpression       ::= '%' Identifier ArgumentList?;
 DefinitionRefExpression ::= '$' Path;
 ParameterExpression     ::= '#' ParameterList;
 CompoundExpression      ::= '{' Arguments '}';
 ArrayExpression         ::= '[' (Expression (',' Expression)*)? ']';
 IndexedExpression       ::= Expression '[' Arguments ']';
 
-Path                    ::= ParentPath IdentifierWithArguments ('.' IdentifierWithArguments)*;
-ParentPath              ::= ((Identifier | '.' | '..') '/')*
-IdentifierWithArguments ::= Identifier ArgumentList?
+Path                    ::= BasePath ArgumentList? ('.' Identifier ArgumentList?)*;
+BasePath                ::= (ParentPath Identifier) | AliasIdentifier;
+ParentPath              ::= (AliasIdentifier '/')? (PathItem '/')*;
+PathItem                ::= Identifier | '.' | '..';
 Identifier              ::= <nonempty string of characters except whitespace and punctuation (see isSpecialCharacter)> | <C-style string enclosed in double quotes>;
