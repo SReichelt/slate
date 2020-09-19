@@ -1045,22 +1045,8 @@ export class Reader {
     this.lastDocumentationComment = undefined;
     this.skipWhitespace(c !== '/');
     if (!this.tryReadChar(c)) {
-      let expected = '';
-      let index = 0;
-      for (let tried of this.triedChars) {
-        if (index) {
-          if (this.triedChars.length > 2) {
-            expected += ',';
-          }
-          expected += ' ';
-          if (index === this.triedChars.length - 1) {
-            expected += 'or ';
-          }
-        }
-        expected += tried ? `'${tried}'` : expected ? 'identifier' : 'Identifier';
-        index++;
-      }
-      this.error(`${expected} expected`);
+      let expected = this.triedChars.map((tried: string, index: number) => (tried ? `'${tried}'` : index ? 'identifier' : 'Identifier'));
+      this.error(`${expected.join(' or ')} expected`);
     }
   }
 

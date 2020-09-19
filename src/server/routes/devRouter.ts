@@ -45,7 +45,6 @@ export function devRouter(rootPath: string): express.Router {
 
   router.use('/data', express.static(dataPath));
   router.use('/docs', express.static(path.join(rootPath, 'docs')));
-  router.use('/fonts/MathJax', express.static(path.join(rootPath, 'node_modules', 'mathjax', 'fonts', 'HTML-CSS', 'TeX', 'woff')));
 
   router.put('/data/libraries/*', (request, response) => saveLocally(request, response, rootPath));
 
