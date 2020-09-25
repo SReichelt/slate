@@ -25,7 +25,7 @@ exports[`render hlm library: 1.1.2 Essentials/Sets/Empty%20set%20is%20subset%20o
 
 Proof.  Let x ∈ ∅. Then x ∈ S:
 
-x ∈ ∅ ⇒^def ↯
+x ∈ ∅ ⇒^def ↯
 
 References.
 
@@ -47,30 +47,30 @@ Equivalence.
 
 1⇒3. Assume S = ∅. Then ∄ x ∈ S:
      Let x ∈ S.
-      ⇒^[S = ∅] x ∈ ∅
-      ⇒^def ↯
+     ⇒^[S = ∅] x ∈ ∅
+     ⇒^def ↯
 3⇒2. Assume ∄ x ∈ S. Then S ⊆ ∅:
      Let a ∈ S.
      We have ∃ x ∈ S: ↯
        Choose x := a.
 2⇒1. Assume S ⊆ ∅. Then S = ∅:
      ⊆. Trivial.
-     ⊇. 1.1.2 ⇒ ∅ ⊆ S
+     ⊇. 1.1.2 ⇒ ∅ ⊆ S
 1⇒4. Assume S = ∅. Then |S| = 0:
-     We have |S| = |∅|
-      = |ℕ_(<0)|
-      = 0.
+     We have |S| = |∅|
+      = |ℕ_(<0)|
+      = 0.
 4⇒5. Assume |S| = 0. Then |S| ≤ 0:
      We show that 0 ≤ 0:
-     1.7.2.9 ⇒ ≤ is a partial order
-      ⇒^def ≤ is reflexive
-      ⇒^def ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
-      ⇒ 0 ≤ 0
+     1.7.2.9 ⇒ ≤ is a partial order
+      ⇒^def ≤ is reflexive
+      ⇒^def ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
+      ⇒ 0 ≤ 0
 5⇒3. Assume |S| ≤ 0. Then ∄ x ∈ S:
-     |S| ≤ 0 ⇒^def ∃ φ : |S| → 0 : φ is injective
+     |S| ≤ 0 ⇒^def ∃ φ : |S| → 0 : φ is injective
      Let x ∈ S.
-     We have φ(x) ∈ ℕ_(<0) ⇒^def φ(x) < 0
-      ⇒^def ↯.
+     We have φ(x) ∈ ℕ_(<0) ⇒^def φ(x) < 0
+      ⇒^def ↯.
 
 Remarks.
 
@@ -95,8 +95,8 @@ exports[`render hlm library: 1.1.4 Essentials/Sets/finite 1`] = `
 Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-     |S| is finite ⇒^def ∃ n ∈ ℕ : |S| = n
-      ⇒^def ∃ r : S ↔ ℕ_(<n)
+     |S| is finite ⇒^def ∃ n ∈ ℕ : |S| = n
+      ⇒^def ∃ r : S ↔ ℕ_(<n)
      Choose k := n, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
      Choose l := k, g := f^-1.
@@ -105,10 +105,10 @@ Equivalence.
      We have l = |S|:
        We show that ∃ s : ℕ_(<l) ↔ S:
        Choose s := g.
-     l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
+     l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-     f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
-      ⇒^def f is injective
+     f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
+      ⇒^def f is injective
      Choose m := k, h := f.
 4⇒1. Let n ∈ ℕ, i : S → ℕ_(<n) be an injective function. Then |S| is finite:
      We show that ∃ y ∈ ℕ : |S| ≤ y:
@@ -116,7 +116,7 @@ Equivalence.
        We show that ∃ φ : |S| → n : φ is injective:
        Choose φ := i.
 4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
-     1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
+     1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
      Choose n := m, i := h∣_S^(ℕ_(≤m)). h∣_S^(ℕ_(≤m)) is injective by 1.4.16.
 5⇒4. Let n ∈ ℕ, i : S → ℕ_(≤n) be an injective function. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
      Choose m := n + 1, h := i∣_S^(ℕ_(<(n+1))). i∣_S^(ℕ_(<(n+1))) is injective by 1.4.16.
@@ -141,7 +141,7 @@ exports[`render hlm library: 1.1.5 Essentials/Sets/Subsets%20of%20finite%20sets%
 
 Proof.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
 
-S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
+S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
 Choose m := n, f := g∣_T. g∣_T is injective by 1.4.17.
 
@@ -2238,7 +2238,7 @@ Proof.  By induction on n.
 
 * (0) = (0): Trivial.
 * Let x ∈ ℕ. Then (((0) + x)+1) = (x+1):
-  We have (x+1) = (x+1) ⇒^1.7.1.6 (((0) + x)+1) = (x+1).
+  We have (x+1) = (x+1) ⇒^1.7.1.6 (((0) + x)+1) = (x+1).
 
 References.
 
@@ -2259,7 +2259,7 @@ Proof.  By induction on n.
 
 * (m+1) = (m+1): Trivial.
 * Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
-  We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1).
+  We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1).
 
 References.
 
@@ -2495,7 +2495,7 @@ Proof.  By induction on k.
   Choose m := f(0).
 * Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
   Let N := f(ℕ_(≤x)).
-   ⇒^1.7.1.18 ∃ n ∈ N : n is a ≤-greatest element of N
+  ⇒^1.7.1.18 ∃ n ∈ N : n is a ≤-greatest element of N
   Choose m := {f(k) if f(k) > n, n if f(k) ≤ n.
 
 Remarks.
@@ -2515,26 +2515,26 @@ exports[`render hlm library: 1.7.1.19 Essentials/Numbers/Natural/Finiteness%20cr
 Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
-     M is finite ⇒^def |M| is finite
-      ⇒^def |M| ∈ ℕ
+     M is finite ⇒^def |M| is finite
+      ⇒^def |M| ∈ ℕ
      * Assume |M| = 0. Then M is empty by definition.
      * Let k ∈ ℕ such that |M| = k + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
-       We have |M| = k + 1 ⇒^def ∃ f : M ↔ ℕ_(<(k+1)).
-       1.7.1.18 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
+       We have |M| = k + 1 ⇒^def ∃ f : M ↔ ℕ_(<(k+1)).
+       1.7.1.18 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
 3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M: Trivial.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
-        ⇒^def M = ∅
+       ⇒^def M = ∅
        Choose a := 0. We show that M ⊆ ℕ_(≤0):
-         1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-          ⇒^[M = ∅] M ⊆ ℕ_(≤0)
+         1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
+          ⇒^[M = ∅] M ⊆ ℕ_(≤0)
      * Let m ∈ M such that m is a ≤-greatest element of M.
        Choose a := m.
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
      Choose b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
-     1.7.1.17.7 ⇒ ℕ_(<b) is finite
-      ⇒^1.1.5 M is finite"
+     1.7.1.17.7 ⇒ ℕ_(<b) is finite
+      ⇒^1.1.5 M is finite"
 `;
 
 exports[`render hlm library: 1.7.1.20 Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -2773,11 +2773,11 @@ exports[`render hlm library: 1.7.1.36 Essentials/Numbers/Natural/Induction%20lem
 Proof.  By induction on n.
 
 * We show that 0 ∈ M:
-  M is inductive ⇒^def 0 ∈ M
+  M is inductive ⇒^def 0 ∈ M
 * Let x ∈ ℕ. Then x + 1 ∈ M:
-  1.7.1.36 ⇒ x ∈ M
-  M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
-   ⇒ x + 1 ∈ M"
+  1.7.1.36 ⇒ x ∈ M
+  M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
+   ⇒ x + 1 ∈ M"
 `;
 
 exports[`render hlm library: 1.7.1.37 Essentials/Numbers/Natural/Induction%20principle 1`] = `
@@ -3215,18 +3215,18 @@ Proof.  Assume ℙ is finite.
 
 Let a := ∏_(p ∈ ℙ) p.
 
- ⇒ a ≥ 1:
+⇒ a ≥ 1:
 
-  1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
-   ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
+  1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
+   ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
- ⇒^1.7.1.13 a + 1 > 1
- ⇒^1.7.1.50.5 ∃ prime p : p ∣ (a + 1)
- ⇒^1.7.1.31 p ∣ 1
- ⇒^1.7.1.30 p ≤ 1
+⇒^1.7.1.13 a + 1 > 1
+⇒^1.7.1.50.5 ∃ prime p : p ∣ (a + 1)
+⇒^1.7.1.31 p ∣ 1
+⇒^1.7.1.30 p ≤ 1
 
-p ∈ ℙ ⇒^def p ∈ ℕ_(>1)
- ⇒^def p > 1 ↯
+p ∈ ℙ ⇒^def p ∈ ℕ_(>1)
+ ⇒^def p > 1 ↯
 
 References.
 
@@ -3380,9 +3380,9 @@ n = |ℕ_(<n)|
 
   Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|. Then m = n:
 
-  |ℕ_(<m)| = |ℕ_(<n)| ⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
+  |ℕ_(<m)| = |ℕ_(<n)| ⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
 
-  1.7.2.1 ⇒ m = n
+  1.7.2.1 ⇒ m = n
 
 We write “let κ be a cardinal number” for “let κ ∈ 𝓒𝓻𝓭.”
 
@@ -4143,8 +4143,8 @@ x = (x-0)
 
   Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
 
-  (x-0) = (y-0) ⇒^def x + 0 = y + 0
-   ⇒^def x = y
+  (x-0) = (y-0) ⇒^def x + 0 = y + 0
+   ⇒^def x = y
 
 Remarks.
 
@@ -5376,34 +5376,34 @@ exports[`render hlm library: 1.7.6.18 Essentials/Numbers/Real/Roots%20of%20prime
 
 Proof.  Assume n√p is rational.
 
- ⇒^def ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+⇒^def ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
- ⇒^def p = (b∕a)^n
- =^1.7.6.13 b^n∕a^n
+⇒^def p = (b∕a)^n
+ =^1.7.6.13 b^n∕a^n
 
- ⇒^def p ⋅ a^n = b^n
- ⇒ p ∣ b^n by definition
- ⇒^1.7.4.23.1 p ∣ b
- ⇒ p ∣ a^n:
+⇒^def p ⋅ a^n = b^n
+⇒ p ∣ b^n by definition
+⇒^1.7.4.23.1 p ∣ b
+⇒ p ∣ a^n:
 
   We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
 
-  p ∣ b ⇒^def ∃ z ∈ ℤ : p ⋅ z = b
+  p ∣ b ⇒^def ∃ z ∈ ℤ : p ⋅ z = b
 
-  n ∈ ℕ_(>1) ⇒^def ∃ m ∈ ℕ : 2 + m = n
+  n ∈ ℕ_(>1) ⇒^def ∃ m ∈ ℕ : 2 + m = n
 
   Choose y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
-    p ⋅ a^n = b^n
-     = b^(2+m)
-     =^def b^m ⋅ b ⋅ b
-     = b^m ⋅ p ⋅ z ⋅ p ⋅ z
+    p ⋅ a^n = b^n
+     = b^(2+m)
+     =^def b^m ⋅ b ⋅ b
+     = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
-     ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
+    ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
- ⇒^1.7.4.23.1 p ∣ a
+⇒^1.7.4.23.1 p ∣ a
 
-p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
+p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
 
 References.
 
@@ -5419,7 +5419,7 @@ exports[`render hlm library: 1.7.6.19 Essentials/Numbers/Real/Square%20root%20of
 
 Proof.
 
-1.7.6.18 ⇒ 2√2 is irrational
+1.7.6.18 ⇒ 2√2 is irrational
 
 References.
 

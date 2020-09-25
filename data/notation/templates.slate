@@ -2095,27 +2095,23 @@ $Cases(cases: %Expr[][]): %Template {
  * @param formula An optional expression giving a formula related to this implication. This expression will be displayed above the implication arrow unless a source is given.
  */
 $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
-  notation = [
-    ' ',
+  notation = %opt(
+    source,
+    $OverUnder(
+      body = '⇒',
+      over = source,
+      style = 'shallow'
+    ),
     %opt(
-      source,
+      formula,
       $OverUnder(
         body = '⇒',
-        over = source,
+        over = formula,
         style = 'shallow'
       ),
-      %opt(
-        formula,
-        $OverUnder(
-          body = '⇒',
-          over = formula,
-          style = 'shallow'
-        ),
-        '⇒'
-      )
-    ),
-    ' '
-  ]
+      '⇒'
+    )
+  )
 }
 
 /**
@@ -2125,19 +2121,15 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
  * @param formula An optional expression giving a formula related to this implication. Currently ignored.
  */
 $ProofEquality(source?: %Expr, formula?: %Expr): %Template {
-  notation = [
-    ' ',
-    %opt(
-      source,
-      $OverUnder(
-        body = '=',
-        over = source,
-        style = 'shallow'
-      ),
-      '='
+  notation = %opt(
+    source,
+    $OverUnder(
+      body = '=',
+      over = source,
+      style = 'shallow'
     ),
-    ' '
-  ]
+    '='
+  )
 }
 
 /**

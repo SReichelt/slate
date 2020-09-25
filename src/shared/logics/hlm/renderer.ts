@@ -3076,20 +3076,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private outputImplicationSymbol(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
-    if (gridState.implicationSymbolColumn === undefined) {
-      // Implication symbol always needs to be in an odd column because all odd columns are center-aligned.
-      gridState.implicationSymbolColumn = 1;
-    }
     if (implication.source && !implication.dependsOnPrevious) {
       row.push(implication.source);
+      implication.source = undefined;
     }
-    while (row.length < gridState.implicationSymbolColumn) {
+    if (gridState.implicationSymbolColumn === undefined) {
+      gridState.implicationSymbolColumn = row.length;
+    }
+    let leftAligned = !gridState.implicationSymbolColumn;
+    // Implication symbol cannot be in the first column because only odd columns are center-aligned.
+    while (!row.length || row.length < gridState.implicationSymbolColumn) {
       row.push(new Notation.EmptyExpression);
     }
-    row.push(this.renderTemplate('ProofImplication', {
-                                   'source': implication.dependsOnPrevious ? implication.source : undefined,
-                                   'formula': implication.sourceFormula
-                                 }));
+    let implicationRow: Notation.RenderedExpression[] = [
+      this.renderTemplate('ProofImplication', {
+                            'source': implication.source,
+                            'formula': implication.sourceFormula
+                          }),
+      new Notation.TextExpression('\u2002')
+    ];
+    if (!leftAligned) {
+      implicationRow.unshift(new Notation.TextExpression('\u2002'));
+    }
+    row.push(new Notation.RowExpression(implicationRow));
+    implication.source = undefined;
+    implication.sourceFormula = undefined;
   }
 
   private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
@@ -3135,16 +3146,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         row.push(left);
       }
       gridState.equalitySymbolColumn = row.length;
-      row.push(this.renderTemplate('ProofEquality'));
     } else {
       while (row.length < gridState.equalitySymbolColumn) {
         row.push(new Notation.EmptyExpression);
       }
-      row.push(this.renderTemplate('ProofEquality', {
-                                     'source': implication.source,
-                                     'formula': implication.sourceFormula
-                                   }));
     }
+    row.push(new Notation.RowExpression([
+      new Notation.TextExpression('\u2008'),
+      this.renderTemplate('ProofEquality', {
+                            'source': implication.source,
+                            'formula': implication.sourceFormula
+                          }),
+      new Notation.TextExpression('\u2008')
+    ]));
     if (implication.resultSuffixes) {
       row.push(new Notation.RowExpression([right, ...implication.resultSuffixes]));
     } else {
