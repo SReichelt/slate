@@ -7,6 +7,10 @@ export interface ParseDocumentEvent {
     hasErrors: boolean;
 }
 
+export interface ForgetDocumentEvent {
+    document: vscode.TextDocument;
+}
+
 export interface HoverEvent {
     document: vscode.TextDocument;
     object: Object;

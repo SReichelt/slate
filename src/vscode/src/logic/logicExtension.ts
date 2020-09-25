@@ -4,13 +4,13 @@ import * as FmtNotation from '../../../shared/notation/meta';
 import { FileAccessor } from '../../../shared/data/fileAccessor';
 import { fileExtension } from '../../../shared/data/constants';
 import { SLATE_MODE } from '../slate';
-import { ParseDocumentEvent, HoverEvent } from '../events';
+import { ParseDocumentEvent, ForgetDocumentEvent, HoverEvent } from '../events';
 import { LibraryDocumentProvider } from './data';
 import { SlateDiagnosticsProvider } from './providers/diagnosticsProvider';
 import { SlateCodeLensProvider } from './providers/codeLensProvider';
 import { SlateLogicHoverProvider } from './providers/logicHoverProvider';
 
-export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onShowHover: vscode.Event<HoverEvent>, fileAccessor: FileAccessor): void {
+export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onDidForgetDocument: vscode.Event<ForgetDocumentEvent>, onShowHover: vscode.Event<HoverEvent>, fileAccessor: FileAccessor): void {
     let libraryDocumentProvider = new LibraryDocumentProvider(fileAccessor);
     let diagnosticsProvider = new SlateDiagnosticsProvider(libraryDocumentProvider);
     let changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             } catch (error) {
             }
         }),
-        vscode.workspace.onDidCloseTextDocument((document) => libraryDocumentProvider.invalidateUris([document.uri])),
+        onDidForgetDocument((event: ForgetDocumentEvent) => libraryDocumentProvider.invalidateUris([event.document.uri])),
         vscode.languages.registerCodeLensProvider(SLATE_MODE, codeLensProvider),
         onShowHover((event: HoverEvent) => hoverProvider.provideHover(event))
     );

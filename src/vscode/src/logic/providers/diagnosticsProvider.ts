@@ -9,7 +9,7 @@ export class SlateDiagnosticsProvider {
         if (libraryDocument.isSection) {
             return;
         }
-        if (libraryDocument.file.definitions.length) {
+        if (libraryDocument.document && libraryDocument.file.definitions.length) {
             let definition = libraryDocument.file.definitions[0];
             let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
             let options: Logic.LogicCheckerOptions = {
@@ -20,7 +20,9 @@ export class SlateDiagnosticsProvider {
             checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider, options).then((checkResult: Logic.LogicCheckResult) => {
                 let diagnostics = checkResult.diagnostics.map((diagnostic: Logic.LogicCheckDiagnostic) =>
                     new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
-                libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);
+                if (libraryDocument.document) {
+                    libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);
+                }
             });
         }
     }

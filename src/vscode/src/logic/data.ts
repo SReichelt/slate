@@ -7,7 +7,7 @@ import { FileAccessor } from '../../../shared/data/fileAccessor';
 import { LibraryDataProvider, LibraryDataProviderOptions } from '../../../shared/data/libraryDataProvider';
 import { languageId } from '../slate';
 import { ParseDocumentEvent } from '../events';
-import { RangeInfo, RangeHandler, deleteUrisFromDiagnosticCollection } from '../utils';
+import { RangeInfo, RangeHandler, deleteUrisFromDiagnosticCollection, areUrisEqual, isEqualOrParentUriOf } from '../utils';
 
 export interface Library {
     libraryDataProvider: LibraryDataProvider;
@@ -15,7 +15,7 @@ export interface Library {
 }
 
 export interface LibraryDocument {
-    document: vscode.TextDocument;
+    document?: vscode.TextDocument;
     library: Library;
     documentLibraryDataProvider: LibraryDataProvider;
     file: Fmt.File;
@@ -159,6 +159,18 @@ export class LibraryDocumentProvider {
     }
 
     invalidateUris(uris: vscode.Uri[]): void {
+        let invalidatedDocuments: vscode.TextDocument[] = [];
+        for (let [document, libraryDocument] of this.documents) {
+            for (let uri of uris) {
+                if (isEqualOrParentUriOf(uri, document.uri)) {
+                    invalidatedDocuments.push(document);
+                    libraryDocument.document = undefined;
+                }
+            }
+        }
+        for (let document of invalidatedDocuments) {
+            this.documents.delete(document);
+        }
         for (let library of this.libraries.values()) {
             deleteUrisFromDiagnosticCollection(uris, library.diagnosticCollection);
         }

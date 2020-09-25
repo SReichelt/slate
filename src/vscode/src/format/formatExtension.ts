@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';  // TODO replace with vscode.workspace.fs / WorkspaceFileAccessor
 import { WorkspaceFileAccessor } from '../workspaceFileAccessor';
 import { languageId, SLATE_MODE } from '../slate';
-import { ParseDocumentEvent, HoverEvent } from '../events';
+import { ParseDocumentEvent, ForgetDocumentEvent, HoverEvent } from '../events';
 import { deleteUrisFromDiagnosticCollection } from '../utils';
 import { ParsedDocument, ParsedDocumentMap } from './parsedDocument';
 import { parseFile, parsedFileCache, metaModelCache } from './parse';
@@ -17,13 +17,11 @@ import { SlateRenameProvider } from './providers/renameProvider';
 import { SlateDocumentFormatter } from './providers/documentFormatter';
 
 function emitParseEvent(document: vscode.TextDocument, parsedDocument: ParsedDocument, parseEventEmitter: vscode.EventEmitter<ParseDocumentEvent> | undefined): void {
-    if (parseEventEmitter) {
-        parseEventEmitter.fire({
-            document: document,
-            file: parsedDocument.file,
-            hasErrors: parsedDocument.hasSyntaxErrors || parsedDocument.hasBrokenReferences
-        });
-    }
+    parseEventEmitter?.fire({
+        document: document,
+        file: parsedDocument.file,
+        hasErrors: parsedDocument.hasSyntaxErrors || parsedDocument.hasBrokenReferences
+    });
 }
 
 function parseDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter?: vscode.EventEmitter<ParseDocumentEvent>): ParsedDocument | undefined {
@@ -48,7 +46,7 @@ let parseAllDelay = 0;
 let reparseCompletely = false;
 let reparseConditions: ReparseCondition[] | undefined = [];
 
-function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<ParseDocumentEvent>, recheckOnly: boolean, condition?: ReparseCondition, delay: number = 500): void {
+function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<ParseDocumentEvent> | undefined, recheckOnly: boolean, condition?: ReparseCondition, delay: number = 500): void {
     if (!recheckOnly) {
         reparseCompletely = true;
     }
@@ -97,7 +95,28 @@ function triggerParseAll(diagnosticCollection: vscode.DiagnosticCollection, pars
     parseAllTimer = setTimeout(parseAll, parseAllDelay);
 }
 
-function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter: vscode.EventEmitter<ParseDocumentEvent>): void {
+function reparseDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, fileAccessor: WorkspaceFileAccessor, parseEventEmitter?: vscode.EventEmitter<ParseDocumentEvent>): ParsedDocument | undefined {
+    if (document.languageId === languageId) {
+        let fileName = document.uri.fsPath;
+        parsedFileCache.delete(fileName);
+        let recheckOnly = true;
+        if (metaModelCache.has(fileName)) {
+            metaModelCache.delete(fileName);
+            recheckOnly = false;
+        }
+        let parsedDocument = parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
+        if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
+            fileAccessor.documentChanged(document);
+        }
+        // TODO only reparse affected documents (maintain a list of documents to reparse)
+        triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly, (checkedDocument) => (checkedDocument !== document));
+        return parsedDocument;
+    } else {
+        return undefined;
+    }
+}
+
+function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.DiagnosticCollection, parsedDocuments: ParsedDocumentMap, parseEventEmitter?: vscode.EventEmitter<ParseDocumentEvent>): void {
     deleteUrisFromDiagnosticCollection(uris, diagnosticCollection);
     let recheckOnly = true;
     for (let uri of uris) {
@@ -109,6 +128,13 @@ function invalidateUris(uris: vscode.Uri[], diagnosticCollection: vscode.Diagnos
         }
     }
     triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly);
+}
+
+function forgetDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection, forgetEventEmitter?: vscode.EventEmitter<ForgetDocumentEvent>): void {
+    diagnosticCollection.delete(document.uri);
+    forgetEventEmitter?.fire({
+        document: document
+    });
 }
 
 function configureLanguage(context: vscode.ExtensionContext): void {
@@ -137,43 +163,29 @@ function configureLanguage(context: vscode.ExtensionContext): void {
     );
 }
 
-export function activate(context: vscode.ExtensionContext, fileAccessor: WorkspaceFileAccessor, onInitialized: (parseEvent: vscode.Event<ParseDocumentEvent>, hoverEvent: vscode.Event<HoverEvent>) => void): void {
+export function activate(context: vscode.ExtensionContext, fileAccessor: WorkspaceFileAccessor, onInitialized: (parseEvent: vscode.Event<ParseDocumentEvent>, forgetEvent: vscode.Event<ForgetDocumentEvent>, hoverEvent: vscode.Event<HoverEvent>) => void): void {
     configureLanguage(context);
 
     let diagnosticCollection = vscode.languages.createDiagnosticCollection(languageId);
     let parsedDocuments: ParsedDocumentMap = new Map<vscode.TextDocument, ParsedDocument>();
     let parseEventEmitter = new vscode.EventEmitter<ParseDocumentEvent>();
+    let forgetEventEmitter = new vscode.EventEmitter<ForgetDocumentEvent>();
     let hoverEventEmitter = new vscode.EventEmitter<HoverEvent>();
     context.subscriptions.push(
         parseEventEmitter,
+        forgetEventEmitter,
         hoverEventEmitter
     );
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument((document) => parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter)),
-        vscode.workspace.onDidCloseTextDocument((document) => diagnosticCollection.delete(document.uri)),
+        vscode.workspace.onDidCloseTextDocument((document) => forgetDocument(document, diagnosticCollection, forgetEventEmitter)),
         vscode.workspace.onDidChangeTextDocument((event) => {
             if (parseAllTimer && reparseConditions === undefined) {
                 // After certain events like file renaming, we want to avoid registering intermediate errors.
                 return;
             }
-            if (!event.contentChanges.length) {
-                return;
-            }
-            let changedDocument = event.document;
-            if (changedDocument.languageId === languageId) {
-                let fileName = changedDocument.uri.fsPath;
-                parsedFileCache.delete(fileName);
-                let recheckOnly = true;
-                if (metaModelCache.has(fileName)) {
-                    metaModelCache.delete(fileName);
-                    recheckOnly = false;
-                }
-                let parsedDocument = parseDocument(changedDocument, diagnosticCollection, parsedDocuments, parseEventEmitter);
-                if (parsedDocument && !parsedDocument.hasSyntaxErrors) {
-                    fileAccessor.documentChanged(changedDocument);
-                }
-                // TODO only reparse affected documents (maintain a list of documents to reparse)
-                triggerParseAll(diagnosticCollection, parsedDocuments, parseEventEmitter, recheckOnly, (document) => (document !== changedDocument));
+            if (event.contentChanges.length) {
+                reparseDocument(event.document, diagnosticCollection, parsedDocuments, fileAccessor, parseEventEmitter);
             }
         })
     );
@@ -219,7 +231,7 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: Workspa
             })
         );
     }
-    onInitialized(parseEventEmitter.event, hoverEventEmitter.event);
+    onInitialized(parseEventEmitter.event, forgetEventEmitter.event, hoverEventEmitter.event);
     for (let document of vscode.workspace.textDocuments) {
         parseDocument(document, diagnosticCollection, parsedDocuments, parseEventEmitter);
     }
