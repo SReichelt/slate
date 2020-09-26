@@ -15,7 +15,7 @@ import MenuButton from './components/MenuButton';
 import Message from './components/Message';
 import InsertDialog from './components/InsertDialog';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
-import renderPromise from './components/PromiseHelper';
+import { renderPromise } from './components/PromiseHelper';
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';

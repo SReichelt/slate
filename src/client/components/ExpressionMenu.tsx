@@ -2,7 +2,7 @@ import * as React from 'react';
 import './ExpressionMenu.css';
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
-import renderPromise from './PromiseHelper';
+import { renderPromise } from './PromiseHelper';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import ExpressionToolTip from './ExpressionToolTip';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';

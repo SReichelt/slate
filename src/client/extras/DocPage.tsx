@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { OnDocLinkClicked } from './DocLink';
-import renderPromise from '../components/PromiseHelper';
+import { renderPromise } from '../components/PromiseHelper';
 import { fetchText } from '../../shared/utils/fetch';
 import CachedPromise from '../../shared/data/cachedPromise';
 

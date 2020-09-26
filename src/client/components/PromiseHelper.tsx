@@ -14,7 +14,7 @@ interface PromiseHelperState {
   errorMessage?: string;
 }
 
-class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperState> {
+export class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperState> {
   private currentPromise?: CachedPromise<any>;
 
   constructor(props: PromiseHelperProps) {
@@ -73,7 +73,7 @@ class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHelperSta
   }
 }
 
-function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key?: string, getFallback?: () => React.ReactNode): React.ReactElement | T {
+export function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key?: string, getFallback?: () => React.ReactNode): React.ReactElement | T {
   let immediateResult = promise.getImmediateResult();
   if (immediateResult === undefined) {
     return <PromiseHelper promise={promise} getFallback={getFallback} key={key}/>;
@@ -81,5 +81,3 @@ function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key
     return immediateResult;
   }
 }
-
-export default renderPromise;

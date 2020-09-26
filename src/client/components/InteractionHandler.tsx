@@ -5,7 +5,7 @@ import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/librar
 import * as Logic from '../../shared/logics/logic';
 import CachedPromise from '../../shared/data/cachedPromise';
 import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
-import renderPromise from './PromiseHelper';
+import { renderPromise } from './PromiseHelper';
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 

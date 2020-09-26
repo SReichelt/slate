@@ -4,7 +4,7 @@ import './Expression.css';
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
 import * as Dialog from '../../shared/notation/dialog';
-import renderPromise from './PromiseHelper';
+import { PromiseHelper, renderPromise } from './PromiseHelper';
 import ExpressionToolTip, { ToolTipPosition } from './ExpressionToolTip';
 import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
@@ -624,7 +624,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           });
         }
       });
-      result = renderPromise(render);
+      result = <PromiseHelper promise={render}/>;
     } else if (expression instanceof Notation.OuterParenExpression) {
       if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
           && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
@@ -907,7 +907,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Notation.PromiseExpression) {
       let render = expression.promise.then((innerExpression: Notation.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
-      return renderPromise(render);
+      return <PromiseHelper promise={render}/>;
     } else if (expression instanceof Notation.DecoratedExpression) {
       return this.renderExpression(expression.body, className, semanticLinks);
     } else if (expression instanceof Notation.PlaceholderExpression) {

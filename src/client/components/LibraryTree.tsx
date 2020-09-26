@@ -9,7 +9,7 @@ import ScrollPane from './ScrollPane';
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import ExpressionToolTip from './ExpressionToolTip';
 import CachedPromise from '../../shared/data/cachedPromise';
-import renderPromise from './PromiseHelper';
+import { renderPromise } from './PromiseHelper';
 import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
 import Button from './Button';
 import MenuButton from './MenuButton';
