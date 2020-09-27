@@ -15,7 +15,7 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
 import { HLMRenderUtils } from './renderUtils';
-import { HLMDefinitionChecker } from './checker';
+import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
@@ -70,6 +70,7 @@ function addNegations(expressions: Fmt.Expression[]): Fmt.Expression[] {
 
 export class HLMEditHandler extends GenericEditHandler {
   protected checker: HLMDefinitionChecker;
+  private checkResultPromise?: CachedPromise<HLMCheckResult>;
 
   constructor(definition: Fmt.Definition, libraryDataProvider: LibraryDataProvider, protected utils: HLMUtils, protected renderUtils: HLMRenderUtils, templates: Fmt.File, mruList: MRUList) {
     super(definition, libraryDataProvider, new HLMEditAnalysis, utils, templates, mruList);
@@ -83,6 +84,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   update(onAutoFilled?: () => void): CachedPromise<void> {
+    this.checkResultPromise = undefined;
     return super.update().then(() => {
       let autoFilled = false;
       if (onAutoFilled) {
@@ -105,9 +107,10 @@ export class HLMEditHandler extends GenericEditHandler {
           }
         }
       }
-      return this.checker.checkDefinition()
-        .then((result: Logic.LogicCheckResult): void | CachedPromise<void> => {
-          if (onAutoFilled && !result.hasErrors) {
+      this.checkResultPromise = this.checker.checkDefinition();
+      return this.checkResultPromise
+        .then((checkResult: HLMCheckResult): void | CachedPromise<void> => {
+          if (onAutoFilled && !checkResult.hasErrors) {
             let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
               let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
               if (expressionEditInfo) {
@@ -595,7 +598,7 @@ export class HLMEditHandler extends GenericEditHandler {
     }
     if (checkType && expressionEditInfo.expression) {
       return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
-        .then((checkResult: Logic.LogicCheckResultWithExpression) => {
+        .then((checkResult: HLMCheckResultWithExpression) => {
           if (checkResult.hasErrors) {
             return [];
           } else {
@@ -638,7 +641,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let expression = new Fmt.DefinitionRefExpression(resultPath);
         if (checkType && expressionEditInfo.expression) {
           return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
-            .then((checkResult: Logic.LogicCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
+            .then((checkResult: HLMCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
             .catch(() => undefined);
         } else {
           return expression;
@@ -779,7 +782,7 @@ export class HLMEditHandler extends GenericEditHandler {
                   []
                 );
                 return structuralChecker.checkExpression(inductionExpression, expressionType)
-                  .then((checkResult: Logic.LogicCheckResultWithExpression) => {
+                  .then((checkResult: HLMCheckResultWithExpression) => {
                     if (checkResult.hasErrors) {
                       return items;
                     } else {
@@ -920,7 +923,7 @@ export class HLMEditHandler extends GenericEditHandler {
       if (substitutedExpression) {
         let onInsertItem = () => expressionEditInfo!.onSetValue(substitutedExpression);
         let enabledPromise = this.checker.recheckWithSubstitution(originalExpression, substitutedExpression)
-          .then((checkResult: Logic.LogicCheckResultWithExpression) => !checkResult.hasErrors);
+          .then((checkResult: HLMCheckResultWithExpression) => !checkResult.hasErrors);
         this.addListItemInsertButton(renderedItems, innerType, onInsertItem, enabledPromise);
       }
     }
@@ -971,7 +974,7 @@ export class HLMEditHandler extends GenericEditHandler {
           }
           let expression = new Fmt.DefinitionRefExpression(resultPath);
           return this.checker.checkConstraint(parameterList, expression)
-            .then((checkResult: Logic.LogicCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
+            .then((checkResult: HLMCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
             .catch(() => undefined);
         });
       };
@@ -1111,11 +1114,23 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.getImmediateInsertButton(onInsert);
   }
 
-  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof): Notation.RenderedExpression {
-    return this.getMenuInsertButton(() => {
-      let rows: Menu.ExpressionMenuRow[] = [];
-
-      return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
-    });
+  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onRenderTrivialProof: Logic.RenderFn): Notation.RenderedExpression {
+    if (this.checkResultPromise) {
+      let resultPromise = this.checkResultPromise.then((checkResult: HLMCheckResult) => {
+        let context = checkResult.incompleteProofs.get(proof);
+        if (context) {
+          return this.getMenuInsertButton(() => {
+            let rows: Menu.ExpressionMenuRow[] = [];
+            // TODO
+            return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
+          });
+        } else {
+          return onRenderTrivialProof();
+        }
+      });
+      return new Notation.PromiseExpression(resultPromise);
+    } else {
+      return new Notation.ErrorExpression('Proof state unavailable');
+    }
   }
 }

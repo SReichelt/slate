@@ -42,7 +42,15 @@ interface HLMCheckerContext {
   rechecking: boolean;
 }
 
-interface HLMCheckerProofStepContext extends HLMCheckerContext, HLMProofStepContext {
+export interface HLMCheckerProofStepContext extends HLMCheckerContext, HLMProofStepContext {
+}
+
+export interface HLMCheckResult extends Logic.LogicCheckResult {
+  incompleteProofs: Map<FmtHLM.ObjectContents_Proof, HLMCheckerProofStepContext>;
+}
+
+export interface HLMCheckResultWithExpression extends HLMCheckResult {
+  expression: Fmt.Expression;
 }
 
 interface HLMCheckerCompatibilityStatus {
@@ -109,14 +117,15 @@ type PendingCheck = () => CachedPromise<void>;
 
 export class HLMDefinitionChecker {
   private rootContext: HLMCheckerContext;
-  private result: Logic.LogicCheckResult = {
-    diagnostics: [],
-    hasErrors: false
-  };
+  private result: HLMCheckResult;
   private pendingChecks: PendingCheck[] = [];
-  private pendingChecksPromise?: CachedPromise<Logic.LogicCheckResult>;
+  private pendingChecksPromise?: CachedPromise<HLMCheckResult>;
 
   constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private options: Logic.LogicCheckerOptions) {
+    this.reset();
+  }
+
+  private reset(): void {
     this.rootContext = {
       context: new Ctx.EmptyContext(FmtHLM.metaModel),
       binderSourceParameters: [],
@@ -125,13 +134,33 @@ export class HLMDefinitionChecker {
       stepResults: new Map<Fmt.Parameter, Fmt.Expression>(),
       rechecking: false
     };
+    if (this.options.supportPlaceholders) {
+      this.rootContext.editData = {
+        restrictions: new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(),
+        recheckFns: this.options.supportRechecking ? new Map<Fmt.Expression, HLMCheckerRecheckFn>() : undefined,
+        constraintCheckFns: this.options.supportRechecking ? new Map<Fmt.ParameterList, HLMCheckerCheckFormulaFn>() : undefined
+      };
+      this.rootContext.currentPlaceholderCollection = {
+        containsNonAutoPlaceholders: false,
+        unfilledPlaceholderCount: 0
+      };
+    }
+    this.resetResult();
   }
 
-  checkDefinition(): CachedPromise<Logic.LogicCheckResult> {
+  private resetResult(): void {
+    this.result = {
+      diagnostics: [],
+      incompleteProofs: new Map<FmtHLM.ObjectContents_Proof, HLMCheckerProofStepContext>(),
+      hasErrors: false
+    };
+  }
+
+  checkDefinition(): CachedPromise<HLMCheckResult> {
     return this.check(() => this.checkRootDefinition());
   }
 
-  checkExpression(expression: Fmt.Expression, expressionType: HLMExpressionType): CachedPromise<Logic.LogicCheckResult> {
+  checkExpression(expression: Fmt.Expression, expressionType: HLMExpressionType): CachedPromise<HLMCheckResult> {
     return this.check(() => {
       switch (expressionType) {
       case HLMExpressionType.SetTerm:
@@ -147,27 +176,13 @@ export class HLMDefinitionChecker {
     });
   }
 
-  private check(checkFn: () => void): CachedPromise<Logic.LogicCheckResult> {
+  private check(checkFn: () => void): CachedPromise<HLMCheckResult> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
         .then(() => this.checkDefinition());
     } else {
-      if (this.options.supportPlaceholders) {
-        this.rootContext.editData = {
-          restrictions: new Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>(),
-          recheckFns: this.options.supportRechecking ? new Map<Fmt.Expression, HLMCheckerRecheckFn>() : undefined,
-          constraintCheckFns: this.options.supportRechecking ? new Map<Fmt.ParameterList, HLMCheckerCheckFormulaFn>() : undefined
-        };
-        this.rootContext.currentPlaceholderCollection = {
-          containsNonAutoPlaceholders: false,
-          unfilledPlaceholderCount: 0
-        };
-      }
-      this.result = {
-        diagnostics: [],
-        hasErrors: false
-      };
+      this.reset();
       try {
         checkFn();
       } catch (error) {
@@ -177,7 +192,7 @@ export class HLMDefinitionChecker {
     }
   }
 
-  recheckWithSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): CachedPromise<Logic.LogicCheckResultWithExpression> {
+  recheckWithSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): CachedPromise<HLMCheckResultWithExpression> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
@@ -186,10 +201,7 @@ export class HLMDefinitionChecker {
       if (debugRecheck) {
         console.log(`Checking ${substitutedExpression}...`);
       }
-      this.result = {
-        diagnostics: [],
-        hasErrors: false
-      };
+      this.resetResult();
       let recheckContext: HLMCheckerContext | undefined = undefined;
       if (this.rootContext.editData && this.rootContext.editData.recheckFns) {
         let recheckFn = this.rootContext.editData.recheckFns.get(originalExpression);
@@ -205,7 +217,7 @@ export class HLMDefinitionChecker {
     }
   }
 
-  checkConstraint(parameterList: Fmt.ParameterList, formula: Fmt.Expression): CachedPromise<Logic.LogicCheckResultWithExpression> {
+  checkConstraint(parameterList: Fmt.ParameterList, formula: Fmt.Expression): CachedPromise<HLMCheckResultWithExpression> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
@@ -214,10 +226,7 @@ export class HLMDefinitionChecker {
       if (debugRecheck) {
         console.log(`Checking ${formula}...`);
       }
-      this.result = {
-        diagnostics: [],
-        hasErrors: false
-      };
+      this.resetResult();
       let recheckContext: HLMCheckerContext | undefined = undefined;
       if (this.rootContext.editData && this.rootContext.editData.constraintCheckFns) {
         let checkConstraintFn = this.rootContext.editData.constraintCheckFns.get(parameterList);
@@ -233,8 +242,8 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private getRecheckResult(expression: Fmt.Expression, recheckContext: HLMCheckerContext | undefined): CachedPromise<Logic.LogicCheckResultWithExpression> {
-    return this.getPendingChecksPromise().then((result: Logic.LogicCheckResult) => {
+  private getRecheckResult(expression: Fmt.Expression, recheckContext: HLMCheckerContext | undefined): CachedPromise<HLMCheckResultWithExpression> {
+    return this.getPendingChecksPromise().then((result: HLMCheckResult) => {
       let resultExpression = expression;
       if (!result.hasErrors) {
         let restrictions = recheckContext?.editData?.restrictions;
@@ -353,7 +362,7 @@ export class HLMDefinitionChecker {
     return result;
   }
 
-  private getPendingChecksPromise(): CachedPromise<Logic.LogicCheckResult> {
+  private getPendingChecksPromise(): CachedPromise<HLMCheckResult> {
     for (;;) {
       let nextCheck = this.pendingChecks.shift();
       if (!nextCheck) {
@@ -1303,7 +1312,6 @@ export class HLMDefinitionChecker {
   }
 
   private forAllConstructors(construction: Fmt.DefinitionRefExpression, callbackFn: (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, contents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => void): CachedPromise<void> {
-    let constructionPathWithoutArguments = new Fmt.Path(construction.path.name, undefined, construction.path.parentPath);
     return this.utils.getOuterDefinition(construction)
       .then((constructionDefinition: Fmt.Definition) => {
         if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction) {
@@ -1428,10 +1436,14 @@ export class HLMDefinitionChecker {
     }
     let checkProof = this.stripConstraintsFromFormulas(goals, true, !proof, !proof, context).then((newGoals: Fmt.Expression[]) => {
       if (proof) {
+        // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
+        if (!(object instanceof Fmt.Expression)) {
+          object = proof;
+        }
         this.checkProofValidity(object, proof, newGoals, context);
       } else if (this.options.warnAboutMissingProofs
                  && !newGoals.some((goal: Fmt.Expression) => this.utils.isTrueFormula(goal))) {
-        this.message(object, parameters || !goals.length ? 'Proof required' : `Proof of ${goals.join(' or ')} required`, Logic.DiagnosticSeverity.Warning);
+        this.message(object, parameters || !newGoals.length ? 'Proof required' : `Proof of ${newGoals.join(' or ')} required`, Logic.DiagnosticSeverity.Warning);
       }
     });
     this.addPendingCheck(object, checkProof);
@@ -1442,17 +1454,27 @@ export class HLMDefinitionChecker {
       this.checkFormula(proof.goal, context);
       this.checkUnfolding(goals, proof.goal, true);
     }
-    let stepContext: HLMCheckerProofStepContext = {
+    let stepContext: HLMCheckerProofStepContext | undefined = {
       ...context,
       goal: proof.goal ?? goals.length ? goals[0] : undefined,
       previousResult: undefined
     };
     this.utils.updateInitialProofStepContext(proof, stepContext);
-    // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
-    if (!(object instanceof Fmt.Expression)) {
-      object = proof;
+    stepContext = this.checkProofSteps(proof.steps, stepContext);
+    if (stepContext) {
+      if (stepContext.goal) {
+        let check = this.isTriviallyProvable(stepContext.goal, stepContext).then((result: boolean) => {
+          if (!result) {
+            this.result.incompleteProofs.set(proof, stepContext!);
+            this.message(object, `Proof of ${stepContext!.goal} is incomplete`, Logic.DiagnosticSeverity.Warning);
+          }
+        });
+        this.addPendingCheck(object, check);
+      } else {
+        this.result.incompleteProofs.set(proof, stepContext);
+        this.message(object, `Proof is incomplete`, Logic.DiagnosticSeverity.Warning);
+      }
     }
-    this.checkProofSteps(object, proof.steps, stepContext);
   }
 
   private checkProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
@@ -1486,35 +1508,19 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkProofSteps(object: Object, steps: Fmt.ParameterList, context: HLMCheckerProofStepContext): void {
-    let completed = false;
+  private checkProofSteps(steps: Fmt.ParameterList, context: HLMCheckerProofStepContext | undefined): HLMCheckerProofStepContext | undefined {
     for (let step of steps) {
-      if (completed) {
-        this.error(step, 'Superfluous proof step');
-      } else {
+      if (context) {
         let stepResult = this.checkProofStep(step, context);
-        if (stepResult) {
-          if (stepResult.previousResult) {
-            context.stepResults.set(step, stepResult.previousResult);
-          }
-          context = stepResult;
-        } else {
-          completed = true;
+        if (stepResult?.previousResult) {
+          context.stepResults.set(step, stepResult.previousResult);
         }
-      }
-    }
-    if (!completed) {
-      if (context.goal) {
-        let check = this.isTriviallyProvable(context.goal, context).then((result: boolean) => {
-          if (!result) {
-            this.message(object, `Proof of ${context.goal} is incomplete`, Logic.DiagnosticSeverity.Warning);
-          }
-        });
-        this.addPendingCheck(object, check);
+        context = stepResult;
       } else {
-        this.message(object, `Proof is incomplete`, Logic.DiagnosticSeverity.Warning);
+        this.error(step, 'Superfluous proof step');
       }
     }
+    return context;
   }
 
   private checkProofStep(step: Fmt.Parameter, context: HLMCheckerProofStepContext): HLMCheckerProofStepContext | undefined {

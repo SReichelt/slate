@@ -67,6 +67,7 @@ interface ProofOutputState {
   startRow?: Notation.RenderedExpression[];
   startRowSpacing?: string;
   implications?: ProofOutputImplication[];
+  additionalRow?: Notation.RenderedExpression;
 }
 
 interface ProofGridState {
@@ -2534,9 +2535,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     } else {
       this.outputStartRowSpacing(state);
-      let trivial = new Notation.TextExpression('Trivial.');
-      trivial.styleClasses = ['proof-placeholder'];
-      state.startRow.push(trivial);
+      let placeholder = this.editHandler ? this.editHandler.getConditionalProofStepInsertButton(proof, () => this.getTrivialProofPlaceholder()) : this.getTrivialProofPlaceholder();
+      state.startRow.push(placeholder);
     }
     this.commitStartRow(state);
   }
@@ -2563,6 +2563,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.paragraphs.push(new Notation.RowExpression(state.startRow));
     state.startRow = undefined;
     state.startRowSpacing = undefined;
+  }
+
+  private getTrivialProofPlaceholder(): Notation.RenderedExpression {
+    let trivial = new Notation.TextExpression('Trivial.');
+    trivial.styleClasses = ['proof-placeholder'];
+    return trivial;
   }
 
   private addProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, onInsertProof: InsertProofFn | undefined, paragraphs: Notation.RenderedExpression[]): void {
@@ -2710,7 +2716,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.utils.addParameterListSubstitution(renderContext.originalParameters, renderContext.substitutedParameters, substitutionContext);
         renderedStep = this.utils.applySubstitutionContextToParameter(renderedStep, substitutionContext);
       }
-      let stepResult = this.addProofStep(renderedStep, renderContext, state);
+      let stepResult = this.addProofStep(proof, renderedStep, renderContext, state);
       if (stepResult) {
         renderContext.stepResults.set(step, stepResult);
       }
@@ -2720,19 +2726,23 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.commitImplications(state, false);
   }
 
-  private addProofStep(step: Fmt.Parameter, context: HLMProofStepRenderContext, state: ProofOutputState): Fmt.Expression | undefined {
+  private addProofStep(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext, state: ProofOutputState): Fmt.Expression | undefined {
     try {
       let type = step.type;
-      let isFinishedContradiction = (context.goal && this.utils.isFalseFormula(context.goal) && context.isLastStep);
       let addImplication = (implication: ProofOutputImplication) => {
-        if (isFinishedContradiction && !this.utils.isFalseFormula(implication.result)) {
-          if (!implication.resultPunctuation) {
-            implication.resultPunctuation = [];
+        if (context.isLastStep) {
+          let displayContradiction = (context.goal && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
+          if (this.editHandler) {
+            state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression));
+          } else if (displayContradiction) {
+            if (!implication.resultPunctuation) {
+              implication.resultPunctuation = [];
+            }
+            implication.resultPunctuation.push(
+              new Notation.TextExpression('\u2002'),
+              this.renderTemplate('Contradiction')
+            );
           }
-          implication.resultPunctuation.push(
-            new Notation.TextExpression('\u2000'),
-            this.renderTemplate('Contradiction')
-          );
         }
         if (state.implications) {
           state.implications.push(implication);
@@ -2836,9 +2846,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let byDefinition = false;
         let bySubstitution = false;
         let definitionDependency: Fmt.Expression | undefined;
-        let proof = type.proof;
-        if (proof?.steps.length === 1) {
-          let subStepType = proof.steps[0].type;
+        let subProof = type.proof;
+        if (subProof?.steps.length === 1) {
+          let subStepType = subProof.steps[0].type;
           if (subStepType instanceof FmtHLM.MetaRefExpression_ProveDef) {
             if (subStepType.proof) {
               if (subStepType.proof.steps.length === 1 && subStepType.proof.goal instanceof FmtHLM.MetaRefExpression_exists && subStepType.proof.goal.formula) {
@@ -2876,20 +2886,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (byDefinition) {
           // TODO link to definition
           implication.resultSuffixes = [new Notation.TextExpression(' by definition')];
-          proof = undefined;
+          subProof = undefined;
         } else if (bySubstitution) {
-          proof = undefined;
+          subProof = undefined;
         }
-        if (fullSentence || proof) {
-          implication.resultPunctuation = [new Notation.TextExpression(proof ? ':' : '.')];
+        if (fullSentence || subProof) {
+          implication.resultPunctuation = [new Notation.TextExpression(subProof ? ':' : '.')];
         }
         addImplication(implication);
-        if (proof) {
+        if (subProof) {
           let subProofContext: HLMProofStepContext = {
             goal: type.statement,
             stepResults: context.stepResults
           };
-          this.addIndentedSubProof(proof, subProofContext, state);
+          this.addIndentedSubProof(subProof, subProofContext, state);
         }
         return type.statement;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
@@ -3047,6 +3057,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || (forceLeftAlignment && !implication.dependsOnPrevious)) {
           this.commitProofGrid(gridState, state.paragraphs);
         }
+      }
+      if (state.additionalRow) {
+        let row: Notation.RenderedExpression[] = [];
+        if (gridState.implicationSymbolColumn) {
+          while (row.length < gridState.implicationSymbolColumn) {
+            row.push(new Notation.EmptyExpression);
+          }
+        }
+        row.push(state.additionalRow);
+        gridState.rows.push(row);
       }
       this.commitProofGrid(gridState, state.paragraphs);
       state.implications = undefined;

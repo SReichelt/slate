@@ -51,7 +51,7 @@ Equivalence.
      ⇒^def ↯
 3⇒2. Assume ∄ x ∈ S. Then S ⊆ ∅:
      Let a ∈ S.
-     We have ∃ x ∈ S: ↯
+     We have ∃ x ∈ S: ↯
        Choose x := a.
 2⇒1. Assume S ⊆ ∅. Then S = ∅:
      ⊆. Trivial.
@@ -3226,7 +3226,7 @@ Let a := ∏_(p ∈ ℙ) p.
 ⇒^1.7.1.30 p ≤ 1
 
 p ∈ ℙ ⇒^def p ∈ ℕ_(>1)
- ⇒^def p > 1 ↯
+ ⇒^def p > 1 ↯
 
 References.
 
@@ -4508,7 +4508,7 @@ by:
 References.
 
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.pow
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#monoid.pow"
 `;
 
 exports[`render hlm library: 1.7.4.19 Essentials/Numbers/Integer/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -4889,7 +4889,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Rational_number#Exponentiation_to_integer_power
 * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower_positive
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#monoid.pow"
 `;
 
 exports[`render hlm library: 1.7.5.13 Essentials/Numbers/Rational/power%20to%20integer 1`] = `
@@ -4905,7 +4905,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Rational_number#Exponentiation_to_integer_power
 * https://coq.inria.fr/library/Coq.QArith.QArith_base.html#Qpower
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#gpow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#gpow"
 `;
 
 exports[`render hlm library: 1.7.5.14.1 Essentials/Numbers/Rational/Iterated%20operators/iterated%20sum 1`] = `
@@ -5288,7 +5288,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#mul_pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#mul_pow"
 `;
 
 exports[`render hlm library: 1.7.6.13 Essentials/Numbers/Real/Power%20base%20quotient%20law 1`] = `
@@ -5300,7 +5300,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#div_pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#div_pow"
 `;
 
 exports[`render hlm library: 1.7.6.14 Essentials/Numbers/Real/root 1`] = `
@@ -5403,13 +5403,13 @@ Proof.  Assume n√p is rational.
 
 ⇒^1.7.4.23.1 p ∣ a
 
-p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
+p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
 
 References.
 
 * https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for \`n\` = 2)
 * https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for \`n\` = 2)
-* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#irr_sqrt_of_prime (for \`n\` = 2)"
+* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#nat.prime.irrational_sqrt (for \`n\` = 2)"
 `;
 
 exports[`render hlm library: 1.7.6.19 Essentials/Numbers/Real/Square%20root%20of%20two%20is%20irrational 1`] = `
@@ -6484,7 +6484,7 @@ by:
 References.
 
 * https://proofwiki.org/wiki/Definition:Power_of_Element/Monoid
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#monoid.pow"
 `;
 
 exports[`render hlm library: 2.5.15 Algebra/Monoids/power%20to%20integer 1`] = `
@@ -6641,7 +6641,7 @@ by:
 References.
 
 * https://proofwiki.org/wiki/Definition:Power_of_Element/Monoid
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#monoid.pow"
 `;
 
 exports[`render hlm library: 2.6.11 Algebra/Groups/power%20to%20integer 1`] = `
@@ -6652,7 +6652,7 @@ exports[`render hlm library: 2.6.11 Algebra/Groups/power%20to%20integer 1`] = `
 References.
 
 * https://proofwiki.org/wiki/Definition:Power_of_Element/Group
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#gpow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#gpow"
 `;
 
 exports[`render hlm library: 2.6.12.1 Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
@@ -7360,7 +7360,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#add_monoid.smul"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#nsmul"
 `;
 
 exports[`render hlm library: 2.7.13 Algebra/Semirings/power%20to%20natural%20number 1`] = `
@@ -7376,7 +7376,7 @@ by:
 References.
 
 * https://coq.inria.fr/library/Coq.setoid_ring.Ring_theory.html#pow_N
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#monoid.pow"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#monoid.pow"
 `;
 
 exports[`render hlm library: 2.7.14.1 Algebra/Semirings/Examples/natural%20numbers 1`] = `
@@ -7436,7 +7436,7 @@ References.
 * https://mathworld.wolfram.com/BinomialTheorem.html
 * https://proofwiki.org/wiki/Binomial_Theorem
 * https://ncatlab.org/nlab/show/binomial+theorem#combinatorial_interpretation
-* https://leanprover-community.github.io/mathlib_docs/data/nat/choose.html#add_pow"
+* https://leanprover-community.github.io/mathlib_docs/data/nat/choose/sum.html#add_pow"
 `;
 
 exports[`render hlm library: 2.8.1 Algebra/Rings/ring 1`] = `
@@ -7775,7 +7775,7 @@ by:
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#add_monoid.smul"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#nsmul"
 `;
 
 exports[`render hlm library: 2.8.20 Algebra/Rings/product%20with%20integer 1`] = `
@@ -7785,7 +7785,7 @@ exports[`render hlm library: 2.8.20 Algebra/Rings/product%20with%20integer 1`] =
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/algebra/group_power.html#gsmul"
+* https://leanprover-community.github.io/mathlib_docs/algebra/group_power/basic.html#gsmul"
 `;
 
 exports[`render hlm library: 2.8.21 Algebra/Rings/power%20to%20natural%20number 1`] = `
