@@ -87,7 +87,7 @@ export class PlaceholderExpression extends RenderedExpression {
 export class InsertPlaceholderExpression extends PlaceholderExpression {
   action?: Menu.ExpressionMenuAction;
 
-  constructor() {
+  constructor(public mandatory: boolean = false) {
     super(InsertPlaceholderExpression);
   }
 }

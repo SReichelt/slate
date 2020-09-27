@@ -15,7 +15,7 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils } from './utils';
 import { HLMRenderUtils } from './renderUtils';
-import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression } from './checker';
+import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
@@ -134,6 +134,16 @@ export class HLMEditHandler extends GenericEditHandler {
     let usedNames = this.getUsedParameterNames();
     for (let parameterList of newParameterLists) {
       this.utils.adaptParameterNames(parameterList, usedNames);
+    }
+  }
+
+  createConditionalElement(onRenderElement: (checkResult: HLMCheckResult) => Notation.RenderedExpression): Notation.RenderedExpression {
+    if (this.checkResultPromise) {
+      let resultPromise = this.checkResultPromise.then(onRenderElement);
+      return new Notation.PromiseExpression(resultPromise);
+    } else {
+      // Should not happen.
+      return new Notation.ErrorExpression('Check result unavailable');
     }
   }
 
@@ -857,13 +867,13 @@ export class HLMEditHandler extends GenericEditHandler {
   private getEmbeddingRow(definitionContents: FmtHLM.ObjectContents_Construction, full: boolean, onRenderEmbedding: (expression: Fmt.Expression, full: boolean) => Notation.RenderedExpression): Menu.ExpressionMenuRow {
     let parameter = this.utils.createElementParameter('x', this.getUsedParameterNames());
     let parameterType = parameter.type as FmtHLM.MetaRefExpression_Element;
-    let item = new Menu.ExpressionMenuItem(onRenderEmbedding(parameterType._set, full));
-    item.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       let fullExpression = full ? new FmtHLM.MetaRefExpression_true : undefined;
       let embedding = new FmtHLM.ObjectContents_Embedding(parameter, new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), fullExpression);
       definitionContents.embedding = embedding;
       GenericEditHandler.lastInsertedParameter = embedding.parameter;
     });
+    let item = new Menu.ExpressionMenuItem(onRenderEmbedding(parameterType._set, full), action);
     let row = new Menu.StandardExpressionMenuRow(full ? 'Equivalence' : 'Embedding');
     row.subMenu = item;
     return row;
@@ -1016,12 +1026,12 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getExplicitDefinitionRow(onRenderExplicitIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
-    let item = new Menu.ExpressionMenuItem(onRenderExplicitIntro());
-    item.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
       this.definition.type = new FmtHLM.MetaRefExpression_ExplicitOperator;
       this.definition.contents = new FmtHLM.ObjectContents_ExplicitOperator(originalContents.properties, originalContents.notation, originalContents.abbreviations, originalContents.definitionNotation, [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)]);
     });
+    let item = new Menu.ExpressionMenuItem(onRenderExplicitIntro(), action);
     let row = new Menu.StandardExpressionMenuRow('Explicit');
     row.subMenu = item;
     row.selected = this.definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator;
@@ -1031,13 +1041,13 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getImplicitDefinitionRow(onRenderImplicitIntro: RenderParameterFn): Menu.ExpressionMenuRow {
     let parameter = this.utils.createElementParameter('x', this.getUsedParameterNames());
-    let item = new Menu.ExpressionMenuItem(onRenderImplicitIntro(parameter));
-    item.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       let originalContents = this.definition.contents as FmtHLM.ObjectContents_Definition;
       this.definition.type = new FmtHLM.MetaRefExpression_ImplicitOperator;
       this.definition.contents = new FmtHLM.ObjectContents_ImplicitOperator(originalContents.properties, originalContents.notation, originalContents.abbreviations, originalContents.definitionNotation, parameter, [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)]);
       GenericEditHandler.lastInsertedParameter = parameter;
     });
+    let item = new Menu.ExpressionMenuItem(onRenderImplicitIntro(parameter), action);
     let row = new Menu.StandardExpressionMenuRow('Implicit');
     row.subMenu = item;
     row.selected = this.definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator;
@@ -1056,21 +1066,21 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getStandardTheoremRow(onRenderStandardIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
-    let item = new Menu.ExpressionMenuItem(onRenderStandardIntro());
-    item.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       this.definition.type = new FmtHLM.MetaRefExpression_StandardTheorem;
       this.definition.contents = new FmtHLM.ObjectContents_StandardTheorem(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
     });
+    let item = new Menu.ExpressionMenuItem(onRenderStandardIntro(), action);
     item.selected = this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem;
     return item;
   }
 
   private getEquivalenceTheoremRow(onRenderEquivalenceIntro: Logic.RenderFn): Menu.ExpressionMenuRow {
-    let item = new Menu.ExpressionMenuItem(onRenderEquivalenceIntro());
-    item.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       this.definition.type = new FmtHLM.MetaRefExpression_EquivalenceTheorem;
       this.definition.contents = new FmtHLM.ObjectContents_EquivalenceTheorem([new Fmt.PlaceholderExpression(HLMExpressionType.Formula), new Fmt.PlaceholderExpression(HLMExpressionType.Formula)]);
     });
+    let item = new Menu.ExpressionMenuItem(onRenderEquivalenceIntro(), action);
     item.selected = this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem;
     return item;
   }
@@ -1114,23 +1124,237 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.getImmediateInsertButton(onInsert);
   }
 
-  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onRenderTrivialProof: Logic.RenderFn): Notation.RenderedExpression {
-    if (this.checkResultPromise) {
-      let resultPromise = this.checkResultPromise.then((checkResult: HLMCheckResult) => {
-        let context = checkResult.incompleteProofs.get(proof);
-        if (context) {
-          return this.getMenuInsertButton(() => {
-            let rows: Menu.ExpressionMenuRow[] = [];
-            // TODO
-            return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
-          });
-        } else {
-          return onRenderTrivialProof();
+  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onRenderTrivialProof: Logic.RenderFn, onRenderProofStep: RenderParameterFn): Notation.RenderedExpression {
+    return this.createConditionalElement((checkResult: HLMCheckResult) => {
+      let context = checkResult.incompleteProofs.get(proof);
+      if (context) {
+        return this.getProofStepInsertButton(proof, context, onRenderProofStep);
+      } else {
+        return onRenderTrivialProof();
+      }
+    });
+  }
+
+  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext, onRenderProofStep: RenderParameterFn): Notation.RenderedExpression {
+    return this.getMenuInsertButton(() => {
+      let rows: Menu.ExpressionMenuRow[] = [];
+
+      if (context.previousResult) {
+        if (context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
+          rows.push(this.getUseForAllRow());
         }
-      });
-      return new Notation.PromiseExpression(resultPromise);
-    } else {
-      return new Notation.ErrorExpression('Proof state unavailable');
+        rows.push(
+          this.getUseCasesRow(),
+          this.getUseDefinitionRow(),
+          this.getUnfoldRow(),
+          this.getSubstituteRow(),
+          new Menu.ExpressionMenuSeparator
+        );
+      }
+
+      if (!(proof.steps.length && proof.steps[proof.steps.length - 1].type instanceof FmtHLM.MetaRefExpression_Consider)) {
+        if (context.goal instanceof FmtHLM.MetaRefExpression_not) {
+          rows.push(this.getProveByContradictionRow(proof, context.goal, onRenderProofStep));
+        } else if (context.goal instanceof FmtHLM.MetaRefExpression_forall) {
+          rows.push(this.getProveForAllRow(proof, context.goal, onRenderProofStep));
+        } else if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
+          rows.push(this.getProveExistsRow());
+        } else if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals
+                   || context.goal instanceof FmtHLM.MetaRefExpression_equals && context.goal.terms.length > 2
+                   || context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
+          rows.push(this.getProveEquivalenceRow());
+        }
+        rows.push(
+          this.getProveCasesRow(),
+          this.getProveByDefinitionRow(),
+          this.getUnfoldGoalRow()
+        );
+        if (context.goal && !(context.goal instanceof FmtHLM.MetaRefExpression_not
+                              || context.goal instanceof FmtHLM.MetaRefExpression_forall
+                              || this.utils.isFalseFormula(context.goal)
+                              || this.utils.isTrueFormula(context.goal))) {
+          rows.push(this.getProveByContradictionRow(proof, context.goal, onRenderProofStep));
+        }
+        rows.push(new Menu.ExpressionMenuSeparator);
+
+        rows.push(
+          this.getConsiderRow(),
+          this.getStateFormulaRow(proof, onRenderProofStep),
+          this.getProveByInductionRow(),
+          this.getProveBySubstitutionRow(),
+          this.getDefineVariableRow(proof, onRenderProofStep),
+          new Menu.ExpressionMenuSeparator
+        );
+      }
+
+      rows.push(this.getUseTheoremRow());
+
+      return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
+    }, true);
+  }
+
+  private getUseForAllRow(): Menu.ExpressionMenuRow {
+    let useForAllRow = new Menu.StandardExpressionMenuRow('Specialize');
+    // TODO
+    useForAllRow.titleAction = this.getNotImplementedAction();
+    return useForAllRow;
+  }
+
+  private getUseCasesRow(): Menu.ExpressionMenuRow {
+    let useCasesRow = new Menu.StandardExpressionMenuRow('By cases');
+    // TODO
+    return useCasesRow;
+  }
+
+  private getUseDefinitionRow(): Menu.ExpressionMenuRow {
+    let useDefinitionRow = new Menu.StandardExpressionMenuRow('Use definition');
+    // TODO
+    return useDefinitionRow;
+  }
+
+  private getSubstituteRow(): Menu.ExpressionMenuRow {
+    let substituteRow = new Menu.StandardExpressionMenuRow('Substitute');
+    // TODO
+    substituteRow.titleAction = this.getNotImplementedAction();
+    return substituteRow;
+  }
+
+  private getUnfoldRow(): Menu.ExpressionMenuRow {
+    let unfoldRow = new Menu.StandardExpressionMenuRow('Unfold');
+    // TODO
+    return unfoldRow;
+  }
+
+  private getProveByContradictionRow(proof: FmtHLM.ObjectContents_Proof, goal: Fmt.Expression, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
+    let proveByContradictionRow = new Menu.StandardExpressionMenuRow('Prove by contradiction');
+    let stepsPromise = this.createProveByContradictionStep(goal, new FmtHLM.MetaRefExpression_or).then((step: Fmt.Parameter) => [step]);
+    if (goal instanceof FmtHLM.MetaRefExpression_or && goal.formulas) {
+      for (let index = 0; index < goal.formulas.length; index++) {
+        let [goalToNegate, newGoal] = this.utils.getProveByContradictionVariant(goal.formulas, index);
+        stepsPromise = stepsPromise.then((currentSteps: Fmt.Parameter[]) =>
+          this.createProveByContradictionStep(goalToNegate, newGoal, index).then((step: Fmt.Parameter) =>
+            currentSteps.concat(step)));
+      }
     }
+    proveByContradictionRow.subMenu = this.getProofStepSubMenu(proof, stepsPromise, onRenderProofStep);
+    return proveByContradictionRow;
+  }
+
+  private createProveByContradictionStep(goalToNegate: Fmt.Expression, newGoal: Fmt.Expression, index?: number): CachedPromise<Fmt.Parameter> {
+    return this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
+      let parameters = new Fmt.ParameterList;
+      this.utils.addProofConstraint(parameters, negatedGoal);
+      let from = (index === undefined ? undefined : new Fmt.BN(index + 1));
+      let subProof = new FmtHLM.ObjectContents_Proof(from, undefined, parameters, newGoal, new Fmt.ParameterList);
+      return this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveByContradiction(subProof), '_');
+    });
+  }
+
+  private getProveForAllRow(proof: FmtHLM.ObjectContents_Proof, goal: FmtHLM.MetaRefExpression_forall, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
+    let proveForAllRow = new Menu.StandardExpressionMenuRow('Prove universality');
+    let parameters = goal.parameters.clone();
+    let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, parameters, undefined, new Fmt.ParameterList);
+    let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveForAll(subProof), '_');
+    proveForAllRow.subMenu = this.getProofStepMenuItem(proof, step, onRenderProofStep);
+    return proveForAllRow;
+  }
+
+  private getProveExistsRow(): Menu.ExpressionMenuRow {
+    let proveExistsRow = new Menu.StandardExpressionMenuRow('Prove existence');
+    // TODO
+    return proveExistsRow;
+  }
+
+  private getProveEquivalenceRow(): Menu.ExpressionMenuRow {
+    let proveEquivalenceRow = new Menu.StandardExpressionMenuRow('Split');
+    // TODO
+    return proveEquivalenceRow;
+  }
+
+  private getProveCasesRow(): Menu.ExpressionMenuRow {
+    let proveCasesRow = new Menu.StandardExpressionMenuRow('Prove by cases');
+    // TODO
+    return proveCasesRow;
+  }
+
+  private getProveByDefinitionRow(): Menu.ExpressionMenuRow {
+    let proveByDefinitionRow = new Menu.StandardExpressionMenuRow('Prove by definition');
+    // TODO
+    return proveByDefinitionRow;
+  }
+
+  private getUnfoldGoalRow(): Menu.ExpressionMenuRow {
+    let unfoldGoalRow = new Menu.StandardExpressionMenuRow('Unfold goal');
+    // TODO
+    return unfoldGoalRow;
+  }
+
+  private getConsiderRow(): Menu.ExpressionMenuRow {
+    let considerRow = new Menu.StandardExpressionMenuRow('Consider');
+    // TODO
+    return considerRow;
+  }
+
+  private getStateFormulaRow(proof: FmtHLM.ObjectContents_Proof, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
+    let stateFormulaRow = new Menu.StandardExpressionMenuRow('State formula');
+    let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_State(new Fmt.PlaceholderExpression(HLMExpressionType.Formula)), '_');
+    stateFormulaRow.subMenu = this.getProofStepMenuItem(proof, step, onRenderProofStep);
+    return stateFormulaRow;
+  }
+
+  private getProveByInductionRow(): Menu.ExpressionMenuRow {
+    let proveByInductionRow = new Menu.StandardExpressionMenuRow('Prove by induction');
+    // TODO
+    return proveByInductionRow;
+  }
+
+  private getProveBySubstitutionRow(): Menu.ExpressionMenuRow {
+    let proveBySubstitutionRow = new Menu.StandardExpressionMenuRow('Substitute in goal');
+    // TODO
+    proveBySubstitutionRow.titleAction = this.getNotImplementedAction();
+    return proveBySubstitutionRow;
+  }
+
+  private getDefineVariableRow(proof: FmtHLM.ObjectContents_Proof, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
+    let defineVariableRow = new Menu.StandardExpressionMenuRow('Define variable');
+    let elementDefinitionType = new FmtHLM.MetaRefExpression_Def(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
+    let setDefinitionType = new FmtHLM.MetaRefExpression_SetDef(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
+    let steps: Fmt.Parameter[] = [
+      this.utils.createParameter(elementDefinitionType, 'x', this.getUsedParameterNames()),
+      this.utils.createParameter(setDefinitionType, 'S', this.getUsedParameterNames())
+    ];
+    defineVariableRow.subMenu = this.getProofStepSubMenu(proof, CachedPromise.resolve(steps), onRenderProofStep);
+    return defineVariableRow;
+  }
+
+  private getUseTheoremRow(): Menu.ExpressionMenuRow {
+    let useTheoremRow = new Menu.StandardExpressionMenuRow('Use theorem');
+    useTheoremRow.iconType = Logic.LogicDefinitionType.Theorem;
+    // TODO
+    useTheoremRow.titleAction = this.getNotImplementedAction();
+    return useTheoremRow;
+  }
+
+  private getNotImplementedAction(): Menu.ExpressionMenuAction {
+    return new Menu.DialogExpressionMenuAction(() => {
+      let infoItem = new Dialog.ExpressionDialogInfoItem;
+      infoItem.info = new Notation.TextExpression('Not implemented yet');
+      let dialog = new Dialog.ExpressionDialog;
+      dialog.items = [infoItem];
+      return dialog;
+    });
+  }
+
+  private getProofStepSubMenu(proof: FmtHLM.ObjectContents_Proof, stepsPromise: CachedPromise<Fmt.Parameter[]>, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenu {
+    let rowsPromise = stepsPromise.then((steps: Fmt.Parameter[]) =>
+      steps.map((step: Fmt.Parameter) => this.getProofStepMenuItem(proof, step, onRenderProofStep)));
+    return new Menu.ExpressionMenu(rowsPromise);
+  }
+
+  private getProofStepMenuItem(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
+      proof.steps.push(step);
+    });
+    return new Menu.ExpressionMenuItem(onRenderProofStep(step), action);
   }
 }

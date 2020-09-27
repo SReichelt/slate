@@ -606,6 +606,33 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
+  addProofConstraint(parameters: Fmt.ParameterList, formula: Fmt.Expression): void {
+    if (formula instanceof FmtHLM.MetaRefExpression_and) {
+      if (formula.formulas) {
+        for (let item of formula.formulas) {
+          this.addProofConstraint(parameters, item);
+        }
+      }
+    } else if (formula instanceof FmtHLM.MetaRefExpression_exists) {
+      parameters.push(...formula.parameters);
+      if (formula.formula) {
+        this.addProofConstraint(parameters, formula.formula);
+      }
+    } else {
+      parameters.push(this.createConstraintParameter(formula, '_1'));
+    }
+  }
+
+  getProveByContradictionVariant(disjunctions: Fmt.Expression[], index: number): [Fmt.Expression, Fmt.Expression] {
+    if (disjunctions.length === 2) {
+      return [disjunctions[1 - index], disjunctions[index]];
+    } else {
+      let goalToNegate = new FmtHLM.MetaRefExpression_or(...disjunctions);
+      goalToNegate.formulas!.splice(index, 1);
+      return [goalToNegate, disjunctions[index]];
+    }
+  }
+
   getNextFormulas(formula: Fmt.Expression, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
     let [variableRefExpression, indexContext] = this.extractVariableRefExpression(formula);
     if (variableRefExpression) {

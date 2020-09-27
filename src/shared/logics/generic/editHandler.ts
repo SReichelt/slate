@@ -50,14 +50,14 @@ export abstract class GenericEditHandler {
   }
 
   protected getTypeRow(type: string | undefined, onRenderType: RenderTypeFn, info: LibraryItemInfo): Menu.ExpressionMenuRow {
-    let item = new Menu.ExpressionMenuItem(onRenderType(type));
-    item.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       let newInfo = {
         ...info,
         type: type
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
     });
+    let item = new Menu.ExpressionMenuItem(onRenderType(type), action);
     item.selected = info.type === type;
     return item;
   }
@@ -97,16 +97,16 @@ export abstract class GenericEditHandler {
     return this.getActionInsertButton(action);
   }
 
-  protected getSemanticLinkInsertButton(onInitialize: (semanticLink: Notation.SemanticLink) => void): Notation.RenderedExpression {
-    let insertButton = new Notation.InsertPlaceholderExpression;
+  protected getSemanticLinkInsertButton(onInitialize: (semanticLink: Notation.SemanticLink) => void, mandatory: boolean = false): Notation.RenderedExpression {
+    let insertButton = new Notation.InsertPlaceholderExpression(mandatory);
     let semanticLink = new Notation.SemanticLink(insertButton, false, false);
     onInitialize(semanticLink);
     insertButton.semanticLinks = [semanticLink];
     return insertButton;
   }
 
-  protected getMenuInsertButton(onMenuOpened: () => Menu.ExpressionMenu): Notation.RenderedExpression {
-    return this.getSemanticLinkInsertButton((semanticLink: Notation.SemanticLink) => (semanticLink.onMenuOpened = onMenuOpened));
+  protected getMenuInsertButton(onMenuOpened: () => Menu.ExpressionMenu, mandatory: boolean = false): Notation.RenderedExpression {
+    return this.getSemanticLinkInsertButton((semanticLink: Notation.SemanticLink) => (semanticLink.onMenuOpened = onMenuOpened), mandatory);
   }
 
   protected addListItemInsertButton(renderedItems: Notation.ExpressionValue[], innerType: Fmt.Expression, onInsertItem: () => void, enabledPromise: CachedPromise<boolean>): void {
@@ -183,8 +183,7 @@ export abstract class GenericEditHandler {
       defaultRow.iconType = 'remove';
     }
     if (renderedDefault) {
-      let defaultItem = new Menu.ExpressionMenuItem(renderedDefault);
-      defaultItem.action = defaultAction;
+      let defaultItem = new Menu.ExpressionMenuItem(renderedDefault, defaultAction);
       defaultItem.selected = isDefault;
       defaultRow.subMenu = defaultItem;
     } else {
@@ -247,14 +246,14 @@ export abstract class GenericEditHandler {
   private getNotationMenuVariablesRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
     let items: Menu.ExpressionMenuItem[] = [];
     for (let variable of variables) {
-      let variableItem = new Menu.ExpressionMenuItem(variable.notation);
-      if (notation instanceof Fmt.VariableRefExpression && notation.variable === variable.param) {
-        variableItem.selected = true;
-      }
-      variableItem.action = new Menu.ImmediateExpressionMenuAction(() => {
+      let action = new Menu.ImmediateExpressionMenuAction(() => {
         let newNotation = new Fmt.VariableRefExpression(variable.param);
         onSetNotation(newNotation);
       });
+      let variableItem = new Menu.ExpressionMenuItem(variable.notation, action);
+      if (notation instanceof Fmt.VariableRefExpression && notation.variable === variable.param) {
+        variableItem.selected = true;
+      }
       items.push(variableItem);
     }
     let variablesGroup = new Menu.ExpressionMenuItemList(CachedPromise.resolve(items));
@@ -673,9 +672,8 @@ export abstract class GenericEditHandler {
   protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
     let parameter = this.utils.createParameter(type, defaultName, this.getUsedParameterNames());
 
-    let item = new Menu.ExpressionMenuItem(onRenderParam(parameter));
-    item.action = new Menu.ImmediateExpressionMenuAction(() => onInsertParam(parameter));
-    return item;
+    let action = new Menu.ImmediateExpressionMenuAction(() => onInsertParam(parameter));
+    return new Menu.ExpressionMenuItem(onRenderParam(parameter), action);
   }
 
   protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: (variableInfo: Ctx.VariableInfo) => CachedPromise<Fmt.Expression[]>, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
@@ -819,8 +817,8 @@ export abstract class GenericEditHandler {
 
   protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
     let renderedExpression = onRenderExpression(expression);
-    let item = new Menu.ExpressionMenuItem(renderedExpression);
-    item.action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
+    let action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
+    let item = new Menu.ExpressionMenuItem(renderedExpression, action);
     let origExpression = expressionEditInfo.expression;
     if (origExpression && !(origExpression instanceof Fmt.DefinitionRefExpression)) {
       let newExpression = expression;

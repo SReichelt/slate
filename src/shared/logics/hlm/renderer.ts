@@ -10,6 +10,7 @@ import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelect
 import { GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, HLMSubstitutionContext, HLMProofStepContext } from './utils';
 import { HLMRenderUtils, ExtractedStructuralCase, ElementParameterOverrides } from './renderUtils';
+import { HLMCheckResult } from './checker';
 import { PropertyInfo, AbbreviationParamExpression } from '../generic/renderUtils';
 import { LibraryDataAccessor, LibraryItemInfo, formatItemNumber } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
@@ -68,6 +69,7 @@ interface ProofOutputState {
   startRowSpacing?: string;
   implications?: ProofOutputImplication[];
   additionalRow?: Notation.RenderedExpression;
+  isPreview: boolean;
 }
 
 interface ProofGridState {
@@ -563,7 +565,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addConstraint(type: FmtHLM.MetaRefExpression_Constraint, remainingParameters: Fmt.Parameter[], remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, row: Notation.RenderedExpression[]): void {
-    if (state.inLetExpr && !state.inDefinition) {
+    if ((state.inLetExpr || (state.inConstraint && state.sentence)) && !state.inDefinition) {
       let connective: string;
       if (state.inConstraint) {
         connective = 'and ';
@@ -604,6 +606,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else {
       let formulaWithParens = new Notation.InnerParenExpression(formula);
       formulaWithParens.maxLevel = -2;
+      if (state.sentence && !remainingParameters.length) {
+        formulaWithParens.right = false;
+      }
       row.push(formulaWithParens);
     }
 
@@ -2427,7 +2432,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
       let state: ProofOutputState = {
-        paragraphs: paragraphs
+        paragraphs: paragraphs,
+       isPreview: false
       };
       this.addProofsInternal(proofs, heading, context, false, onInsertProof, state);
     }
@@ -2442,9 +2448,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         proofNumber++;
       }
       if (this.editHandler && onInsertProof) {
-        state.paragraphs.push(this.editHandler.getProofInsertButton(onInsertProof));
+        let editHandler = this.editHandler;
+        state.paragraphs.push(editHandler.createConditionalElement((checkResult: HLMCheckResult) => {
+          if (checkResult.incompleteProofs.size) {
+            return new Notation.EmptyExpression;
+          } else {
+            return editHandler.getProofInsertButton(onInsertProof);
+          }
+        }));
       }
-    } else {
+    } else if (!this.utils.containsPlaceholders()) {
       this.addNoProofPlaceholder(heading, onInsertProof, state);
     }
   }
@@ -2508,13 +2521,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           return;
         }
       }
-      if (proof.steps.length && !hasContents) {
-        state.startRow.push(new Notation.TextExpression('We show that '));
+      if (state.isPreview) {
+        state.startRow.push(renderedGoal);
+        if (hasContents) {
+          state.startRow.push(new Notation.TextExpression('.'));
+        }
+      } else {
+        if (proof.steps.length && !hasContents) {
+          state.startRow.push(new Notation.TextExpression('We show that '));
+        }
+        state.startRow.push(
+          renderedGoal,
+          new Notation.TextExpression(':')
+        );
       }
-      state.startRow.push(
-        renderedGoal,
-        new Notation.TextExpression(':')
-      );
       state.startRowSpacing = ' ';
       hasContents = true;
     }
@@ -2524,7 +2544,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (indentSteps) {
         let indentedState: ProofOutputState = {
-          paragraphs: []
+          paragraphs: [],
+          isPreview: state.isPreview
         };
         this.addProofSteps(proof, context, indentedState);
         let steps = new Notation.ParagraphExpression(indentedState.paragraphs);
@@ -2533,10 +2554,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else {
         this.addProofSteps(proof, context, state);
       }
-    } else {
+    } else if (!state.isPreview) {
       this.outputStartRowSpacing(state);
-      let placeholder = this.editHandler ? this.editHandler.getConditionalProofStepInsertButton(proof, () => this.getTrivialProofPlaceholder()) : this.getTrivialProofPlaceholder();
-      state.startRow.push(placeholder);
+      if (this.editHandler) {
+        let onRenderTrivialProof = () => this.getTrivialProofPlaceholder();
+        let renderContext: HLMProofStepRenderContext = {
+          ...context,
+          originalParameters: [],
+          substitutedParameters: [],
+          isLastStep: true
+        };
+        let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, renderContext);
+        state.startRow.push(this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep));
+      } else {
+        state.startRow.push(this.getTrivialProofPlaceholder());
+      }
     }
     this.commitStartRow(state);
   }
@@ -2587,6 +2619,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       this.outputStartRowSpacing(state);
       state.startRow.push(this.readOnlyRenderer.renderFormula(externalGoal, fullFormulaSelection));
+      // TODO add conditional proof step insertion button
       state.startRow.push(new Notation.TextExpression('.'));
       this.commitStartRow(state);
     } else if (state.startRow) {
@@ -2600,7 +2633,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
       let state: ProofOutputState = {
-        paragraphs: paragraphs
+        paragraphs: paragraphs,
+        isPreview: false
       };
       this.addIndentedProofInternal(proof, heading, context, state);
     }
@@ -2614,7 +2648,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
     let proofs = proof ? [proof] : undefined;
     let indentedState: ProofOutputState = {
-      paragraphs: []
+      paragraphs: [],
+      isPreview: state.isPreview
     };
     this.addProofsInternal(proofs, heading, context, false, undefined, indentedState);
     let indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
@@ -2629,7 +2664,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
       let state: ProofOutputState = {
-        paragraphs: paragraphs
+        paragraphs: paragraphs,
+        isPreview: false
       };
       this.addProofListInternal(proofs, heading, labels, context, state);
     }
@@ -2644,7 +2680,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       let items = proofs.map((proof) => {
         let itemState: ProofOutputState = {
-          paragraphs: []
+          paragraphs: [],
+          isPreview: state.isPreview
         };
         this.addProofsInternal(proof ? [proof] : undefined, undefined, context, false, undefined, itemState);
         return new Notation.ParagraphExpression(itemState.paragraphs);
@@ -2661,8 +2698,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addProofList(proofs, heading, labels, undefined, paragraphs);
       } else {
         let state: ProofOutputState = {
-          paragraphs: paragraphs
+          paragraphs: paragraphs,
+          isPreview: false
         };
+        // TODO implement insertion
         this.addNoProofPlaceholder(heading, undefined, state);
       }
     }
@@ -2733,7 +2772,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (context.isLastStep) {
           let displayContradiction = (context.goal && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
           if (this.editHandler) {
-            state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression));
+            let previewContext: HLMProofStepRenderContext = {
+              ...context,
+              previousResult: undefined,
+              previousStep: step
+            };
+            let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
+            let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, previewContext);
+            state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep);
           } else if (displayContradiction) {
             if (!implication.resultPunctuation) {
               implication.resultPunctuation = [];
@@ -2815,7 +2861,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 stepResults: context.stepResults
               };
               let subState: ProofOutputState = {
-                paragraphs: []
+                paragraphs: [],
+                isPreview: state.isPreview
               };
               this.addSubProof(subProof, subProofContext, false, subState);
               return new Notation.ParagraphExpression(subState.paragraphs);
@@ -3009,6 +3056,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       state.paragraphs.push(new Notation.ErrorExpression(e.message));
     }
     return undefined;
+  }
+
+  private renderProofStepPreview(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext): Notation.RenderedExpression {
+    let state: ProofOutputState = {
+      paragraphs: [],
+      isPreview: true
+    };
+    this.addProofStep(proof, step, context, state);
+    this.commitImplications(state, false);
+    if (state.paragraphs.length === 1) {
+      return state.paragraphs[0];
+    } else {
+      return new Notation.ParagraphExpression(state.paragraphs);
+    }
   }
 
   private outputStartRowSpacing(state: ProofOutputState): void {

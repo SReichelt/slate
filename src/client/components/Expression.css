@@ -558,7 +558,11 @@ div.display-math {
   font-size: smaller;
 }
 
-.charcorner-tr.charcorner-large+.space-start::before, .charcorner-tr+sup::before {
+.charcorner-tr.charcorner-large+.space-start::before {
+  content: ' '!important;
+}
+
+.charcorner-tr+sup::before {
   content: ' '!important;
 }
 

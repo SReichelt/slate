@@ -471,7 +471,7 @@ export class HLMDefinitionChecker {
       let parameters1 = innerDefinition.parameters.clone();
       let parameters2 = innerDefinition.parameters.clone();
       let parameters = new Fmt.ParameterList(...parameters1, ...parameters2);
-      this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
+      this.utils.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
       this.checkProof(equalityDefinition, equalityDefinition.symmetryProof, parameters, goal, context);
     }
@@ -480,8 +480,8 @@ export class HLMDefinitionChecker {
       let parameters2 = innerDefinition.parameters.clone();
       let parameters3 = innerDefinition.parameters.clone();
       let parameters = new Fmt.ParameterList(...parameters1, ...parameters2, ...parameters3);
-      this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
-      this.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3));
+      this.utils.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
+      this.utils.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3));
       let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters3);
       this.checkProof(equalityDefinition, equalityDefinition.transitivityProof, parameters, goal, context);
     }
@@ -547,7 +547,7 @@ export class HLMDefinitionChecker {
     let parameters = new Fmt.ParameterList;
     parameters.push(leftParam, rightParam);
     let constraint = new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
-    this.addProofConstraint(parameters, constraint);
+    this.utils.addProofConstraint(parameters, constraint);
     let leftVariableRef = new Fmt.VariableRefExpression(leftParam);
     let rightVariableRef = new Fmt.VariableRefExpression(rightParam);
     let goal = new FmtHLM.MetaRefExpression_equals(leftVariableRef, rightVariableRef);
@@ -985,7 +985,7 @@ export class HLMDefinitionChecker {
         this.checkElementTerm(item.value, context);
         let exclusivityParameters = new Fmt.ParameterList;
         let exclusivityConstraint = this.utils.createDisjunction(formulas);
-        this.addProofConstraint(exclusivityParameters, exclusivityConstraint);
+        this.utils.addProofConstraint(exclusivityParameters, exclusivityConstraint);
         let exclusivityGoalPromise = this.utils.negateFormula(item.formula, true);
         let checkProof = exclusivityGoalPromise.then((exclusivityGoal: Fmt.Expression) =>
           this.checkProof(term, item.exclusivityProof, exclusivityParameters, exclusivityGoal, context));
@@ -1110,7 +1110,7 @@ export class HLMDefinitionChecker {
         };
       };
       let getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => {
-        this.addProofConstraint(proofParameters, leftValue);
+        this.utils.addProofConstraint(proofParameters, leftValue);
         return rightValue;
       };
       this.checkStructuralCases(formula.term, formula.construction, formula.cases, checkCase, undefined, replaceCases, getWellDefinednessProofGoal, context);
@@ -1407,7 +1407,7 @@ export class HLMDefinitionChecker {
   }
 
   private getFormulaEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList): Fmt.Expression => {
-    this.addProofConstraint(proofParameters, from);
+    this.utils.addProofConstraint(proofParameters, from);
     return to;
   };
 
@@ -1588,7 +1588,7 @@ export class HLMDefinitionChecker {
                   if (previousResultCase.parameters) {
                     parameters.push(...previousResultCase.parameters);
                   }
-                  this.addProofConstraint(parameters, previousResultCase.formula);
+                  this.utils.addProofConstraint(parameters, previousResultCase.formula);
                   this.checkProof(caseProof, caseProof, parameters, goal, context);
                 } else {
                   this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
@@ -1731,19 +1731,12 @@ export class HLMDefinitionChecker {
         if (goalToNegate instanceof FmtHLM.MetaRefExpression_or && goalToNegate.formulas && proveByContradiction.proof._to !== undefined) {
           let index = this.utils.translateIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
-            newGoal = goalToNegate.formulas[index];
-            if (goalToNegate.formulas.length === 2) {
-              goalToNegate = goalToNegate.formulas[1 - index];
-            } else {
-              let newGoalToNegate = new FmtHLM.MetaRefExpression_or(...goalToNegate.formulas);
-              newGoalToNegate.formulas!.splice(index, 1);
-              goalToNegate = newGoalToNegate;
-            }
+            [goalToNegate, newGoal] = this.utils.getProveByContradictionVariant(goalToNegate.formulas, index);
           }
         }
         let check = this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
           let parameters = new Fmt.ParameterList;
-          this.addProofConstraint(parameters, negatedGoal);
+          this.utils.addProofConstraint(parameters, negatedGoal);
           this.checkProof(step, proveByContradiction.proof, parameters, newGoal, context);
         });
         this.addPendingCheck(step, check);
@@ -1956,23 +1949,6 @@ export class HLMDefinitionChecker {
       }
       return intermediateFormula;
     });
-  }
-
-  private addProofConstraint(parameters: Fmt.ParameterList, formula: Fmt.Expression): void {
-    if (formula instanceof FmtHLM.MetaRefExpression_and) {
-      if (formula.formulas) {
-        for (let item of formula.formulas) {
-          this.addProofConstraint(parameters, item);
-        }
-      }
-    } else if (formula instanceof FmtHLM.MetaRefExpression_exists) {
-      parameters.push(...formula.parameters);
-      if (formula.formula) {
-        this.addProofConstraint(parameters, formula.formula);
-      }
-    } else {
-      parameters.push(this.utils.createConstraintParameter(formula, '_1'));
-    }
   }
 
   private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression, sourceIsResult: boolean): void {

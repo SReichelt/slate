@@ -7,6 +7,8 @@ import CachedPromise from '../data/cachedPromise';
 export interface DialogResultBase {
 }
 
+// TODO define proper constructors for these classes
+
 export class DialogBase {
   onOK?: (result: DialogResultBase) => void;
 }

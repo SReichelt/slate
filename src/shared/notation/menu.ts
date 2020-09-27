@@ -34,9 +34,7 @@ export abstract class ExpressionMenuCell extends ExpressionMenuRow {
 }
 
 export class ExpressionMenuItem extends ExpressionMenuCell {
-  action: ExpressionMenuAction;
-
-  constructor(public expression: Notation.RenderedExpression) {
+  constructor(public expression: Notation.RenderedExpression, public action: ExpressionMenuAction) {
     super();
   }
 }

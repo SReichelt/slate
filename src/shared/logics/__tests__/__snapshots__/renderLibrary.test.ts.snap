@@ -2801,7 +2801,7 @@ References.
 `;
 
 exports[`render hlm library: 1.7.1.38 Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
-"Corollary 1.7.1.38 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and [∀ m ∈ ℕ s.t. m is p : m + 1 is p]. Then:
+"Corollary 1.7.1.38 (Induction principle (property-based)).  Let p be a property on ℕ such that 0 is p and ∀ m ∈ ℕ s.t. m is p : m + 1 is p. Then:
 
   ∀ n ∈ ℕ : n is p
 

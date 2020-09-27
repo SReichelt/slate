@@ -121,8 +121,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   componentDidUpdate(prevProps: ExpressionProps): void {
-    // Do not check for changes to props.expression here. Some expressions are generated dynamically while rendering, and thus change every time.
-    if (this.props.parent !== prevProps.parent || this.props.interactionHandler !== prevProps.interactionHandler) {
+    // Do not check for arbitrary changes to props.expression here. Some expressions are generated dynamically while rendering, and thus change every time.
+    if (this.props.parent !== prevProps.parent
+        || prevProps.expression.constructor !== this.props.expression.constructor
+        || this.props.interactionHandler !== prevProps.interactionHandler) {
       this.cleanupDependentState(prevProps);
     }
     if (this.props.interactionHandler !== prevProps.interactionHandler) {
@@ -913,8 +915,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.PlaceholderExpression) {
       className += ' placeholder';
       if (expression instanceof Notation.InsertPlaceholderExpression) {
+        let buttonType = (expression.mandatory ? ButtonType.InsertMandatory : ButtonType.Insert);
         let enabled = (expression.action !== undefined || onMenuOpened !== undefined || this.props.interactionHandler === undefined);
-        result = getButtonIcon(ButtonType.Insert, enabled);
+        result = getButtonIcon(buttonType, enabled);
       } else {
         result = getDefinitionIcon(expression.placeholderType);
       }

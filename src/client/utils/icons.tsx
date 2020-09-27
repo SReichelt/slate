@@ -16,6 +16,7 @@ export enum ButtonType {
   LogOut,
   TableOfContents,
   Insert,
+  InsertMandatory,
   Remove,
   Up,
   Down
@@ -95,6 +96,12 @@ function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true):
   case ButtonType.Insert:
     return [
       <path d="M -1 -7 L 1 -7 L 1 -1 L 7 -1 L 7 1 L 1 1 L 1 7 L -1 7 L -1 1 L -7 1 L -7 -1 L -1 -1 z" fill={getBackgroundColor('lime', enabled)} stroke={getForegroundColor('darkgreen', enabled)} strokeWidth="0.5" key="cross"/>
+    ];
+  case ButtonType.InsertMandatory:
+    return [
+      <circle cx="-5" cy="0" r="1.5" fill={getMainButtonForegroundColor(enabled)} stroke="none" key="dot1"/>,
+      <circle cx="0" cy="0" r="1.5" fill={getMainButtonForegroundColor(enabled)} stroke="none" key="dot2"/>,
+      <circle cx="5" cy="0" r="1.5" fill={getMainButtonForegroundColor(enabled)} stroke="none" key="dot3"/>
     ];
   case ButtonType.Remove:
     return [
