@@ -151,7 +151,7 @@ This is just an example proof. It could be rewritten in a very concise way as a 
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/data/set/finite.html#set.finite_subset"
+* https://leanprover-community.github.io/mathlib_docs/data/set/finite.html#set.finite.subset"
 `;
 
 exports[`render hlm library: 1.1.6 Essentials/Sets/countable 1`] = `
@@ -2237,8 +2237,8 @@ exports[`render hlm library: 1.7.1.6 Essentials/Numbers/Natural/Left-addition%20
 Proof.  By induction on n.
 
 * (0) = (0): Trivial.
-* Let x ∈ ℕ. Then (((0) + x)+1) = (x+1):
-  We have (x+1) = (x+1) ⇒^1.7.1.6 (((0) + x)+1) = (x+1).
+* Let x ∈ ℕ such that (0) + x = x. Then (((0) + x)+1) = (x+1):
+  We have (x+1) = (x+1) ⇒^[(0)+x = x] (((0) + x)+1) = (x+1).
 
 References.
 
@@ -2258,8 +2258,8 @@ exports[`render hlm library: 1.7.1.7 Essentials/Numbers/Natural/Successor%20can%
 Proof.  By induction on n.
 
 * (m+1) = (m+1): Trivial.
-* Let x ∈ ℕ. Then (((m+1) + x)+1) = (((m + x)+1)+1):
-  We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^1.7.1.7 (((m+1) + x)+1) = (((m + x)+1)+1).
+* Let x ∈ ℕ such that (m+1) + x = ((m + x)+1). Then (((m+1) + x)+1) = (((m + x)+1)+1):
+  We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^[(m+1)+x = ((m+x)+1)] (((m+1) + x)+1) = (((m + x)+1)+1).
 
 References.
 
@@ -2774,8 +2774,7 @@ Proof.  By induction on n.
 
 * We show that 0 ∈ M:
   M is inductive ⇒^def 0 ∈ M
-* Let x ∈ ℕ. Then x + 1 ∈ M:
-  1.7.1.36 ⇒ x ∈ M
+* Let x ∈ ℕ such that x ∈ M. Then x + 1 ∈ M:
   M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
    ⇒ x + 1 ∈ M"
 `;

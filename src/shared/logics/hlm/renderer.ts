@@ -2853,6 +2853,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               } else {
                 subProof.parameters = structuralCase.parameters;
               }
+              if (subProof.steps.length) {
+                let firstStep = subProof.steps[0];
+                let firstStepType = firstStep.type;
+                if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
+                  let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
+                  subProof.parameters = new Fmt.ParameterList(...subProof.parameters, inductionHypothesis);
+                  subProof.steps = new Fmt.ParameterList(...subProof.steps.slice(1));
+                  let substitutionContext = new HLMSubstitutionContext;
+                  this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
+                  subProof.steps = this.utils.applySubstitutionContextToParameterList(subProof.steps, substitutionContext);
+                }
+              }
             }
             let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
             let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {

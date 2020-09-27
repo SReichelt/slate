@@ -17,11 +17,22 @@ export class SubstitutionContext {
 export class GenericUtils {
   constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected supportPlaceholders: boolean) {}
 
+  private isSelfReferencePath(path: Fmt.Path): boolean {
+    return (!path.parentPath && path.name === this.definition.name);
+  }
+
+  private isSelfOrChildReferencePath(path: Fmt.Path): boolean {
+    while (path.parentPath instanceof Fmt.Path) {
+      path = path.parentPath;
+    }
+    return this.isSelfReferencePath(path);
+  }
+
   getDefinition(path: Fmt.Path): CachedPromise<Fmt.Definition> {
     if (path.parentPath instanceof Fmt.Path) {
       throw new Error('Unexpected path to inner definition');
     }
-    if (!path.parentPath && path.name === this.definition.name) {
+    if (this.isSelfReferencePath(path)) {
       return CachedPromise.resolve(this.definition);
     } else {
       return this.libraryDataAccessor.fetchItem(path, false, false)
@@ -152,19 +163,17 @@ export class GenericUtils {
     return result;
   }
 
+  isSelfReference(expression: Fmt.Expression): boolean {
+    return (expression instanceof Fmt.DefinitionRefExpression && this.isSelfReferencePath(expression.path));
+  }
+
+  isSelfOrChildReference(expression: Fmt.Expression): boolean {
+    return (expression instanceof Fmt.DefinitionRefExpression && this.isSelfOrChildReferencePath(expression.path));
+  }
+
   referencesSelf(expression: Fmt.Expression): boolean {
-    return this.containsSubExpression(expression, (subExpression: Fmt.Expression) => {
-      if (subExpression instanceof Fmt.DefinitionRefExpression) {
-        let path = subExpression.path;
-        while (path.parentPath instanceof Fmt.Path) {
-          path = path.parentPath;
-        }
-        if (!path.parentPath && path.name === this.definition.name) {
-          return true;
-        }
-      }
-      return false;
-    });
+    return this.containsSubExpression(expression, (subExpression: Fmt.Expression) =>
+      this.isSelfOrChildReference(subExpression));
   }
 
   referencesParameter(expression: Fmt.Expression, param: Fmt.Parameter): boolean {
