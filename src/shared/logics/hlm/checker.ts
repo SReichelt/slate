@@ -33,6 +33,7 @@ type HLMCheckerFillExpressionFn = (originalExpression: Fmt.Expression, filledExp
 interface HLMCheckerContext {
   context: Ctx.Context;
   binderSourceParameters: Fmt.Parameter[];
+  temporaryParameters: Fmt.Parameter[];
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
   inAutoArgument: boolean;
   stepResults: Map<Fmt.Parameter, Fmt.Expression>;
@@ -112,6 +113,12 @@ interface HLMCheckerFillExpressionArgs {
   filledExpression: Fmt.Expression;
 }
 
+export interface HLMCheckerConstraint {
+  parameter?: Fmt.Parameter;
+  constraint: Fmt.Expression;
+  isImmediate: boolean;
+}
+
 // TODO create pending checks on demand only, so that they can be omitted during rechecking if hasErrors is already true
 type PendingCheck = () => CachedPromise<void>;
 
@@ -129,6 +136,7 @@ export class HLMDefinitionChecker {
     this.rootContext = {
       context: new Ctx.EmptyContext(FmtHLM.metaModel),
       binderSourceParameters: [],
+      temporaryParameters: [],
       parentStructuralCases: [],
       inAutoArgument: false,
       stepResults: new Map<Fmt.Parameter, Fmt.Expression>(),
@@ -1069,6 +1077,10 @@ export class HLMDefinitionChecker {
           if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
             let constraintFormula = formula instanceof FmtHLM.MetaRefExpression_or ? this.utils.negateFormula(item, false).getImmediateResult()! : item;
             let constraintParam = this.utils.createConstraintParameter(constraintFormula, '_');
+            checkContext = {
+              ...checkContext,
+              temporaryParameters: checkContext.temporaryParameters.concat(constraintParam)
+            };
             checkContext = this.getParameterContext(constraintParam, checkContext);
           }
         }
@@ -1878,25 +1890,46 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private isTriviallyProvable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
-    // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
-    let constraintsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
+  getAvailableConstraints(context: HLMCheckerContext, split: boolean): HLMCheckerConstraint[] {
+    let constraints: HLMCheckerConstraint[] = [];
     for (let variableInfo of context.context.getVariables()) {
       if (!variableInfo.indexParameterLists && context.binderSourceParameters.indexOf(variableInfo.parameter) < 0) {
-        constraintsPromise = constraintsPromise.then((currentConstraints: Fmt.Expression[]) => {
-          let constraint = this.utils.getParameterConstraint(variableInfo.parameter, context);
-          if (constraint) {
-            return currentConstraints.concat(constraint);
-          } else {
-            return currentConstraints;
-          }
-        });
+        let constraint = this.utils.getParameterConstraint(variableInfo.parameter, context);
+        if (constraint) {
+          let parameter = context.temporaryParameters.indexOf(variableInfo.parameter) < 0 ? variableInfo.parameter : undefined;
+          this.addConstraint(parameter, constraint, true, constraints, split);
+        }
       }
     }
-    return constraintsPromise.then((constraints: Fmt.Expression[]) => {
-      let constraint = this.utils.createConjunction(constraints);
-      return this.utils.triviallyImplies(constraint, goal, true);
+    return constraints;
+  }
+
+  private addConstraint(parameter: Fmt.Parameter | undefined, constraint: Fmt.Expression, isImmediate: boolean, constraints: HLMCheckerConstraint[], split: boolean): void {
+    if (split) {
+      if (constraint instanceof FmtHLM.MetaRefExpression_and) {
+        if (constraint.formulas) {
+          for (let item of constraint.formulas) {
+            this.addConstraint(parameter, item, false, constraints, split);
+          }
+        }
+        return;
+      } else if (constraint instanceof FmtHLM.MetaRefExpression_exists) {
+        // Should be followed by UseExists.
+        return;
+      }
+    }
+    constraints.push({
+      parameter: parameter,
+      constraint: constraint,
+      isImmediate: isImmediate
     });
+  }
+
+  private isTriviallyProvable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+    // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
+    let constraints = this.getAvailableConstraints(context, false);
+    let conjunction = this.utils.createConjunction(constraints.map((constraint: HLMCheckerConstraint) => constraint.constraint));
+    return this.utils.triviallyImplies(conjunction, goal, true);
   }
 
   private isTriviallyDisprovable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {

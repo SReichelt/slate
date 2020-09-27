@@ -12,6 +12,10 @@
   user-select: none;
 }
 
+.open-menu .expr {
+  white-space: nowrap!important;
+}
+
 .open-menu-table, .open-menu-content-cell-table {
   border-spacing: 0;
 }

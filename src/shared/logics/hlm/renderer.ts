@@ -2846,26 +2846,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (type.construction instanceof Fmt.DefinitionRefExpression) {
           let path = type.construction.path;
           let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
-            let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
-            if (structuralCase.parameters) {
-              if (subProof.parameters) {
-                subProof.parameters = new Fmt.ParameterList(...structuralCase.parameters, ...subProof.parameters);
-              } else {
-                subProof.parameters = structuralCase.parameters;
-              }
-              if (subProof.steps.length) {
-                let firstStep = subProof.steps[0];
-                let firstStepType = firstStep.type;
-                if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
-                  let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
-                  subProof.parameters = new Fmt.ParameterList(...subProof.parameters, inductionHypothesis);
-                  subProof.steps = new Fmt.ParameterList(...subProof.steps.slice(1));
-                  let substitutionContext = new HLMSubstitutionContext;
-                  this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
-                  subProof.steps = this.utils.applySubstitutionContextToParameterList(subProof.steps, substitutionContext);
-                }
-              }
-            }
+            let subProof = this.createInductionSubProofForRendering(structuralCase);
             let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
             let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
               let subProofContext: HLMProofStepContext = {
@@ -3082,6 +3063,30 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else {
       return new Notation.ParagraphExpression(state.paragraphs);
     }
+  }
+
+  private createInductionSubProofForRendering(structuralCase: FmtHLM.ObjectContents_StructuralCase): FmtHLM.ObjectContents_Proof {
+    let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+    if (structuralCase.parameters) {
+      if (subProof.parameters) {
+        subProof.parameters = new Fmt.ParameterList(...structuralCase.parameters, ...subProof.parameters);
+      } else {
+        subProof.parameters = structuralCase.parameters;
+      }
+    }
+    if (subProof.steps.length) {
+      let firstStep = subProof.steps[0];
+      let firstStepType = firstStep.type;
+      if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
+        let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
+        subProof.parameters = new Fmt.ParameterList(...subProof.parameters!, inductionHypothesis);
+        subProof.steps = new Fmt.ParameterList(...subProof.steps.slice(1));
+        let substitutionContext = new HLMSubstitutionContext;
+        this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
+        subProof.steps = this.utils.applySubstitutionContextToParameterList(subProof.steps, substitutionContext);
+      }
+    }
+    return subProof;
   }
 
   private outputStartRowSpacing(state: ProofOutputState): void {
