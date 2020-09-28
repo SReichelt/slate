@@ -1500,8 +1500,8 @@ export class HLMDefinitionChecker {
   private checkEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, items: Fmt.Expression[], getEquivalenceGoal: (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => Fmt.Expression, context: HLMCheckerContext): void {
     if (proofs) {
       for (let proof of proofs) {
-        let fromIndex = this.utils.translateIndex(proof._from);
-        let toIndex = this.utils.translateIndex(proof._to);
+        let fromIndex = this.utils.externalToInternalIndex(proof._from);
+        let toIndex = this.utils.externalToInternalIndex(proof._to);
         if (fromIndex === undefined || toIndex === undefined) {
           this.error(proof, 'From/to required');
         } else if (fromIndex < 0 || fromIndex >= items.length) {
@@ -1563,7 +1563,7 @@ export class HLMDefinitionChecker {
       if (context.goal) {
         if (context.previousResult) {
           let useDef = type;
-          let previousResultDefinitionsPromise = this.utils.getFormulaDefinitions(context.previousResult, this.utils.translateIndex(useDef.side));
+          let previousResultDefinitionsPromise = this.utils.getFormulaDefinitions(context.previousResult, this.utils.externalToInternalIndex(useDef.side));
           if (previousResultDefinitionsPromise) {
             let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
               if (previousResultDefinitions.length) {
@@ -1588,7 +1588,7 @@ export class HLMDefinitionChecker {
       if (context.goal) {
         if (context.previousResult) {
           let goal = context.goal;
-          let previousResultCasesPromise = this.utils.getFormulaCases(context.previousResult, this.utils.translateIndex(type.side), false);
+          let previousResultCasesPromise = this.utils.getFormulaCases(context.previousResult, this.utils.externalToInternalIndex(type.side), false);
           if (previousResultCasesPromise) {
             let caseProofs = type.caseProofs;
             let checkCases = previousResultCasesPromise.then((previousResultCases: HLMFormulaCase[]) => {
@@ -1650,7 +1650,7 @@ export class HLMDefinitionChecker {
         let sourceResultContext = this.checkProofStep(type.source, sourceContext);
         if (sourceResultContext && (sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
           let terms = sourceResultContext.previousResult.terms;
-          let sourceIndex = this.utils.translateIndex(type.sourceSide);
+          let sourceIndex = this.utils.externalToInternalIndex(type.sourceSide);
           if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < terms.length) {
             let sourceTerm = terms[sourceIndex];
             let targetTerms = terms.slice();
@@ -1721,7 +1721,7 @@ export class HLMDefinitionChecker {
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
       if (context.goal) {
         let proveDef = type;
-        let goalDefinitionsPromise = this.utils.getFormulaDefinitions(context.goal, this.utils.translateIndex(proveDef.side));
+        let goalDefinitionsPromise = this.utils.getFormulaDefinitions(context.goal, this.utils.externalToInternalIndex(proveDef.side));
         if (goalDefinitionsPromise) {
           let checkDefinition = goalDefinitionsPromise.then((goalDefinitions: HLMFormulaDefinition[]) => {
             let goals = goalDefinitions.map((goalDefinition: HLMFormulaDefinition) => goalDefinition.formula);
@@ -1741,7 +1741,7 @@ export class HLMDefinitionChecker {
         let goalToNegate = context.goal;
         let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
         if (goalToNegate instanceof FmtHLM.MetaRefExpression_or && goalToNegate.formulas && proveByContradiction.proof._to !== undefined) {
-          let index = this.utils.translateIndex(proveByContradiction.proof._to);
+          let index = this.utils.externalToInternalIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
             [goalToNegate, newGoal] = this.utils.getProveByContradictionVariant(goalToNegate.formulas, index);
           }
@@ -1787,7 +1787,7 @@ export class HLMDefinitionChecker {
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveCases) {
       if (context.goal) {
-        let goalCasesPromise = this.utils.getFormulaCases(context.goal, this.utils.translateIndex(type.side), true);
+        let goalCasesPromise = this.utils.getFormulaCases(context.goal, this.utils.externalToInternalIndex(type.side), true);
         if (goalCasesPromise) {
           let caseProofs = type.caseProofs;
           let checkCases = goalCasesPromise.then((goalCases: HLMFormulaCase[]) => {
@@ -1855,7 +1855,7 @@ export class HLMDefinitionChecker {
         let sourceResultContext = this.checkProofStep(type.source, sourceContext);
         if (sourceResultContext && (sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
           let terms = sourceResultContext.previousResult.terms;
-          let sourceIndex = this.utils.translateIndex(type.sourceSide);
+          let sourceIndex = this.utils.externalToInternalIndex(type.sourceSide);
           if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < terms.length) {
             let sourceTerm = terms[sourceIndex];
             let targetTerms = terms.slice();

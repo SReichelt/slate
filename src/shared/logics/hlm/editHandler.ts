@@ -13,7 +13,7 @@ import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProv
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
-import { HLMUtils } from './utils';
+import { HLMFormulaDefinition, HLMUtils } from './utils';
 import { HLMRenderUtils } from './renderUtils';
 import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext, HLMCheckerConstraint } from './checker';
 import CachedPromise from '../../data/cachedPromise';
@@ -1157,29 +1157,32 @@ export class HLMEditHandler extends GenericEditHandler {
       }
 
       if (!(proof.steps.length && proof.steps[proof.steps.length - 1].type instanceof FmtHLM.MetaRefExpression_Consider)) {
-        if (context.goal instanceof FmtHLM.MetaRefExpression_not) {
-          rows.push(this.getProveByContradictionRow(context.goal, onInsertProofStep, onRenderProofStep));
-        } else if (context.goal instanceof FmtHLM.MetaRefExpression_forall) {
-          rows.push(this.getProveForAllRow(context.goal, onInsertProofStep, onRenderProofStep));
-        } else if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
-          rows.push(this.getProveExistsRow());
-        } else if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals
-                   || context.goal instanceof FmtHLM.MetaRefExpression_equals && context.goal.terms.length > 2
-                   || context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
-          rows.push(this.getProveEquivalenceRow());
+        if (context.goal) {
+          if (context.goal instanceof FmtHLM.MetaRefExpression_not) {
+            rows.push(this.getProveByContradictionRow(context.goal, onInsertProofStep, onRenderProofStep));
+          } else if (context.goal instanceof FmtHLM.MetaRefExpression_forall) {
+            rows.push(this.getProveForAllRow(context.goal, onInsertProofStep, onRenderProofStep));
+          } else if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
+            rows.push(this.getProveExistsRow());
+          } else if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals
+                    || context.goal instanceof FmtHLM.MetaRefExpression_equals && context.goal.terms.length > 2
+                    || context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
+            rows.push(this.getProveEquivalenceRow());
+          }
+          rows.push(this.getProveCasesRow());
+          let proveByDefinitionRow = this.getProveByDefinitionRow(context.goal, onInsertProofStep, onRenderProofStep);
+          if (proveByDefinitionRow) {
+            rows.push(proveByDefinitionRow);
+          }
+          rows.push(this.getUnfoldGoalRow());
+          if (!(context.goal instanceof FmtHLM.MetaRefExpression_not
+                || context.goal instanceof FmtHLM.MetaRefExpression_forall
+                || this.utils.isFalseFormula(context.goal)
+                || this.utils.isTrueFormula(context.goal))) {
+            rows.push(this.getProveByContradictionRow(context.goal, onInsertProofStep, onRenderProofStep));
+          }
+          rows.push(new Menu.ExpressionMenuSeparator);
         }
-        rows.push(
-          this.getProveCasesRow(),
-          this.getProveByDefinitionRow(),
-          this.getUnfoldGoalRow()
-        );
-        if (context.goal && !(context.goal instanceof FmtHLM.MetaRefExpression_not
-                              || context.goal instanceof FmtHLM.MetaRefExpression_forall
-                              || this.utils.isFalseFormula(context.goal)
-                              || this.utils.isTrueFormula(context.goal))) {
-          rows.push(this.getProveByContradictionRow(context.goal, onInsertProofStep, onRenderProofStep));
-        }
-        rows.push(new Menu.ExpressionMenuSeparator);
 
         rows.push(
           this.getConsiderRow(context, onInsertProofStep, onRenderProofStep),
@@ -1248,7 +1251,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
       let parameters = new Fmt.ParameterList;
       this.utils.addProofConstraint(parameters, negatedGoal);
-      let from = (index === undefined ? undefined : new Fmt.BN(index + 1));
+      let from = this.utils.internalToExternalIndex(index);
       let subProof = new FmtHLM.ObjectContents_Proof(from, undefined, parameters, newGoal, new Fmt.ParameterList);
       return this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveByContradiction(subProof), '_');
     });
@@ -1256,11 +1259,18 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getProveForAllRow(goal: FmtHLM.MetaRefExpression_forall, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
     let proveForAllRow = new Menu.StandardExpressionMenuRow('Prove universality');
-    let parameters = goal.parameters.clone();
-    let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, parameters, undefined, new Fmt.ParameterList);
-    let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveForAll(subProof), '_');
+    let step = this.createProveForAllStep(goal);
     proveForAllRow.subMenu = this.getProofStepMenuItem(step, onInsertProofStep, onRenderProofStep);
     return proveForAllRow;
+  }
+
+  private createProveForAllStep(goal: FmtHLM.MetaRefExpression_forall): Fmt.Parameter {
+    let replacedParameters: Fmt.ReplacedParameter[] = [];
+    let parameters = goal.parameters.clone(replacedParameters);
+    let subGoal = goal.formula.clone(replacedParameters);
+    // TODO auto-fill "by definition" if subgoal can be proved this way (here and in other places)
+    let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, parameters, subGoal, new Fmt.ParameterList);
+    return this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveForAll(subProof), '_');
   }
 
   private getProveExistsRow(): Menu.ExpressionMenuRow {
@@ -1281,10 +1291,25 @@ export class HLMEditHandler extends GenericEditHandler {
     return proveCasesRow;
   }
 
-  private getProveByDefinitionRow(): Menu.ExpressionMenuRow {
-    let proveByDefinitionRow = new Menu.StandardExpressionMenuRow('Prove by definition');
-    // TODO
-    return proveByDefinitionRow;
+  private getProveByDefinitionRow(goal: Fmt.Expression, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow | undefined {
+    let definitionsPromise = this.utils.getAllFormulaDefinitions(goal);
+    if (definitionsPromise) {
+      let proveByDefinitionRow = new Menu.StandardExpressionMenuRow('Prove by definition');
+      let stepsPromise = definitionsPromise.then((definitions: HLMFormulaDefinition[]) =>
+        definitions.map((definition: HLMFormulaDefinition) => {
+          // TODO eliminate known facts, display tooltip
+          let steps = new Fmt.ParameterList;
+          if (definition.formula instanceof FmtHLM.MetaRefExpression_forall) {
+            steps.push(this.createProveForAllStep(definition.formula));
+          }
+          let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, undefined, definition.formula, steps);
+          return this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveDef(this.utils.internalToExternalIndex(definition.side), subProof), '_');
+        }));
+      proveByDefinitionRow.subMenu = this.getProofStepSubMenu(stepsPromise, onInsertProofStep, onRenderProofStep);
+      return proveByDefinitionRow;
+    } else {
+      return undefined;
+    }
   }
 
   private getUnfoldGoalRow(): Menu.ExpressionMenuRow {
@@ -1295,14 +1320,17 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getConsiderRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
     let considerRow = new Menu.StandardExpressionMenuRow('Consider');
-    let constraints = this.checker.getAvailableConstraints(context, true);
-    let steps: Fmt.Parameter[] = constraints.map((constraint: HLMCheckerConstraint) => {
-      if (constraint.parameter) {
-        return this.utils.createParameter(new FmtHLM.MetaRefExpression_Consider(new Fmt.VariableRefExpression(constraint.parameter), constraint.isImmediate ? undefined : constraint.constraint), '_');
-      } else {
-        return this.utils.createParameter(new FmtHLM.MetaRefExpression_State(constraint.constraint), '_');
+    let steps: Fmt.Parameter[] = [];
+    for (let constraint of this.checker.getAvailableConstraints(context, true)) {
+      if (context.previousResult?.isEquivalentTo(constraint.constraint)) {
+        continue;
       }
-    });
+      if (constraint.parameter) {
+        steps.push(this.utils.createParameter(new FmtHLM.MetaRefExpression_Consider(new Fmt.VariableRefExpression(constraint.parameter), constraint.isImmediate ? undefined : constraint.constraint), '_'));
+      } else {
+        steps.push(this.utils.createParameter(new FmtHLM.MetaRefExpression_State(constraint.constraint), '_'));
+      }
+    }
     let onInsertConstraintStep = (step: Fmt.Parameter) => {
       if (step.type instanceof FmtHLM.MetaRefExpression_Consider && step.type.variable instanceof Fmt.VariableRefExpression) {
         let variable = step.type.variable.variable;

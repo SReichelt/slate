@@ -239,7 +239,9 @@ exports[`render hlm library: 1.1.11 Essentials/Sets/Intersection%20is%20subset%2
 
   S ∩ T ⊆ S
 
-No proof.
+Proof.  Let x ∈ S ∩ T. Then x ∈ S:
+
+x ∈ S ∩ T ⇒^def x ∈ S
 
 References.
 
@@ -296,7 +298,7 @@ exports[`render hlm library: 1.1.15 Essentials/Sets/Union%20is%20superset%20of%2
 
   S ⊆ S ∪ T
 
-No proof.
+Proof.  Let x ∈ S. Then x ∈ S ∪ T by definition.
 
 References.
 

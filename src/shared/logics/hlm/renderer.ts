@@ -61,6 +61,7 @@ interface ProofOutputImplication {
   resultPrefixes?: Notation.RenderedExpression[];
   resultSuffixes?: Notation.RenderedExpression[];
   resultPunctuation?: Notation.RenderedExpression[];
+  resultIsEditable: boolean;
 }
 
 interface ProofOutputState {
@@ -2770,17 +2771,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let type = step.type;
       let addImplication = (implication: ProofOutputImplication) => {
         if (context.isLastStep) {
-          let displayContradiction = (context.goal && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
-          if (this.editHandler) {
-            let previewContext: HLMProofStepRenderContext = {
-              ...context,
-              previousResult: undefined,
-              previousStep: step
-            };
-            let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
-            let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, previewContext);
-            state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep);
-          } else if (displayContradiction) {
+          let displayContradiction = (context.goal !== undefined && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
+          if (!this.addConditionalProofStepInsertButton(proof, step, context, displayContradiction, state) && displayContradiction) {
             if (!implication.resultPunctuation) {
               implication.resultPunctuation = [];
             }
@@ -2813,7 +2805,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
         let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
         if (context.goal instanceof FmtHLM.MetaRefExpression_or && context.goal.formulas) {
-          let index = this.utils.translateIndex(type.proof._to);
+          let index = this.utils.externalToInternalIndex(type.proof._to);
           if (index !== undefined && index >= 0 && index < context.goal.formulas.length) {
             newGoal = context.goal.formulas[index];
           }
@@ -2871,6 +2863,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
         this.commitImplications(state, false);
         state.paragraphs.push(this.renderParameter(step, true, false, false));
+        if (context.isLastStep) {
+          this.addConditionalProofStepInsertButton(proof, step, context, false, state);
+        }
         return this.utils.getProofStepResult(step, context);
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
         let result = this.utils.getProofStepResult(step, context);
@@ -2878,7 +2873,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           addImplication({
             dependsOnPrevious: false,
             result: result,
-            resultLink: type.variable
+            resultLink: type.variable,
+            resultIsEditable: false
           });
         }
         return result;
@@ -2907,7 +2903,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         let implication: ProofOutputImplication = {
           dependsOnPrevious: false,
-          result: type.statement
+          result: type.statement,
+          resultIsEditable: true
         };
         let fullSentence = false;
         if (definitionDependency || (context.previousStep && this.utils.referencesParameter(type, context.previousStep))) {
@@ -2987,7 +2984,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           dependsOnPrevious: dependsOnPrevious,
           source: source,
           sourceFormula: sourceFormula,
-          result: result
+          result: result,
+          resultIsEditable: false
         });
         // TODO add sub-proofs (maybe inline like in expressions, or maybe expandable)
         return result;
@@ -3051,6 +3049,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return undefined;
   }
 
+  private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {
+    if (this.editHandler) {
+      if (!this.utils.containsPlaceholders()) {
+        let previewContext: HLMProofStepRenderContext = {
+          ...context,
+          previousResult: undefined,
+          previousStep: step
+        };
+        let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
+        let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, previewContext);
+        state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private renderProofStepPreview(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext): Notation.RenderedExpression {
     let state: ProofOutputState = {
       paragraphs: [],
@@ -3107,34 +3123,38 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean): void {
-    if (state.implications) {
+    if (state.implications || state.additionalRow) {
       this.commitStartRow(state);
       let gridState: ProofGridState = {
         rows: []
       };
-      for (let index = 0; index < state.implications.length; index++) {
-        let implication = state.implications[index];
-        let nextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
-        let mergeEquality = nextImplication !== undefined && nextImplication.dependsOnPrevious && this.canMergeEquality(implication.result, nextImplication.result);
-        if (!implication.dependsOnPrevious || (mergeEquality && gridState.equalitySymbolColumn === undefined)) {
-          this.commitProofGrid(gridState, state.paragraphs);
+      if (state.implications) {
+        for (let index = 0; index < state.implications.length; index++) {
+          let implication = state.implications[index];
+          let nextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
+          let mergeEquality = nextImplication !== undefined && nextImplication.dependsOnPrevious && this.canMergeEquality(implication.result, nextImplication.result);
+          if (!implication.dependsOnPrevious || (mergeEquality && gridState.equalitySymbolColumn === undefined)) {
+            this.commitProofGrid(gridState, state.paragraphs);
+          }
+          let row: Notation.RenderedExpression[] = [];
+          this.outputImplication(implication, gridState, mergeEquality, row);
+          if (gridState.implicationSymbolColumn === undefined
+              && gridState.equalitySymbolColumn === undefined
+              && nextImplication?.dependsOnPrevious
+              && !forceLeftAlignment) {
+            index++;
+            let nextNextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
+            mergeEquality = nextNextImplication !== undefined && nextNextImplication.dependsOnPrevious && this.canMergeEquality(nextImplication.result, nextNextImplication.result);
+            this.outputImplication(nextImplication, gridState, mergeEquality, row);
+          }
+          gridState.rows.push(row);
+          if ((gridState.equalitySymbolColumn !== undefined && !mergeEquality)
+              || (forceLeftAlignment && !implication.dependsOnPrevious)) {
+            this.commitProofGrid(gridState, state.paragraphs);
+          }
         }
-        let row: Notation.RenderedExpression[] = [];
-        this.outputImplication(implication, gridState, mergeEquality, row);
-        if (gridState.implicationSymbolColumn === undefined
-            && gridState.equalitySymbolColumn === undefined
-            && nextImplication?.dependsOnPrevious
-            && !forceLeftAlignment) {
-          index++;
-          let nextNextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
-          mergeEquality = nextNextImplication !== undefined && nextNextImplication.dependsOnPrevious && this.canMergeEquality(nextImplication.result, nextNextImplication.result);
-          this.outputImplication(nextImplication, gridState, mergeEquality, row);
-        }
-        gridState.rows.push(row);
-        if ((gridState.equalitySymbolColumn !== undefined && !mergeEquality)
-            || (forceLeftAlignment && !implication.dependsOnPrevious)) {
-          this.commitProofGrid(gridState, state.paragraphs);
-        }
+        this.commitPunctuation(gridState);
+        state.implications = undefined;
       }
       if (state.additionalRow) {
         let row: Notation.RenderedExpression[] = [];
@@ -3147,7 +3167,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         gridState.rows.push(row);
       }
       this.commitProofGrid(gridState, state.paragraphs);
-      state.implications = undefined;
     }
   }
 
@@ -3202,11 +3221,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
+    let renderer = implication.resultIsEditable ? this : this.readOnlyRenderer;
     let result = (this.utils.isFalseFormula(implication.result)
-                  ? this.renderTemplate('Contradiction')
-                  : this.readOnlyRenderer.renderFormula(implication.result, fullFormulaSelection));
+                  ? renderer.renderTemplate('Contradiction')
+                  : renderer.renderFormula(implication.result, fullFormulaSelection));
     if (implication.resultLink) {
-      this.readOnlyRenderer.addSemanticLink(result, implication.result);
+      renderer.addSemanticLink(result, implication.result);
     }
     if (implication.resultPrefixes || implication.resultSuffixes) {
       let resultRow: Notation.RenderedExpression[] = [];
@@ -3265,18 +3285,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private commitProofGrid(gridState: ProofGridState, paragraphs: Notation.RenderedExpression[]): void {
+    this.commitPunctuation(gridState);
     if (gridState.rows.length) {
-      if (gridState.pendingPunctuation) {
-        let lastRow = gridState.rows[gridState.rows.length - 1];
-        if (lastRow.length) {
-          lastRow[lastRow.length - 1] = new Notation.RowExpression([
-            lastRow[lastRow.length - 1],
-            ...gridState.pendingPunctuation
-          ]);
-        } else {
-          lastRow.push(...gridState.pendingPunctuation);
-        }
-      }
       let table = new Notation.TableExpression(gridState.rows);
       table.styleClasses = ['proof-grid'];
       paragraphs.push(table);
@@ -3284,6 +3294,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     gridState.rows = [];
     gridState.implicationSymbolColumn = undefined;
     gridState.equalitySymbolColumn = undefined;
+  }
+
+  private commitPunctuation(gridState: ProofGridState): void {
+    if (gridState.pendingPunctuation && gridState.rows.length) {
+      let lastRow = gridState.rows[gridState.rows.length - 1];
+      if (lastRow.length) {
+        lastRow[lastRow.length - 1] = new Notation.RowExpression([
+          lastRow[lastRow.length - 1],
+          ...gridState.pendingPunctuation
+        ]);
+      } else {
+        lastRow.push(...gridState.pendingPunctuation);
+      }
+    }
     gridState.pendingPunctuation = undefined;
   }
 

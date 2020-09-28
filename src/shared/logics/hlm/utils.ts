@@ -81,6 +81,7 @@ const followEmbedding: HLMTypeSearchParameters = {
 export interface HLMFormulaDefinition {
   formula: Fmt.Expression;
   definitionRef?: Fmt.DefinitionRefExpression;
+  side?: number;
 }
 
 export interface HLMFormulaCase {
@@ -1824,13 +1825,14 @@ export class HLMUtils extends GenericUtils {
               this.negateFormula(negationDefinition.formula, true).then((negatedFormula: Fmt.Expression) =>
                 currentResult.concat({
                   formula: negatedFormula,
-                  definitionRef: negationDefinition.definitionRef
+                  definitionRef: negationDefinition.definitionRef,
+                  side: negationDefinition.side
                 })));
           }
           return result;
         });
       }
-    } else if (formula instanceof Fmt.DefinitionRefExpression) {
+    } else if (formula instanceof Fmt.DefinitionRefExpression && side === undefined) {
       let path = formula.path;
       return this.getOuterDefinition(formula).then((definition: Fmt.Definition) => {
         let result: HLMFormulaDefinition[] = [];
@@ -1846,7 +1848,7 @@ export class HLMUtils extends GenericUtils {
       });
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
       return this.getElementFormulaDefinitions(formula.element, formula._set, side);
-    } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
+    } else if (formula instanceof FmtHLM.MetaRefExpression_sub && side === undefined) {
       let paramType = new FmtHLM.MetaRefExpression_Element(formula.subset);
       let param = this.createParameter(paramType, 'x');
       let parameters = new Fmt.ParameterList(param);
@@ -1866,7 +1868,7 @@ export class HLMUtils extends GenericUtils {
           return this.getImplicitOperatorDefinition(term, otherTerm, side);
         }
       }
-    } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
+    } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique && side === undefined) {
       let replacedParameters: Fmt.ReplacedParameter[] = [];
       let parameters = formula.parameters.clone(replacedParameters);
       let equalities: Fmt.Expression[] = [];
@@ -1891,14 +1893,14 @@ export class HLMUtils extends GenericUtils {
 
   private getElementFormulaDefinitions(element: Fmt.Expression, set: Fmt.Expression, side: number | undefined): CachedPromise<HLMFormulaDefinition[]> | undefined {
     // TODO special support for embeddings (e.g. prove that an integer is a natural number)
-    if (set instanceof FmtHLM.MetaRefExpression_enumeration) {
+    if (set instanceof FmtHLM.MetaRefExpression_enumeration && side === undefined) {
       let formulas = set.terms?.map((term: Fmt.Expression) =>
         new FmtHLM.MetaRefExpression_equals(element, term)) ?? [];
       let result = this.createDisjunction(formulas);
       return CachedPromise.resolve([{
         formula: result
       }]);
-    } else if (set instanceof FmtHLM.MetaRefExpression_subset) {
+    } else if (set instanceof FmtHLM.MetaRefExpression_subset && side === undefined) {
       let paramType = set.parameter.type as FmtHLM.MetaRefExpression_Element;
       let elementConstraint = new FmtHLM.MetaRefExpression_in(element, paramType._set);
       let subsetFormula = FmtUtils.substituteVariable(set.formula, set.parameter, element);
@@ -1906,7 +1908,7 @@ export class HLMUtils extends GenericUtils {
       return CachedPromise.resolve([{
         formula: result
       }]);
-    } else if (set instanceof FmtHLM.MetaRefExpression_extendedSubset) {
+    } else if (set instanceof FmtHLM.MetaRefExpression_extendedSubset && side === undefined) {
       let equality = new FmtHLM.MetaRefExpression_equals(element, set.term);
       let result = new FmtHLM.MetaRefExpression_exists(set.parameters, equality);
       return CachedPromise.resolve([{
@@ -1927,7 +1929,8 @@ export class HLMUtils extends GenericUtils {
                 return newFormulaDefinitionsPromise.then((newFormulaDefinitions: HLMFormulaDefinition[]) =>
                   currentResult.concat(newFormulaDefinitions.map((newFormulaDefinition: HLMFormulaDefinition): HLMFormulaDefinition => ({
                     formula: newFormulaDefinition.formula,
-                    definitionRef: definitionRef
+                    definitionRef: definitionRef,
+                    side: newFormulaDefinition.side
                   }))));
               } else {
                 return currentResult;
@@ -2029,12 +2032,32 @@ export class HLMUtils extends GenericUtils {
           let conjunction = new FmtHLM.MetaRefExpression_and(elementCondition, substitutedItem);
           return {
             formula: conjunction,
-            definitionRef: term
+            definitionRef: term,
+            side: side
           };
         });
       }
       return [];
     });
+  }
+
+  getAllFormulaDefinitions(formula: Fmt.Expression): CachedPromise<HLMFormulaDefinition[]> | undefined {
+    let resultPromise: CachedPromise<HLMFormulaDefinition[]> | undefined = undefined;
+    for (let side of [0, 1, undefined]) {
+      if (resultPromise) {
+        resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) => {
+          let nextResultPromise = this.getFormulaDefinitions(formula, side);
+          if (nextResultPromise) {
+            return nextResultPromise.then((nextResult: HLMFormulaDefinition[]) => currentResult.concat(nextResult));
+          } else {
+            return currentResult;
+          }
+        });
+      } else {
+        resultPromise = this.getFormulaDefinitions(formula, side);
+      }
+    }
+    return resultPromise;
   }
 
   getFormulaCases(formula: Fmt.Expression, side: number | undefined, isGoal: boolean): CachedPromise<HLMFormulaCase[]> | undefined {
@@ -2109,8 +2132,12 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  translateIndex(externalIndex: Fmt.BN | undefined): number | undefined {
+  externalToInternalIndex(externalIndex: Fmt.BN | undefined): number | undefined {
     return externalIndex === undefined ? undefined : externalIndex.toNumber() - 1;
+  }
+
+  internalToExternalIndex(internalIndex: number | undefined): Fmt.BN | undefined {
+    return internalIndex === undefined ? undefined : new Fmt.BN(internalIndex + 1);
   }
 
   fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, createPlaceholder: CreatePlaceholderFn, createParameterList: CreateParameterListFn): void {
