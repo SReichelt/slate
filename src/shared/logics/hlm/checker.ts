@@ -1927,6 +1927,7 @@ export class HLMDefinitionChecker {
 
   private isTriviallyProvable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
     // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
+    // TODO somewhere (maybe here), the "full" property of embeddings should be taken into account
     let constraints = this.getAvailableConstraints(context, false);
     let conjunction = this.utils.createConjunction(constraints.map((constraint: HLMCheckerConstraint) => constraint.constraint));
     return this.utils.triviallyImplies(conjunction, goal, true);
@@ -1937,7 +1938,7 @@ export class HLMDefinitionChecker {
       this.isTriviallyProvable(negatedGoal, context));
   }
 
-  private stripConstraintsFromFormulas(formulas: Fmt.Expression[], stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext): CachedPromise<Fmt.Expression[]> {
+  stripConstraintsFromFormulas(formulas: Fmt.Expression[], stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext): CachedPromise<Fmt.Expression[]> {
     let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
     for (let formula of formulas) {
       resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>

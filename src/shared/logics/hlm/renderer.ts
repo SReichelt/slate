@@ -3165,6 +3165,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         row.push(state.additionalRow);
         gridState.rows.push(row);
+        state.additionalRow = undefined;
       }
       this.commitProofGrid(gridState, state.paragraphs);
     }
