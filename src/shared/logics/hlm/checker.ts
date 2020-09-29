@@ -1925,7 +1925,7 @@ export class HLMDefinitionChecker {
     });
   }
 
-  private isTriviallyProvable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+  isTriviallyProvable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
     // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
     // TODO somewhere (maybe here), the "full" property of embeddings should be taken into account
     let constraints = this.getAvailableConstraints(context, false);
@@ -1933,7 +1933,7 @@ export class HLMDefinitionChecker {
     return this.utils.triviallyImplies(conjunction, goal, true);
   }
 
-  private isTriviallyDisprovable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
+  isTriviallyDisprovable(goal: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
     return this.utils.negateFormula(goal, true).then((negatedGoal: Fmt.Expression) =>
       this.isTriviallyProvable(negatedGoal, context));
   }

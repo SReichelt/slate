@@ -2647,6 +2647,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
+    // TODO add conditional proof step insertion button
     let proofs = proof ? [proof] : undefined;
     let indentedState: ProofOutputState = {
       paragraphs: [],
@@ -2763,7 +2764,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       renderContext.previousStep = step;
       renderContext.previousResult = stepResult;
     }
-    this.commitImplications(state, false);
+    this.commitImplications(state, false, true);
   }
 
   private addProofStep(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext, state: ProofOutputState): Fmt.Expression | undefined {
@@ -2772,7 +2773,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let addImplication = (implication: ProofOutputImplication) => {
         if (context.isLastStep) {
           let displayContradiction = (context.goal !== undefined && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
-          if (!this.addConditionalProofStepInsertButton(proof, step, context, displayContradiction, state) && displayContradiction) {
+          let insertionContext = {
+            ...context,
+            previousStep: step,
+            previousResult: implication.result
+          };
+          if (!this.addConditionalProofStepInsertButton(proof, insertionContext, displayContradiction, state) && displayContradiction) {
             if (!implication.resultPunctuation) {
               implication.resultPunctuation = [];
             }
@@ -2863,10 +2869,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
         this.commitImplications(state, false);
         state.paragraphs.push(this.renderParameter(step, true, false, false));
+        let result = this.utils.getProofStepResult(step, context);
         if (context.isLastStep) {
-          this.addConditionalProofStepInsertButton(proof, step, context, false, state);
+          let insertionContext = {
+            ...context,
+            previousStep: step,
+            previousResult: result
+          };
+          this.addConditionalProofStepInsertButton(proof, insertionContext, false, state);
         }
-        return this.utils.getProofStepResult(step, context);
+        return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
         let result = this.utils.getProofStepResult(step, context);
         if (result) {
@@ -2920,18 +2932,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (fullSentence) {
           this.commitImplications(state, false);
         }
+        let showSubProof = subProof !== undefined || this.editHandler !== undefined;
         if (byDefinition) {
           // TODO link to definition
           implication.resultSuffixes = [new Notation.TextExpression(' by definition')];
-          subProof = undefined;
+          showSubProof = false;
         } else if (bySubstitution) {
-          subProof = undefined;
+          showSubProof = false;
         }
-        if (fullSentence || subProof) {
-          implication.resultPunctuation = [new Notation.TextExpression(subProof ? ':' : '.')];
+        if (fullSentence || showSubProof) {
+          implication.resultPunctuation = [new Notation.TextExpression(showSubProof ? ':' : '.')];
         }
         addImplication(implication);
-        if (subProof) {
+        if (showSubProof) {
           let subProofContext: HLMProofStepContext = {
             goal: type.statement,
             stepResults: context.stepResults
@@ -3049,16 +3062,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return undefined;
   }
 
-  private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {
+  private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {
     if (this.editHandler) {
       if (!this.utils.containsPlaceholders()) {
-        let previewContext: HLMProofStepRenderContext = {
-          ...context,
-          previousResult: undefined,
-          previousStep: step
-        };
         let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
-        let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, previewContext);
+        let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
         state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep);
       }
       return true;
@@ -3122,8 +3130,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean): void {
-    if (state.implications || state.additionalRow) {
+  private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean, commitAdditionalRow: boolean = false): void {
+    if (state.implications || (commitAdditionalRow && state.additionalRow)) {
       this.commitStartRow(state);
       let gridState: ProofGridState = {
         rows: []
@@ -3156,7 +3164,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.commitPunctuation(gridState);
         state.implications = undefined;
       }
-      if (state.additionalRow) {
+      if (commitAdditionalRow && state.additionalRow) {
         let row: Notation.RenderedExpression[] = [];
         if (gridState.implicationSymbolColumn) {
           while (row.length < gridState.implicationSymbolColumn) {
@@ -3223,9 +3231,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
     let renderer = implication.resultIsEditable ? this : this.readOnlyRenderer;
+    let formulaSelection: FormulaSelection = {
+      allowTruthValue: false,
+      allowEquiv: false,
+      allowCases: true
+    };
     let result = (this.utils.isFalseFormula(implication.result)
                   ? renderer.renderTemplate('Contradiction')
-                  : renderer.renderFormula(implication.result, fullFormulaSelection));
+                  : renderer.renderFormula(implication.result, formulaSelection));
     if (implication.resultLink) {
       renderer.addSemanticLink(result, implication.result);
     }
