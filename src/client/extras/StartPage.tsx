@@ -56,23 +56,13 @@ function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageP
   );
 }
 
-function renderDefinitionExample(names: string[], props: StartPageProps, renderer: HLMRenderer, title?: string[]): React.ReactNode {
+function renderDefinitionExample(names: string[], props: StartPageProps, renderer: HLMRenderer): React.ReactNode {
   let example = buildExample(names);
   let expression = renderer.renderExampleExpression(example);
-  let result: React.ReactNode = <Expression expression={expression}/>;
-  if (title) {
-    let titleLines = [];
-    for (let line of title) {
-      if (titleLines.length) {
-        titleLines.push(<br key={titleLines.length}/>);
-      }
-      titleLines.push(line);
-    }
-    result = [
-      <div key="result">{result}</div>,
-      <div className="example-title" key="title">({titleLines})</div>
-    ];
-  }
+  let result = [
+    <div className="example-title" key="title">Definition:</div>,
+    <div key="result"><Expression expression={expression}/></div>
+  ];
   return wrapExample(result, example.path, props);
 }
 
@@ -107,8 +97,8 @@ function StartPage(props: StartPageProps) {
     };
     let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(dummyDefinition, props.libraryDataProvider, props.templates, rendererOptions);
     let examples = [
-      renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer, ['multiple definitions', 'of finiteness']),
-      renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer, ['definition']),
+      renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer),
+      renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer),
       renderTheoremExample(['Essentials', 'Numbers', 'Real', 'Roots of primes are irrational'], props),
       renderTheoremExample(['Algebra', 'Semirings', 'Formulas', 'Binomial theorem'], props)
     ];
