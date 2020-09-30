@@ -17,7 +17,6 @@ interface StartPageProps {
   isLoggedIn: boolean;
   libraryDataProvider?: LibraryDataProvider;
   templates?: Fmt.File;
-  createInteractionHandler: (libraryDataProvider: LibraryDataProvider) => ExpressionInteractionHandler | undefined;
   onStartTutorial: (withTouchWarning: boolean) => void;
   onLinkClicked: OnLinkClicked;
   onDocLinkClicked: OnDocLinkClicked;
@@ -60,8 +59,7 @@ function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageP
 function renderDefinitionExample(names: string[], props: StartPageProps, renderer: HLMRenderer, title?: string[]): React.ReactNode {
   let example = buildExample(names);
   let expression = renderer.renderExampleExpression(example);
-  let interactionHandler = props.createInteractionHandler(props.libraryDataProvider!);
-  let result: React.ReactNode = <Expression expression={expression} interactionHandler={interactionHandler}/>;
+  let result: React.ReactNode = <Expression expression={expression}/>;
   if (title) {
     let titleLines = [];
     for (let line of title) {
@@ -90,8 +88,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
   let expression = new Notation.PromiseExpression(expressionPromise);
-  let interactionHandler = props.createInteractionHandler(libraryDataProvider);
-  let result = <Expression expression={expression} interactionHandler={interactionHandler}/>;
+  let result = <Expression expression={expression}/>;
   return wrapExample(result, examplePath, props);
 }
 

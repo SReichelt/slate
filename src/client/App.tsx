@@ -477,8 +477,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     } else if (!config.embedded) {
       if (this.state.showStartPage) {
-        let createInteractionHandler = (libraryDataProvider: LibraryDataProvider) => this.createInteractionHandler(libraryDataProvider, this.state.templates, undefined);
-        mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} createInteractionHandler={createInteractionHandler} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} onDocLinkClicked={this.docLinkClicked} key="start-page"/>;
+        mainContents = <StartPage isLoggedIn={this.state.gitHubUserInfo !== undefined} libraryDataProvider={this.libraryDataProvider} templates={this.state.templates} onStartTutorial={this.startTutorial} onLinkClicked={this.linkClicked} onDocLinkClicked={this.docLinkClicked} key="start-page"/>;
       } else {
         mainContents = <Button className={'standalone'} onClick={() => this.setState({showStartPage: true})} key="start-page-placeholder">Show start page</Button>;
       }
