@@ -11,7 +11,9 @@ import * as Fmt from '../../shared/format/format';
 import * as FmtHLM from '../../shared/logics/hlm/meta';
 import * as Logic from '../../shared/logics/logic';
 import * as Menu from '../../shared/notation/menu';
+import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
 
+import { PromiseHelper } from '../components/PromiseHelper';
 import StartPage from './StartPage';
 import Button, { ButtonProps } from '../components/Button';
 import MenuButton from '../components/MenuButton';
@@ -22,7 +24,6 @@ import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
-import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
 
 export type TutorialStateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => DynamicTutorialState | undefined;
 export type ChangeTutorialStateFn = (stateTransitionFn: TutorialStateTransitionFn) => void;
@@ -432,27 +433,32 @@ class TutorialStates {
                           index: 0,
                           condition: (component: Expression) => !component.state.openMenu
                         },
-                        elementAction: this.automateClick(),
                         children: [
                           {
-                            type: ExpressionMenu,
+                            type: PromiseHelper,
+                            elementAction: this.automateClick(),
                             children: [
                               {
-                                type: ExpressionMenuRow,
-                                key: 2,
+                                type: ExpressionMenu,
                                 children: [
                                   {
-                                    type: ExpressionMenuItem,
-                                    toolTip: {
-                                      contents: <p>Our definition will deal with functions between two arbitrary sets, so pick this item.</p>,
-                                      position: 'right',
-                                      index: 0
-                                    },
-                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
-                                      ...props,
-                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_ST_names))
-                                    }),
-                                    elementAction: this.automateClick()
+                                    type: ExpressionMenuRow,
+                                    key: 2,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuItem,
+                                        toolTip: {
+                                          contents: <p>Our definition will deal with functions between two arbitrary sets, so pick this item.</p>,
+                                          position: 'right',
+                                          index: 0
+                                        },
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertOperatorParameters_ST_names))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
                                   }
                                 ]
                               }
@@ -3508,27 +3514,32 @@ class TutorialStates {
                           index: 0,
                           condition: (component: Expression) => !component.state.openMenu
                         },
-                        elementAction: this.automateClick(),
                         children: [
                           {
-                            type: ExpressionMenu,
+                            type: PromiseHelper,
+                            elementAction: this.automateClick(),
                             children: [
                               {
-                                type: ExpressionMenuRow,
-                                key: 0,
+                                type: ExpressionMenu,
                                 children: [
                                   {
-                                    type: ExpressionMenuItem,
-                                    toolTip: {
-                                      contents: <p>Click here.</p>,
-                                      position: 'right',
-                                      index: 1
-                                    },
-                                    manipulateProps: (props: ExpressionMenuItemProps) => ({
-                                      ...props,
-                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_name))
-                                    }),
-                                    elementAction: this.automateClick()
+                                    type: ExpressionMenuRow,
+                                    key: 0,
+                                    children: [
+                                      {
+                                        type: ExpressionMenuItem,
+                                        toolTip: {
+                                          contents: <p>Click here.</p>,
+                                          position: 'right',
+                                          index: 1
+                                        },
+                                        manipulateProps: (props: ExpressionMenuItemProps) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, () => this.changeState(this.insertTheoremParameters_f_name))
+                                        }),
+                                        elementAction: this.automateClick()
+                                      }
+                                    ]
                                   }
                                 ]
                               }
@@ -4828,7 +4839,21 @@ class TutorialStates {
                           position: 'bottom',
                           index: 0
                         },
-                        elementAction: this.automateClick()
+                        children: [
+                          {
+                            type: PromiseHelper,
+                            children: [
+                              {
+                                type: 'a',
+                                elementAction: this.automateClick()
+                              },
+                              {
+                                type: 'span',
+                                elementAction: this.automateClick()
+                              }
+                            ]
+                          }
+                        ]
                       }
                     ]
                   }
@@ -5086,37 +5111,52 @@ class TutorialStates {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done) {
-        done = true;
-        while (reactElement.props && reactElement.props.children && !reactElement.props.onMouseDown && !reactElement.props.onMouseUp && !reactElement.props.onClick) {
-          if (Array.isArray(reactElement.props.children)) {
-            if (reactElement.props.children.length) {
-              reactElement = reactElement.props.children[0];
-            } else {
-              break;
-            }
-          } else {
-            reactElement = reactElement.props.children;
+        let clickableElement = this.findClickableReactElement(reactElement);
+        if (clickableElement) {
+          let props = clickableElement.props;
+          if (props) {
+            done = true;
+            let simulateClick = () => {
+              if (props.onMouseDown) {
+                let mouseDownEvent = createDummyEvent(htmlElement);
+                props.onMouseDown(mouseDownEvent);
+              }
+              if (props.onMouseUp) {
+                let mouseUpEvent = createDummyEvent(htmlElement);
+                props.onMouseUp(mouseUpEvent);
+              }
+              if (props.onClick) {
+                let clickEvent = createDummyEvent(htmlElement);
+                props.onClick(clickEvent);
+              }
+            };
+            setTimeout(simulateClick, delay);
           }
-        }
-        if (reactElement.props) {
-          let simulateClick = () => {
-            if (reactElement.props.onMouseDown) {
-              let mouseDownEvent = createDummyEvent(htmlElement);
-              reactElement.props.onMouseDown(mouseDownEvent);
-            }
-            if (reactElement.props.onMouseUp) {
-              let mouseUpEvent = createDummyEvent(htmlElement);
-              reactElement.props.onMouseUp(mouseUpEvent);
-            }
-            if (reactElement.props.onClick) {
-              let clickEvent = createDummyEvent(htmlElement);
-              reactElement.props.onClick(clickEvent);
-            }
-          };
-          setTimeout(simulateClick, delay);
         }
       }
     };
+  }
+
+  private findClickableReactElement(reactElement: React.ReactElement): React.ReactElement | undefined {
+    for (;;) {
+      if (typeof reactElement.type === 'string' && (reactElement.props.onMouseDown || reactElement.props.onMouseUp || reactElement.props.onClick)) {
+        return reactElement;
+      }
+      let childNode = reactElement.props.children;
+      if (!childNode) {
+        return undefined;
+      }
+      while (Array.isArray(childNode)) {
+        if (!childNode.length) {
+          return undefined;
+        }
+        childNode = childNode[0];
+      }
+      if (typeof childNode !== 'object') {
+        return undefined;
+      }
+      reactElement = childNode;
+    }
   }
 
   private automateHover(delay: number = defaultDelay) {

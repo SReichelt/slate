@@ -3,6 +3,7 @@ import { ReactElementManipulator, traverseReactComponents } from '../utils/trave
 import { PermanentToolTip, ToolTipPosition, ToolTipArrow } from '../components/ExpressionToolTip';
 import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
 import * as Fmt from '../../shared/format/format';
+import { PromiseHelper } from '../components/PromiseHelper';
 
 export interface TutorialToolTip {
   contents: React.ReactElement | ((component: React.Component<any, any>) => React.ReactNode) | null;
@@ -54,6 +55,11 @@ function applyTutorialManipulationEntries(tutorialState: DynamicTutorialState, n
         console.log(`${indent}Found ${entryName}.`);
         return createTutorialManipulator(tutorialState, parentComponent, entry, checkInterrupt, indent + '  ');
       }
+    }
+    if (element.type === PromiseHelper) {
+      return {
+        manipulateContents: (childNode: React.ReactNode) => traverseReactComponents(childNode, visitor)
+      };
     }
     return undefined;
   };
@@ -134,7 +140,7 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
         }
       };
       let outerRef = undefined;
-      if (node !== null && typeof node === 'object' && !Array.isArray(node)) {
+      if (node !== null && typeof node === 'object' && !Array.isArray(node) && typeof (node as any).type === 'string') {
         let nodeObject: any = node;
         let combinedRef = ref;
         if (nodeObject.ref) {
