@@ -615,13 +615,13 @@ We write “let t ∈ 𝑻” for “let t ∈ Set(𝑻).”"
 exports[`render hlm library: 1.1.24.4 Essentials/Sets/Multisets/Items 1`] = `
 "Definition 1.1.24.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
 
-  Items_𝑻(t) := {(t, n) : n ∈ ℕ_(<(mult_𝑻(t)))}"
+  Items_𝑻(t) := {(t, n) : n ∈ ℕ_(<mult_𝑻(t))}"
 `;
 
 exports[`render hlm library: 1.1.24.5 Essentials/Sets/Multisets/Elements 1`] = `
 "Definition 1.1.24.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
-  Elems(𝑻) := {(t, n) : t ∈ S, n ∈ ℕ_(<(mult_𝑻(t)))}
+  Elems(𝑻) := {(t, n) : t ∈ S, n ∈ ℕ_(<mult_𝑻(t))}
    = ⋃_(t ∈ S) Items_𝑻(t)
 
 Equality.  No proof."

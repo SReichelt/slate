@@ -1939,7 +1939,8 @@ $Segment(set: %Expr, symbol: %Expr, limit: %Expr): %Template {
     body = set,
     sub = $PrefixUnaryOperator(
       symbol = symbol,
-      operand = limit
+      operand = limit,
+      maxParenLevel = 2
     )
   ),
   context = {
