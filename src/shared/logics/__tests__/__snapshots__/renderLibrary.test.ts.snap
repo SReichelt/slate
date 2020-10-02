@@ -15,6 +15,7 @@ References.
 * https://mathworld.wolfram.com/EmptySet.html
 * https://proofwiki.org/wiki/Definition:Empty_Set
 * https://ncatlab.org/nlab/show/empty+set
+* http://us.metamath.org/mpeuni/df-nul.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_def"
 `;
 
@@ -29,6 +30,7 @@ x ∈ ∅ ⇒^def ↯
 
 References.
 
+* http://us.metamath.org/mpeuni/0ss.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_subset"
 `;
 
@@ -194,6 +196,10 @@ exports[`render hlm library: 1.1.8 Essentials/Sets/Intersection 1`] = `
 "Definition 1.1.8.  Let U be a set, S, T ⊆ U. We define:
 
   S ∩ T := {x ∈ U : x ∈ S and x ∈ T}
+   = {x ∈ S : x ∈ T}
+   = {x ∈ T : x ∈ S}
+
+Equality.  No proof.
 
 Remarks.
 
@@ -205,6 +211,8 @@ References.
 * https://mathworld.wolfram.com/Intersection.html
 * https://proofwiki.org/wiki/Definition:Set_Intersection
 * https://ncatlab.org/nlab/show/intersection
+* http://us.metamath.org/mpeuni/df-in.html
+* http://us.metamath.org/mpeuni/dfin5.html
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.inter"
 `;
 
@@ -218,6 +226,7 @@ No proof.
 References.
 
 * https://proofwiki.org/wiki/Intersection_is_Associative
+* http://us.metamath.org/mpeuni/inass.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_assoc"
 `;
 
@@ -231,6 +240,7 @@ No proof.
 References.
 
 * https://proofwiki.org/wiki/Intersection_is_Commutative
+* http://us.metamath.org/mpeuni/incom.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_comm"
 `;
 
@@ -246,6 +256,7 @@ x ∈ S ∩ T ⇒^def x ∈ S
 References.
 
 * https://proofwiki.org/wiki/Intersection_is_Subset
+* http://us.metamath.org/mpeuni/inss1.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_subset_left"
 `;
 
@@ -264,6 +275,7 @@ References.
 * https://mathworld.wolfram.com/Union.html
 * https://proofwiki.org/wiki/Definition:Set_Union
 * https://ncatlab.org/nlab/show/union
+* http://us.metamath.org/mpeuni/df-un.html
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.union"
 `;
 
@@ -277,6 +289,7 @@ No proof.
 References.
 
 * https://proofwiki.org/wiki/Union_is_Associative
+* http://us.metamath.org/mpeuni/unass.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_assoc"
 `;
 
@@ -290,6 +303,7 @@ No proof.
 References.
 
 * https://proofwiki.org/wiki/Union_is_Commutative
+* http://us.metamath.org/mpeuni/uncom.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_comm"
 `;
 
@@ -302,6 +316,7 @@ Proof.  Let x ∈ S. Then x ∈ S ∪ T by definition.
 
 References.
 
+* http://us.metamath.org/mpeuni/ssun1.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.subset_union_left"
 `;
 
@@ -318,6 +333,8 @@ References.
 * https://en.wikipedia.org/wiki/Complement_(set_theory)#Relative_complement
 * https://mathworld.wolfram.com/SetDifference.html
 * https://proofwiki.org/wiki/Definition:Set_Difference
+* http://us.metamath.org/mpeuni/df-dif.html
+* http://us.metamath.org/mpeuni/dfdif2.html
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.diff"
 `;
 
@@ -1908,7 +1925,7 @@ exports[`render hlm library: 1.5.18.11 Essentials/Operations/Iterated%20operatio
 `;
 
 exports[`render hlm library: 1.5.18.12 Essentials/Operations/Iterated%20operations/indexed%20by%20finite%20multiset 1`] = `
-"Definition 1.5.18.12.  Let X be a set, ⨂ be an iterated operation on X, S be a set, 𝑰 be a/an S-multiset such that 𝑰 is finite, let a_i ∈ X for each i ∈ 𝑰. We define:
+"Definition 1.5.18.12.  Let X be a set, ⨂ be an iterated operation on X, S be a set, 𝑰 be a finite S-multiset, let a_i ∈ X for each i ∈ 𝑰. We define:
 
   ⨂_(i ∈ 𝑰) a_i := ⨂_((t,n) ∈ Elems(𝑰)) a_t
    = ⨂_(j ∈ Set(𝑰)) (⨂_(k < mult_𝑰(j)) a_j)
@@ -3222,18 +3239,24 @@ Let a := ∏_(p ∈ ℙ) p.
    ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
 ⇒^1.7.1.13 a + 1 > 1
-⇒^1.7.1.50.5 ∃ prime p : p ∣ (a + 1)
-⇒^1.7.1.31 p ∣ 1
-⇒^1.7.1.30 p ≤ 1
+⇒^1.7.1.50.5 ∃ prime q : q ∣ (a + 1)
 
-p ∈ ℙ ⇒^def p ∈ ℕ_(>1)
- ⇒^def p > 1 ↯
+We have q ∣ a:
+
+  1.7.1.49.9 ⇒ q ∣ (∏_(p ∈ ℙ) p)
+
+⇒^1.7.1.31 q ∣ 1
+⇒^1.7.1.30 q ≤ 1
+
+q ∈ ℙ ⇒^def q ∈ ℕ_(>1)
+ ⇒^def q > 1 ↯
 
 References.
 
 * https://en.wikipedia.org/wiki/Euclid%27s_theorem
 * https://mathworld.wolfram.com/EuclidsTheorems.html
 * https://proofwiki.org/wiki/Euclid%27s_Theorem
+* http://us.metamath.org/mpeuni/infpn.html
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_infinite_primes"
 `;
 
@@ -3306,7 +3329,7 @@ References.
 exports[`render hlm library: 1.7.1.50.11 Essentials/Numbers/Natural/Prime/Fundamental%20theorem%20of%20arithmetic 1`] = `
 "Theorem 1.7.1.50.11 (Fundamental theorem of arithmetic).  Let n ∈ ℕ_+. Then:
 
-  ∃! 𝑷 ∈ 𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(ℙ) s.t. 𝑷 is finite : n = ∏_(p ∈ 𝑷) p
+  ∃! finite ℙ-multiset 𝑷 : n = ∏_(p ∈ 𝑷) p
 
 No proof.
 
@@ -3731,7 +3754,11 @@ exports[`render hlm library: 1.7.2.17 Essentials/Numbers/Cardinal/countable 1`] 
 
   κ is uncountable  :⇔  κ is not countable
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+Remarks.
+
+See also the definition of a \`$../../Sets/countable\` set, which references this definition as one alternative."
 `;
 
 exports[`render hlm library: 1.7.2.18 Essentials/Numbers/Cardinal/countably%20infinite 1`] = `
@@ -3740,7 +3767,11 @@ exports[`render hlm library: 1.7.2.18 Essentials/Numbers/Cardinal/countably%20in
   κ is countably infinite  :⇔  κ is countable and κ is infinite
     ⇔  κ = ℵ_0
 
-Equivalence.  No proof."
+Equivalence.  No proof.
+
+Remarks.
+
+See also the definition of a \`$../../Sets/\\"countably infinite\\"\` set, which references this definition as one alternative."
 `;
 
 exports[`render hlm library: 1.7.2.19 Essentials/Numbers/Cardinal/Cantors%20theorem 1`] = `
@@ -3756,6 +3787,7 @@ References.
 * https://mathworld.wolfram.com/CantorsTheorem.html
 * https://proofwiki.org/wiki/Cantor%27s_Theorem
 * https://ncatlab.org/nlab/show/Cantor%27s+theorem
+* http://us.metamath.org/mpegif/canth2.html
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.cantor"
 `;
 
@@ -3778,6 +3810,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Cardinality_of_the_continuum
 * https://proofwiki.org/wiki/Real_Numbers_are_Uncountable
+* http://us.metamath.org/mpeuni/ruc.html
 * https://leanprover-community.github.io/mathlib_docs/data/real/cardinality.html#cardinal.not_countable_real"
 `;
 
@@ -5410,7 +5443,9 @@ References.
 
 * https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for \`n\` = 2)
 * https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for \`n\` = 2)
-* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#nat.prime.irrational_sqrt (for \`n\` = 2)"
+* https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#nat.prime.irrational_sqrt (for \`n\` = 2)
+* https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html (for \`n\` = 2)
+* http://www.mizar.org/version/current/html/irrat_1.html#T1 (for \`n\` = 2)"
 `;
 
 exports[`render hlm library: 1.7.6.19 Essentials/Numbers/Real/Square%20root%20of%20two%20is%20irrational 1`] = `
@@ -5424,6 +5459,7 @@ Proof.
 
 References.
 
+* http://us.metamath.org/mpeuni/infpn.html
 * https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#irr_sqrt_two"
 `;
 

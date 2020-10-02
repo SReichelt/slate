@@ -666,7 +666,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             this.addSemanticLink(variableNotation, definitionRef);
           }
           if (!(state.abbreviate && definitionNotation.nameOptional instanceof FmtNotation.MetaRefExpression_true)) {
-            if (definitionNotation.singularName && (!state.abbreviate || definitionNotation.singularName instanceof Fmt.StringExpression)) {
+            if (definitionNotation.singularName) {
               noun.singular = this.applyName(definitionNotation.singularName, args, definitionRef, singular);
               if (definitionNotation.singularName instanceof Fmt.StringExpression && remainingParameters && remainingParameters.length && remainingDefinitions && remainingDefinitions.length) {
                 let nextDefinitionRef = this.getNotationDefinitionRef(remainingParameters[0].type);
@@ -683,7 +683,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                 }
               }
             }
-            if (definitionNotation.pluralName && (!state.abbreviate || definitionNotation.pluralName instanceof Fmt.StringExpression)) {
+            if (definitionNotation.pluralName) {
               noun.plural = this.applyName(definitionNotation.pluralName, args, definitionRef, plural);
             }
           }
@@ -702,7 +702,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     this.replaceName(noun.singular, noun.definitionRef, noun.extracted, singular);
     this.replaceName(noun.plural, noun.definitionRef, noun.extracted, plural);
-    if (singular.length && plural.length) {
+    if (singular.length && plural.length && (!state.abbreviate || (singular.length === 1 && plural.length === 1))) {
       if (properties && properties.length) {
         noun.article = undefined;
         this.addExtractedProperties(properties, singular, plural);
@@ -771,140 +771,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
 
     state.started = true;
-  }
-
-  private applyName(name: Fmt.Expression, args: RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Notation.RenderedExpression[]): string | undefined {
-    result.length = 0;
-    let expression = this.renderNotationExpression(name, args);
-    let firstItem = this.splitName(expression, result);
-    this.addSemanticLink(firstItem, definitionRef);
-    if (firstItem instanceof Notation.TextExpression) {
-      return firstItem.text;
-    } else {
-      return undefined;
-    }
-  }
-
-  private splitName(expression: Notation.RenderedExpression, result?: Notation.RenderedExpression[]): Notation.RenderedExpression {
-    while (expression instanceof Notation.UserDefinedExpression) {
-      expression = expression.resolve();
-    }
-    if (expression instanceof Notation.RowExpression && expression.items.length) {
-      result?.push(...expression.items);
-      return expression.items[0];
-    } else {
-      result?.push(expression);
-      return expression;
-    }
-  }
-
-  private replaceName(name: string | undefined, definitionRef: Fmt.DefinitionRefExpression | undefined, alwaysApply: boolean, result: Notation.RenderedExpression[]): void {
-    if (name && (alwaysApply || !result.length)) {
-      let newName = new Notation.TextExpression(name);
-      this.addSemanticLink(newName, definitionRef || newName);
-      if (result.length) {
-        result[0] = newName;
-      } else {
-        result.push(newName);
-      }
-    }
-  }
-
-  private addNounDefinition(noun: Notation.RenderedExpression[], article: string | undefined, isPlural: boolean, isLetExpression: boolean, row: Notation.RenderedExpression[]): void {
-    if (isPlural) {
-      if (isLetExpression) {
-        row.push(new Notation.TextExpression(' be '));
-        row.push(...noun);
-      } else {
-        row.push(new Notation.TextExpression(' are '));
-        row.push(...noun);
-      }
-    } else {
-      let nounStart = noun[0];
-      if (nounStart instanceof Notation.PlaceholderExpression && noun.length > 2) {
-        let space = noun[1];
-        if (space instanceof Notation.TextExpression && space.text === ' ') {
-          nounStart = noun[2];
-        }
-      }
-      for (;;) {
-        if (nounStart instanceof Notation.RowExpression && nounStart.items.length) {
-          nounStart = nounStart.items[0];
-        } else if (nounStart instanceof Notation.IndirectExpression) {
-          nounStart = nounStart.resolve();
-        } else {
-          break;
-        }
-      }
-      if (!article) {
-        article = this.getSingularArticle(nounStart instanceof Notation.TextExpression ? nounStart.text : undefined);
-      }
-      if (isLetExpression) {
-        row.push(new Notation.TextExpression(` be ${article} `));
-        row.push(...noun);
-      } else {
-        row.push(new Notation.TextExpression(` is ${article} `));
-        row.push(...noun);
-      }
-    }
-  }
-
-  private getSingularArticle(nextWord?: string): string {
-    // TODO handle single-letter case, in particular variables include e.g. greek letters
-    // (Note: We currently do not even have access to the variable name.)
-    if (nextWord && nextWord.length > 1) {
-      let firstChar = nextWord.charAt(0).toLowerCase();
-      switch (firstChar) {
-      case 'a':
-      case 'e':
-      case 'i':
-      case 'o':
-      case 'u':
-        // We currently do not consider any special cases such as a silent 'h'. That seems complicated.
-        // Other languages are even worse.
-        return 'an';
-      default:
-        return 'a';
-      }
-    }
-    return 'a/an';
-  }
-
-  private addExtractedProperties(properties: PropertyInfo[], singular: Notation.RenderedExpression[], plural: Notation.RenderedExpression[]) {
-    for (let property of properties) {
-      let space = new Notation.TextExpression(' ');
-      if (property.property) {
-        let renderedProperty = new Notation.TextExpression(property.property);
-        if (property.definitionRef) {
-          this.addSemanticLink(renderedProperty, property.definitionRef);
-        }
-        singular.unshift(space);
-        singular.unshift(renderedProperty);
-        plural.unshift(space);
-        plural.unshift(renderedProperty);
-      }
-      else if (property.singular) {
-        let preposition = new Notation.TextExpression(' with ');
-        singular.push(preposition);
-        plural.push(preposition);
-        if (property.article) {
-          singular.push(new Notation.TextExpression(property.article));
-          singular.push(space);
-        }
-        let renderedProperty = new Notation.TextExpression(property.singular);
-        if (property.definitionRef) {
-          this.addSemanticLink(renderedProperty, property.definitionRef);
-        }
-        singular.push(renderedProperty);
-        if (property.plural) {
-          renderedProperty = new Notation.TextExpression(property.plural);
-          if (property.definitionRef) {
-            this.addSemanticLink(renderedProperty, property.definitionRef);
-          }
-        }
-        plural.push(renderedProperty);
-      }
-    }
   }
 
   private renderConstraintMenuItem(expressions: Fmt.Expression[], firstObjectParam: Fmt.Parameter): Notation.RenderedExpression {

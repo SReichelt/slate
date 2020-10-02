@@ -39,6 +39,11 @@ export const defaultReferences: DefaultReference[] = [
     searchUrlPrefix: 'https://www.google.com/search?q=site%3Ancatlab.org+'
   },
   {
+    title: 'Metamath library',
+    urlPrefix: 'http://us.metamath.org/',
+    searchUrlPrefix: 'https://www.google.com/search?q=site%3Aus.metamath.org+'
+  },
+  {
     title: 'Coq standard library',
     urlPrefix: 'https://coq.inria.fr/library/',
     searchUrlPrefix: 'https://www.google.com/search?q=site%3Acoq.inria.fr%2Flibrary+'
