@@ -5,7 +5,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
-import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition } from './utils';
+import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -694,7 +694,7 @@ export class HLMDefinitionChecker {
     return currentContext;
   }
 
-  private getParameterListContext<ContextType extends HLMCheckerContext>(parameterList: Fmt.ParameterList, context: ContextType): ContextType {
+  getParameterListContext<ContextType extends HLMCheckerContext>(parameterList: Fmt.ParameterList, context: ContextType): ContextType {
     for (let param of parameterList) {
       context = this.getParameterContext(param, context);
     }
@@ -754,7 +754,7 @@ export class HLMDefinitionChecker {
     };
   }
 
-  private getParameterContext<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): ContextType {
+  getParameterContext<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): ContextType {
     let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       let sourceContext = this.getParameterListContext(type.sourceParameters, context);
@@ -1368,60 +1368,53 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkEquivalenceList(object: Object, list: Fmt.Expression[], equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, checkItem: (expression: Fmt.Expression, context: HLMCheckerContext) => void, checkCompatibility: ((expressions: Fmt.Expression[], context: HLMCheckerContext) => void) | undefined, getEquivalenceGoal: (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => Fmt.Expression, context: HLMCheckerContext): void {
-    if (list.length) {
-      for (let item of list) {
+  private checkEquivalenceList(object: Object, list: HLMEquivalenceListInfo, equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, checkItem: (expression: Fmt.Expression, context: HLMCheckerContext) => void, checkCompatibility: ((expressions: Fmt.Expression[], context: HLMCheckerContext) => void) | undefined, context: HLMCheckerContext): void {
+    if (list.items.length) {
+      for (let item of list.items) {
         if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath && item.path.name === this.definition.name) {
           this.error(item, 'Invalid circular reference');
         }
         let currentContext = context;
         if (checkCompatibility) {
           let recheckFn = (substitutedItem: Fmt.Expression, recheckContext: HLMCheckerContext) => {
-            let substitutedList = list.map((originalItem: Fmt.Expression) => originalItem === item ? substitutedItem : originalItem);
-            this.checkEquivalenceList(object, substitutedList, undefined, checkItem, checkCompatibility, getEquivalenceGoal, recheckContext);
+            let substitutedList = {
+              ...list,
+              expressions: list.items.map((originalItem: Fmt.Expression) => originalItem === item ? substitutedItem : originalItem)
+            };
+            this.checkEquivalenceList(object, substitutedList, undefined, checkItem, checkCompatibility, recheckContext);
           };
           currentContext = this.setCurrentRecheckFn(item, recheckFn, undefined, currentContext);
         }
         checkItem(item, currentContext);
       }
       if (checkCompatibility) {
-        checkCompatibility(list, context);
+        checkCompatibility(list.items, context);
       }
-      this.checkEquivalenceProofs(equivalenceProofs, list, getEquivalenceGoal, context);
+      this.checkEquivalenceProofs(equivalenceProofs, list, context);
     } else {
       this.error(object, 'At least one item expected');
     }
   }
 
-  private checkSetTermEquivalenceList(object: Object, list: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+  private checkSetTermEquivalenceList(object: Object, items: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+    let list = this.utils.getSetTermEquivalenceListInfo(items);
     let checkCompatibility = (terms: Fmt.Expression[], checkContext: HLMCheckerContext) => this.checkSetCompatibility(object, terms, checkContext);
     let checkItem = (term: Fmt.Expression, termContext: HLMCheckerContext) => this.checkSetTerm(term, termContext);
-    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, this.getSetTermEquivalenceGoal, context);
+    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, context);
   }
 
-  private getSetTermEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression): Fmt.Expression => {
-    return new FmtHLM.MetaRefExpression_sub(from, to);
-  };
-
-  private checkElementTermEquivalenceList(object: Object, list: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+  private checkElementTermEquivalenceList(object: Object, items: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+    let list = this.utils.getElementTermEquivalenceListInfo(items);
     let checkCompatibility = (terms: Fmt.Expression[], checkContext: HLMCheckerContext) => this.checkElementCompatibility(object, terms, checkContext);
     let checkItem = (term: Fmt.Expression, termContext: HLMCheckerContext) => this.checkElementTerm(term, termContext);
-    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, this.getElementTermEquivalenceGoal, context);
+    this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, context);
   }
 
-  private getElementTermEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression): Fmt.Expression => {
-    return new FmtHLM.MetaRefExpression_equals(from, to);
-  };
-
-  private checkFormulaEquivalenceList(object: Object, list: Fmt.Expression[], equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+  private checkFormulaEquivalenceList(object: Object, items: Fmt.Expression[], equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
+    let list = this.utils.getFormulaEquivalenceListInfo(items);
     let checkItem = (formula: Fmt.Expression, itemContext: HLMCheckerContext) => this.checkFormula(formula, itemContext);
-    this.checkEquivalenceList(object, list, equivalenceProofs, checkItem, undefined, this.getFormulaEquivalenceGoal, context);
+    this.checkEquivalenceList(object, list, equivalenceProofs, checkItem, undefined, context);
   }
-
-  private getFormulaEquivalenceGoal = (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList): Fmt.Expression => {
-    this.utils.addProofConstraint(proofParameters, from);
-    return to;
-  };
 
   private checkProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
     this.checkMultiGoalProof(object, proof, parameters, [goal], context);
@@ -1497,20 +1490,20 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, items: Fmt.Expression[], getEquivalenceGoal: (from: Fmt.Expression, to: Fmt.Expression, equivalenceContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => Fmt.Expression, context: HLMCheckerContext): void {
+  private checkEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, list: HLMEquivalenceListInfo, context: HLMCheckerContext): void {
     if (proofs) {
       for (let proof of proofs) {
         let fromIndex = this.utils.externalToInternalIndex(proof._from);
         let toIndex = this.utils.externalToInternalIndex(proof._to);
         if (fromIndex === undefined || toIndex === undefined) {
           this.error(proof, 'From/to required');
-        } else if (fromIndex < 0 || fromIndex >= items.length) {
+        } else if (fromIndex < 0 || fromIndex >= list.items.length) {
           this.error(proof, 'Invalid from index');
-        } else if (toIndex < 0 || toIndex >= items.length) {
+        } else if (toIndex < 0 || toIndex >= list.items.length) {
           this.error(proof, 'Invalid to index');
         } else {
           let proofParameters: Fmt.ParameterList | undefined = new Fmt.ParameterList;
-          let goal = getEquivalenceGoal(items[fromIndex], items[toIndex], context, proofParameters!);
+          let goal = list.getEquivalenceGoal(list.items[fromIndex], list.items[toIndex], proofParameters!);
           if (!proofParameters!.length) {
             proofParameters = undefined;
           }
@@ -1596,11 +1589,7 @@ export class HLMDefinitionChecker {
               for (let previousResultCase of previousResultCases) {
                 if (index < caseProofs.length) {
                   let caseProof = caseProofs[index];
-                  let parameters = new Fmt.ParameterList;
-                  if (previousResultCase.parameters) {
-                    parameters.push(...previousResultCase.parameters);
-                  }
-                  this.utils.addProofConstraint(parameters, previousResultCase.formula);
+                  let parameters = this.utils.getFormulaCaseParameters(previousResultCase);
                   this.checkProof(caseProof, caseProof, parameters, goal, context);
                 } else {
                   this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
@@ -1775,12 +1764,9 @@ export class HLMDefinitionChecker {
       }
       return undefined;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
-      if (context.goal instanceof FmtHLM.MetaRefExpression_setEquals) {
-        this.checkEquivalenceProofs(type.proofs, context.goal.terms, this.getSetTermEquivalenceGoal, context);
-      } else if (context.goal instanceof FmtHLM.MetaRefExpression_equals) {
-        this.checkEquivalenceProofs(type.proofs, context.goal.terms, this.getElementTermEquivalenceGoal, context);
-      } else if (context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
-        this.checkEquivalenceProofs(type.proofs, context.goal.formulas, this.getFormulaEquivalenceGoal, context);
+      let list = this.utils.getEquivalenceListInfo(context.goal);
+      if (list) {
+        this.checkEquivalenceProofs(type.proofs, list, context);
       } else {
         this.error(step, 'Goal is not an equivalence');
       }
@@ -1948,7 +1934,7 @@ export class HLMDefinitionChecker {
     return resultPromise;
   }
 
-  private stripConstraintsFromFormula(formula: Fmt.Expression,  stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext, negate: boolean = false): CachedPromise<Fmt.Expression> {
+  private stripConstraintsFromFormula(formula: Fmt.Expression, stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext, negate: boolean = false): CachedPromise<Fmt.Expression> {
     let intermediatePromise = CachedPromise.resolve(formula);
     if (allowTrivialResult) {
       if (negate) {

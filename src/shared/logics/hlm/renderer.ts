@@ -2362,7 +2362,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (proof.steps.length === 1) {
         let type = proof.steps[0].type;
-        if (type instanceof FmtHLM.MetaRefExpression_Consider && !hasContents) {
+        if (type instanceof FmtHLM.MetaRefExpression_Consider && !hasContents && !this.editHandler) {
           state.startRow.push(
             renderedGoal,
             new Notation.TextExpression('.')
@@ -3015,7 +3015,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (gridState.implicationSymbolColumn === undefined
               && gridState.equalitySymbolColumn === undefined
               && nextImplication?.dependsOnPrevious
-              && !forceLeftAlignment) {
+              && (!forceLeftAlignment || state.implications.length === index + 2)) {
             index++;
             let nextNextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
             mergeEquality = nextNextImplication !== undefined && nextNextImplication.dependsOnPrevious && this.canMergeEquality(nextImplication.result, nextNextImplication.result);

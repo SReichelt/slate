@@ -15,7 +15,7 @@ References.
 * https://mathworld.wolfram.com/EmptySet.html
 * https://proofwiki.org/wiki/Definition:Empty_Set
 * https://ncatlab.org/nlab/show/empty+set
-* http://us.metamath.org/mpeuni/df-nul.html
+* http://metamath.tirix.org/df-nul.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_def"
 `;
 
@@ -30,7 +30,7 @@ x ∈ ∅ ⇒^def ↯
 
 References.
 
-* http://us.metamath.org/mpeuni/0ss.html
+* http://metamath.tirix.org/0ss.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_subset"
 `;
 
@@ -64,7 +64,7 @@ Equivalence.
       = 0.
 4⇒5. Assume |S| = 0. Then |S| ≤ 0:
      We show that 0 ≤ 0:
-     1.7.2.9 ⇒ ≤ is a partial order
+     1.7.2.10 ⇒ ≤ is a partial order
       ⇒^def ≤ is reflexive
       ⇒^def ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
       ⇒ 0 ≤ 0
@@ -141,15 +141,18 @@ exports[`render hlm library: 1.1.5 Essentials/Sets/Subsets%20of%20finite%20sets%
 
   T is finite
 
-Proof.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
+Proof 1.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
 
 S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
 Choose m := n, f := g∣_T. g∣_T is injective by 1.4.17.
 
-Remarks.
+Proof 2.  We show that |T| is finite:
 
-This is just an example proof. It could be rewritten in a very concise way as a proof about cardinals.
+1.7.2.7 ⇒ |T| ≤ |S|
+
+S is finite ⇒^def |S| is finite
+ ⇒^1.7.2.18 |T| is finite
 
 References.
 
@@ -196,10 +199,6 @@ exports[`render hlm library: 1.1.8 Essentials/Sets/Intersection 1`] = `
 "Definition 1.1.8.  Let U be a set, S, T ⊆ U. We define:
 
   S ∩ T := {x ∈ U : x ∈ S and x ∈ T}
-   = {x ∈ S : x ∈ T}
-   = {x ∈ T : x ∈ S}
-
-Equality.  No proof.
 
 Remarks.
 
@@ -211,8 +210,8 @@ References.
 * https://mathworld.wolfram.com/Intersection.html
 * https://proofwiki.org/wiki/Definition:Set_Intersection
 * https://ncatlab.org/nlab/show/intersection
-* http://us.metamath.org/mpeuni/df-in.html
-* http://us.metamath.org/mpeuni/dfin5.html
+* http://metamath.tirix.org/df-in.html
+* http://metamath.tirix.org/dfin5.html
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.inter"
 `;
 
@@ -221,12 +220,25 @@ exports[`render hlm library: 1.1.9 Essentials/Sets/Intersection%20is%20associati
 
   (R ∩ S) ∩ T = R ∩ (S ∩ T)
 
-No proof.
+Proof.
+
+⊆. We show that (R ∩ S) ∩ T ⊆ R ∩ (S ∩ T):
+   Let x ∈ (R ∩ S) ∩ T. Then x ∈ R ∩ (S ∩ T):
+   We show that x ∈ R and x ∈ S ∩ T:
+   x ∈ (R ∩ S) ∩ T ⇒^def x ∈ R ∩ S and x ∈ T
+   x ∈ R ∩ S ⇒^def x ∈ R and x ∈ S
+   We have x ∈ S ∩ T by definition.
+⊇. We show that R ∩ (S ∩ T) ⊆ (R ∩ S) ∩ T:
+   Let x ∈ R ∩ (S ∩ T). Then x ∈ (R ∩ S) ∩ T:
+   We show that x ∈ R ∩ S and x ∈ T:
+   x ∈ R ∩ (S ∩ T) ⇒^def x ∈ R and x ∈ S ∩ T
+   x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
+   We have x ∈ R ∩ S by definition.
 
 References.
 
 * https://proofwiki.org/wiki/Intersection_is_Associative
-* http://us.metamath.org/mpeuni/inass.html
+* http://metamath.tirix.org/inass.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_assoc"
 `;
 
@@ -235,17 +247,44 @@ exports[`render hlm library: 1.1.10 Essentials/Sets/Intersection%20is%20commutat
 
   S ∩ T = T ∩ S
 
-No proof.
+Proof.
+
+⊆. We show that S ∩ T ⊆ T ∩ S:
+   Let x ∈ S ∩ T. Then x ∈ T ∩ S:
+   We show that x ∈ T and x ∈ S:
+   x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
+⊇. We show that T ∩ S ⊆ S ∩ T:
+   Let x ∈ T ∩ S. Then x ∈ S ∩ T:
+   We show that x ∈ S and x ∈ T:
+   x ∈ T ∩ S ⇒^def x ∈ T and x ∈ S
 
 References.
 
 * https://proofwiki.org/wiki/Intersection_is_Commutative
-* http://us.metamath.org/mpeuni/incom.html
+* http://metamath.tirix.org/incom.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_comm"
 `;
 
-exports[`render hlm library: 1.1.11 Essentials/Sets/Intersection%20is%20subset%20of%20argument 1`] = `
-"Proposition 1.1.11.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.11 Essentials/Sets/Intersection%20is%20idempotent 1`] = `
+"Proposition 1.1.11.  Let S be a set. Then:
+
+  S ∩ S = S
+
+Proof.
+
+⊆. S ∩ S ⊆ S: Trivial.
+⊇. We show that S ⊆ S ∩ S:
+   Let x ∈ S. Then x ∈ S ∩ S by definition.
+
+References.
+
+* https://proofwiki.org/wiki/Intersection_is_Idempotent
+* http://metamath.tirix.org/inidm.html
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_self"
+`;
+
+exports[`render hlm library: 1.1.12 Essentials/Sets/Intersection%20is%20subset%20of%20left%20argument 1`] = `
+"Proposition 1.1.12.  Let U be a set, S, T ⊆ U. Then:
 
   S ∩ T ⊆ S
 
@@ -256,12 +295,60 @@ x ∈ S ∩ T ⇒^def x ∈ S
 References.
 
 * https://proofwiki.org/wiki/Intersection_is_Subset
-* http://us.metamath.org/mpeuni/inss1.html
+* http://metamath.tirix.org/inss1.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_subset_left"
 `;
 
-exports[`render hlm library: 1.1.12 Essentials/Sets/Union 1`] = `
-"Definition 1.1.12.  Let U be a set, S, T ⊆ U. We define:
+exports[`render hlm library: 1.1.13 Essentials/Sets/Intersection%20is%20subset%20of%20right%20argument 1`] = `
+"Proposition 1.1.13.  Let U be a set, S, T ⊆ U. Then:
+
+  S ∩ T ⊆ T
+
+Proof.  Let x ∈ S ∩ T. Then x ∈ T:
+
+x ∈ S ∩ T ⇒^def x ∈ T
+
+References.
+
+* https://proofwiki.org/wiki/Intersection_is_Subset
+* http://metamath.tirix.org/inss2.html
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_subset_right"
+`;
+
+exports[`render hlm library: 1.1.14 Essentials/Sets/Intersection%20with%20empty%20right%20argument%20is%20empty 1`] = `
+"Proposition 1.1.14.  Let S be a set. Then:
+
+  S ∩ ∅ = ∅
+
+Proof.
+
+⊆. S ∩ ∅ ⊆ ∅ by 1.1.13.
+⊇. ∅ ⊆ S ∩ ∅ by 1.1.2.
+
+References.
+
+* https://proofwiki.org/wiki/Intersection_with_Empty_Set
+* http://metamath.tirix.org/in0.html
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.inter_empty"
+`;
+
+exports[`render hlm library: 1.1.15 Essentials/Sets/Intersection%20with%20empty%20left%20argument%20is%20empty 1`] = `
+"Proposition 1.1.15.  Let S be a set. Then:
+
+  ∅ ∩ S = ∅
+
+Proof.
+
+⊆. ∅ ∩ S ⊆ ∅ by 1.1.12.
+⊇. ∅ ⊆ ∅ ∩ S by 1.1.2.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_inter"
+`;
+
+exports[`render hlm library: 1.1.16 Essentials/Sets/Union 1`] = `
+"Definition 1.1.16.  Let U be a set, S, T ⊆ U. We define:
 
   S ∪ T := {x ∈ U : x ∈ S or x ∈ T}
 
@@ -275,40 +362,88 @@ References.
 * https://mathworld.wolfram.com/Union.html
 * https://proofwiki.org/wiki/Definition:Set_Union
 * https://ncatlab.org/nlab/show/union
-* http://us.metamath.org/mpeuni/df-un.html
+* http://metamath.tirix.org/df-un.html
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.union"
 `;
 
-exports[`render hlm library: 1.1.13 Essentials/Sets/Union%20is%20associative 1`] = `
-"Proposition 1.1.13.  Let U be a set, R, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.17 Essentials/Sets/Union%20is%20associative 1`] = `
+"Proposition 1.1.17.  Let U be a set, R, S, T ⊆ U. Then:
 
   (R ∪ S) ∪ T = R ∪ (S ∪ T)
 
-No proof.
+Proof.
+
+⊆. We show that (R ∪ S) ∪ T ⊆ R ∪ (S ∪ T):
+   Let x ∈ (R ∪ S) ∪ T. Then x ∈ R ∪ (S ∪ T):
+   x ∈ (R ∪ S) ∪ T ⇒^def x ∈ R ∪ S or x ∈ T
+   * Assume x ∈ R ∪ S. Then x ∈ R ∪ (S ∪ T):
+     x ∈ R ∪ S ⇒^def x ∈ R or x ∈ S
+     * Assume x ∈ R. Then x ∈ R ∪ (S ∪ T) by definition.
+     * Assume x ∈ S. Then x ∈ R ∪ (S ∪ T):
+       We have x ∈ S ∪ T by definition.
+   * Assume x ∈ T. Then x ∈ R ∪ (S ∪ T):
+     We have x ∈ S ∪ T by definition.
+⊇. We show that R ∪ (S ∪ T) ⊆ (R ∪ S) ∪ T:
+   Let x ∈ R ∪ (S ∪ T). Then x ∈ (R ∪ S) ∪ T:
+   x ∈ R ∪ (S ∪ T) ⇒^def x ∈ R or x ∈ S ∪ T
+   * Assume x ∈ R. Then x ∈ (R ∪ S) ∪ T:
+     We have x ∈ R ∪ S by definition.
+   * Assume x ∈ S ∪ T. Then x ∈ (R ∪ S) ∪ T:
+     x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
+     * Assume x ∈ S. Then x ∈ (R ∪ S) ∪ T:
+       We have x ∈ R ∪ S by definition.
+     * Assume x ∈ T. Then x ∈ (R ∪ S) ∪ T by definition.
 
 References.
 
 * https://proofwiki.org/wiki/Union_is_Associative
-* http://us.metamath.org/mpeuni/unass.html
+* http://metamath.tirix.org/unass.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_assoc"
 `;
 
-exports[`render hlm library: 1.1.14 Essentials/Sets/Union%20is%20commutative 1`] = `
-"Proposition 1.1.14.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.18 Essentials/Sets/Union%20is%20commutative 1`] = `
+"Proposition 1.1.18.  Let U be a set, S, T ⊆ U. Then:
 
   S ∪ T = T ∪ S
 
-No proof.
+Proof.
+
+⊆. We show that S ∪ T ⊆ T ∪ S:
+   Let x ∈ S ∪ T. Then x ∈ T ∪ S:
+   We show that x ∈ T or x ∈ S:
+   x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
+⊇. We show that T ∪ S ⊆ S ∪ T:
+   Let x ∈ T ∪ S. Then x ∈ S ∪ T:
+   We show that x ∈ S or x ∈ T:
+   x ∈ T ∪ S ⇒^def x ∈ T or x ∈ S
 
 References.
 
 * https://proofwiki.org/wiki/Union_is_Commutative
-* http://us.metamath.org/mpeuni/uncom.html
+* http://metamath.tirix.org/uncom.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_comm"
 `;
 
-exports[`render hlm library: 1.1.15 Essentials/Sets/Union%20is%20superset%20of%20argument 1`] = `
-"Proposition 1.1.15.  Let U be a set, S, T ⊆ U. Then:
+exports[`render hlm library: 1.1.19 Essentials/Sets/Union%20is%20idempotent 1`] = `
+"Proposition 1.1.19.  Let S be a set. Then:
+
+  S ∪ S = S
+
+Proof.
+
+⊆. S ∪ S ⊆ S: Trivial.
+⊇. We show that S ⊆ S ∪ S:
+   Let x ∈ S. Then x ∈ S ∪ S by definition.
+
+References.
+
+* https://proofwiki.org/wiki/Union_is_Idempotent
+* http://metamath.tirix.org/unidm.html
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_self"
+`;
+
+exports[`render hlm library: 1.1.20 Essentials/Sets/Union%20is%20superset%20of%20left%20argument 1`] = `
+"Proposition 1.1.20.  Let U be a set, S, T ⊆ U. Then:
 
   S ⊆ S ∪ T
 
@@ -316,12 +451,59 @@ Proof.  Let x ∈ S. Then x ∈ S ∪ T by definition.
 
 References.
 
-* http://us.metamath.org/mpeuni/ssun1.html
+* https://proofwiki.org/wiki/Set_is_Subset_of_Union
+* http://metamath.tirix.org/ssun1.html
 * https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.subset_union_left"
 `;
 
-exports[`render hlm library: 1.1.16 Essentials/Sets/Relative%20complement 1`] = `
-"Definition 1.1.16.  Let U be a set, S, T ⊆ U. We define:
+exports[`render hlm library: 1.1.21 Essentials/Sets/Union%20is%20superset%20of%20right%20argument 1`] = `
+"Proposition 1.1.21.  Let U be a set, S, T ⊆ U. Then:
+
+  T ⊆ S ∪ T
+
+Proof.  Let x ∈ T. Then x ∈ S ∪ T by definition.
+
+References.
+
+* https://proofwiki.org/wiki/Set_is_Subset_of_Union
+* http://metamath.tirix.org/ssun2.html
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.subset_union_right"
+`;
+
+exports[`render hlm library: 1.1.22 Essentials/Sets/Union%20with%20empty%20right%20argument%20is%20self 1`] = `
+"Proposition 1.1.22.  Let S be a set. Then:
+
+  S ∪ ∅ = S
+
+Proof.
+
+⊆. S ∪ ∅ ⊆ S: Trivial.
+⊇. S ⊆ S ∪ ∅ by 1.1.20.
+
+References.
+
+* https://proofwiki.org/wiki/Union_with_Empty_Set
+* http://metamath.tirix.org/un0.html
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.union_empty"
+`;
+
+exports[`render hlm library: 1.1.23 Essentials/Sets/Union%20with%20empty%20left%20argument%20is%20self 1`] = `
+"Proposition 1.1.23.  Let S be a set. Then:
+
+  ∅ ∪ S = S
+
+Proof.
+
+⊆. ∅ ∪ S ⊆ S: Trivial.
+⊇. S ⊆ ∅ ∪ S by 1.1.21.
+
+References.
+
+* https://leanprover-community.github.io/mathlib_docs/data/set/basic.html#set.empty_union"
+`;
+
+exports[`render hlm library: 1.1.24 Essentials/Sets/Relative%20complement 1`] = `
+"Definition 1.1.24.  Let U be a set, S, T ⊆ U. We define:
 
   S ∖ T := {x ∈ U : x ∈ S and x ∉ T}
    = {x ∈ S : x ∉ T}
@@ -333,13 +515,13 @@ References.
 * https://en.wikipedia.org/wiki/Complement_(set_theory)#Relative_complement
 * https://mathworld.wolfram.com/SetDifference.html
 * https://proofwiki.org/wiki/Definition:Set_Difference
-* http://us.metamath.org/mpeuni/df-dif.html
-* http://us.metamath.org/mpeuni/dfdif2.html
+* http://metamath.tirix.org/df-dif.html
+* http://metamath.tirix.org/dfdif2.html
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.diff"
 `;
 
-exports[`render hlm library: 1.1.17 Essentials/Sets/Disjoint%20union 1`] = `
-"Definition 1.1.17.  Let S, T be sets. We define:
+exports[`render hlm library: 1.1.25 Essentials/Sets/Disjoint%20union 1`] = `
+"Definition 1.1.25.  Let S, T be sets. We define:
 
   S ⊎ T :=: {l(s) | s ∈ S, r(t) | t ∈ T}
 
@@ -366,8 +548,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sum"
 `;
 
-exports[`render hlm library: 1.1.18 Essentials/Sets/Cartesian%20product 1`] = `
-"Definition 1.1.18.  Let S, T be sets. We define:
+exports[`render hlm library: 1.1.26 Essentials/Sets/Cartesian%20product 1`] = `
+"Definition 1.1.26.  Let S, T be sets. We define:
 
   S × T :=: {(s, t) | s ∈ S, t ∈ T}
 
@@ -388,8 +570,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#prod"
 `;
 
-exports[`render hlm library: 1.1.19 Essentials/Sets/Power%20set 1`] = `
-"Definition 1.1.19.  Let S be a set. We define:
+exports[`render hlm library: 1.1.27 Essentials/Sets/Power%20set 1`] = `
+"Definition 1.1.27.  Let S be a set. We define:
 
   𝒫(S) :=: {(T) | T ⊆ S}
 
@@ -411,8 +593,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.powerset"
 `;
 
-exports[`render hlm library: 1.1.20 Essentials/Sets/Truth%20values 1`] = `
-"Definition 1.1.20.  We define:
+exports[`render hlm library: 1.1.28 Essentials/Sets/Truth%20values 1`] = `
+"Definition 1.1.28.  We define:
 
   𝓣𝓻𝓾𝓽𝓱 :=: {[p] | p is a proposition}
 
@@ -431,14 +613,14 @@ References.
 * https://ncatlab.org/nlab/show/truth+value"
 `;
 
-exports[`render hlm library: 1.1.21 Essentials/Sets/maximal%20subset 1`] = `
-"Definition 1.1.21.  Let S be a set, T ⊆ S, let p_I be a proposition for each I ⊆ S. We define:
+exports[`render hlm library: 1.1.29 Essentials/Sets/maximal%20subset 1`] = `
+"Definition 1.1.29.  Let S be a set, T ⊆ S, let p_I be a proposition for each I ⊆ S. We define:
 
   T is a maximal subset I of S such that p_I  :⇔  p_T and ∀ I ⊆ S s.t. p_I and T ⊆ I : T = I"
 `;
 
-exports[`render hlm library: 1.1.22.1 Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
-"Definition 1.1.22.1.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.30.1 Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
+"Definition 1.1.30.1.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
 
@@ -452,8 +634,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.22.2 Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
-"Definition 1.1.22.2.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.30.2 Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
+"Definition 1.1.30.2.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋂S := ⋂_((T) ∈ S) T
 
@@ -462,8 +644,8 @@ References.
 * https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
 `;
 
-exports[`render hlm library: 1.1.22.3 Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
-"Definition 1.1.22.3.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.30.3 Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
+"Definition 1.1.30.3.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
 
@@ -473,8 +655,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.22.4 Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
-"Definition 1.1.22.4.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.30.4 Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
+"Definition 1.1.30.4.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋃S := ⋃_((T) ∈ S) T
 
@@ -483,8 +665,8 @@ References.
 * https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
 `;
 
-exports[`render hlm library: 1.1.22.5 Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
-"Definition 1.1.22.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
+exports[`render hlm library: 1.1.30.5 Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
+"Definition 1.1.30.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
 
   ⨄_(i ∈ I)^≃ S_i :=: {(j, s) | j ∈ I, s ∈ S_j}
 
@@ -500,8 +682,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sigma"
 `;
 
-exports[`render hlm library: 1.1.22.6 Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
-"Definition 1.1.22.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+exports[`render hlm library: 1.1.30.6 Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
+"Definition 1.1.30.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
 
   ∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
 
@@ -518,8 +700,8 @@ References.
 * https://ncatlab.org/nlab/show/cartesian+product#in_sets"
 `;
 
-exports[`render hlm library: 1.1.23.1 Essentials/Sets/Choice/Choice%20functions 1`] = `
-"Definition 1.1.23.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.31.1 Essentials/Sets/Choice/Choice%20functions 1`] = `
+"Definition 1.1.31.1.  Let S be a set. We define:
 
   𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
 
@@ -530,14 +712,14 @@ References.
 * https://en.wikipedia.org/wiki/Axiom_of_choice#Variants"
 `;
 
-exports[`render hlm library: 1.1.23.2 Essentials/Sets/Choice/choice 1`] = `
-"Definition 1.1.23.2.  Let S be a set. We define:
+exports[`render hlm library: 1.1.31.2 Essentials/Sets/Choice/choice 1`] = `
+"Definition 1.1.31.2.  Let S be a set. We define:
 
   S has a choice function  :⇔  𝓒𝓱𝓸𝓲𝓬𝓮(S) is nonempty"
 `;
 
-exports[`render hlm library: 1.1.23.3 Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
-"Axiom 1.1.23.3 (Axiom of choice).  We define:
+exports[`render hlm library: 1.1.31.3 Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
+"Axiom 1.1.31.3 (Axiom of choice).  We define:
 
   AC  :⇔  ∀ sets S : S has a choice function
 
@@ -569,8 +751,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
-exports[`render hlm library: 1.1.24.1 Essentials/Sets/Multisets/Multisets 1`] = `
-"Definition 1.1.24.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.32.1 Essentials/Sets/Multisets/Multisets 1`] = `
+"Definition 1.1.32.1.  Let S be a set. We define:
 
   𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(S) :=: {{s^(m_s)} | m_s ∈ ℕ for each s ∈ S}
 
@@ -594,8 +776,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/multiset/basic.html#multiset"
 `;
 
-exports[`render hlm library: 1.1.24.2 Essentials/Sets/Multisets/multiplicity 1`] = `
-"Definition 1.1.24.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
+exports[`render hlm library: 1.1.32.2 Essentials/Sets/Multisets/multiplicity 1`] = `
+"Definition 1.1.32.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
 
   mult_𝑻(t)
 
@@ -604,22 +786,22 @@ by:
   mult_{s^(m_s)}(t) := m_t  (m_s ∈ ℕ for each s ∈ S)"
 `;
 
-exports[`render hlm library: 1.1.24.3 Essentials/Sets/Multisets/Set 1`] = `
-"Definition 1.1.24.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.32.3 Essentials/Sets/Multisets/Set 1`] = `
+"Definition 1.1.32.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Set(𝑻) := {s ∈ S : mult_𝑻(s) ≠ 0}
 
 We write “let t ∈ 𝑻” for “let t ∈ Set(𝑻).”"
 `;
 
-exports[`render hlm library: 1.1.24.4 Essentials/Sets/Multisets/Items 1`] = `
-"Definition 1.1.24.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
+exports[`render hlm library: 1.1.32.4 Essentials/Sets/Multisets/Items 1`] = `
+"Definition 1.1.32.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
 
   Items_𝑻(t) := {(t, n) : n ∈ ℕ_(<mult_𝑻(t))}"
 `;
 
-exports[`render hlm library: 1.1.24.5 Essentials/Sets/Multisets/Elements 1`] = `
-"Definition 1.1.24.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.32.5 Essentials/Sets/Multisets/Elements 1`] = `
+"Definition 1.1.32.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Elems(𝑻) := {(t, n) : t ∈ S, n ∈ ℕ_(<mult_𝑻(t))}
    = ⋃_(t ∈ S) Items_𝑻(t)
@@ -627,8 +809,8 @@ exports[`render hlm library: 1.1.24.5 Essentials/Sets/Multisets/Elements 1`] = `
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.24.6 Essentials/Sets/Multisets/cardinality 1`] = `
-"Definition 1.1.24.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.32.6 Essentials/Sets/Multisets/cardinality 1`] = `
+"Definition 1.1.32.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   |𝑻| := |Elems(𝑻)|
    = {∑_(i ∈ Set(𝑻)) mult_𝑻(i) if 𝑻 is finite, |Set(𝑻)| if 𝑻 is infinite
@@ -637,8 +819,8 @@ exports[`render hlm library: 1.1.24.6 Essentials/Sets/Multisets/cardinality 1`] 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.24.7 Essentials/Sets/Multisets/finite 1`] = `
-"Definition 1.1.24.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.32.7 Essentials/Sets/Multisets/finite 1`] = `
+"Definition 1.1.32.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   𝑻 is finite  :⇔  |𝑻| is finite
     ⇔  Elems(𝑻) is finite
@@ -3256,7 +3438,7 @@ References.
 * https://en.wikipedia.org/wiki/Euclid%27s_theorem
 * https://mathworld.wolfram.com/EuclidsTheorems.html
 * https://proofwiki.org/wiki/Euclid%27s_Theorem
-* http://us.metamath.org/mpeuni/infpn.html
+* http://metamath.tirix.org/infpn.html
 * https://leanprover-community.github.io/mathlib_docs/data/nat/prime.html#nat.exists_infinite_primes"
 `;
 
@@ -3560,32 +3742,42 @@ Remarks.
 Note that without the axiom of choice, this is not equivalent to the negation of \\"greater or equal\\"."
 `;
 
-exports[`render hlm library: 1.7.2.7.1 Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
-"Definition 1.7.2.7.1.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.7 Essentials/Numbers/Cardinal/Cardinality%20of%20subset%20is%20less%20or%20equal 1`] = `
+"Proposition 1.7.2.7.  Let S be a set, T ⊆ S. Then:
+
+  |T| ≤ |S|
+
+Proof.  We show that ∃ X ⊆ S : |X| = |T|:
+
+Choose X := T."
+`;
+
+exports[`render hlm library: 1.7.2.8.1 Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
+"Definition 1.7.2.8.1.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(<κ) := {μ ∈ 𝓒𝓻𝓭 : μ < κ}"
 `;
 
-exports[`render hlm library: 1.7.2.7.2 Essentials/Numbers/Cardinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
-"Definition 1.7.2.7.2.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.8.2 Essentials/Numbers/Cardinal/Subsets/Segment%20(less%20or%20equal) 1`] = `
+"Definition 1.7.2.8.2.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(≤κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≤ κ}"
 `;
 
-exports[`render hlm library: 1.7.2.7.3 Essentials/Numbers/Cardinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
-"Definition 1.7.2.7.3.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.8.3 Essentials/Numbers/Cardinal/Subsets/Segment%20(greater%20or%20equal) 1`] = `
+"Definition 1.7.2.8.3.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(≥κ) := {μ ∈ 𝓒𝓻𝓭 : μ ≥ κ}"
 `;
 
-exports[`render hlm library: 1.7.2.7.4 Essentials/Numbers/Cardinal/Subsets/Segment%20(greater) 1`] = `
-"Definition 1.7.2.7.4.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.8.4 Essentials/Numbers/Cardinal/Subsets/Segment%20(greater) 1`] = `
+"Definition 1.7.2.8.4.  Let κ be a cardinal number. We define:
 
   𝓒𝓻𝓭_(>κ) := {μ ∈ 𝓒𝓻𝓭 : μ > κ}"
 `;
 
-exports[`render hlm library: 1.7.2.8 Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
-"Theorem 1.7.2.8 (Schröder-Bernstein).  Let κ, μ be cardinal numbers. Then the following are equivalent:
+exports[`render hlm library: 1.7.2.9 Essentials/Numbers/Cardinal/Equality%20criterion 1`] = `
+"Theorem 1.7.2.9 (Schröder-Bernstein).  Let κ, μ be cardinal numbers. Then the following are equivalent:
 
   1. κ ≤ μ and μ ≤ κ
   2. Iso(κ, μ) is nonempty
@@ -3605,16 +3797,16 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/schroeder_bernstein.html#function.embedding.antisymm"
 `;
 
-exports[`render hlm library: 1.7.2.9 Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
-"Proposition 1.7.2.9.
+exports[`render hlm library: 1.7.2.10 Essentials/Numbers/Cardinal/Less%20or%20equal%20is%20a%20partial%20order 1`] = `
+"Proposition 1.7.2.10.
 
   ≤ is a partial order
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.2.10 Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
-"Proposition 1.7.2.10.  The following are equivalent:
+exports[`render hlm library: 1.7.2.11 Essentials/Numbers/Cardinal/AC%20is%20equivalent%20to%20total%20order 1`] = `
+"Proposition 1.7.2.11.  The following are equivalent:
 
   1. AC
   2. ≤ is a total order
@@ -3630,8 +3822,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.linear_order"
 `;
 
-exports[`render hlm library: 1.7.2.11 Essentials/Numbers/Cardinal/sum 1`] = `
-"Definition 1.7.2.11.  Let κ, μ be cardinal numbers. We define
+exports[`render hlm library: 1.7.2.12 Essentials/Numbers/Cardinal/sum 1`] = `
+"Definition 1.7.2.12.  Let κ, μ be cardinal numbers. We define
 
   κ + μ
 
@@ -3647,8 +3839,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.add_def"
 `;
 
-exports[`render hlm library: 1.7.2.12 Essentials/Numbers/Cardinal/product 1`] = `
-"Definition 1.7.2.12.  Let κ, μ be cardinal numbers. We define
+exports[`render hlm library: 1.7.2.13 Essentials/Numbers/Cardinal/product 1`] = `
+"Definition 1.7.2.13.  Let κ, μ be cardinal numbers. We define
 
   κ ⋅ μ
 
@@ -3664,8 +3856,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.mul_def"
 `;
 
-exports[`render hlm library: 1.7.2.13 Essentials/Numbers/Cardinal/power 1`] = `
-"Definition 1.7.2.13.  Let κ, μ be cardinal numbers. We define
+exports[`render hlm library: 1.7.2.14 Essentials/Numbers/Cardinal/power 1`] = `
+"Definition 1.7.2.14.  Let κ, μ be cardinal numbers. We define
 
   κ^μ
 
@@ -3681,8 +3873,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.power_def"
 `;
 
-exports[`render hlm library: 1.7.2.14 Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
-"Proposition 1.7.2.14.  Let S be a set. Then:
+exports[`render hlm library: 1.7.2.15 Essentials/Numbers/Cardinal/Cardinality%20of%20power%20set 1`] = `
+"Proposition 1.7.2.15.  Let S be a set. Then:
 
   |𝒫(S)| = |𝓟𝓻𝓹(S)| = 2^|S|
 
@@ -3694,8 +3886,8 @@ References.
 * https://mathworld.wolfram.com/CardinalExponentiation.html"
 `;
 
-exports[`render hlm library: 1.7.2.15.1 Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
-"Definition 1.7.2.15.1.  Let α ∈ {0}. We define:
+exports[`render hlm library: 1.7.2.16.1 Essentials/Numbers/Cardinal/Examples/aleph 1`] = `
+"Definition 1.7.2.16.1.  Let α ∈ {0}. We define:
 
   ℵ_α := |ℕ|
    = |ℤ|
@@ -3715,8 +3907,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/ordinal.html#cardinal.aleph_zero"
 `;
 
-exports[`render hlm library: 1.7.2.15.2 Essentials/Numbers/Cardinal/Examples/continuum 1`] = `
-"Definition 1.7.2.15.2.  We define:
+exports[`render hlm library: 1.7.2.16.2 Essentials/Numbers/Cardinal/Examples/continuum 1`] = `
+"Definition 1.7.2.16.2.  We define:
 
   𝔠 := |ℝ|
    = |ℂ|
@@ -3733,8 +3925,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/real/cardinality.html#cardinal.mk_real"
 `;
 
-exports[`render hlm library: 1.7.2.16 Essentials/Numbers/Cardinal/finite 1`] = `
-"Definition 1.7.2.16.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.17 Essentials/Numbers/Cardinal/finite 1`] = `
+"Definition 1.7.2.17.  Let κ be a cardinal number. We define:
 
   κ is finite  :⇔  κ ∈ ℕ
     ⇔  ∃ x ∈ ℕ : κ = x
@@ -3746,8 +3938,16 @@ exports[`render hlm library: 1.7.2.16 Essentials/Numbers/Cardinal/finite 1`] = `
 Equivalence.  No proof."
 `;
 
-exports[`render hlm library: 1.7.2.17 Essentials/Numbers/Cardinal/countable 1`] = `
-"Definition 1.7.2.17.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.18 Essentials/Numbers/Cardinal/Less%20or%20equal%20preserves%20finiteness 1`] = `
+"Proposition 1.7.2.18.  Let κ, μ be cardinal numbers such that μ is finite and κ ≤ μ. Then:
+
+  κ is finite
+
+No proof."
+`;
+
+exports[`render hlm library: 1.7.2.19 Essentials/Numbers/Cardinal/countable 1`] = `
+"Definition 1.7.2.19.  Let κ be a cardinal number. We define:
 
   κ is countable  :⇔  κ ≤ ℵ_0
     ⇔  ∃ M ⊆ ℕ : κ = |M|
@@ -3761,8 +3961,16 @@ Remarks.
 See also the definition of a \`$../../Sets/countable\` set, which references this definition as one alternative."
 `;
 
-exports[`render hlm library: 1.7.2.18 Essentials/Numbers/Cardinal/countably%20infinite 1`] = `
-"Definition 1.7.2.18.  Let κ be a cardinal number. We define:
+exports[`render hlm library: 1.7.2.20 Essentials/Numbers/Cardinal/Less%20or%20equal%20preserves%20countability 1`] = `
+"Proposition 1.7.2.20.  Let κ, μ be cardinal numbers such that μ is countable and κ ≤ μ. Then:
+
+  κ is countable
+
+No proof."
+`;
+
+exports[`render hlm library: 1.7.2.21 Essentials/Numbers/Cardinal/countably%20infinite 1`] = `
+"Definition 1.7.2.21.  Let κ be a cardinal number. We define:
 
   κ is countably infinite  :⇔  κ is countable and κ is infinite
     ⇔  κ = ℵ_0
@@ -3774,8 +3982,8 @@ Remarks.
 See also the definition of a \`$../../Sets/\\"countably infinite\\"\` set, which references this definition as one alternative."
 `;
 
-exports[`render hlm library: 1.7.2.19 Essentials/Numbers/Cardinal/Cantors%20theorem 1`] = `
-"Theorem 1.7.2.19 (Cantor's theorem).  Let S be a set. Then:
+exports[`render hlm library: 1.7.2.22 Essentials/Numbers/Cardinal/Cantors%20theorem 1`] = `
+"Theorem 1.7.2.22 (Cantor's theorem).  Let S be a set. Then:
 
   |𝒫(S)| > |S|
 
@@ -3791,16 +3999,16 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/set_theory/cardinal.html#cardinal.cantor"
 `;
 
-exports[`render hlm library: 1.7.2.20 Essentials/Numbers/Cardinal/Cantors%20theorem%20generalized 1`] = `
-"Corollary 1.7.2.20.  Let κ ∈ 𝓒𝓻𝓭_(>1), μ be a cardinal number. Then:
+exports[`render hlm library: 1.7.2.23 Essentials/Numbers/Cardinal/Cantors%20theorem%20generalized 1`] = `
+"Corollary 1.7.2.23.  Let κ ∈ 𝓒𝓻𝓭_(>1), μ be a cardinal number. Then:
 
   κ^μ > μ
 
 No proof."
 `;
 
-exports[`render hlm library: 1.7.2.21 Essentials/Numbers/Cardinal/Continuum%20is%20uncountable 1`] = `
-"Corollary 1.7.2.21.
+exports[`render hlm library: 1.7.2.24 Essentials/Numbers/Cardinal/Continuum%20is%20uncountable 1`] = `
+"Corollary 1.7.2.24.
 
   𝔠 is uncountable
 
@@ -3810,12 +4018,12 @@ References.
 
 * https://en.wikipedia.org/wiki/Cardinality_of_the_continuum
 * https://proofwiki.org/wiki/Real_Numbers_are_Uncountable
-* http://us.metamath.org/mpeuni/ruc.html
+* http://metamath.tirix.org/ruc.html
 * https://leanprover-community.github.io/mathlib_docs/data/real/cardinality.html#cardinal.not_countable_real"
 `;
 
-exports[`render hlm library: 1.7.2.22.1 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20sum 1`] = `
-"Definition 1.7.2.22.1.  We define:
+exports[`render hlm library: 1.7.2.25.1 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20sum 1`] = `
+"Definition 1.7.2.25.1.  We define:
 
   ∑ := [0 + ⋅⋅⋅] is an iterated operation on 𝓒𝓻𝓭
 
@@ -3830,8 +4038,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.7.2.22.2 Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20sum 1`] = `
-"Definition 1.7.2.22.2.  Let I be a set, let κ_i be a cardinal number for each i ∈ I, let ≃ be a dependent equality on (κ_i) (i ∈ I). We define:
+exports[`render hlm library: 1.7.2.25.2 Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20sum 1`] = `
+"Definition 1.7.2.25.2.  Let I be a set, let κ_i be a cardinal number for each i ∈ I, let ≃ be a dependent equality on (κ_i) (i ∈ I). We define:
 
   ∑_(i ∈ I)^≃ κ_i := |⨄_(i ∈ I)^≃ (κ_i)|
 
@@ -3840,8 +4048,8 @@ Remarks.
 In contrast to the previous definition, this definition works for arbitrary index sets \`I\`, using the generalized disjoint union to add cardinal numbers. However, due to the definition of disjoint union, it requires a \\"dependent equality\\" on the carrier sets of cardinalities."
 `;
 
-exports[`render hlm library: 1.7.2.22.3 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20product 1`] = `
-"Definition 1.7.2.22.3.  We define:
+exports[`render hlm library: 1.7.2.25.3 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20product 1`] = `
+"Definition 1.7.2.25.3.  We define:
 
   ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on 𝓒𝓻𝓭
 
@@ -3856,8 +4064,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.7.2.22.4 Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20product 1`] = `
-"Definition 1.7.2.22.4.  Let I be a set, let κ_i be a cardinal number for each i ∈ I. We define:
+exports[`render hlm library: 1.7.2.25.4 Essentials/Numbers/Cardinal/Iterated%20operators/generalized%20product 1`] = `
+"Definition 1.7.2.25.4.  Let I be a set, let κ_i be a cardinal number for each i ∈ I. We define:
 
   ∏_(i ∈ I) κ_i := |∏_(i ∈ I) (κ_i)|
 
@@ -5459,7 +5667,7 @@ Proof.
 
 References.
 
-* http://us.metamath.org/mpeuni/infpn.html
+* http://metamath.tirix.org/infpn.html
 * https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#irr_sqrt_two"
 `;
 

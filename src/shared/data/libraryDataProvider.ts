@@ -40,8 +40,8 @@ export const defaultReferences: DefaultReference[] = [
   },
   {
     title: 'Metamath library',
-    urlPrefix: 'http://us.metamath.org/',
-    searchUrlPrefix: 'https://www.google.com/search?q=site%3Aus.metamath.org+'
+    urlPrefix: 'http://metamath.tirix.org/',
+    searchUrlPrefix: 'https://www.google.com/search?q=site%3Ametamath.tirix.org+'
   },
   {
     title: 'Coq standard library',
