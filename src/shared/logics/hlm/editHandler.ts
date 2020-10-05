@@ -1240,7 +1240,7 @@ export class HLMEditHandler extends GenericEditHandler {
             for (let formulaCase of caseList.cases) {
               let caseParameters = this.utils.getFormulaCaseParameters(formulaCase);
               caseProofsPromise = caseProofsPromise.then((currentCaseProofs: FmtHLM.ObjectContents_Proof[]) =>
-                this.createSubProof(caseParameters, context.goal, context).then((caseProof: FmtHLM.ObjectContents_Proof) =>
+                this.createSubProof(caseParameters, context.goal, false, context).then((caseProof: FmtHLM.ObjectContents_Proof) =>
                   currentCaseProofs.concat(caseProof)));
             }
             return caseProofsPromise.then((caseProofs: FmtHLM.ObjectContents_Proof[]) => {
@@ -1321,7 +1321,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
       let parameters = new Fmt.ParameterList;
       this.utils.addProofConstraint(parameters, negatedGoal);
-      return this.createSubProof(parameters, newGoal, context, new Fmt.ParameterList, index).then((subProof: FmtHLM.ObjectContents_Proof) => {
+      return this.createSubProof(parameters, newGoal, true, context, new Fmt.ParameterList, index).then((subProof: FmtHLM.ObjectContents_Proof) => {
         let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveByContradiction(subProof), '_');
         return {step: step};
       });
@@ -1339,7 +1339,7 @@ export class HLMEditHandler extends GenericEditHandler {
     let replacedParameters: Fmt.ReplacedParameter[] = [];
     let parameters = goal.parameters.clone(replacedParameters);
     let subGoal = goal.formula.clone(replacedParameters);
-    return this.createSubProof(parameters, subGoal, context).then((subProof: FmtHLM.ObjectContents_Proof) => {
+    return this.createSubProof(parameters, subGoal, true, context).then((subProof: FmtHLM.ObjectContents_Proof) => {
       let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveForAll(subProof), '_');
       return {step: step};
     });
@@ -1378,7 +1378,7 @@ export class HLMEditHandler extends GenericEditHandler {
           subParameters = undefined;
         }
         subProofsPromise = subProofsPromise.then((currentSubProofs: FmtHLM.ObjectContents_Proof[]) =>
-          this.createSubProof(subParameters, subGoal, context, undefined, fromIndex, toIndex).then((subProof: FmtHLM.ObjectContents_Proof) =>
+          this.createSubProof(subParameters, subGoal, true, context, undefined, fromIndex, toIndex).then((subProof: FmtHLM.ObjectContents_Proof) =>
             currentSubProofs.concat(subProof)));
       }
       return subProofsPromise.then((subProofs: FmtHLM.ObjectContents_Proof[]) => ({
@@ -1421,7 +1421,7 @@ export class HLMEditHandler extends GenericEditHandler {
               subStepsPromise = CachedPromise.resolve(new Fmt.ParameterList);
             }
             return subStepsPromise.then((subSteps: Fmt.ParameterList) =>
-              this.createSubProof(undefined, definition.formula, context, subSteps).then((subProof: FmtHLM.ObjectContents_Proof) => {
+              this.createSubProof(undefined, definition.formula, false, context, subSteps).then((subProof: FmtHLM.ObjectContents_Proof) => {
                 let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveDef(this.utils.internalToExternalIndex(definition.side), subProof), '_');
                 return currentSteps.concat({
                   step: step,
@@ -1444,7 +1444,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let resultPromise: CachedPromise<Fmt.Parameter | undefined> = CachedPromise.resolve(undefined);
         for (let definition of definitions) {
           resultPromise = resultPromise.or(() =>
-            this.checker.stripConstraintsFromFormulas([definition.formula], true, false, true, context).then((strippedGoals: Fmt.Expression[]) => {
+            this.checker.stripConstraintsFromFormulas([definition.formula], true, true, false, true, context).then((strippedGoals: Fmt.Expression[]) => {
               for (let strippedGoal of strippedGoals) {
                 if (this.utils.isTrueFormula(strippedGoal)) {
                   return this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveDef(this.utils.internalToExternalIndex(definition.side)), '_');
@@ -1475,13 +1475,13 @@ export class HLMEditHandler extends GenericEditHandler {
       }
       if (constraint.parameter) {
         let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_Consider(new Fmt.VariableRefExpression(constraint.parameter), constraint.isImmediate ? undefined : constraint.constraint), '_');
-        steps.push({
+        steps.unshift({
           step: step,
-          linkedObject: constraint.parameter
+          linkedObject: this.utils.isValueParamType(constraint.parameter.type) ? constraint.parameter : constraint.constraint
         });
       } else {
         let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_State(constraint.constraint), '_');
-        steps.push({
+        steps.unshift({
           step: step,
           linkedObject: constraint.constraint
         });
@@ -1543,7 +1543,7 @@ export class HLMEditHandler extends GenericEditHandler {
   private simplifyGoal(goal: Fmt.Expression | undefined, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression | undefined> {
     if (goal) {
       // TODO auto-unfold
-      return this.checker.stripConstraintsFromFormulas([goal], true, false, false, context).then((strippedGoals: Fmt.Expression[]) => {
+      return this.checker.stripConstraintsFromFormulas([goal], true, true, false, false, context).then((strippedGoals: Fmt.Expression[]) => {
         let strippedGoal = (strippedGoals.length ? strippedGoals[0] : goal);
         return strippedGoal;
       });
@@ -1554,7 +1554,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private simplifyResult(result: Fmt.Expression, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression> {
     // TODO auto-unfold
-    return this.checker.stripConstraintsFromFormulas([result], true, true, false, context).then((strippedResults: Fmt.Expression[]) => {
+    return this.checker.stripConstraintsFromFormulas([result], true, false, true, false, context).then((strippedResults: Fmt.Expression[]) => {
       let strippedResult = strippedResults.length ? strippedResults[0] : result;
       // TODO make variable names in result unique
       // TODO if result is a conjunction and a single term closes the goal, use only that term
@@ -1562,12 +1562,16 @@ export class HLMEditHandler extends GenericEditHandler {
     });
   }
 
-  private createSubProof(parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression | undefined, context: HLMCheckerProofStepContext, steps: Fmt.ParameterList = new Fmt.ParameterList(), fromIndex?: number, toIndex?: number): CachedPromise<FmtHLM.ObjectContents_Proof> {
+  private createSubProof(parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression | undefined, mayOmitGoal: boolean, context: HLMCheckerProofStepContext, steps: Fmt.ParameterList = new Fmt.ParameterList(), fromIndex?: number, toIndex?: number): CachedPromise<FmtHLM.ObjectContents_Proof> {
     let subContext = parameters ? this.checker.getParameterListContext(parameters, context) : context;
     return this.simplifyGoal(goal, subContext).then((simplifiedGoal: Fmt.Expression | undefined) => {
       let from = this.utils.internalToExternalIndex(fromIndex);
       let to = this.utils.internalToExternalIndex(toIndex);
-      let result = new FmtHLM.ObjectContents_Proof(from, to, parameters, simplifiedGoal, steps);
+      let finalGoal = simplifiedGoal;
+      if (goal && mayOmitGoal && simplifiedGoal?.isEquivalentTo(goal) && !parameters) {
+        finalGoal = undefined;
+      }
+      let result = new FmtHLM.ObjectContents_Proof(from, to, parameters, finalGoal, steps);
       if (simplifiedGoal && !steps.length) {
         let byDefinitionStepPromise = this.createByDefinitionStep(simplifiedGoal, subContext);
         if (byDefinitionStepPromise) {

@@ -222,14 +222,12 @@ exports[`render hlm library: 1.1.9 Essentials/Sets/Intersection%20is%20associati
 
 Proof.
 
-⊆. We show that (R ∩ S) ∩ T ⊆ R ∩ (S ∩ T):
-   Let x ∈ (R ∩ S) ∩ T. Then x ∈ R ∩ (S ∩ T):
+⊆. Let x ∈ (R ∩ S) ∩ T. Then x ∈ R ∩ (S ∩ T):
    We show that x ∈ R and x ∈ S ∩ T:
    x ∈ (R ∩ S) ∩ T ⇒^def x ∈ R ∩ S and x ∈ T
    x ∈ R ∩ S ⇒^def x ∈ R and x ∈ S
    We have x ∈ S ∩ T by definition.
-⊇. We show that R ∩ (S ∩ T) ⊆ (R ∩ S) ∩ T:
-   Let x ∈ R ∩ (S ∩ T). Then x ∈ (R ∩ S) ∩ T:
+⊇. Let x ∈ R ∩ (S ∩ T). Then x ∈ (R ∩ S) ∩ T:
    We show that x ∈ R ∩ S and x ∈ T:
    x ∈ R ∩ (S ∩ T) ⇒^def x ∈ R and x ∈ S ∩ T
    x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
@@ -249,12 +247,10 @@ exports[`render hlm library: 1.1.10 Essentials/Sets/Intersection%20is%20commutat
 
 Proof.
 
-⊆. We show that S ∩ T ⊆ T ∩ S:
-   Let x ∈ S ∩ T. Then x ∈ T ∩ S:
+⊆. Let x ∈ S ∩ T. Then x ∈ T ∩ S:
    We show that x ∈ T and x ∈ S:
    x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
-⊇. We show that T ∩ S ⊆ S ∩ T:
-   Let x ∈ T ∩ S. Then x ∈ S ∩ T:
+⊇. Let x ∈ T ∩ S. Then x ∈ S ∩ T:
    We show that x ∈ S and x ∈ T:
    x ∈ T ∩ S ⇒^def x ∈ T and x ∈ S
 
@@ -272,9 +268,8 @@ exports[`render hlm library: 1.1.11 Essentials/Sets/Intersection%20is%20idempote
 
 Proof.
 
-⊆. S ∩ S ⊆ S: Trivial.
-⊇. We show that S ⊆ S ∩ S:
-   Let x ∈ S. Then x ∈ S ∩ S by definition.
+⊆. Trivial.
+⊇. Let x ∈ S. Then x ∈ S ∩ S by definition.
 
 References.
 
@@ -288,9 +283,9 @@ exports[`render hlm library: 1.1.12 Essentials/Sets/Intersection%20is%20subset%2
 
   S ∩ T ⊆ S
 
-Proof.  Let x ∈ S ∩ T. Then x ∈ S:
+Proof.  Let x ∈ S ∩ T.
 
-x ∈ S ∩ T ⇒^def x ∈ S
+⇒^def x ∈ S
 
 References.
 
@@ -304,9 +299,9 @@ exports[`render hlm library: 1.1.13 Essentials/Sets/Intersection%20is%20subset%2
 
   S ∩ T ⊆ T
 
-Proof.  Let x ∈ S ∩ T. Then x ∈ T:
+Proof.  Let x ∈ S ∩ T.
 
-x ∈ S ∩ T ⇒^def x ∈ T
+⇒^def x ∈ T
 
 References.
 
@@ -322,8 +317,8 @@ exports[`render hlm library: 1.1.14 Essentials/Sets/Intersection%20with%20empty%
 
 Proof.
 
-⊆. S ∩ ∅ ⊆ ∅ by 1.1.13.
-⊇. ∅ ⊆ S ∩ ∅ by 1.1.2.
+⊆. 1.1.13 ⇒ S ∩ ∅ ⊆ ∅
+⊇. 1.1.2 ⇒ ∅ ⊆ S ∩ ∅
 
 References.
 
@@ -339,8 +334,8 @@ exports[`render hlm library: 1.1.15 Essentials/Sets/Intersection%20with%20empty%
 
 Proof.
 
-⊆. ∅ ∩ S ⊆ ∅ by 1.1.12.
-⊇. ∅ ⊆ ∅ ∩ S by 1.1.2.
+⊆. 1.1.12 ⇒ ∅ ∩ S ⊆ ∅
+⊇. 1.1.2 ⇒ ∅ ⊆ ∅ ∩ S
 
 References.
 
@@ -373,8 +368,7 @@ exports[`render hlm library: 1.1.17 Essentials/Sets/Union%20is%20associative 1`]
 
 Proof.
 
-⊆. We show that (R ∪ S) ∪ T ⊆ R ∪ (S ∪ T):
-   Let x ∈ (R ∪ S) ∪ T. Then x ∈ R ∪ (S ∪ T):
+⊆. Let x ∈ (R ∪ S) ∪ T. Then x ∈ R ∪ (S ∪ T):
    x ∈ (R ∪ S) ∪ T ⇒^def x ∈ R ∪ S or x ∈ T
    * Assume x ∈ R ∪ S. Then x ∈ R ∪ (S ∪ T):
      x ∈ R ∪ S ⇒^def x ∈ R or x ∈ S
@@ -383,8 +377,7 @@ Proof.
        We have x ∈ S ∪ T by definition.
    * Assume x ∈ T. Then x ∈ R ∪ (S ∪ T):
      We have x ∈ S ∪ T by definition.
-⊇. We show that R ∪ (S ∪ T) ⊆ (R ∪ S) ∪ T:
-   Let x ∈ R ∪ (S ∪ T). Then x ∈ (R ∪ S) ∪ T:
+⊇. Let x ∈ R ∪ (S ∪ T). Then x ∈ (R ∪ S) ∪ T:
    x ∈ R ∪ (S ∪ T) ⇒^def x ∈ R or x ∈ S ∪ T
    * Assume x ∈ R. Then x ∈ (R ∪ S) ∪ T:
      We have x ∈ R ∪ S by definition.
@@ -408,12 +401,10 @@ exports[`render hlm library: 1.1.18 Essentials/Sets/Union%20is%20commutative 1`]
 
 Proof.
 
-⊆. We show that S ∪ T ⊆ T ∪ S:
-   Let x ∈ S ∪ T. Then x ∈ T ∪ S:
+⊆. Let x ∈ S ∪ T. Then x ∈ T ∪ S:
    We show that x ∈ T or x ∈ S:
    x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
-⊇. We show that T ∪ S ⊆ S ∪ T:
-   Let x ∈ T ∪ S. Then x ∈ S ∪ T:
+⊇. Let x ∈ T ∪ S. Then x ∈ S ∪ T:
    We show that x ∈ S or x ∈ T:
    x ∈ T ∪ S ⇒^def x ∈ T or x ∈ S
 
@@ -431,9 +422,8 @@ exports[`render hlm library: 1.1.19 Essentials/Sets/Union%20is%20idempotent 1`] 
 
 Proof.
 
-⊆. S ∪ S ⊆ S: Trivial.
-⊇. We show that S ⊆ S ∪ S:
-   Let x ∈ S. Then x ∈ S ∪ S by definition.
+⊆. Trivial.
+⊇. Let x ∈ S. Then x ∈ S ∪ S by definition.
 
 References.
 
@@ -477,8 +467,8 @@ exports[`render hlm library: 1.1.22 Essentials/Sets/Union%20with%20empty%20right
 
 Proof.
 
-⊆. S ∪ ∅ ⊆ S: Trivial.
-⊇. S ⊆ S ∪ ∅ by 1.1.20.
+⊆. Trivial.
+⊇. 1.1.20 ⇒ S ⊆ S ∪ ∅
 
 References.
 
@@ -494,8 +484,8 @@ exports[`render hlm library: 1.1.23 Essentials/Sets/Union%20with%20empty%20left%
 
 Proof.
 
-⊆. ∅ ∪ S ⊆ S: Trivial.
-⊇. S ⊆ ∅ ∪ S by 1.1.21.
+⊆. Trivial.
+⊇. 1.1.21 ⇒ S ⊆ ∅ ∪ S
 
 References.
 

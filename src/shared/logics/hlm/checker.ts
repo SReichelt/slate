@@ -658,7 +658,7 @@ export class HLMDefinitionChecker {
     let lastSetsToCheckLength = 0;
     let checkRestrictions = () => {
       let setsToCheck: Fmt.Expression[][] = [];
-      for (let [placeholder, restriction] of restrictions) {
+      for (let [placeholder, restriction] of recheckContext.editData!.restrictions) {
         if (!placeholder.isTemporary) {
           let sets = restriction.compatibleSets.concat(restriction.declaredSets);
           if (sets.length > 1) {
@@ -1439,7 +1439,7 @@ export class HLMDefinitionChecker {
       this.error(proof.parameters, 'Superfluous proof parameters');
       return;
     }
-    let checkProof = this.stripConstraintsFromFormulas(goals, true, !proof, !proof, context).then((newGoals: Fmt.Expression[]) => {
+    let checkProof = this.stripConstraintsFromFormulas(goals, true, true, !proof, !proof, context).then((newGoals: Fmt.Expression[]) => {
       if (proof) {
         // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
         if (!(object instanceof Fmt.Expression)) {
@@ -1517,7 +1517,8 @@ export class HLMDefinitionChecker {
     for (let step of steps) {
       if (context) {
         let stepResult = this.checkProofStep(step, context);
-        if (stepResult?.previousResult) {
+        if (stepResult?.previousResult
+            && !(step.type instanceof FmtHLM.MetaRefExpression_Consider && !step.type.result)) {
           context.stepResults.set(step, stepResult.previousResult);
         }
         context = stepResult;
@@ -1561,7 +1562,7 @@ export class HLMDefinitionChecker {
             let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
               if (previousResultDefinitions.length) {
                 let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
-                this.stripConstraintsFromFormulas(sources, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
+                this.stripConstraintsFromFormulas(sources, false, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
                   this.checkUnfolding(strippedSources, useDef.result, false));
               } else {
                 this.error(step, `${context.previousResult} does not have any definition`);
@@ -1684,9 +1685,9 @@ export class HLMDefinitionChecker {
                 if (inputResultContext?.previousResult) {
                   let previousResult = inputResultContext.previousResult;
                   let conditions = definition.contents.conditions.map((condition: Fmt.Expression) => this.utils.substitutePath(condition, theorem.path, [definition]));
-                  this.stripConstraintsFromFormulas(conditions, true, false, true, context).then((strippedConditions: Fmt.Expression[]) =>
+                  this.stripConstraintsFromFormulas(conditions, true, true, false, true, context).then((strippedConditions: Fmt.Expression[]) =>
                     this.checkImplication(step, previousResult, strippedConditions));
-                  this.stripConstraintsFromFormulas(conditions, false, true, true, context).then((strippedConditions: Fmt.Expression[]) =>
+                  this.stripConstraintsFromFormulas(conditions, false, false, true, true, context).then((strippedConditions: Fmt.Expression[]) =>
                     this.checkUnfolding(strippedConditions, useTheorem.result, false));
                 } else {
                   this.error(step, 'Invalid input proof step');
@@ -1696,7 +1697,7 @@ export class HLMDefinitionChecker {
               }
             } else {
               let claim = this.utils.substitutePath(definition.contents.claim, theorem.path, [definition]);
-              this.stripConstraintsFromFormula(claim, false, true, true, context).then((strippedClaim: Fmt.Expression) =>
+              this.stripConstraintsFromFormula(claim, false, false, true, true, context).then((strippedClaim: Fmt.Expression) =>
                 this.checkUnfolding([strippedClaim], useTheorem.result, false));
             }
           } else {
@@ -1924,17 +1925,17 @@ export class HLMDefinitionChecker {
       this.isTriviallyProvable(negatedGoal, context));
   }
 
-  stripConstraintsFromFormulas(formulas: Fmt.Expression[], stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext): CachedPromise<Fmt.Expression[]> {
+  stripConstraintsFromFormulas(formulas: Fmt.Expression[], stripExactPositive: boolean, stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext): CachedPromise<Fmt.Expression[]> {
     let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
     for (let formula of formulas) {
       resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
-        this.stripConstraintsFromFormula(formula, stripPositive, stripNegative, allowTrivialResult, context).then((strippedFormula: Fmt.Expression) =>
+        this.stripConstraintsFromFormula(formula, stripExactPositive, stripPositive, stripNegative, allowTrivialResult, context).then((strippedFormula: Fmt.Expression) =>
           currentResult.concat(strippedFormula)));
     }
     return resultPromise;
   }
 
-  private stripConstraintsFromFormula(formula: Fmt.Expression, stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext, negate: boolean = false): CachedPromise<Fmt.Expression> {
+  private stripConstraintsFromFormula(formula: Fmt.Expression, stripExactPositive: boolean, stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean, context: HLMCheckerContext, negate: boolean = false): CachedPromise<Fmt.Expression> {
     let intermediatePromise = CachedPromise.resolve(formula);
     if (allowTrivialResult) {
       if (negate) {
@@ -1946,6 +1947,12 @@ export class HLMDefinitionChecker {
         if (stripPositive) {
           intermediatePromise = this.isTriviallyProvable(formula, context).then((result: boolean) =>
             (result ? new FmtHLM.MetaRefExpression_and : formula));
+        } else if (stripExactPositive) {
+          for (let constraint of this.getAvailableConstraints(context, true)) {
+            if (formula.isEquivalentTo(constraint.constraint)) {
+              intermediatePromise = CachedPromise.resolve(new FmtHLM.MetaRefExpression_and);
+            }
+          }
         }
       }
     }
@@ -1954,7 +1961,7 @@ export class HLMDefinitionChecker {
         let resultItemsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         for (let item of intermediateFormula.formulas) {
           resultItemsPromise = resultItemsPromise.then((currentResultItems: Fmt.Expression[]) =>
-            this.stripConstraintsFromFormula(item, stripPositive, stripNegative, true, context, negate).then((strippedItem: Fmt.Expression) =>
+            this.stripConstraintsFromFormula(item, stripExactPositive, stripPositive, stripNegative, true, context, negate).then((strippedItem: Fmt.Expression) =>
               (this.utils.isTrueFormula(strippedItem) ? currentResultItems : currentResultItems.concat(strippedItem))));
         }
         return resultItemsPromise.then((resultItems: Fmt.Expression[]) => this.utils.createConjunction(resultItems));
@@ -1962,7 +1969,7 @@ export class HLMDefinitionChecker {
         let resultItemsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         for (let item of intermediateFormula.formulas) {
           resultItemsPromise = resultItemsPromise.then((currentResultItems: Fmt.Expression[]) =>
-            this.stripConstraintsFromFormula(item, stripPositive, stripNegative, true, context, !negate).then((strippedItem: Fmt.Expression) =>
+            this.stripConstraintsFromFormula(item, stripExactPositive, stripPositive, stripNegative, true, context, !negate).then((strippedItem: Fmt.Expression) =>
               (this.utils.isFalseFormula(strippedItem) ? currentResultItems : currentResultItems.concat(strippedItem))));
         }
         return resultItemsPromise.then((resultItems: Fmt.Expression[]) => this.utils.createDisjunction(resultItems));
@@ -2201,7 +2208,7 @@ export class HLMDefinitionChecker {
 
   private checkSetTermEquivalence(left: Fmt.Expression, right: Fmt.Expression, context: HLMCheckerContext): boolean {
     let state: HLMCheckerPlaceholderRestrictionState = {
-      exactValueRequried: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
+      exactValueRequried: false,
       context: context
     };
     let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;

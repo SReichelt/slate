@@ -2546,16 +2546,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (heading) {
         state.paragraphs.push(this.renderSubHeading(heading));
       }
-      let items = proofs.map((proof) => {
-        let itemState: ProofOutputState = {
-          paragraphs: [],
-          isPreview: state.isPreview
-        };
-        this.addProofsInternal(proof ? [proof] : undefined, undefined, context, false, undefined, itemState);
-        return new Notation.ParagraphExpression(itemState.paragraphs);
-      });
-      let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
-      state.paragraphs.push(list);
+      if (state.isPreview && labels) {
+        let labelText = labels.map((label) => `${label}.`).join(' ');
+        state.paragraphs.push(new Notation.TextExpression(labelText));
+      } else {
+        let items = proofs.map((proof) => {
+          let itemState: ProofOutputState = {
+            paragraphs: [],
+            isPreview: state.isPreview
+          };
+          this.addProofsInternal(proof ? [proof] : undefined, undefined, context, false, undefined, itemState);
+          return new Notation.ParagraphExpression(itemState.paragraphs);
+        });
+        let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
+        state.paragraphs.push(list);
+      }
     }
   }
 
@@ -2942,6 +2947,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderProofStepPreview(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext): Notation.RenderedExpression {
+    context = {
+      ...context,
+      isLastStep: false
+    };
     let state: ProofOutputState = {
       paragraphs: [],
       isPreview: true
