@@ -1590,7 +1590,7 @@ export class HLMDefinitionChecker {
               for (let previousResultCase of previousResultCases) {
                 if (index < caseProofs.length) {
                   let caseProof = caseProofs[index];
-                  let parameters = this.utils.getFormulaCaseParameters(previousResultCase);
+                  let parameters = this.utils.getUseCasesProofParameters(previousResultCase);
                   this.checkProof(caseProof, caseProof, parameters, goal, context);
                 } else {
                   this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);

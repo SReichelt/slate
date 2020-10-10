@@ -1578,7 +1578,7 @@ exports[`render hlm library: 1.4.11 Essentials/Functions/Composition%20is%20asso
 
   (h ∘ g) ∘ f = h ∘ (g ∘ f)
 
-No proof.
+Proof.  Let w ∈ W. Then h(g(f(w))) = h(g(f(w))).
 
 References.
 
@@ -2395,11 +2395,13 @@ exports[`render hlm library: 1.7.1.4 Essentials/Numbers/Natural/Addition%20of%20
 
   (n+1) = n + 1
 
-No proof.
+Proof.  (n+1) = (n+1).
 
 Remarks.
 
 This proposition justifies the notation for the successor constructor.
+
+The proof works by unfolding the definitions of \`$sum\` and 1.
 
 References.
 
@@ -2427,7 +2429,7 @@ exports[`render hlm library: 1.7.1.6 Essentials/Numbers/Natural/Left-addition%20
 
 Proof.  By induction on n.
 
-* (0) = (0): Trivial.
+* (0) = (0).
 * Let x ∈ ℕ such that (0) + x = x. Then (((0) + x)+1) = (x+1):
   We have (x+1) = (x+1) ⇒^[(0)+x = x] (((0) + x)+1) = (x+1).
 
@@ -2448,7 +2450,7 @@ exports[`render hlm library: 1.7.1.7 Essentials/Numbers/Natural/Successor%20can%
 
 Proof.  By induction on n.
 
-* (m+1) = (m+1): Trivial.
+* (m+1) = (m+1).
 * Let x ∈ ℕ such that (m+1) + x = ((m + x)+1). Then (((m+1) + x)+1) = (((m + x)+1)+1):
   We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^[(m+1)+x = ((m+x)+1)] (((m+1) + x)+1) = (((m + x)+1)+1).
 
@@ -2529,7 +2531,13 @@ exports[`render hlm library: 1.7.1.12 Essentials/Numbers/Natural/Less%20and%20le
 
   a < c
 
-No proof.
+Proof.  We show that ∃ x ∈ ℕ_+ : a + x = c:
+
+a < b ⇒^def ∃ y ∈ ℕ_+ : a + y = b
+
+b ≤ c ⇒^def ∃ z ∈ ℕ : b + z = c
+
+Choose x := y + z.
 
 References.
 
@@ -2569,7 +2577,9 @@ exports[`render hlm library: 1.7.1.16 Essentials/Numbers/Natural/Successor%20is%
 
   n + 1 > n
 
-No proof.
+Proof.  We show that ∃ x ∈ ℕ_+ : n + x = n + 1:
+
+Choose x := 1.
 
 References.
 
@@ -2712,7 +2722,7 @@ Proof.
      * Let k ∈ ℕ such that |M| = k + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
        We have |M| = k + 1 ⇒^def ∃ f : M ↔ ℕ_(<(k+1)).
        1.7.1.18 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
-3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M: Trivial.
+3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
        ⇒^def M = ∅

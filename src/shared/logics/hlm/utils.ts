@@ -25,7 +25,14 @@ export interface HLMUnfoldParameters {
   requiredUnfoldLocation?: Fmt.Expression;
 }
 
-const unfoldOutside: HLMUnfoldParameters = {
+export const unfoldAll: HLMUnfoldParameters = {
+  followDefinitions: true,
+  unfoldArguments: true,
+  substituteStructuralCases: true,
+  extractStructuralCases: true
+};
+
+export const unfoldOutside: HLMUnfoldParameters = {
   followDefinitions: true,
   unfoldArguments: false,
   substituteStructuralCases: false,
@@ -38,7 +45,7 @@ export interface HLMTypeSearchParameters extends HLMUnfoldParameters {
   followAllAlternatives?: boolean;
 }
 
-const eliminateVariablesOnly: HLMTypeSearchParameters = {
+export const eliminateVariablesOnly: HLMTypeSearchParameters = {
   followDefinitions: false,
   followSupersets: true,
   followEmbeddings: false,
@@ -48,7 +55,7 @@ const eliminateVariablesOnly: HLMTypeSearchParameters = {
   extractStructuralCases: false
 };
 
-const findExplicitlyDeclaredSuperset: HLMTypeSearchParameters = {
+export const findExplicitlyDeclaredSuperset: HLMTypeSearchParameters = {
   followDefinitions: true,
   followSupersets: true,
   followEmbeddings: false,
@@ -58,7 +65,7 @@ const findExplicitlyDeclaredSuperset: HLMTypeSearchParameters = {
   extractStructuralCases: false
 };
 
-const findFinalSuperset: HLMTypeSearchParameters = {
+export const findFinalSuperset: HLMTypeSearchParameters = {
   followDefinitions: true,
   followSupersets: true,
   followEmbeddings: false,
@@ -68,7 +75,7 @@ const findFinalSuperset: HLMTypeSearchParameters = {
   extractStructuralCases: false
 };
 
-const followEmbedding: HLMTypeSearchParameters = {
+export const followEmbedding: HLMTypeSearchParameters = {
   followDefinitions: true,
   followSupersets: false,
   followEmbeddings: true,
@@ -899,10 +906,8 @@ export class HLMUtils extends GenericUtils {
         return CachedPromise.resolve(undefined);
       } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
         return CachedPromise.resolve([term.term]);
-      } else if (term instanceof Fmt.PlaceholderExpression) {
-        return CachedPromise.resolve(undefined);
       } else {
-        return CachedPromise.reject(new Error('Set term expected'));
+        return CachedPromise.resolve(undefined);
       }
     }
   }
@@ -962,10 +967,8 @@ export class HLMUtils extends GenericUtils {
           .then((currentResult: Fmt.Expression) => [currentResult]);
       } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
         return CachedPromise.resolve([term.term]);
-      } else if (term instanceof Fmt.PlaceholderExpression) {
-        return CachedPromise.resolve(undefined);
       } else {
-        return CachedPromise.reject(new Error('Element term expected'));
+        return CachedPromise.resolve(undefined);
       }
     }
   }
@@ -2141,14 +2144,16 @@ export class HLMUtils extends GenericUtils {
         if (equalityDefinition) {
           let pathSubstitutionContext = new HLMSubstitutionContext;
           this.addTargetPathSubstitution(constructionPath.parentPath, pathSubstitutionContext);
-          let leftSubstitutionContext = new HLMSubstitutionContext;
-          this.addParameterListSubstitution(equalityDefinition.leftParameters, constructorDefinition.parameters, leftSubstitutionContext);
-          this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, leftArguments], constructionPath.parentPath, leftSubstitutionContext);
-          let rightSubstitutionContext = new HLMSubstitutionContext;
-          this.addParameterListSubstitution(equalityDefinition.rightParameters, constructorDefinition.parameters, rightSubstitutionContext);
-          this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, rightArguments], constructionPath.parentPath, rightSubstitutionContext);
+          let leftParameterSubstitutionContext = new HLMSubstitutionContext;
+          this.addParameterListSubstitution(equalityDefinition.leftParameters, constructorDefinition.parameters, leftParameterSubstitutionContext);
+          let leftArgumentSubstitutionContext = new HLMSubstitutionContext;
+          this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, leftArguments], constructionPath.parentPath, leftArgumentSubstitutionContext);
+          let rightParameterSubstitutionContext = new HLMSubstitutionContext;
+          this.addParameterListSubstitution(equalityDefinition.rightParameters, constructorDefinition.parameters, rightParameterSubstitutionContext);
+          let rightArgumentSubstitutionContext = new HLMSubstitutionContext;
+          this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, rightArguments], constructionPath.parentPath, rightArgumentSubstitutionContext);
           return equalityDefinition.definition.map((equalityFormula: Fmt.Expression) =>
-            this.applySubstitutionContexts(equalityFormula, [pathSubstitutionContext, leftSubstitutionContext, rightSubstitutionContext]));
+            this.applySubstitutionContexts(equalityFormula, [pathSubstitutionContext, leftParameterSubstitutionContext, leftArgumentSubstitutionContext, rightParameterSubstitutionContext, rightArgumentSubstitutionContext]));
         } else {
           return [new FmtHLM.MetaRefExpression_and];
         }
@@ -2300,7 +2305,7 @@ export class HLMUtils extends GenericUtils {
     return resultPromise;
   }
 
-  getFormulaCaseParameters(formulaCase: HLMFormulaCase): Fmt.ParameterList {
+  getUseCasesProofParameters(formulaCase: HLMFormulaCase): Fmt.ParameterList {
     let result = new Fmt.ParameterList;
     if (formulaCase.parameters) {
       result.push(...formulaCase.parameters);
@@ -2396,13 +2401,13 @@ export class HLMUtils extends GenericUtils {
     return result;
   }
 
-  adaptParameterNames(parameterList: Fmt.ParameterList, usedNames: Set<string>): void {
+  adaptParameterNames(parameterList: Fmt.ParameterList, usedNames: Set<string>, scope?: Fmt.Traversable): void {
     for (let param of parameterList) {
-      param.name = this.getUnusedDefaultName(param.name, usedNames);
+      FmtUtils.renameParameter(param, this.getUnusedDefaultName(param.name, usedNames), parameterList, scope);
       let type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-        this.adaptParameterNames(type.sourceParameters, usedNames);
-        this.adaptParameterNames(type.targetParameters, usedNames);
+        this.adaptParameterNames(type.sourceParameters, usedNames, scope);
+        this.adaptParameterNames(type.targetParameters, usedNames, scope);
       }
     }
   }

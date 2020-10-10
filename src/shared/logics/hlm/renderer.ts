@@ -2388,13 +2388,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           return;
         }
       }
-      if (state.isPreview) {
+      if ((!proof.steps.length && !this.editHandler) || state.isPreview) {
         state.startRow.push(renderedGoal);
-        if (hasContents) {
+        if (hasContents || !state.isPreview) {
           state.startRow.push(new Notation.TextExpression('.'));
         }
+        this.commitStartRow(state);
+        return;
       } else {
-        if (proof.steps.length && !hasContents) {
+        if (!hasContents) {
           state.startRow.push(new Notation.TextExpression('We show that '));
         }
         state.startRow.push(
@@ -2432,7 +2434,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           isLastStep: true
         };
         let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, renderContext);
-        state.startRow.push(this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep));
+        let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
+        state.startRow.push(this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep, onRenderFormula));
       } else {
         state.startRow.push(this.getTrivialProofPlaceholder());
       }
@@ -2938,7 +2941,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (!this.utils.containsPlaceholders()) {
         let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
         let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
-        state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep);
+        let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
+        state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
       }
       return true;
     } else {

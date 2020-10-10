@@ -867,7 +867,7 @@ export abstract class GenericEditHandler {
       if (newText.endsWith(',')) {
         let newName = newText.substring(0, newText.length - 1);
         if (newName) {
-          param.name = newName;
+          this.utils.renameParameter(param, newName, parameterList);
         }
         if (param.name) {
           let paramClone = this.addParameterToGroup(param, parameterList);
@@ -876,7 +876,7 @@ export abstract class GenericEditHandler {
           }
         }
       } else {
-        param.name = newText;
+        this.utils.renameParameter(param, newText, parameterList);
       }
       return true;
     };

@@ -13,9 +13,9 @@ import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProv
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
-import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases } from './utils';
+import { HLMUtils, HLMFormulaDefinition, HLMFormulaCases, unfoldAll } from './utils';
 import { HLMRenderUtils } from './renderUtils';
-import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext, HLMCheckerConstraint } from './checker';
+import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
@@ -66,6 +66,13 @@ interface ProofStepInfo {
   step: Fmt.Parameter;
   linkedObject?: Object;
 }
+
+interface ProveByCasesInfo {
+  hasPreviousResultBasedCases: boolean;
+  hasGoalBasedCases: boolean;
+}
+
+const unfoldContinuationLimit = 4;
 
 function addNegations(expressions: Fmt.Expression[]): Fmt.Expression[] {
   let negatedExpressions = expressions.map((expression: Fmt.Expression) =>
@@ -119,7 +126,7 @@ export class HLMEditHandler extends GenericEditHandler {
             let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
               let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(originalExpression);
               if (expressionEditInfo) {
-                this.adaptNewParameterLists(newParameterLists);
+                this.adaptNewParameterLists(newParameterLists, filledExpression);
                 expressionEditInfo.onSetValue(filledExpression);
                 autoFilled = true;
               }
@@ -135,10 +142,10 @@ export class HLMEditHandler extends GenericEditHandler {
     });
   }
 
-  private adaptNewParameterLists(newParameterLists: Fmt.ParameterList[]): void {
+  private adaptNewParameterLists(newParameterLists: Fmt.ParameterList[], scope: Fmt.Traversable): void {
     let usedNames = this.getUsedParameterNames();
     for (let parameterList of newParameterLists) {
-      this.utils.adaptParameterNames(parameterList, usedNames);
+      this.utils.adaptParameterNames(parameterList, usedNames, scope);
     }
   }
 
@@ -802,7 +809,7 @@ export class HLMEditHandler extends GenericEditHandler {
                       return items;
                     } else {
                       let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
-                        this.adaptNewParameterLists(newParameterLists);
+                        this.adaptNewParameterLists(newParameterLists, filledExpression);
                         inductionExpression = FmtUtils.substituteExpression(inductionExpression, originalExpression, filledExpression);
                       };
                       return structuralChecker.autoFill(onFillExpression).then(() =>
@@ -1129,18 +1136,18 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.getImmediateInsertButton(onInsert);
   }
 
-  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onRenderTrivialProof: Logic.RenderFn, onRenderProofStep: RenderParameterFn): Notation.RenderedExpression {
+  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onRenderTrivialProof: Logic.RenderFn, onRenderProofStep: RenderParameterFn, onRenderFormula: RenderExpressionFn): Notation.RenderedExpression {
     return this.createConditionalElement((checkResult: HLMCheckResult) => {
       let context = checkResult.incompleteProofs.get(proof);
       if (context) {
-        return this.getProofStepInsertButton(proof, context, onRenderProofStep);
+        return this.getProofStepInsertButton(proof, context, onRenderProofStep, onRenderFormula);
       } else {
         return onRenderTrivialProof();
       }
     });
   }
 
-  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext, onRenderProofStep: RenderParameterFn): Notation.RenderedExpression {
+  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext, onRenderProofStep: RenderParameterFn, onRenderFormula: RenderExpressionFn): Notation.RenderedExpression {
     return this.getMenuInsertButton(() => {
       let rows: Menu.ExpressionMenuRow[] = [];
 
@@ -1148,13 +1155,19 @@ export class HLMEditHandler extends GenericEditHandler {
         proof.steps.push(step);
       };
 
+      let proveByCasesInfo: ProveByCasesInfo = {
+        hasPreviousResultBasedCases: false,
+        hasGoalBasedCases: false
+      };
+      let proveByCasesRow = this.getProveByCasesRow(context, onInsertProofStep, onRenderProofStep, proveByCasesInfo);
+
       if (context.previousResult) {
+        if (proveByCasesRow && proveByCasesInfo.hasPreviousResultBasedCases) {
+          rows.push(proveByCasesRow);
+          proveByCasesRow = undefined;
+        }
         if (context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
           rows.push(this.getUseForAllRow());
-        }
-        let useCasesRow = this.getUseCasesRow(context.previousResult, context, onInsertProofStep, onRenderProofStep);
-        if (useCasesRow) {
-          rows.push(useCasesRow);
         }
         let useDefinitionRow = this.getUseDefinitionRow(context.previousResult, context, onInsertProofStep, onRenderProofStep);
         if (useDefinitionRow) {
@@ -1180,12 +1193,15 @@ export class HLMEditHandler extends GenericEditHandler {
                      || context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
             rows.push(this.getProveEquivalenceRow(context.goal, context, onInsertProofStep, onRenderProofStep));
           }
-          rows.push(this.getProveCasesRow());
+          if (proveByCasesRow && proveByCasesInfo.hasGoalBasedCases) {
+            rows.push(proveByCasesRow);
+            proveByCasesRow = undefined;
+          }
           let proveByDefinitionRow = this.getProveByDefinitionRow(context.goal, context, onInsertProofStep, onRenderProofStep);
           if (proveByDefinitionRow) {
             rows.push(proveByDefinitionRow);
           }
-          rows.push(this.getUnfoldGoalRow());
+          rows.push(this.getUnfoldGoalRow(proof, context.goal, onRenderFormula));
           if (!(context.goal instanceof FmtHLM.MetaRefExpression_not
                 || context.goal instanceof FmtHLM.MetaRefExpression_forall
                 || this.utils.isFalseFormula(context.goal)
@@ -1197,8 +1213,13 @@ export class HLMEditHandler extends GenericEditHandler {
 
         rows.push(
           this.getConsiderRow(context, onInsertProofStep, onRenderProofStep),
-          this.getStateFormulaRow(onInsertProofStep, onRenderProofStep),
-          this.getProveByInductionRow(),
+          this.getStateFormulaRow(onInsertProofStep, onRenderProofStep)
+        );
+        if (proveByCasesRow) {
+          rows.push(proveByCasesRow);
+          proveByCasesRow = undefined;
+        }
+        rows.push(
           this.getProveBySubstitutionRow(),
           this.getDefineVariableRow(onInsertProofStep, onRenderProofStep),
           new Menu.ExpressionMenuSeparator
@@ -1211,19 +1232,28 @@ export class HLMEditHandler extends GenericEditHandler {
     }, true);
   }
 
-  private getUseForAllRow(): Menu.ExpressionMenuRow {
-    let useForAllRow = new Menu.StandardExpressionMenuRow('Specialize');
-    // TODO
-    useForAllRow.titleAction = this.getNotImplementedAction();
-    return useForAllRow;
-  }
-
-  private getUseCasesRow(previousResult: Fmt.Expression, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow | undefined {
-    let stepsPromise = this.createUseCasesSteps(previousResult, context);
-    if (stepsPromise) {
-      let useCasesRow = new Menu.StandardExpressionMenuRow('By cases');
-      useCasesRow.subMenu = this.getProofStepSubMenu(stepsPromise, onInsertProofStep, onRenderProofStep);
-      return useCasesRow;
+  private getProveByCasesRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn, proveByCasesInfo: ProveByCasesInfo): Menu.ExpressionMenuRow | undefined {
+    // TODO include ProveByInduction
+    let stepsPromises: CachedPromise<ProofStepInfo[]>[] = [];
+    if (context.previousResult) {
+      let useCasesStepsPromise = this.createUseCasesSteps(context.previousResult, context);
+      if (useCasesStepsPromise) {
+        proveByCasesInfo.hasPreviousResultBasedCases = true;
+        stepsPromises.push(useCasesStepsPromise);
+      }
+    }
+    if (context.goal) {
+      let proveCasesStepsPromise = this.createProveCasesSteps(context.goal, context);
+      if (proveCasesStepsPromise) {
+        proveByCasesInfo.hasGoalBasedCases = true;
+        stepsPromises.push(proveCasesStepsPromise);
+      }
+    }
+    if (stepsPromises.length) {
+      let stepsPromise = CachedPromise.all(stepsPromises).then((steps: ProofStepInfo[][]) => ([] as ProofStepInfo[]).concat(...steps));
+      let proveByCasesRow = new Menu.StandardExpressionMenuRow('Prove by cases');
+      proveByCasesRow.subMenu = this.getProofStepSubMenu(stepsPromise, onInsertProofStep, onRenderProofStep);
+      return proveByCasesRow;
     } else {
       return undefined;
     }
@@ -1238,7 +1268,7 @@ export class HLMEditHandler extends GenericEditHandler {
           resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) => {
             let caseProofsPromise: CachedPromise<FmtHLM.ObjectContents_Proof[]> = CachedPromise.resolve([]);
             for (let formulaCase of caseList.cases) {
-              let caseParameters = this.utils.getFormulaCaseParameters(formulaCase);
+              let caseParameters = this.utils.getUseCasesProofParameters(formulaCase);
               caseProofsPromise = caseProofsPromise.then((currentCaseProofs: FmtHLM.ObjectContents_Proof[]) =>
                 this.createSubProof(caseParameters, context.goal, false, context).then((caseProof: FmtHLM.ObjectContents_Proof) =>
                   currentCaseProofs.concat(caseProof)));
@@ -1254,6 +1284,39 @@ export class HLMEditHandler extends GenericEditHandler {
     } else {
       return undefined;
     }
+  }
+
+  private createProveCasesSteps(goal: Fmt.Expression, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo[]> | undefined {
+    let casesPromise = this.utils.getAllFormulaCases(goal, true);
+    if (casesPromise) {
+      return casesPromise.then((cases: HLMFormulaCases[]) => {
+        let resultPromise: CachedPromise<ProofStepInfo[]> = CachedPromise.resolve([]);
+        for (let caseList of cases) {
+          resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) => {
+            let caseProofsPromise: CachedPromise<FmtHLM.ObjectContents_Proof[]> = CachedPromise.resolve([]);
+            for (let formulaCase of caseList.cases) {
+              caseProofsPromise = caseProofsPromise.then((currentCaseProofs: FmtHLM.ObjectContents_Proof[]) =>
+                this.createSubProof(formulaCase.parameters, formulaCase.formula, false, context).then((caseProof: FmtHLM.ObjectContents_Proof) =>
+                  currentCaseProofs.concat(caseProof)));
+            }
+            return caseProofsPromise.then((caseProofs: FmtHLM.ObjectContents_Proof[]) => {
+              let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveCases(this.utils.internalToExternalIndex(caseList.side), caseProofs), '_');
+              return currentSteps.concat({step: step});
+            });
+          });
+        }
+        return resultPromise;
+      });
+    } else {
+      return undefined;
+    }
+  }
+
+  private getUseForAllRow(): Menu.ExpressionMenuRow {
+    let useForAllRow = new Menu.StandardExpressionMenuRow('Specialize');
+    // TODO
+    useForAllRow.titleAction = this.getNotImplementedAction();
+    return useForAllRow;
   }
 
   private getUseDefinitionRow(previousResult: Fmt.Expression, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow | undefined {
@@ -1389,12 +1452,6 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  private getProveCasesRow(): Menu.ExpressionMenuRow {
-    let proveCasesRow = new Menu.StandardExpressionMenuRow('Prove by cases');
-    // TODO
-    return proveCasesRow;
-  }
-
   private getProveByDefinitionRow(goal: Fmt.Expression, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow | undefined {
     let stepsPromise = this.createProveByDefinitionSteps(goal, context);
     if (stepsPromise) {
@@ -1415,7 +1472,7 @@ export class HLMEditHandler extends GenericEditHandler {
           resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) => {
             let subStepsPromise: CachedPromise<Fmt.ParameterList>;
             if (definition.formula instanceof FmtHLM.MetaRefExpression_forall) {
-              // TODO rename hidden result variables if user renames variable of ProveForAll step
+              // TODO (maybe) rename hidden result variables if user renames variable of ProveForAll step
               subStepsPromise = this.createProveForAllStep(definition.formula, context).then((proveForAllStep: ProofStepInfo) => new Fmt.ParameterList(proveForAllStep.step));
             } else {
               subStepsPromise = CachedPromise.resolve(new Fmt.ParameterList);
@@ -1460,10 +1517,48 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  private getUnfoldGoalRow(): Menu.ExpressionMenuRow {
+  private getUnfoldGoalRow(proof: FmtHLM.ObjectContents_Proof, goal: Fmt.Expression, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let unfoldGoalRow = new Menu.StandardExpressionMenuRow('Unfold goal');
-    // TODO
+    let unfoldedFormulasPromise = this.getUnfoldedFormulas(goal);
+    let rowsPromise = unfoldedFormulasPromise.then((unfoldedFormulas: Fmt.Expression[] | undefined) =>
+      unfoldedFormulas?.map((unfoldedFormula: Fmt.Expression) => this.getUnfoldGoalMenuItem(proof, unfoldedFormula, onRenderFormula)) ?? []);
+    unfoldGoalRow.subMenu = new Menu.ExpressionMenu(rowsPromise);
     return unfoldGoalRow;
+  }
+
+  private getUnfoldGoalMenuItem(proof: FmtHLM.ObjectContents_Proof, unfoldedFormula: Fmt.Expression, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuItem {
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
+      proof.goal = unfoldedFormula;
+    });
+    let renderedFormula = onRenderFormula(unfoldedFormula);
+    return new Menu.ExpressionMenuItem(renderedFormula, action);
+  }
+
+  private getUnfoldedFormulas(formula: Fmt.Expression): CachedPromise<Fmt.Expression[] | undefined> {
+    return this.utils.getNextFormulas(formula, unfoldAll).then((immediateFormulas: Fmt.Expression[] | undefined) => {
+      if (immediateFormulas && immediateFormulas.length < unfoldContinuationLimit) {
+        let resultPromise = CachedPromise.resolve(immediateFormulas);
+        for (let immediateFormula of immediateFormulas) {
+          resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
+            this.getUnfoldedFormulas(immediateFormula).then((nextFormulas: Fmt.Expression[] | undefined) => {
+              if (nextFormulas) {
+                let nextResult = currentResult.slice();
+                for (let nextFormula of nextFormulas) {
+                  if (!currentResult.some((item: Fmt.Expression) => nextFormula.isEquivalentTo(item))) {
+                    nextResult.push(nextFormula);
+                  }
+                }
+                return nextResult;
+              } else {
+                return currentResult;
+              }
+            }));
+        }
+        return resultPromise;
+      } else {
+        return immediateFormulas;
+      }
+    });
   }
 
   private getConsiderRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
@@ -1505,12 +1600,6 @@ export class HLMEditHandler extends GenericEditHandler {
     let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_State(new Fmt.PlaceholderExpression(HLMExpressionType.Formula)), '_');
     stateFormulaRow.subMenu = this.getProofStepMenuItem({step: step}, onInsertProofStep, onRenderProofStep);
     return stateFormulaRow;
-  }
-
-  private getProveByInductionRow(): Menu.ExpressionMenuRow {
-    let proveByInductionRow = new Menu.StandardExpressionMenuRow('Prove by induction');
-    // TODO
-    return proveByInductionRow;
   }
 
   private getProveBySubstitutionRow(): Menu.ExpressionMenuRow {
@@ -1616,7 +1705,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getProofStepMenuItem(step: ProofStepInfo, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
     // TODO if result is existentially quantified, insert UseExists
-    let action = new Menu.ImmediateExpressionMenuAction(() => onInsertProofStep(step.step));
+    let action = new Menu.ImmediateExpressionMenuAction(() => onInsertProofStep(step.step.clone()));
     let renderedStep = onRenderProofStep(step.step);
     if (step.linkedObject) {
       let semanticLink = new Notation.SemanticLink(step.linkedObject);

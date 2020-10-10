@@ -71,20 +71,34 @@ export function substituteVariable(expression: Fmt.Expression, variable: Fmt.Par
   });
 }
 
+export function renameParameter(parameter: Fmt.Parameter, newName: string, parameterList: Fmt.ParameterList | undefined, scope: Fmt.Traversable | undefined): void {
+  let oldName = parameter.name;
+  parameter.name = newName;
+  let paramIndex = parameterList?.indexOf(parameter);
+  scope?.traverse((expression: Fmt.Expression) => {
+    if (expression instanceof Fmt.IndexedExpression && expression.parameters && expression.arguments) {
+      let arg: Fmt.Argument | undefined = undefined;
+      if (parameterList) {
+        if (expression.parameters === parameterList) {
+          arg = expression.arguments.get(oldName, paramIndex);
+        }
+      } else {
+        let localParamIndex = expression.parameters.indexOf(parameter);
+        if (localParamIndex >= 0) {
+          arg = expression.arguments.get(oldName, localParamIndex);
+        }
+      }
+      if (arg && arg.name === oldName) {
+        arg.name = newName;
+      }
+    }
+  });
+}
+
 export function readCode(code: string, metaModel: Meta.MetaModel): Fmt.Expression {
   let stream = new FmtReader.StringInputStream(code);
   let errorHandler = new FmtReader.DefaultErrorHandler;
   let reader = new FmtReader.Reader(stream, errorHandler, () => metaModel);
   let context = new Ctx.DummyContext(metaModel);
   return reader.readExpression(false, metaModel.functions, context);
-}
-
-export function definitionContainsPlaceholders(definition: Fmt.Definition): boolean {
-  let result = false;
-  definition.traverse((subExpression: Fmt.Expression) => {
-    if (subExpression instanceof Fmt.PlaceholderExpression) {
-      result = true;
-    }
-  });
-  return result;
 }

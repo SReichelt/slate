@@ -209,7 +209,17 @@ export class GenericUtils {
     }
   }
 
+  renameParameter(parameter: Fmt.Parameter, newName: string, parameterList: Fmt.ParameterList | undefined): void {
+    FmtUtils.renameParameter(parameter, newName, parameterList, this.definition);
+  }
+
   containsPlaceholders(): boolean {
-    return FmtUtils.definitionContainsPlaceholders(this.definition);
+    let result = false;
+    this.definition.traverse((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.PlaceholderExpression) {
+        result = true;
+      }
+    });
+    return result;
   }
 }

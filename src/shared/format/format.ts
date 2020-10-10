@@ -9,15 +9,34 @@ export type ExpressionUnificationFn = (left: Expression, right: Expression, repl
 
 export type ReportConversionFn = (raw: Expression, converted: ObjectContents) => void;
 
-export class File {
-  definitions: DefinitionList = new DefinitionList;
+export interface Cloneable<T> {
+  clone(): T;
+}
 
-  constructor(public metaModelPath: Path) {}
+export interface Traversable {
+  traverse(fn: ExpressionTraversalFn): void;
+}
+
+export interface FileObject<T> extends Cloneable<T>, Traversable {}
+
+export interface ReplacedParameter {
+  original: Parameter;
+  replacement: Parameter;
+}
+
+export interface Comparable<T> {
+  isEquivalentTo(object: T, fn?: ExpressionUnificationFn, replacedParameters?: ReplacedParameter[]): boolean;
+}
+
+export interface ExpressionObject<T> extends FileObject<T>, Comparable<T> {
+  clone(replacedParameters?: ReplacedParameter[]): T;
+}
+
+export class File implements FileObject<File> {
+  constructor(public metaModelPath: Path, public definitions: DefinitionList = new DefinitionList) {}
 
   clone(): File {
-    let result = new File(this.metaModelPath);
-    this.definitions.clone(result.definitions);
-    return result;
+    return new File(this.metaModelPath, this.definitions.clone());
   }
 
   traverse(fn: ExpressionTraversalFn): void {
@@ -29,20 +48,15 @@ export class File {
   }
 }
 
-export interface ReplacedParameter {
-  original: Parameter;
-  replacement: Parameter;
-}
-
-export interface Comparable<T> {
-  isEquivalentTo(object: T, fn?: ExpressionUnificationFn, replacedParameters?: ReplacedParameter[]): boolean;
-}
-
-export abstract class PathItem implements Comparable<PathItem> {
+export abstract class PathItem implements ExpressionObject<PathItem> {
   constructor(public parentPath?: PathItem) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): PathItem {
     return this.substituteExpression(undefined, replacedParameters);
+  }
+
+  traverse(fn: ExpressionTraversalFn): void {
+    this.parentPath?.traverse(fn);
   }
 
   abstract substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters?: ReplacedParameter[]): PathItem;
@@ -135,6 +149,11 @@ export class Path extends NamedPathItem {
     this.arguments = args;
   }
 
+  traverse(fn: ExpressionTraversalFn): void {
+    super.traverse(fn);
+    this.arguments.traverse(fn);
+  }
+
   substituteExpression(fn?: ExpressionSubstitutionFn, replacedParameters: ReplacedParameter[] = []): Path {
     let changed = !fn;
     let parentPath: PathItem | undefined = undefined;
@@ -164,7 +183,7 @@ export class Path extends NamedPathItem {
   }
 }
 
-export class Definition {
+export class Definition implements FileObject<Definition> {
   innerDefinitions: DefinitionList = new DefinitionList;
   contents?: ObjectContents;
   documentation?: DocumentationComment;
@@ -192,6 +211,7 @@ export class Definition {
     this.parameters.traverse(fn);
     this.innerDefinitions.traverse(fn);
     this.contents?.traverse(fn);
+    this.documentation?.traverse(fn);
   }
 
   toString(): string {
@@ -199,7 +219,7 @@ export class Definition {
   }
 }
 
-export class DefinitionList extends Array<Definition> {
+export class DefinitionList extends Array<Definition> implements FileObject<DefinitionList> {
   getDefinition(name: string): Definition {
     for (let definition of this) {
       if (definition.name === name) {
@@ -209,10 +229,12 @@ export class DefinitionList extends Array<Definition> {
     throw new Error(`Definition "${name}" not found`);
   }
 
-  clone(result: DefinitionList): void {
+  clone(): DefinitionList {
+    let result = new DefinitionList;
     for (let definition of this) {
       result.push(definition.clone());
     }
+    return result;
   }
 
   traverse(fn: ExpressionTraversalFn): void {
@@ -226,7 +248,7 @@ export class DefinitionList extends Array<Definition> {
   }
 }
 
-export class Parameter implements Comparable<Parameter> {
+export class Parameter implements ExpressionObject<Parameter> {
   defaultValue?: Expression;
   optional: boolean = false;
   list: boolean = false;
@@ -347,7 +369,7 @@ export class Parameter implements Comparable<Parameter> {
   }
 }
 
-export class ParameterList extends Array<Parameter> implements Comparable<ParameterList> {
+export class ParameterList extends Array<Parameter> implements ExpressionObject<ParameterList> {
   getParameter(name?: string, index?: number): Parameter {
     if (name !== undefined) {
       for (let param of this) {
@@ -422,7 +444,7 @@ export class ParameterList extends Array<Parameter> implements Comparable<Parame
   }
 }
 
-export class Argument implements Comparable<Argument> {
+export class Argument implements ExpressionObject<Argument> {
   constructor(public name: string | undefined, public value: Expression, public optional: boolean = false) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): Argument {
@@ -455,7 +477,7 @@ export class Argument implements Comparable<Argument> {
   }
 }
 
-export class ArgumentList extends Array<Argument> implements Comparable<ArgumentList> {
+export class ArgumentList extends Array<Argument> implements ExpressionObject<ArgumentList> {
   get(name: string | undefined, index?: number): Argument | undefined {
     let curIndex = 0;
     for (let arg of this) {
@@ -586,7 +608,7 @@ export class ArgumentList extends Array<Argument> implements Comparable<Argument
   }
 }
 
-export abstract class ObjectContents {
+export abstract class ObjectContents implements FileObject<ObjectContents> {
   abstract fromArgumentList(argumentList: ArgumentList, reportFn?: ReportConversionFn): void;
   abstract toArgumentList(outputAllNames: boolean, reportFn?: ReportConversionFn): ArgumentList;
 
@@ -642,7 +664,7 @@ export class GenericObjectContents extends ObjectContents {
   }
 }
 
-export abstract class Expression implements Comparable<Expression> {
+export abstract class Expression implements ExpressionObject<Expression> {
   clone(replacedParameters: ReplacedParameter[] = []): Expression {
     return this.substitute(undefined, replacedParameters);
   }
@@ -909,6 +931,8 @@ export class IndexedExpression extends Expression implements Index {
       resultIndex.arguments = this.arguments.substituteExpression(fn, replacedParameters);
       if (resultIndex.arguments !== this.arguments) {
         changed = true;
+      } else if (replacedParameters) {
+        resultIndex.arguments = this.arguments.clone(replacedParameters);
       }
     }
     if (this.assignParameters(resultIndex, replacedParameters)) {
@@ -1011,7 +1035,7 @@ export class PlaceholderExpression extends Expression {
   }
 }
 
-export class DocumentationComment {
+export class DocumentationComment implements FileObject<DocumentationComment> {
   constructor(public items: DocumentationItem[]) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): DocumentationComment {
@@ -1019,17 +1043,21 @@ export class DocumentationComment {
     return new DocumentationComment(items);
   }
 
+  traverse(fn: ExpressionTraversalFn): void {}
+
   toString(): string {
     return writeToString((writer: FmtWriter.Writer) => writer.writeDocumentationComment(this));
   }
 }
 
-export class DocumentationItem {
+export class DocumentationItem implements FileObject<DocumentationItem> {
   constructor(public kind: string | undefined, public parameter: Parameter | undefined, public text: string) {}
 
   clone(replacedParameters: ReplacedParameter[] = []): DocumentationItem {
     return new DocumentationItem(this.kind, this.parameter?.findReplacement(replacedParameters), this.text);
   }
+
+  traverse(fn: ExpressionTraversalFn): void {}
 }
 
 export class PathAlias {

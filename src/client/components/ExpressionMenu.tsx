@@ -180,6 +180,8 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             }
           } else if (standardRow.subMenu instanceof Menu.ExpressionMenuRow) {
             subMenuMainRow = standardRow.subMenu;
+          } else if (!titleAction) {
+            return null;
           }
           if (subMenuMainRow) {
             let onEnter = () => {
