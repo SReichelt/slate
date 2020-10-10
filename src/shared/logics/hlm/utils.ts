@@ -677,7 +677,7 @@ export class HLMUtils extends GenericUtils {
           // and should be transparently unfolded when giving an explicitly defined predicate. We may need to make this more
           // specific, e.g. by checking the corresponding argument.
           let result: Fmt.Expression[] | undefined = undefined;
-          if (unfoldParameters.followDefinitions && !(unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== formula)) {
+          if (unfoldParameters.followDefinitions && (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === formula)) {
             for (let item of definition.contents.definition) {
               if (item instanceof FmtHLM.MetaRefExpression_structural) {
                 let itemResult = this.substitutePath(item, formula.path, [definition]);
@@ -795,10 +795,11 @@ export class HLMUtils extends GenericUtils {
         }
         return CachedPromise.resolve(undefined);
       } else if (type instanceof FmtHLM.MetaRefExpression_SetDef) {
-        if (typeSearchParameters.requiredUnfoldLocation && typeSearchParameters.requiredUnfoldLocation !== term) {
+        if (!typeSearchParameters.requiredUnfoldLocation || typeSearchParameters.requiredUnfoldLocation === term) {
+          return CachedPromise.resolve([this.applySubstitutionContext(type._set, indexContext)]);
+        } else {
           return CachedPromise.resolve(undefined);
         }
-        return CachedPromise.resolve([this.applySubstitutionContext(type._set, indexContext)]);
       } else {
         return CachedPromise.reject(new Error('Set variable expected'));
       }
@@ -827,7 +828,7 @@ export class HLMUtils extends GenericUtils {
             }
           } else {
             let result: Fmt.Expression[] | undefined = undefined;
-            if (typeSearchParameters.followDefinitions && !(typeSearchParameters.requiredUnfoldLocation && typeSearchParameters.requiredUnfoldLocation !== term)) {
+            if (typeSearchParameters.followDefinitions && (!typeSearchParameters.requiredUnfoldLocation || typeSearchParameters.requiredUnfoldLocation === term)) {
               result = definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
             }
             return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.SetTerm, typeSearchParameters).then((argumentResult: Fmt.Expression[] | undefined) =>
@@ -881,38 +882,33 @@ export class HLMUtils extends GenericUtils {
       }
       return resultPromise;
     } else {
-      if (typeSearchParameters.requiredUnfoldLocation && typeSearchParameters.requiredUnfoldLocation !== term) {
-        return CachedPromise.resolve(undefined);
-      }
-      if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
-        if (typeSearchParameters.followSupersets && term.terms && term.terms.length) {
-          for (let element of term.terms) {
-            if (!(element instanceof Fmt.PlaceholderExpression)) {
-              return this.getDeclaredSet(element).then((declaredSet: Fmt.Expression) => [declaredSet]);
+      if (!typeSearchParameters.requiredUnfoldLocation || typeSearchParameters.requiredUnfoldLocation === term) {
+        if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
+          if (typeSearchParameters.followSupersets && term.terms && term.terms.length) {
+            for (let element of term.terms) {
+              if (!(element instanceof Fmt.PlaceholderExpression)) {
+                return this.getDeclaredSet(element).then((declaredSet: Fmt.Expression) => [declaredSet]);
+              }
             }
           }
-        }
-        return CachedPromise.resolve(undefined);
-      } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
-        if (typeSearchParameters.followSupersets) {
-          let type = term.parameter.type;
-          if (type instanceof FmtHLM.MetaRefExpression_Element) {
-            return CachedPromise.resolve([type._set]);
-          } else {
-            return CachedPromise.reject(new Error('Element parameter expected'));
+        } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
+          if (typeSearchParameters.followSupersets) {
+            let type = term.parameter.type;
+            if (type instanceof FmtHLM.MetaRefExpression_Element) {
+              return CachedPromise.resolve([type._set]);
+            } else {
+              return CachedPromise.reject(new Error('Element parameter expected'));
+            }
           }
+        } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
+          if (typeSearchParameters.followSupersets) {
+            return this.getDeclaredSet(term.term).then((declaredSet: Fmt.Expression) => [declaredSet]);
+          }
+        } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
+          return CachedPromise.resolve([term.term]);
         }
-        return CachedPromise.resolve(undefined);
-      } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
-        if (typeSearchParameters.followSupersets) {
-          return this.getDeclaredSet(term.term).then((declaredSet: Fmt.Expression) => [declaredSet]);
-        }
-        return CachedPromise.resolve(undefined);
-      } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
-        return CachedPromise.resolve([term.term]);
-      } else {
-        return CachedPromise.resolve(undefined);
       }
+      return CachedPromise.resolve(undefined);
     }
   }
 
@@ -927,10 +923,11 @@ export class HLMUtils extends GenericUtils {
       if (type instanceof FmtHLM.MetaRefExpression_Element) {
         return this.unfoldIndices(term, HLMExpressionType.ElementTerm, unfoldParameters);
       } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
-        if (unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== term) {
+        if (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === term) {
+          return CachedPromise.resolve([this.applySubstitutionContext(type.element, indexContext)]);
+        } else {
           return CachedPromise.resolve(undefined);
         }
-        return CachedPromise.resolve([this.applySubstitutionContext(type.element, indexContext)]);
       } else {
         return CachedPromise.reject(new Error('Element variable expected'));
       }
@@ -947,7 +944,7 @@ export class HLMUtils extends GenericUtils {
           return this.unfoldDefinitionArguments(term, [definition, innerDefinition], HLMExpressionType.ElementTerm, unfoldParameters);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
           let result: Fmt.Expression[] | undefined = undefined;
-          if (unfoldParameters.followDefinitions && !(unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== term)) {
+          if (unfoldParameters.followDefinitions && (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === term)) {
             result = definition.contents.definition.map((item: Fmt.Expression) => this.substitutePath(item, term.path, [definition]));
           }
           return this.unfoldDefinitionArguments(term, [definition], HLMExpressionType.ElementTerm, unfoldParameters).then((argumentResult: Fmt.Expression[] | undefined) =>
@@ -963,17 +960,15 @@ export class HLMUtils extends GenericUtils {
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
       return this.unfoldStructuralCases(term, HLMExpressionType.ElementTerm, unfoldParameters);
     } else {
-      if (unfoldParameters.requiredUnfoldLocation && unfoldParameters.requiredUnfoldLocation !== term) {
-        return CachedPromise.resolve(undefined);
+      if (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === term) {
+        if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
+          return this.cast(term.term, term._set)
+            .then((currentResult: Fmt.Expression) => [currentResult]);
+        } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
+          return CachedPromise.resolve([term.term]);
+        }
       }
-      if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
-        return this.cast(term.term, term._set)
-          .then((currentResult: Fmt.Expression) => [currentResult]);
-      } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
-        return CachedPromise.resolve([term.term]);
-      } else {
-        return CachedPromise.resolve(undefined);
-      }
+      return CachedPromise.resolve(undefined);
     }
   }
 
