@@ -1201,7 +1201,7 @@ export class HLMEditHandler extends GenericEditHandler {
           if (proveByDefinitionRow) {
             rows.push(proveByDefinitionRow);
           }
-          rows.push(this.getUnfoldGoalRow(proof, context.goal, onRenderFormula));
+          rows.push(this.getUnfoldGoalRow(proof, context.goal, context, onRenderFormula));
           if (!(context.goal instanceof FmtHLM.MetaRefExpression_not
                 || context.goal instanceof FmtHLM.MetaRefExpression_forall
                 || this.utils.isFalseFormula(context.goal)
@@ -1234,6 +1234,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getProveByCasesRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn, proveByCasesInfo: ProveByCasesInfo): Menu.ExpressionMenuRow | undefined {
     // TODO include ProveByInduction
+    // TODO move conjunction proofs to "split"
     let stepsPromises: CachedPromise<ProofStepInfo[]>[] = [];
     if (context.previousResult) {
       let useCasesStepsPromise = this.createUseCasesSteps(context.previousResult, context);
@@ -1517,9 +1518,9 @@ export class HLMEditHandler extends GenericEditHandler {
     }
   }
 
-  private getUnfoldGoalRow(proof: FmtHLM.ObjectContents_Proof, goal: Fmt.Expression, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
+  private getUnfoldGoalRow(proof: FmtHLM.ObjectContents_Proof, goal: Fmt.Expression, context: HLMCheckerProofStepContext, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     let unfoldGoalRow = new Menu.StandardExpressionMenuRow('Unfold goal');
-    let unfoldedFormulasPromise = this.getUnfoldedFormulas(goal);
+    let unfoldedFormulasPromise = this.getUnfoldedFormulas(goal, context);
     let rowsPromise = unfoldedFormulasPromise.then((unfoldedFormulas: Fmt.Expression[] | undefined) =>
       unfoldedFormulas?.map((unfoldedFormula: Fmt.Expression) => this.getUnfoldGoalMenuItem(proof, unfoldedFormula, onRenderFormula)) ?? []);
     unfoldGoalRow.subMenu = new Menu.ExpressionMenu(rowsPromise);
@@ -1534,29 +1535,43 @@ export class HLMEditHandler extends GenericEditHandler {
     return new Menu.ExpressionMenuItem(renderedFormula, action);
   }
 
-  private getUnfoldedFormulas(formula: Fmt.Expression): CachedPromise<Fmt.Expression[] | undefined> {
+  private getUnfoldedFormulas(formula: Fmt.Expression, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression[] | undefined> {
     return this.utils.getNextFormulas(formula, unfoldAll).then((immediateFormulas: Fmt.Expression[] | undefined) => {
-      if (immediateFormulas && immediateFormulas.length < unfoldContinuationLimit) {
-        let resultPromise = CachedPromise.resolve(immediateFormulas);
+      if (immediateFormulas) {
+        let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         for (let immediateFormula of immediateFormulas) {
           resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
-            this.getUnfoldedFormulas(immediateFormula).then((nextFormulas: Fmt.Expression[] | undefined) => {
-              if (nextFormulas) {
-                let nextResult = currentResult.slice();
-                for (let nextFormula of nextFormulas) {
-                  if (!currentResult.some((item: Fmt.Expression) => nextFormula.isEquivalentTo(item))) {
-                    nextResult.push(nextFormula);
-                  }
-                }
-                return nextResult;
+            this.utils.unfoldsTo(context.originalGoal!, immediateFormula).then((unfoldResult: boolean) => {
+              if (unfoldResult) {
+                return currentResult.concat(immediateFormula);
               } else {
+                // TODO fix cases where this happens
+                console.warn(`Omitting ${immediateFormula} because unfoldsTo returned false`);
                 return currentResult;
               }
             }));
         }
+        if (immediateFormulas.length < unfoldContinuationLimit) {
+          for (let immediateFormula of immediateFormulas) {
+            resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
+              this.getUnfoldedFormulas(immediateFormula, context).then((nextFormulas: Fmt.Expression[] | undefined) => {
+                if (nextFormulas) {
+                  let nextResult = currentResult.slice();
+                  for (let nextFormula of nextFormulas) {
+                    if (!currentResult.some((item: Fmt.Expression) => nextFormula.isEquivalentTo(item))) {
+                      nextResult.push(nextFormula);
+                    }
+                  }
+                  return nextResult;
+                } else {
+                  return currentResult;
+                }
+              }));
+          }
+        }
         return resultPromise;
       } else {
-        return immediateFormulas;
+        return undefined;
       }
     });
   }

@@ -5,7 +5,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
-import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo } from './utils';
+import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMBaseContext, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -30,13 +30,12 @@ type HLMCheckerRecheckFn = (originalExpression: Fmt.Expression, substitutedExpre
 type HLMCheckerCheckFormulaFn = (formula: Fmt.Expression) => HLMCheckerContext;
 type HLMCheckerFillExpressionFn = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => void;
 
-interface HLMCheckerContext {
+interface HLMCheckerContext extends HLMBaseContext {
   context: Ctx.Context;
   binderSourceParameters: Fmt.Parameter[];
   temporaryParameters: Fmt.Parameter[];
   parentStructuralCases: HLMCheckerStructuralCaseRef[];
   inAutoArgument: boolean;
-  stepResults: Map<Fmt.Parameter, Fmt.Expression>;
   editData?: HLMCheckerEditData;
   currentRecheckFn?: HLMCheckerRecheckFn;
   currentPlaceholderCollection?: HLMCheckerPlaceholderCollection;
@@ -1459,9 +1458,11 @@ export class HLMDefinitionChecker {
       this.checkFormula(proof.goal, context);
       this.checkUnfolding(goals, proof.goal, true);
     }
+    let originalGoal = goals.length ? goals[0] : undefined;
     let stepContext: HLMCheckerProofStepContext | undefined = {
       ...context,
-      goal: proof.goal ?? goals.length ? goals[0] : undefined,
+      originalGoal: originalGoal,
+      goal: proof.goal ?? originalGoal,
       previousResult: undefined
     };
     this.utils.updateInitialProofStepContext(proof, stepContext);

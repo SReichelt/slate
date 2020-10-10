@@ -11,10 +11,14 @@ import CachedPromise from '../../data/cachedPromise';
 
 export class HLMSubstitutionContext extends SubstitutionContext {}
 
-export interface HLMProofStepContext {
+export interface HLMBaseContext {
+  stepResults: Map<Fmt.Parameter, Fmt.Expression>;
+}
+
+export interface HLMProofStepContext extends HLMBaseContext {
+  originalGoal?: Fmt.Expression;
   goal?: Fmt.Expression;
   previousResult?: Fmt.Expression;
-  stepResults: Map<Fmt.Parameter, Fmt.Expression>;
 }
 
 export interface HLMUnfoldParameters {
@@ -593,7 +597,7 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getParameterConstraint(param: Fmt.Parameter, context: HLMProofStepContext, variableRefExpression?: Fmt.VariableRefExpression, indexContext?: SubstitutionContext): Fmt.Expression | undefined {
+  getParameterConstraint(param: Fmt.Parameter, context: HLMBaseContext, variableRefExpression?: Fmt.VariableRefExpression, indexContext?: SubstitutionContext): Fmt.Expression | undefined {
     let getVariableRefExpression = () => {
       if (variableRefExpression) {
         return variableRefExpression;
@@ -1184,6 +1188,7 @@ export class HLMUtils extends GenericUtils {
       }
     }
 
+    // TODO only unfold expression.term instead?
     let constructorTermPromise: CachedPromise<Fmt.Expression[]>;
     if (unfoldParameters.substituteStructuralCases
         && (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === expression)) {
@@ -2142,18 +2147,21 @@ export class HLMUtils extends GenericUtils {
       if (constructorDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {
         let equalityDefinition = constructorDefinition.contents.equalityDefinition;
         if (equalityDefinition) {
-          let pathSubstitutionContext = new HLMSubstitutionContext;
-          this.addTargetPathSubstitution(constructionPath.parentPath, pathSubstitutionContext);
-          let leftParameterSubstitutionContext = new HLMSubstitutionContext;
-          this.addParameterListSubstitution(equalityDefinition.leftParameters, constructorDefinition.parameters, leftParameterSubstitutionContext);
-          let leftArgumentSubstitutionContext = new HLMSubstitutionContext;
-          this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, leftArguments], constructionPath.parentPath, leftArgumentSubstitutionContext);
-          let rightParameterSubstitutionContext = new HLMSubstitutionContext;
-          this.addParameterListSubstitution(equalityDefinition.rightParameters, constructorDefinition.parameters, rightParameterSubstitutionContext);
-          let rightArgumentSubstitutionContext = new HLMSubstitutionContext;
-          this.addArgumentListsSubstitution([constructionDefinition.parameters, constructorDefinition.parameters], [constructionPath.arguments, rightArguments], constructionPath.parentPath, rightArgumentSubstitutionContext);
-          return equalityDefinition.definition.map((equalityFormula: Fmt.Expression) =>
-            this.applySubstitutionContexts(equalityFormula, [pathSubstitutionContext, leftParameterSubstitutionContext, leftArgumentSubstitutionContext, rightParameterSubstitutionContext, rightArgumentSubstitutionContext]));
+          let leftParameters = equalityDefinition.leftParameters;
+          let rightParameters = equalityDefinition.rightParameters;
+          return equalityDefinition.definition.map((equalityFormula: Fmt.Expression) => {
+            let substitutionContext = new HLMSubstitutionContext;
+            this.addTargetPathSubstitution(constructionPath.parentPath, substitutionContext);
+            this.addArgumentListSubstitution(constructionDefinition.parameters, constructionPath.arguments, constructionPath.parentPath, substitutionContext);
+            equalityFormula = this.applySubstitutionContext(equalityFormula, substitutionContext);
+            // Since we need to substitute the constructor parameters twice, we cannot use a single substitution context here.
+            // TODO figure out whether avoiding substitution contexts causes any problems
+            equalityFormula = this.substituteParameters(equalityFormula, leftParameters, constructorDefinition.parameters);
+            equalityFormula = this.substituteArguments(equalityFormula, constructorDefinition.parameters, leftArguments, constructionPath.parentPath);
+            equalityFormula = this.substituteParameters(equalityFormula, rightParameters, constructorDefinition.parameters);
+            equalityFormula = this.substituteArguments(equalityFormula, constructorDefinition.parameters, rightArguments, constructionPath.parentPath);
+            return equalityFormula;
+          });
         } else {
           return [new FmtHLM.MetaRefExpression_and];
         }
