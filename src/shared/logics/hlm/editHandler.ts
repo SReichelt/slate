@@ -1541,15 +1541,16 @@ export class HLMEditHandler extends GenericEditHandler {
         let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         for (let immediateFormula of immediateFormulas) {
           resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
-            this.utils.unfoldsTo(context.originalGoal!, immediateFormula).then((unfoldResult: boolean) => {
-              if (unfoldResult) {
-                return currentResult.concat(immediateFormula);
-              } else {
-                // TODO fix cases where this happens
-                console.warn(`Omitting ${immediateFormula} because unfoldsTo returned false`);
-                return currentResult;
-              }
-            }));
+            this.utils.simplifyFormula(immediateFormula).then((simplifiedFormula: Fmt.Expression) =>
+              this.utils.unfoldsTo(context.originalGoal!, simplifiedFormula).then((unfoldResult: boolean) => {
+                if (unfoldResult) {
+                  return currentResult.concat(simplifiedFormula);
+                } else {
+                  // TODO fix cases where this happens
+                  console.warn(`Omitting ${simplifiedFormula} because unfoldsTo returned false`);
+                  return currentResult;
+                }
+              })));
         }
         if (immediateFormulas.length < unfoldContinuationLimit) {
           for (let immediateFormula of immediateFormulas) {

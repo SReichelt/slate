@@ -36,10 +36,10 @@ export const unfoldAll: HLMUnfoldParameters = {
   extractStructuralCases: true
 };
 
-export const unfoldOutside: HLMUnfoldParameters = {
-  followDefinitions: true,
+export const unfoldStrictSimplifications: HLMUnfoldParameters = {
+  followDefinitions: false,
   unfoldArguments: false,
-  substituteStructuralCases: false,
+  substituteStructuralCases: true,
   extractStructuralCases: false
 };
 
@@ -1183,7 +1183,6 @@ export class HLMUtils extends GenericUtils {
       }
     }
 
-    // TODO only unfold expression.term instead?
     let constructorTermPromise: CachedPromise<Fmt.Expression[]>;
     if (unfoldParameters.substituteStructuralCases
         && (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === expression)) {
@@ -1221,15 +1220,11 @@ export class HLMUtils extends GenericUtils {
     return constructorResultPromise.then((constructorResult: Fmt.Expression[]) => {
       if (constructorResult.length) {
         return constructorResult;
-      } else {
-        if (unfoldParameters.requiredUnfoldLocation === expression) {
-          unfoldParameters = {
-            ...unfoldParameters,
-            requiredUnfoldLocation: undefined
-          };
-        }
+      } else if (unfoldParameters.requiredUnfoldLocation !== expression) {
         return this.getNextElementTerms(expression.term, unfoldParameters).then((nextTerms: Fmt.Expression[] | undefined) =>
           nextTerms?.map((nextTerm: Fmt.Expression) => this.buildStructuralCaseTerm(nextTerm, expression.construction, expression.cases, expressionType)));
+      } else {
+        return undefined;
       }
     });
   }
@@ -1359,6 +1354,16 @@ export class HLMUtils extends GenericUtils {
           .then((newResult: T[] | undefined) => (newResult ? currentResult.concat(newResult) : currentResult));
       } else {
         return fn();
+      }
+    });
+  }
+
+  simplifyFormula(formula: Fmt.Expression): CachedPromise<Fmt.Expression> {
+    return this.getNextFormulas(formula, unfoldStrictSimplifications).then((nextFormulas: Fmt.Expression[] | undefined) => {
+      if (nextFormulas && nextFormulas.length) {
+        return this.simplifyFormula(nextFormulas[0]);
+      } else {
+        return formula;
       }
     });
   }
@@ -1510,6 +1515,13 @@ export class HLMUtils extends GenericUtils {
   }
 
   private fullyUnfoldElementTermOutside(term: Fmt.Expression): CachedPromise<Fmt.Expression[]> {
+    let unfoldOutside: HLMUnfoldParameters = {
+      followDefinitions: true,
+      unfoldArguments: false,
+      substituteStructuralCases: true,
+      extractStructuralCases: false,
+      requiredUnfoldLocation: term
+    };
     return this.getNextElementTerms(term, unfoldOutside).then((nextTerms: Fmt.Expression[] | undefined) => {
       if (nextTerms) {
         let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
@@ -1580,38 +1592,59 @@ export class HLMUtils extends GenericUtils {
   }
 
   unfoldsTo(source: Fmt.Expression, target: Fmt.Expression): CachedPromise<boolean> {
-    // This code to determine requiredUnfoldLocation relies on the order in which findDifferenceFn is called by Fmt.Expression.isEquivalentTo.
-    // Since findDifferenceFn will only be called for pairs of subexpressions that are different, and inner expressions are traversed first,
-    // requiredUnfoldLocation will be set to one of the outermost differences.
-    let requiredUnfoldLocation: Fmt.Expression | undefined = undefined;
+    let knownDifferences: Fmt.Expression[] = [];
+    let newUnfoldLocations: Fmt.Expression[] = [];
+    let unfoldLocationsToCheck: Fmt.Expression[] = [];
+    // Note that findDifferenceFn will only be called for pairs of subexpressions that are different.
     let findDifferenceFn = (subExpression: Fmt.Expression) => {
-      requiredUnfoldLocation = subExpression;
-      return true;
+      if (knownDifferences.indexOf(subExpression) < 0) {
+        newUnfoldLocations.push(subExpression);
+        return true;
+      } else {
+        // Also consider unfolding at the common parent of differences found in previous iterations.
+        return false;
+      }
     };
-    source.isEquivalentTo(target, findDifferenceFn);
-
-    if (!requiredUnfoldLocation) {
-      return CachedPromise.resolve(true);
-    } else if (!this.canUnfoldAt(requiredUnfoldLocation, source)) {
-      return CachedPromise.resolve(false);
+    for (;;) {
+      source.isEquivalentTo(target, findDifferenceFn);
+      if (newUnfoldLocations.length) {
+        unfoldLocationsToCheck.push(newUnfoldLocations[0]);
+      }
+      if (newUnfoldLocations.length <= 1) {
+        // If we only have a single (additional) difference, we can stop considering parents.
+        break;
+      }
+      knownDifferences.push(...newUnfoldLocations);
+      newUnfoldLocations = [];
     }
 
-    let unfoldParameters: HLMUnfoldParameters = {
-      followDefinitions: true,
-      unfoldArguments: true,
-      substituteStructuralCases: true,
-      extractStructuralCases: true,
-      requiredUnfoldLocation: requiredUnfoldLocation
-    };
-    return this.getNextFormulas(source, unfoldParameters).then((formulas: Fmt.Expression[] | undefined) => {
-      let result = CachedPromise.resolve(false);
-      if (formulas) {
-        for (let formula of formulas) {
-          result = result.or(() => this.unfoldsTo(formula, target));
-        }
+    if (!unfoldLocationsToCheck.length) {
+      return CachedPromise.resolve(true);
+    }
+
+    let resultPromise = CachedPromise.resolve(false);
+    for (let unfoldLocation of unfoldLocationsToCheck) {
+      if (this.canUnfoldAt(unfoldLocation, source)) {
+        let unfoldParameters: HLMUnfoldParameters = {
+          followDefinitions: true,
+          unfoldArguments: true,
+          substituteStructuralCases: true,
+          extractStructuralCases: true,
+          requiredUnfoldLocation: unfoldLocation
+        };
+        resultPromise = resultPromise.or(() =>
+          this.getNextFormulas(source, unfoldParameters).then((formulas: Fmt.Expression[] | undefined) => {
+            let result = CachedPromise.resolve(false);
+            if (formulas) {
+              for (let formula of formulas) {
+                result = result.or(() => this.unfoldsTo(formula, target));
+              }
+            }
+            return result;
+          }));
       }
-      return result;
-    });
+    }
+    return resultPromise;
   }
 
   private canUnfoldAt(expression: Fmt.Expression, source: Fmt.Expression): boolean {
