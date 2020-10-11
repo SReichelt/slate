@@ -1376,9 +1376,9 @@ export class HLMDefinitionChecker {
         let currentContext = context;
         if (checkCompatibility) {
           let recheckFn = (substitutedItem: Fmt.Expression, recheckContext: HLMCheckerContext) => {
-            let substitutedList = {
+            let substitutedList: HLMEquivalenceListInfo = {
               ...list,
-              expressions: list.items.map((originalItem: Fmt.Expression) => originalItem === item ? substitutedItem : originalItem)
+              items: list.items.map((originalItem: Fmt.Expression) => originalItem === item ? substitutedItem : originalItem)
             };
             this.checkEquivalenceList(object, substitutedList, undefined, checkItem, checkCompatibility, recheckContext);
           };
@@ -2209,7 +2209,7 @@ export class HLMDefinitionChecker {
 
   private checkSetTermEquivalence(left: Fmt.Expression, right: Fmt.Expression, context: HLMCheckerContext): boolean {
     let state: HLMCheckerPlaceholderRestrictionState = {
-      exactValueRequried: false,
+      exactValueRequried: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
       context: context
     };
     let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
