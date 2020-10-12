@@ -1,7 +1,11 @@
 import * as React from 'react';
+import scrollIntoView from 'scroll-into-view-if-needed';
+
 import './Button.css';
 import './MenuButton.css';
-import scrollIntoView from 'scroll-into-view-if-needed';
+
+import { eventHandled } from '../utils/event';
+
 
 interface MenuButtonProps {
   className?: string;
@@ -52,8 +56,7 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           className += ' open';
         }
         onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
-          event.stopPropagation();
-          event.preventDefault();
+          eventHandled(event);
           if (this.state.menuOpen) {
             this.closeMenu();
           } else {
@@ -64,12 +67,10 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           if (event.defaultPrevented) {
             this.closeMenu();
           }
-          event.stopPropagation();
-          event.preventDefault();
+          eventHandled(event);
         };
         onClick = (event: React.MouseEvent<HTMLElement>) => {
-          event.stopPropagation();
-          event.preventDefault();
+          eventHandled(event);
         };
       }
     } else {

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { AlertType } from 'react-alert';
+
 import './Message.css';
+
 
 interface MessageProps {
   type: AlertType;

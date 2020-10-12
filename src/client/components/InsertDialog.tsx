@@ -1,9 +1,12 @@
 import * as React from 'react';
-import * as Dialog from '../../shared/notation/dialog';
-import * as Logic from '../../shared/logics/logic';
+
 import StandardDialog from './StandardDialog';
 import ValidationMessage from './ValidationMessage';
 import { SectionItemList } from './LibraryTree';
+
+import * as Dialog from '../../shared/notation/dialog';
+import * as Logic from '../../shared/logics/logic';
+
 
 export interface InsertDialogProps {
   dialog: Dialog.InsertDialog;

@@ -1,7 +1,8 @@
 import * as React from 'react';
+const ToolTip = require('react-portal-tooltip').default;
+
 import './ExpressionToolTip.css';
 
-const ToolTip = require('react-portal-tooltip').default;
 
 export type ToolTipPosition = 'left' | 'top' | 'right' | 'bottom';
 export type ToolTipArrow = 'center' | 'left' | 'top' | 'right' | 'bottom';

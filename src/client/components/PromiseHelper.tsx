@@ -1,8 +1,10 @@
 import * as React from 'react';
+const Loading = require('react-loading-animation');
+
 import './PromiseHelper.css';
+
 import CachedPromise from '../../shared/data/cachedPromise';
 
-const Loading = require('react-loading-animation');
 
 interface PromiseHelperProps {
   promise: CachedPromise<React.ReactNode>;

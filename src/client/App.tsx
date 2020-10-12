@@ -1,7 +1,10 @@
 import * as React from 'react';
-import './App.css';
 import SplitPane from 'react-split-pane';
 import { withAlert, AlertManager } from 'react-alert';
+const Loading = require('react-loading-animation');
+
+import './App.css';
+
 import ScrollPane from './components/ScrollPane';
 import StartPage from './extras/StartPage';
 import DocPage, { markdownSuffix } from './extras/DocPage';
@@ -16,28 +19,30 @@ import Message from './components/Message';
 import InsertDialog from './components/InsertDialog';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import { renderPromise } from './components/PromiseHelper';
+
+import config from './utils/config';
+import { ButtonType, getButtonIcon } from './utils/icons';
+
 import CachedPromise from '../shared/data/cachedPromise';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
 import * as FmtNotation from '../shared/notation/meta';
 import * as FmtLibrary from '../shared/logics/library';
 import * as Dialog from '../shared/notation/dialog';
-import config from './utils/config';
-import { ButtonType, getButtonIcon } from './utils/icons';
 import * as Embedding from '../shared/api/embedding';
 import { FileAccessor, WriteFileResult, FileWatcher } from '../shared/data/fileAccessor';
 import { WebFileAccessor, WebWriteFileResult } from '../shared/data/webFileAccessor';
 import { PreloadingWebFileAccessor } from '../shared/data/preloadingWebFileAccessor';
-import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from './data/gitHubFileAccessor';
-import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
-import * as GitHub from './data/gitHubAPIHandler';
 import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderOptions, LibraryItemNumber } from '../shared/data/libraryDataProvider';
 import { fileExtension } from '../shared/data/constants';
 import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 
-const Loading = require('react-loading-animation');
+import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from './data/gitHubFileAccessor';
+import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
+import * as GitHub from './data/gitHubAPIHandler';
+
 
 interface Libraries {
   [libraryName: string]: GitHub.Repository;

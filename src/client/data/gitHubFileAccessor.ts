@@ -1,8 +1,9 @@
+import * as GitHub from './gitHubAPIHandler';
+
 import { fetchText } from '../../shared/utils/fetch';
 import { FileAccessor, WriteFileResult, FileReference } from '../../shared/data/fileAccessor';
 import { StandardFileAccessor, StandardFileReference } from '../../shared/data/fileAccessorImpl';
 import CachedPromise from '../../shared/data/cachedPromise';
-import * as GitHub from './gitHubAPIHandler';
 
 export interface GitHubRepositoryAccess {
   apiAccess?: GitHub.APIAccess;

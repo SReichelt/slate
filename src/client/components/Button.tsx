@@ -1,5 +1,11 @@
 import * as React from 'react';
+
 import './Button.css';
+
+import { eventHandled } from '../utils/event';
+
+
+// TODO should we use an HTML button element for this?
 
 const clickDelay = 500;
 
@@ -48,26 +54,24 @@ class Button extends React.Component<ButtonProps, ButtonState> {
       if (this.props.onClick) {
         let propsOnClick = this.props.onClick;
         onClick = (event: React.SyntheticEvent<HTMLElement>) => {
-          event.stopPropagation();
-          event.preventDefault();
+          eventHandled(event);
           if (this.ready && !this.props.isMenuItem) {
             propsOnClick(false);
           }
         };
       }
       onMouseDown = (event: React.SyntheticEvent<HTMLElement>) => {
-        event.stopPropagation();
-        event.preventDefault();
+        eventHandled(event);
         this.setState({pressed: true});
         this.ready = true;
       };
       onMouseUp = (event: React.SyntheticEvent<HTMLElement>) => {
         if (this.props.isMenuItem && this.ready && this.props.onClick) {
           this.props.onClick(false);
+          event.preventDefault();
         } else {
-          event.stopPropagation();
+          eventHandled(event);
         }
-        event.preventDefault();
         this.setState({pressed: false});
       };
       onMouseLeave = (event: React.SyntheticEvent<HTMLElement>) => {
@@ -75,17 +79,17 @@ class Button extends React.Component<ButtonProps, ButtonState> {
       };
       onTouchStart = onMouseDown;
       onTouchEnd = (event: React.SyntheticEvent<HTMLElement>) => {
-        if (!this.props.isMenuItem) {
-          event.stopPropagation();
+        if (this.props.isMenuItem) {
+          event.preventDefault();
+        } else {
+          eventHandled(event);
         }
-        event.preventDefault();
         if (this.ready && this.props.onClick) {
           this.props.onClick(true);
         }
       };
       onTouchCancel = (event: React.SyntheticEvent<HTMLElement>) => {
-        event.stopPropagation();
-        event.preventDefault();
+        eventHandled(event);
         this.setState({pressed: false});
       };
     } else {

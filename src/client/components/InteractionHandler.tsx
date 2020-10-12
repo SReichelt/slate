@@ -1,11 +1,14 @@
 import * as React from 'react';
+
+import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
+import { renderPromise } from './PromiseHelper';
+
 import * as Fmt from '../../shared/format/format';
 import * as Notation from '../../shared/notation/notation';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
 import CachedPromise from '../../shared/data/cachedPromise';
-import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
-import { renderPromise } from './PromiseHelper';
+
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;
 

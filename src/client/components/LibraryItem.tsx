@@ -1,11 +1,15 @@
 import * as React from 'react';
+
 import './LibraryItem.css';
+
+import Expression, { ExpressionInteractionHandler } from './Expression';
+
 import * as Fmt from '../../shared/format/format';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
 import { MRUList } from '../../shared/data/mostRecentlyUsedList';
 import * as Logic from '../../shared/logics/logic';
-import Expression, { ExpressionInteractionHandler } from './Expression';
 import CachedPromise from '../../shared/data/cachedPromise';
+
 
 export interface LibraryItemProps {
   libraryDataProvider?: LibraryDataProvider;

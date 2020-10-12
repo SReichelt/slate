@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+
 export interface ReactElementManipulator {
   manipulateProps?(props: any): any;
   manipulateContents?(node: React.ReactNode, component: React.Component<any, any> | undefined): React.ReactNode;

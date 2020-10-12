@@ -1,17 +1,22 @@
 import * as React from 'react';
+const Loading = require('react-loading-animation');
+
 import './StartPage.css';
+
+import Button from '../components/Button';
+import Expression from '../components/Expression';
+import { OnLinkClicked } from '../components/InteractionHandler';
+import DocLink, { OnDocLinkClicked } from './DocLink';
+
+import { eventHandled } from '../utils/event';
+
 import * as Fmt from '../../shared/format/format';
 import * as Notation from '../../shared/notation/notation';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
 import * as Logics from '../../shared/logics/logics';
 import { HLMRenderer } from '../../shared/logics/hlm/renderer';
-import Button from '../components/Button';
-import Expression, { ExpressionInteractionHandler } from '../components/Expression';
-import { OnLinkClicked } from '../components/InteractionHandler';
-import DocLink, { OnDocLinkClicked } from './DocLink';
 
-const Loading = require('react-loading-animation');
 
 interface StartPageProps {
   isLoggedIn: boolean;
@@ -43,9 +48,9 @@ function buildExample(names: string[]): Fmt.DefinitionRefExpression {
 
 function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageProps): React.ReactNode {
   let href = props.libraryDataProvider!.pathToURI(path);
-  let onClick = (event: React.MouseEvent) => {
+  let onClick = (event: React.MouseEvent<HTMLElement>) => {
     if (event.button < 1) {
-      event.preventDefault();
+      eventHandled(event);
       props.onLinkClicked(props.libraryDataProvider!, path);
     }
   };

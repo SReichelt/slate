@@ -1,9 +1,14 @@
 import * as React from 'react';
-import 'react-responsive-modal/styles.css';
-import './StandardDialog.css';
 import Modal from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
+
+import './StandardDialog.css';
+
 import Button from './Button';
+
+import { eventHandled } from '../utils/event';
 import { getButtonIcon, ButtonType } from '../utils/icons';
+
 
 interface StandardDialogProps {
   onOK: () => void;
@@ -22,8 +27,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
     if (props.okEnabled) {
       props.onOK();
     }
-    event.stopPropagation();
-    event.preventDefault();
+    eventHandled(event);
   };
   let buttons: React.ReactNodeArray;
   if (props.okVisible) {

@@ -1,6 +1,8 @@
+import * as React from 'react';
+
 import * as Logic from '../../shared/logics/logic';
 import { LibraryItemInfo } from '../../shared/data/libraryDataAccessor';
-import * as React from 'react';
+
 
 export enum ButtonType {
   OK,

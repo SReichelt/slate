@@ -1,15 +1,20 @@
 import * as React from 'react';
+import scrollIntoView from 'scroll-into-view-if-needed';
+const Loading = require('react-loading-animation');
+
 import './ExpressionMenu.css';
-import * as Notation from '../../shared/notation/notation';
-import * as Menu from '../../shared/notation/menu';
-import { renderPromise } from './PromiseHelper';
+
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import ExpressionToolTip from './ExpressionToolTip';
-import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
-import CachedPromise from '../../shared/data/cachedPromise';
-import scrollIntoView from 'scroll-into-view-if-needed';
+import { renderPromise } from './PromiseHelper';
 
-const Loading = require('react-loading-animation');
+import { eventHandled } from '../utils/event';
+import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
+
+import * as Notation from '../../shared/notation/notation';
+import * as Menu from '../../shared/notation/menu';
+import CachedPromise from '../../shared/data/cachedPromise';
+
 
 const clickDelay = 100;
 
@@ -238,8 +243,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             if (this.ready) {
               this.props.onItemClicked(titleAction!);
             }
-            event.stopPropagation();
-            event.preventDefault();
+            eventHandled(event);
           };
           if (titleAction instanceof Menu.DialogExpressionMenuAction) {
             title = [title, '...'];
@@ -435,8 +439,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
       if (this.ready) {
         this.props.onItemClicked(this.props.item.action);
       }
-      event.stopPropagation();
-      event.preventDefault();
+      eventHandled(event);
     };
     let toolTip: React.ReactNode = null;
     if (this.props.interactionHandler && expression.semanticLinks && this.htmlNode) {
@@ -507,8 +510,7 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
     let onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
       this.props.item.text = this.state.text;
       this.props.onItemClicked(this.props.item.action);
-      event.stopPropagation();
-      event.preventDefault();
+      eventHandled(event);
     };
     let onMouseEnter = () => {
       this.setState({hovered: true});

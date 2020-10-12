@@ -1,21 +1,25 @@
 import * as React from 'react';
+import scrollIntoView from 'scroll-into-view-if-needed';
+const Loading = require('react-loading-animation');
+
 import './LibraryTree.css';
+
+import ScrollPane from './ScrollPane';
+import Expression, { ExpressionInteractionHandler } from './Expression';
+import ExpressionToolTip from './ExpressionToolTip';
+import Button from './Button';
+import MenuButton from './MenuButton';
+import { renderPromise } from './PromiseHelper';
+
 import * as Fmt from '../../shared/format/format';
 import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState, LibraryItemNumber } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
-import ScrollPane from './ScrollPane';
-import Expression, { ExpressionInteractionHandler } from './Expression';
-import ExpressionToolTip from './ExpressionToolTip';
-import CachedPromise from '../../shared/data/cachedPromise';
-import { renderPromise } from './PromiseHelper';
+import { eventHandled } from '../utils/event';
 import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
-import Button from './Button';
-import MenuButton from './MenuButton';
-import scrollIntoView from 'scroll-into-view-if-needed';
+import CachedPromise from '../../shared/data/cachedPromise';
 
-const Loading = require('react-loading-animation');
 
 export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => CachedPromise<boolean>;
 export type OnItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise: CachedPromise<LibraryDefinition>, itemInfo: LibraryItemInfo) => void;
@@ -895,7 +899,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
 
   private itemClicked = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
     if (event.button < 1 || this.props.isSubsection) {
-      event.preventDefault();
+      eventHandled(event);
       this.clicked = true;
       if (this.props.isSubsection && !this.props.positionSelectionMode) {
         this.setState((prevState) => ({opened: !prevState.opened}));

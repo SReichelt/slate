@@ -7,7 +7,6 @@ const webpack = require('webpack');
 const version = require('../../package.json').version;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 
 const config = require('../server/config');
 const projectRoot = path.join(__dirname, '..', '..');
@@ -52,13 +51,6 @@ const plugins = [
     'outputPlaceholder': outputPlaceholder
   })
 ];
-
-if (!config.IS_PRODUCTION) {
-  plugins.push(new OpenBrowserPlugin({
-    url: `http://localhost:${config.SERVER_PORT}`,
-    browser: 'chrome-remote-debug'
-  }));
-}
 
 /**@type {webpack.Configuration}*/
 module.exports = {

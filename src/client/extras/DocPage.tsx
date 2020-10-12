@@ -1,8 +1,13 @@
 import * as React from 'react';
-import { OnDocLinkClicked } from './DocLink';
+
 import { renderPromise } from '../components/PromiseHelper';
+import { OnDocLinkClicked } from './DocLink';
+
+import { eventHandled } from '../utils/event';
+
 import { fetchText } from '../../shared/utils/fetch';
 import CachedPromise from '../../shared/data/cachedPromise';
+
 
 const RemarkableReactRenderer = require('remarkable-react').default;
 const Remarkable = require('remarkable').Remarkable;
@@ -35,7 +40,7 @@ const DocPage = React.memo((props: DocPageProps) => {
               target = undefined;
               onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
                 if (event.button < 1) {
-                  event.preventDefault();
+                  eventHandled(event);
                   props.onDocLinkClicked(href);
                 }
               };

@@ -1,9 +1,13 @@
 import * as React from 'react';
-import { ReactElementManipulator, traverseReactComponents } from '../utils/traverse';
+
 import { PermanentToolTip, ToolTipPosition, ToolTipArrow } from '../components/ExpressionToolTip';
+import { PromiseHelper } from '../components/PromiseHelper';
+
+import { ReactElementManipulator, traverseReactComponents } from '../utils/traverse';
+
 import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
 import * as Fmt from '../../shared/format/format';
-import { PromiseHelper } from '../components/PromiseHelper';
+
 
 export interface TutorialToolTip {
   contents: React.ReactElement | ((component: React.Component<any, any>) => React.ReactNode) | null;

@@ -1,19 +1,8 @@
 import * as React from 'react';
+
 import './TutorialContents.css';
+
 import { StaticTutorialState, DynamicTutorialState } from './Tutorial';
-import { ButtonType, getButtonIcon } from '../utils/icons';
-import DocLink, { OnDocLinkClicked } from './DocLink';
-import config from '../utils/config';
-import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
-import CachedPromise from '../../shared/data/cachedPromise';
-
-import * as Fmt from '../../shared/format/format';
-import * as FmtHLM from '../../shared/logics/hlm/meta';
-import * as Logic from '../../shared/logics/logic';
-import * as Menu from '../../shared/notation/menu';
-import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
-
-import { PromiseHelper } from '../components/PromiseHelper';
 import StartPage from './StartPage';
 import Button, { ButtonProps } from '../components/Button';
 import MenuButton from '../components/MenuButton';
@@ -24,6 +13,20 @@ import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
+import DocLink, { OnDocLinkClicked } from './DocLink';
+import { PromiseHelper } from '../components/PromiseHelper';
+
+import { ButtonType, getButtonIcon } from '../utils/icons';
+import config from '../utils/config';
+
+import * as Fmt from '../../shared/format/format';
+import * as FmtHLM from '../../shared/logics/hlm/meta';
+import * as Logic from '../../shared/logics/logic';
+import * as Menu from '../../shared/notation/menu';
+import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
+import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
+import CachedPromise from '../../shared/data/cachedPromise';
+
 
 export type TutorialStateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => DynamicTutorialState | undefined;
 export type ChangeTutorialStateFn = (stateTransitionFn: TutorialStateTransitionFn) => void;
@@ -55,7 +58,9 @@ function createContentAction(action: (definition: Fmt.Definition) => void): (com
 
 function createDummyEvent(target: HTMLElement) {
   return {
+    type: 'dummy',
     target: target,
+    currentTarget: target,
     button: 0,
     stopPropagation() {},
     preventDefault() {}

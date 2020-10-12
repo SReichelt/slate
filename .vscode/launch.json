@@ -13,21 +13,19 @@
                 "run-script",
                 "dev"
             ],
-            "port": 9229,
-            "timeout": 120000
+            "port": 9229
         },
         {
             "type": "chrome",
-            "request": "attach",
-            "name": "Attach to Chrome",
-            "port": 9222,
+            "request": "launch",
+            "name": "Launch Chrome",
+            "url": "http://localhost:3000/",
             "webRoot": "${workspaceFolder}/src/client",
             "sourceMapPathOverrides": {
                 "webpack:///./*":  "${webRoot}/*",
                 "webpack:///../*": "${webRoot}/../*",
                 "webpack:///*":    "*"
-            },
-            "timeout": 120000
+            }
         },
         {
             "type": "firefox",
@@ -60,8 +58,12 @@
     ],
     "compounds": [
         {
-            "name": "Launch and attach",
-            "configurations": ["Launch via NPM", "Attach to Chrome"]
+            "name": "Launch with Chrome",
+            "configurations": ["Launch via NPM", "Launch Chrome"]
+        },
+        {
+            "name": "Launch with Firefox",
+            "configurations": ["Launch via NPM", "Launch Firefox"]
         }
     ]
 }

@@ -1,27 +1,32 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import ReactMarkdownEditor from 'react-simplemde-editor';
+import * as EasyMDE from 'easymde';
+import 'easymde/dist/easymde.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+const RemarkableReactRenderer = require('remarkable-react').default;
+const Remarkable = require('remarkable').Remarkable;
+const linkify = require('remarkable/linkify').linkify;
+
 import './Expression.css';
-import * as Notation from '../../shared/notation/notation';
-import * as Menu from '../../shared/notation/menu';
-import * as Dialog from '../../shared/notation/dialog';
-import { PromiseHelper, renderPromise } from './PromiseHelper';
+
 import ExpressionToolTip, { ToolTipPosition } from './ExpressionToolTip';
 import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
 import Button from './Button';
+import { PromiseHelper, renderPromise } from './PromiseHelper';
+
 import config from '../utils/config';
+import { eventHandled } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
+
+import * as Notation from '../../shared/notation/notation';
+import * as Menu from '../../shared/notation/menu';
+import * as Dialog from '../../shared/notation/dialog';
 import { convertUnicode, UnicodeConverter, UnicodeConversionOptions, useItalicsForVariable } from '../../shared/notation/unicode';
-import ReactMarkdownEditor from 'react-simplemde-editor';
-import * as EasyMDE from 'easymde';
-import 'easymde/dist/easymde.min.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import CachedPromise from '../../shared/data/cachedPromise';
 
-const RemarkableReactRenderer = require('remarkable-react').default;
-const Remarkable = require('remarkable').Remarkable;
-const linkify = require('remarkable/linkify').linkify;
 
 export type OnExpressionChanged = (editorUpdateRequired: boolean) => void;
 export type OnHoverChanged = (hoveredObjects: Object[]) => void;
@@ -886,7 +891,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let onClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.button < 1) {
           this.setState({unfolded: !unfolded});
-          this.stopPropagation(event);
+          eventHandled(event);
         }
       };
       let rows = [
@@ -942,19 +947,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       let interactive = hasMenu;
       let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.menuClicked(onMenuOpened!, event)) : undefined;
-      let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.stopPropagation(event)) : undefined;
-      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.stopPropagation(event)) : undefined;
+      let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && eventHandled(event)) : undefined;
+      let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && eventHandled(event)) : undefined;
       if (expression instanceof Notation.InsertPlaceholderExpression && expression.action && !hasMenu) {
         onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
           if (event.button < 1) {
             this.setState({clicking: true});
-            this.stopPropagation(event);
+            eventHandled(event);
           }
         };
         onMouseUp = (event: React.MouseEvent<HTMLElement>) => {
           if (event.button < 1) {
             this.setState({clicking: false});
-            this.stopPropagation(event);
+            eventHandled(event);
           }
         };
         onClick = (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.actionClicked(expression.action!, event));
@@ -1041,13 +1046,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           // However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
           // So we do this anyway, but only in production mode, to prevent warnings from React.
           result = (
-            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => eventHandled(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
             </a>
           );
         } else {
           result = (
-            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => this.stopPropagation(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => eventHandled(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
             </span>
           );
@@ -1197,7 +1202,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return;
     }
     if (event) {
-      this.stopPropagation(event);
+      eventHandled(event);
     }
     this.permanentlyHighlighted = true;
     this.addToHoveredChildren();
@@ -1238,7 +1243,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private linkClicked(semanticLink: Notation.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {
     this.setState({clicking: false});
-    this.stopPropagation(event);
+    eventHandled(event);
     if (this.props.interactionHandler && !this.props.interactionHandler.isBlocked() && semanticLink) {
       this.props.interactionHandler.linkClicked(semanticLink);
     }
@@ -1249,7 +1254,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return;
     }
     this.setState({clicking: false});
-    this.stopPropagation(event);
+    eventHandled(event);
     if (action instanceof Menu.ImmediateExpressionMenuAction) {
       let result = action.onExecute();
       if (!(result instanceof CachedPromise)) {
@@ -1285,7 +1290,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       this.setState({openMenu: onMenuOpened()});
       this.enableWindowClickListener();
     }
-    this.stopPropagation(event);
+    eventHandled(event);
   }
 
   private onMenuItemClicked = (action: Menu.ExpressionMenuAction) => {
@@ -1325,11 +1330,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     this.disableInteractionBlocker(this.props);
     this.clearPermanentHighlight();
   };
-
-  private stopPropagation(event: React.SyntheticEvent<HTMLElement>): void {
-    event.stopPropagation();
-    event.preventDefault();
-  }
 
   private openSearchDialog(searchURLs: Notation.MarkdownExpressionSearchURL[], defaultSearchText?: string): void {
     let searchText = defaultSearchText || '';

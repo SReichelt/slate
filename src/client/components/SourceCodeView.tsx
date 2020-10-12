@@ -1,9 +1,11 @@
 import * as React from 'react';
-import * as Fmt from '../../shared/format/format';
-import * as FmtWriter from '../../shared/format/write';
-import * as SourceCodeDisplay from '../../shared/notation/sourceCodeDisplay';
+
 import Expression from './Expression';
 import { LibraryItemBase } from './LibraryItem';
+
+import * as FmtWriter from '../../shared/format/write';
+import * as SourceCodeDisplay from '../../shared/notation/sourceCodeDisplay';
+
 
 class SourceCodeView extends LibraryItemBase {
   private timer: any;

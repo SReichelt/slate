@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import { eventHandled } from '../utils/event';
+
+
 export type OnDocLinkClicked = (uri: string) => void;
 
 interface DocLinkProps {
@@ -10,7 +13,7 @@ interface DocLinkProps {
 function DocLink(props: React.PropsWithChildren<DocLinkProps>) {
   let onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (event.button < 1) {
-      event.preventDefault();
+      eventHandled(event);
       props.onDocLinkClicked(props.href);
     }
   };
