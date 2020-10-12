@@ -2133,7 +2133,7 @@ export class HLMDefinitionChecker {
         }
         return CachedPromise.resolve(firstTerm);
       } else {
-        let checkForDirectEquivalence = !status.directEquivalenceUnlikely && !status.checkedForDirectEquivalence;
+        let checkForDirectEquivalence = !status.directEquivalenceUnlikely && !status.checkedForDirectEquivalence && !this.options.supportPlaceholders;
         let nextSetTermsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
         let nextStatus: HLMCheckerCompatibilityStatus = {
           directEquivalenceUnlikely: false,
