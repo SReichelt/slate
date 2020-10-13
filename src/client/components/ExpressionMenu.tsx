@@ -457,7 +457,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
       toolTip = <ExpressionToolTip active={this.state.hovered} position="right" parent={this.htmlNode} getContents={getToolTipContents} delay={100} key="tooltip"/>;
     }
     return (
-      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick} ref={(node) => (this.htmlNode = node)}>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={(event) => eventHandled(event)} onMouseUp={onClick} onTouchStart={(event) => eventHandled(event)} onTouchCancel={(event) => eventHandled(event)} onTouchEnd={onClick} ref={(node) => (this.htmlNode = node)}>
         <Expression expression={expression}/>
         {toolTip}
       </td>
