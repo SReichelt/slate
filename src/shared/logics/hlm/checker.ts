@@ -529,6 +529,7 @@ export class HLMDefinitionChecker {
 
   private checkEmbeddability(subset: Fmt.Expression): void {
     let typeSearchParameters: HLMTypeSearchParameters = {
+      unfoldVariableDefinitions: true,
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: true,
@@ -1305,12 +1306,13 @@ export class HLMDefinitionChecker {
     this.checkElementTerm(term, context);
     this.checkSetTerm(construction, this.getAutoFillContext(context));
     let typeSearchParameters: HLMTypeSearchParameters = {
+      unfoldVariableDefinitions: true,
       followDefinitions: true,
       followSupersets: true,
       followEmbeddings: false,
       followAllAlternatives: false,
       unfoldArguments: false,
-      substituteStructuralCases: false,
+      substituteStructuralCases: true,
       extractStructuralCases: false
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters).then((finalSet: Fmt.Expression) => {
@@ -2143,6 +2145,7 @@ export class HLMDefinitionChecker {
           addedStructuralCases: status.followedEmbeddings || !context.parentStructuralCases.length
         };
         let typeSearchParameters: HLMTypeSearchParameters = {
+          unfoldVariableDefinitions: true,
           followDefinitions: true,
           followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings && !checkSubset,

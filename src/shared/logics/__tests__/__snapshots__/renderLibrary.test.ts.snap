@@ -1740,7 +1740,12 @@ exports[`render hlm library: 1.4.23 Essentials/Functions/Inverse%20of%20inverse%
 
   (f^-1)^-1 = f
 
-No proof."
+Proof.  We show that f^-1 ∘ f = id_X:
+
+Let g := f^-1.
+
+⇒^def id_X = g ∘ f
+ =^def f^-1 ∘ f"
 `;
 
 exports[`render hlm library: 1.4.24 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
@@ -2977,7 +2982,11 @@ Proof.  By induction on n.
   M is inductive ⇒^def 0 ∈ M
 * Let x ∈ ℕ such that x ∈ M. Then x + 1 ∈ M:
   M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
-   ⇒ x + 1 ∈ M"
+   ⇒ x + 1 ∈ M
+
+Remarks.
+
+This lemma is necessary to prove \`$\\"Induction principle\\"\` because structural induction is only allowed on theorem parameters."
 `;
 
 exports[`render hlm library: 1.7.1.37 Essentials/Numbers/Natural/Induction%20principle 1`] = `
@@ -2989,7 +2998,10 @@ exports[`render hlm library: 1.7.1.37 Essentials/Numbers/Natural/Induction%20pri
 Proof.
 
 1⇒2. Assume M is inductive. Then M = ℕ:
+     ⊆. Trivial.
      ⊇. Let n ∈ ℕ. Then n ∈ M by 1.7.1.36.
+2⇒1. Assume M = ℕ. Then M is inductive:
+     We have ℕ is inductive by definition ⇒^[M = ℕ] M is inductive.
 
 Remarks.
 

@@ -2867,6 +2867,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           dependsOnPrevious = (type instanceof FmtHLM.MetaRefExpression_Substitute
                                || (context.previousStep !== undefined && this.utils.referencesParameter(sourceType, context.previousStep)));
         }
+        // TODO for UseForAll, display substituted parameters as formulas, e.g. "42 in S" if formula was "for all x in S: ..."
         addImplication({
           dependsOnPrevious: dependsOnPrevious,
           source: source,

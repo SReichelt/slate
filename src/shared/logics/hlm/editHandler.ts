@@ -72,7 +72,7 @@ interface ProveByCasesInfo {
   hasGoalBasedCases: boolean;
 }
 
-const unfoldContinuationLimit = 4;
+const unfoldContinuationLimit = 8;
 
 function addNegations(expressions: Fmt.Expression[]): Fmt.Expression[] {
   let negatedExpressions = expressions.map((expression: Fmt.Expression) =>
@@ -1536,43 +1536,46 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getUnfoldedFormulas(formula: Fmt.Expression, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression[] | undefined> {
-    return this.utils.getNextFormulas(formula, unfoldAll).then((immediateFormulas: Fmt.Expression[] | undefined) => {
-      if (immediateFormulas) {
-        let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-        for (let immediateFormula of immediateFormulas) {
-          resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
-            this.utils.simplifyFormula(immediateFormula).then((simplifiedFormula: Fmt.Expression) =>
-              this.utils.unfoldsTo(context.originalGoal!, simplifiedFormula).then((unfoldResult: boolean) => {
-                if (unfoldResult) {
-                  return currentResult.concat(simplifiedFormula);
-                } else {
-                  // TODO fix cases where this happens
-                  console.warn(`Omitting ${simplifiedFormula} because unfoldsTo returned false`);
-                  return currentResult;
-                }
-              })));
-        }
-        if (immediateFormulas.length < unfoldContinuationLimit) {
-          for (let immediateFormula of immediateFormulas) {
-            resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
-              this.getUnfoldedFormulas(immediateFormula, context).then((nextFormulas: Fmt.Expression[] | undefined) => {
-                if (nextFormulas) {
-                  let nextResult = currentResult.slice();
-                  for (let nextFormula of nextFormulas) {
-                    if (!currentResult.some((item: Fmt.Expression) => nextFormula.isEquivalentTo(item))) {
-                      nextResult.push(nextFormula);
-                    }
+    return this.addUnfoldedFormulas([formula], undefined, context);
+  }
+
+  private addUnfoldedFormulas(newFormulas: Fmt.Expression[], currentResultFormulas: Fmt.Expression[] | undefined, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression[] | undefined> {
+    let resultPromise: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(currentResultFormulas);
+    for (let formula of newFormulas) {
+      resultPromise = resultPromise.then((currentResult: Fmt.Expression[] | undefined) =>
+        this.utils.getNextFormulas(formula, unfoldAll).then((nextFormulas: Fmt.Expression[] | undefined) => {
+          if (nextFormulas) {
+            let nextResultPromise: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(currentResult);
+            for (let nextFormula of nextFormulas) {
+              nextResultPromise = nextResultPromise.then((currentNextResult: Fmt.Expression[] | undefined) =>
+                this.utils.simplifyFormula(nextFormula).then((simplifiedFormula: Fmt.Expression) => {
+                  if (currentNextResult?.some((item: Fmt.Expression) => simplifiedFormula.isEquivalentTo(item))) {
+                    return currentNextResult;
+                  } else {
+                    return this.utils.unfoldsTo(context.originalGoal!, simplifiedFormula).then((unfoldResult: boolean) => {
+                      if (unfoldResult) {
+                        return currentNextResult ? currentNextResult.concat(simplifiedFormula) : [simplifiedFormula];
+                      } else {
+                        // TODO fix cases where this happens
+                        console.warn(`Omitting ${simplifiedFormula} because unfoldsTo returned false`);
+                        return currentNextResult;
+                      }
+                    });
                   }
-                  return nextResult;
-                } else {
-                  return currentResult;
-                }
-              }));
+                }));
+            }
+            return nextResultPromise;
+          } else {
+            return currentResult;
           }
-        }
-        return resultPromise;
+        }));
+    }
+    return resultPromise.then((result: Fmt.Expression[] | undefined) => {
+      if (result && (!currentResultFormulas || result.length > currentResultFormulas.length) && result.length < unfoldContinuationLimit) {
+        let nextNewFormulas = currentResultFormulas ? result.slice(currentResultFormulas.length) : result;
+        return this.addUnfoldedFormulas(nextNewFormulas, result, context);
       } else {
-        return undefined;
+        return result;
       }
     });
   }
@@ -1647,24 +1650,24 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private simplifyGoal(goal: Fmt.Expression | undefined, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression | undefined> {
     if (goal) {
-      // TODO auto-unfold
-      return this.checker.stripConstraintsFromFormulas([goal], true, true, false, false, context).then((strippedGoals: Fmt.Expression[]) => {
-        let strippedGoal = (strippedGoals.length ? strippedGoals[0] : goal);
-        return strippedGoal;
-      });
+      return this.utils.simplifyFormula(goal).then((simplifiedGoal: Fmt.Expression) =>
+        this.checker.stripConstraintsFromFormulas([simplifiedGoal], true, true, false, false, context).then((strippedGoals: Fmt.Expression[]) => {
+          let strippedGoal = (strippedGoals.length ? strippedGoals[0] : simplifiedGoal);
+          return strippedGoal;
+        }));
     } else {
       return CachedPromise.resolve(undefined);
     }
   }
 
   private simplifyResult(result: Fmt.Expression, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression> {
-    // TODO auto-unfold
-    return this.checker.stripConstraintsFromFormulas([result], true, false, true, false, context).then((strippedResults: Fmt.Expression[]) => {
-      let strippedResult = strippedResults.length ? strippedResults[0] : result;
-      // TODO make variable names in result unique
-      // TODO if result is a conjunction and a single term closes the goal, use only that term
-      return strippedResult;
-    });
+    return this.utils.simplifyFormula(result).then((simplifiedResult: Fmt.Expression) =>
+      this.checker.stripConstraintsFromFormulas([simplifiedResult], true, false, true, false, context).then((strippedResults: Fmt.Expression[]) => {
+        let strippedResult = strippedResults.length ? strippedResults[0] : simplifiedResult;
+        // TODO make variable names in result unique
+        // TODO if result is a conjunction and a single term closes the goal, use only that term
+        return strippedResult;
+      }));
   }
 
   private createSubProof(parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression | undefined, mayOmitGoal: boolean, context: HLMCheckerProofStepContext, steps: Fmt.ParameterList = new Fmt.ParameterList(), fromIndex?: number, toIndex?: number): CachedPromise<FmtHLM.ObjectContents_Proof> {
