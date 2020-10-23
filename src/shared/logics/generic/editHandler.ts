@@ -45,6 +45,20 @@ export abstract class GenericEditHandler {
     return new Set<string>(this.editAnalysis.usedParameterNames);
   }
 
+  protected cloneAndAdaptParameterNames(expression: Fmt.Expression): Fmt.Expression {
+    let replacedParameters: Fmt.ReplacedParameter[] = [];
+    let result = expression.clone(replacedParameters);
+    if (replacedParameters.length) {
+      let usedParameterNames = this.getUsedParameterNames();
+      for (let replacedParameter of replacedParameters) {
+        let param = replacedParameter.replacement;
+        let newName = this.utils.getUnusedDefaultName(param.name, usedParameterNames);
+        FmtUtils.renameParameter(param, newName, undefined, result);
+      }
+    }
+    return result;
+  }
+
   isTemporaryExpression(expression: Fmt.Expression): boolean {
     return this.editAnalysis.expressionEditInfo.get(expression) === undefined;
   }

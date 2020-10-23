@@ -73,26 +73,28 @@ export function substituteVariable(expression: Fmt.Expression, variable: Fmt.Par
 
 export function renameParameter(parameter: Fmt.Parameter, newName: string, parameterList: Fmt.ParameterList | undefined, scope: Fmt.Traversable | undefined): void {
   let oldName = parameter.name;
-  parameter.name = newName;
-  let paramIndex = parameterList?.indexOf(parameter);
-  scope?.traverse((expression: Fmt.Expression) => {
-    if (expression instanceof Fmt.IndexedExpression && expression.parameters && expression.arguments) {
-      let arg: Fmt.Argument | undefined = undefined;
-      if (parameterList) {
-        if (expression.parameters === parameterList) {
-          arg = expression.arguments.get(oldName, paramIndex);
+  if (newName !== oldName) {
+    parameter.name = newName;
+    let paramIndex = parameterList?.indexOf(parameter);
+    scope?.traverse((expression: Fmt.Expression) => {
+      if (expression instanceof Fmt.IndexedExpression && expression.parameters && expression.arguments) {
+        let arg: Fmt.Argument | undefined = undefined;
+        if (parameterList) {
+          if (expression.parameters === parameterList) {
+            arg = expression.arguments.get(oldName, paramIndex);
+          }
+        } else {
+          let localParamIndex = expression.parameters.indexOf(parameter);
+          if (localParamIndex >= 0) {
+            arg = expression.arguments.get(oldName, localParamIndex);
+          }
         }
-      } else {
-        let localParamIndex = expression.parameters.indexOf(parameter);
-        if (localParamIndex >= 0) {
-          arg = expression.arguments.get(oldName, localParamIndex);
+        if (arg && arg.name === oldName) {
+          arg.name = newName;
         }
       }
-      if (arg && arg.name === oldName) {
-        arg.name = newName;
-      }
-    }
-  });
+    });
+  }
 }
 
 export function readCode(code: string, metaModel: Meta.MetaModel): Fmt.Expression {

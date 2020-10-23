@@ -8,6 +8,7 @@ import * as HLMMacro from './macro';
 import * as HLMMacros from './macros/macros';
 import { LibraryDefinition } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
+import { Context } from '../../format/context';
 
 export class HLMSubstitutionContext extends SubstitutionContext {}
 
@@ -580,9 +581,18 @@ export class HLMUtils extends GenericUtils {
   updateInitialProofStepContext(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext): void {
     if (proof.goal) {
       context.goal = proof.goal;
-    } else if (proof.parameters && proof.parameters.length) {
+    }
+    if (!this.getDisplayedGoal(proof.goal) && proof.parameters && proof.parameters.length) {
       let lastParam = proof.parameters[proof.parameters.length - 1];
       context.previousResult = this.getParameterConstraint(lastParam, context);
+    }
+  }
+
+  getDisplayedGoal(goal: Fmt.Expression | undefined): Fmt.Expression | undefined {
+    if (goal && !this.isFalseFormula(goal)) {
+      return goal;
+    } else {
+      return undefined;
     }
   }
 

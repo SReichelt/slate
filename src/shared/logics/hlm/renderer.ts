@@ -2344,19 +2344,25 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       state.startRowSpacing = ' ';
       hasContents = true;
     }
-    let goal = proof.goal;
-    if (!goal && context.goal && showExternalGoal) {
-      goal = context.goal;
+    let displayedGoal: Fmt.Expression | undefined = undefined;
+    if (proof.goal) {
+      displayedGoal = this.utils.getDisplayedGoal(proof.goal);
+      context = {
+        ...context,
+        goal: proof.goal
+      };
+    } else if (showExternalGoal) {
+      displayedGoal = this.utils.getDisplayedGoal(context.goal);
     }
-    if (proof.steps.length) {
+    if (displayedGoal && proof.steps.length) {
       let firstStepType = proof.steps[0].type;
-      if (firstStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && goal instanceof FmtHLM.MetaRefExpression_forall) {
-        goal = undefined;
+      if (firstStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && displayedGoal instanceof FmtHLM.MetaRefExpression_forall) {
+        displayedGoal = undefined;
       }
     }
-    if (goal && !this.utils.isFalseFormula(goal)) {
+    if (displayedGoal) {
       this.outputStartRowSpacing(state);
-      let renderedGoal = this.readOnlyRenderer.renderFormula(goal, fullFormulaSelection);
+      let renderedGoal = this.readOnlyRenderer.renderFormula(displayedGoal, fullFormulaSelection);
       if (hasContents) {
         state.startRow.push(new Notation.TextExpression('Then '));
       }
@@ -2377,7 +2383,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           );
           this.commitStartRow(state);
           return;
-        } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression && type.result.isEquivalentTo(goal)) {
+        } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression && type.result.isEquivalentTo(displayedGoal)) {
           state.startRow.push(
             renderedGoal,
             new Notation.TextExpression(' by '),
@@ -2480,7 +2486,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
     this.commitImplications(state, false);
-    let externalGoal = context.goal && !this.utils.isFalseFormula(context.goal) ? context.goal : undefined;
+    let externalGoal = this.utils.getDisplayedGoal(context.goal);
     if (proof) {
       this.addProofInternal(proof, undefined, context, externalGoal !== undefined, indentSteps, state);
     } else if (externalGoal) {
