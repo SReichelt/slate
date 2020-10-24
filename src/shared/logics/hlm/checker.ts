@@ -1467,7 +1467,7 @@ export class HLMDefinitionChecker {
       goal: proof.goal ?? originalGoal,
       previousResult: undefined
     };
-    this.utils.updateInitialProofStepContext(proof, stepContext);
+    this.utils.updateInitialProofStepContext(proof, stepContext, true);
     stepContext = this.checkProofSteps(proof.steps, stepContext);
     if (stepContext) {
       if (stepContext.goal) {

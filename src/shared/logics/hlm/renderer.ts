@@ -2343,13 +2343,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     let displayedGoal: Fmt.Expression | undefined = undefined;
     if (proof.goal) {
-      displayedGoal = this.utils.getDisplayedGoal(proof.goal);
+      displayedGoal = this.getDisplayedGoal(proof.goal);
       context = {
         ...context,
         goal: proof.goal
       };
     } else if (showExternalGoal) {
-      displayedGoal = this.utils.getDisplayedGoal(context.goal);
+      displayedGoal = this.getDisplayedGoal(context.goal);
     }
     if (displayedGoal && proof.steps.length) {
       let firstStepType = proof.steps[0].type;
@@ -2419,12 +2419,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           paragraphs: [],
           isPreview: state.isPreview
         };
-        this.addProofSteps(proof, context, indentedState);
+        this.addProofSteps(proof, context, indentedState, displayedGoal !== undefined);
         let steps = new Notation.ParagraphExpression(indentedState.paragraphs);
         steps.styleClasses = ['indented'];
         state.paragraphs.push(steps);
       } else {
-        this.addProofSteps(proof, context, state);
+        this.addProofSteps(proof, context, state, displayedGoal !== undefined);
       }
     } else if (!state.isPreview) {
       this.outputStartRowSpacing(state);
@@ -2444,6 +2444,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     this.commitStartRow(state);
+  }
+
+  private getDisplayedGoal(goal: Fmt.Expression | undefined): Fmt.Expression | undefined {
+    if (goal && !this.utils.isFalseFormula(goal)) {
+      return goal;
+    } else {
+      return undefined;
+    }
   }
 
   private addNoProofPlaceholder(heading: string | undefined, onInsertProof: InsertProofFn | undefined, state: ProofOutputState): void {
@@ -2483,15 +2491,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
     this.commitImplications(state, false);
-    let externalGoal = this.utils.getDisplayedGoal(context.goal);
     if (proof) {
-      this.addProofInternal(proof, undefined, context, externalGoal !== undefined, indentSteps, state);
-    } else if (externalGoal) {
+      let showExternalGoal = !(proof.steps.length && this.isDependentProofStepType(proof.steps[0].type));
+      this.addProofInternal(proof, undefined, context, showExternalGoal, indentSteps, state);
+    } else if (context.goal) {
       if (!state.startRow) {
         state.startRow = [];
       }
       this.outputStartRowSpacing(state);
-      state.startRow.push(this.readOnlyRenderer.renderFormula(externalGoal, fullFormulaSelection));
+      state.startRow.push(this.readOnlyRenderer.renderFormula(context.goal, fullFormulaSelection));
       // TODO add conditional proof step insertion button
       state.startRow.push(new Notation.TextExpression('.'));
       this.commitStartRow(state);
@@ -2609,14 +2617,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.addProofListInternal(proofs, undefined, labels, context, state);
   }
 
-  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, state: ProofOutputState): void {
+  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, state: ProofOutputState, hasDisplayedGoal: boolean): void {
     let renderContext: HLMProofStepRenderContext = {
       ...context,
       originalParameters: [],
       substitutedParameters: [],
       isLastStep: false
     };
-    this.utils.updateInitialProofStepContext(proof, renderContext);
+    this.utils.updateInitialProofStepContext(proof, renderContext, !hasDisplayedGoal);
     for (let stepIndex = 0; stepIndex < proof.steps.length; stepIndex++) {
       let step = proof.steps[stepIndex];
       if (stepIndex === proof.steps.length - 1) {
@@ -2671,9 +2679,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           state.implications = [implication];
         }
       };
-      if (type instanceof FmtHLM.MetaRefExpression_ProveDef
-          || type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
+      if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
         let subProofContext: HLMProofStepContext = {
+          stepResults: context.stepResults
+        };
+        this.addSubProof(type.proof, subProofContext, false, state);
+        return undefined;
+      } else if (type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
+        let goal: Fmt.Expression | undefined = undefined;
+        if (context.goal instanceof FmtHLM.MetaRefExpression_forall && type.proof.parameters) {
+          goal = this.utils.substituteParameters(context.goal.formula, context.goal.parameters, type.proof.parameters);
+        }
+        let subProofContext: HLMProofStepContext = {
+          goal: goal,
           stepResults: context.stepResults
         };
         this.addSubProof(type.proof, subProofContext, false, state);
@@ -2829,11 +2847,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.addIndentedSubProof(subProof, subProofContext, state);
         }
         return type.statement;
-      } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
-                 || type instanceof FmtHLM.MetaRefExpression_Unfold
-                 || type instanceof FmtHLM.MetaRefExpression_UseForAll
-                 || type instanceof FmtHLM.MetaRefExpression_UseTheorem
-                 || type instanceof FmtHLM.MetaRefExpression_Substitute) {
+      } else if (this.isDependentProofStepType(type) || type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
         let result = this.utils.getProofStepResult(step, context);
         if (!result) {
           return undefined;
@@ -2938,6 +2952,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       state.paragraphs.push(new Notation.ErrorExpression(e.message));
     }
     return undefined;
+  }
+
+  private isDependentProofStepType(type: Fmt.Expression): boolean {
+    return (type instanceof FmtHLM.MetaRefExpression_UseDef
+            || type instanceof FmtHLM.MetaRefExpression_Unfold
+            || type instanceof FmtHLM.MetaRefExpression_UseForAll
+            || type instanceof FmtHLM.MetaRefExpression_Substitute);
   }
 
   private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {

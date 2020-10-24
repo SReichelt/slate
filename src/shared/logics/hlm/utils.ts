@@ -562,21 +562,13 @@ export class HLMUtils extends GenericUtils {
     return macroInstance.invoke(this, expression, config);
   }
 
-  updateInitialProofStepContext(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext): void {
+  updateInitialProofStepContext(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, maySetPreviousResult: boolean): void {
     if (proof.goal) {
       context.goal = proof.goal;
     }
-    if (!this.getDisplayedGoal(proof.goal) && proof.parameters && proof.parameters.length) {
+    if (maySetPreviousResult && proof.parameters && proof.parameters.length) {
       let lastParam = proof.parameters[proof.parameters.length - 1];
       context.previousResult = this.getParameterConstraint(lastParam, context);
-    }
-  }
-
-  getDisplayedGoal(goal: Fmt.Expression | undefined): Fmt.Expression | undefined {
-    if (goal && !this.isFalseFormula(goal)) {
-      return goal;
-    } else {
-      return undefined;
     }
   }
 

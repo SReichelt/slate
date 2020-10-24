@@ -24,9 +24,9 @@ exports[`render hlm library: 1.1.2 Essentials/Sets/Empty%20set%20is%20subset%20o
 
   ∅ ⊆ S
 
-Proof.  Let x ∈ ∅. Then x ∈ S:
+Proof.  Let x ∈ ∅.
 
-x ∈ ∅ ⇒^def ↯
+⇒^def ↯
 
 References.
 

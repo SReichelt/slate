@@ -65,6 +65,7 @@ export const fullFormulaSelection: FormulaSelection = {
 interface ProofStepInfo {
   step: Fmt.Parameter;
   linkedObject?: Object;
+  preventCloning?: boolean;
 }
 
 interface ProveByCasesInfo {
@@ -1439,10 +1440,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createProveForAllStep(goal: FmtHLM.MetaRefExpression_forall, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo> {
-    let replacedParameters: Fmt.ReplacedParameter[] = [];
-    let parameters = goal.parameters.clone(replacedParameters);
-    let subGoal = goal.formula.clone(replacedParameters);
-    return this.createSubProof(parameters, subGoal, true, context).then((subProof: FmtHLM.ObjectContents_Proof) => {
+    return this.createSubProof(goal.parameters, undefined, true, context).then((subProof: FmtHLM.ObjectContents_Proof) => {
       let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveForAll(subProof), '_');
       return {step: step};
     });
@@ -1528,18 +1526,22 @@ export class HLMEditHandler extends GenericEditHandler {
         for (let definition of definitions) {
           resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) => {
             let subStepsPromise: CachedPromise<Fmt.ParameterList>;
-            if (definition.formula instanceof FmtHLM.MetaRefExpression_forall) {
-              // TODO (maybe) rename hidden result variables if user renames variable of ProveForAll step
-              subStepsPromise = this.createProveForAllStep(definition.formula, context).then((proveForAllStep: ProofStepInfo) => new Fmt.ParameterList(proveForAllStep.step));
+            // Clone formula now and prevent cloning of the entire step.
+            // This makes sure that (only in this editing session), the parameter list of the (optional) inner
+            // ProveForAll step is tied to the outer parameter list, so variable name changes are propagated.
+            let formula = definition.formula.clone();
+            if (formula instanceof FmtHLM.MetaRefExpression_forall) {
+              subStepsPromise = this.createProveForAllStep(formula, context).then((proveForAllStep: ProofStepInfo) => new Fmt.ParameterList(proveForAllStep.step));
             } else {
               subStepsPromise = CachedPromise.resolve(new Fmt.ParameterList);
             }
             return subStepsPromise.then((subSteps: Fmt.ParameterList) =>
-              this.createSubProof(undefined, definition.formula, false, context, subSteps).then((subProof: FmtHLM.ObjectContents_Proof) => {
+              this.createSubProof(undefined, formula, false, context, subSteps).then((subProof: FmtHLM.ObjectContents_Proof) => {
                 let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveDef(this.utils.internalToExternalIndex(definition.side), subProof), '_');
                 return currentSteps.concat({
                   step: step,
-                  linkedObject: definition.definitionRef
+                  linkedObject: definition.definitionRef,
+                  preventCloning: true
                 });
               }));
           });
@@ -1780,7 +1782,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getProofStepMenuItem(step: ProofStepInfo, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
     // TODO if result is existentially quantified, insert UseExists
-    let clonedStep = this.cloneAndAdaptParameterNames(step.step);
+    let clonedStep = step.preventCloning ? step.step : this.cloneAndAdaptParameterNames(step.step);
     let action = new Menu.ImmediateExpressionMenuAction(() => onInsertProofStep(clonedStep));
     let renderedStep = onRenderProofStep(clonedStep);
     if (step.linkedObject) {
