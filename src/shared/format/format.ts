@@ -10,7 +10,7 @@ export type ExpressionUnificationFn = (left: Expression, right: Expression, repl
 export type ReportConversionFn = (raw: Expression, converted: ObjectContents) => void;
 
 export interface Cloneable<T> {
-  clone(): T;
+  clone(replacedParameters?: ReplacedParameter[]): T;
 }
 
 export interface Traversable {
@@ -35,8 +35,8 @@ export interface ExpressionObject<T> extends FileObject<T>, Comparable<T> {
 export class File implements FileObject<File> {
   constructor(public metaModelPath: Path, public definitions: DefinitionList = new DefinitionList) {}
 
-  clone(): File {
-    return new File(this.metaModelPath, this.definitions.clone());
+  clone(replacedParameters?: ReplacedParameter[]): File {
+    return new File(this.metaModelPath, this.definitions.clone(replacedParameters));
   }
 
   traverse(fn: ExpressionTraversalFn): void {
@@ -229,10 +229,10 @@ export class DefinitionList extends Array<Definition> implements FileObject<Defi
     throw new Error(`Definition "${name}" not found`);
   }
 
-  clone(): DefinitionList {
+  clone(replacedParameters?: ReplacedParameter[]): DefinitionList {
     let result = new DefinitionList;
     for (let definition of this) {
-      result.push(definition.clone());
+      result.push(definition.clone(replacedParameters));
     }
     return result;
   }
@@ -984,7 +984,7 @@ export class IndexedExpression extends Expression implements Index {
             for (let argIndex = 0; argIndex < result.arguments.length; argIndex++) {
               let arg = result.arguments[argIndex];
               if (arg.name === replacedParameter.original.name) {
-                let newArg = arg.clone();
+                let newArg = arg.clone(replacedParameters);
                 newArg.name = replacedParameter.replacement.name;
                 result.arguments[argIndex] = newArg;
               }
@@ -1025,13 +1025,14 @@ export class PlaceholderExpression extends Expression {
     if (fn) {
       return fn(this);
     } else {
-      return new PlaceholderExpression(this.placeholderType);
+      // Don't clone placeholder expression because the clone would not compare equal to the original.
+      return this;
     }
   }
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
     // Don't identify different placeholders.
-    return false;
+    return this === expression;
   }
 }
 

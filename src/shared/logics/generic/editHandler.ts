@@ -45,7 +45,7 @@ export abstract class GenericEditHandler {
     return new Set<string>(this.editAnalysis.usedParameterNames);
   }
 
-  protected cloneAndAdaptParameterNames(expression: Fmt.Expression): Fmt.Expression {
+  protected cloneAndAdaptParameterNames<T extends Fmt.FileObject<T>>(expression: T): T {
     let replacedParameters: Fmt.ReplacedParameter[] = [];
     let result = expression.clone(replacedParameters);
     if (replacedParameters.length) {

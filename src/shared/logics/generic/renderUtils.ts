@@ -211,7 +211,10 @@ export abstract class GenericRenderUtils {
     return undefined;
   }
 
-  matchParameterizedNotation(expression: Notation.ExpressionValue, notation: Notation.ExpressionValue, abbreviationArgs: RenderedTemplateArguments): CachedPromise<boolean> {
+  matchParameterizedNotation(expression: Notation.ExpressionValue, notation: Notation.ExpressionValue, abbreviationArgs: RenderedTemplateArguments, semanticLinks?: Notation.SemanticLink[]): CachedPromise<boolean> {
+    if (semanticLinks && expression instanceof Notation.RenderedExpression && expression.semanticLinks) {
+      semanticLinks.push(...expression.semanticLinks);
+    }
     if (expression === notation) {
       return CachedPromise.resolve(true);
     }
@@ -231,7 +234,7 @@ export abstract class GenericRenderUtils {
         abbreviationArgs[paramName] = expression;
         return CachedPromise.resolve(true);
       } else {
-        return this.matchParameterizedNotation(expression, abbreviationArgs[paramName], abbreviationArgs);
+        return this.matchParameterizedNotation(expression, abbreviationArgs[paramName], abbreviationArgs, semanticLinks);
       }
     } else if (notation instanceof Notation.TemplateInstanceExpression) {
       if (expression instanceof Notation.TemplateInstanceExpression && expression.template === notation.template) {
@@ -248,16 +251,16 @@ export abstract class GenericRenderUtils {
         }
         return result;
       } else if (expression instanceof Notation.IndirectExpression) {
-        return this.matchParameterizedNotation(expression.resolve(), notation, abbreviationArgs);
+        return this.matchParameterizedNotation(expression.resolve(), notation, abbreviationArgs, semanticLinks);
       } else if (expression instanceof Notation.PromiseExpression) {
         return expression.promise.then((innerExpression: Notation.RenderedExpression) =>
-          this.matchParameterizedNotation(innerExpression, notation, abbreviationArgs));
+          this.matchParameterizedNotation(innerExpression, notation, abbreviationArgs, semanticLinks));
       }
     } else if (notation instanceof Notation.UserDefinedExpression) {
-      return this.matchParameterizedNotation(expression, notation.resolve(), abbreviationArgs);
+      return this.matchParameterizedNotation(expression, notation.resolve(), abbreviationArgs, semanticLinks);
     } else if (notation instanceof Notation.PromiseExpression) {
       return notation.promise.then((innerNotation: Notation.RenderedExpression) =>
-        this.matchParameterizedNotation(expression, innerNotation, abbreviationArgs));
+        this.matchParameterizedNotation(expression, innerNotation, abbreviationArgs, semanticLinks));
     } else if (notation instanceof Notation.RenderedExpression && notation.semanticLinks) {
       if (expression instanceof Notation.RenderedExpression && expression.semanticLinks) {
         for (let semanticLink of notation.semanticLinks) {
@@ -272,5 +275,13 @@ export abstract class GenericRenderUtils {
       }
     }
     return CachedPromise.resolve(false);
+  }
+
+  isRenderedVariable(expression: Notation.ExpressionValue): boolean {
+    if (expression instanceof Notation.RenderedExpression && expression.semanticLinks) {
+      return expression.semanticLinks.some((semanticLink: Notation.SemanticLink) => (semanticLink.linkedObject instanceof Fmt.Parameter));
+    } else {
+      return false;
+    }
   }
 }

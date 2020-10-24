@@ -13,7 +13,7 @@ import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProv
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
-import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll } from './utils';
+import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll, HLMSubstitutionContext } from './utils';
 import { HLMRenderUtils } from './renderUtils';
 import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext } from './checker';
 import CachedPromise from '../../data/cachedPromise';
@@ -614,7 +614,7 @@ export class HLMEditHandler extends GenericEditHandler {
           parameters: indexParameterList,
           arguments: new Fmt.ArgumentList
         };
-        this.utils.fillDefaultPlaceholderArguments(indexParameterList, index.arguments!, undefined);
+        this.utils.fillPlaceholderArguments(indexParameterList, index.arguments!);
         expression = new Fmt.IndexedExpression(expression, index);
       }
     }
@@ -697,8 +697,14 @@ export class HLMEditHandler extends GenericEditHandler {
         parentPaths = [path.parentPath];
       }
       for (let parentPath of parentPaths) {
+        let substitutionContext = new HLMSubstitutionContext;
+        if (parentPath instanceof Fmt.Path) {
+          this.utils.addPathSubstitution(parentPath, [outerDefinition], substitutionContext);
+        } else {
+          this.utils.addTargetPathSubstitution(parentPath, substitutionContext);
+        }
         let resultPath = new Fmt.Path(path.name);
-        this.utils.fillDefaultPlaceholderArguments(definition.parameters, resultPath.arguments, parentPath);
+        this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, substitutionContext);
         resultPath.parentPath = parentPath;
         if (notationAlternative) {
           this.utils.reorderArguments(resultPath.arguments, notationAlternative);
@@ -1331,9 +1337,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private createUseForAllStep(previousResult: FmtHLM.MetaRefExpression_forall, context: HLMCheckerProofStepContext): ProofStepInfo {
     let args = new Fmt.ArgumentList;
-    let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-    let createParameterList = (source: Fmt.ParameterList) => this.utils.createParameterList(source, undefined, this.getUsedParameterNames());
-    this.utils.fillPlaceholderArguments(previousResult.parameters, args, createPlaceholder, createParameterList);
+    this.utils.fillPlaceholderArguments(previousResult.parameters, args);
     let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseForAll(args), '_');
     return {step: step};
   }
@@ -1453,9 +1457,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private createProveExistsStep(goal: FmtHLM.MetaRefExpression_exists, context: HLMCheckerProofStepContext): ProofStepInfo {
     let args = new Fmt.ArgumentList;
-    let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
-    let createParameterList = (source: Fmt.ParameterList) => this.utils.createParameterList(source, undefined, this.getUsedParameterNames());
-    this.utils.fillPlaceholderArguments(goal.parameters, args, createPlaceholder, createParameterList);
+    this.utils.fillPlaceholderArguments(goal.parameters, args);
     let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveExists(args), '_');
     return {step: step};
   }
@@ -1708,10 +1710,8 @@ export class HLMEditHandler extends GenericEditHandler {
   private simplifyGoal(goal: Fmt.Expression | undefined, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Expression | undefined> {
     if (goal) {
       return this.utils.simplifyFormula(goal).then((simplifiedGoal: Fmt.Expression) =>
-        this.checker.stripConstraintsFromFormulas([simplifiedGoal], true, true, false, false, context).then((strippedGoals: Fmt.Expression[]) => {
-          let strippedGoal = (strippedGoals.length ? strippedGoals[0] : simplifiedGoal);
-          return this.cloneAndAdaptParameterNames(strippedGoal);
-        }));
+        this.checker.stripConstraintsFromFormulas([simplifiedGoal], true, true, false, false, context).then((strippedGoals: Fmt.Expression[]) =>
+          (strippedGoals.length ? strippedGoals[0] : simplifiedGoal)));
     } else {
       return CachedPromise.resolve(undefined);
     }
@@ -1722,7 +1722,7 @@ export class HLMEditHandler extends GenericEditHandler {
       this.checker.stripConstraintsFromFormulas([simplifiedResult], true, false, true, false, context).then((strippedResults: Fmt.Expression[]) => {
         let strippedResult = strippedResults.length ? strippedResults[0] : simplifiedResult;
         // TODO if result is a conjunction and a single term closes the goal, use only that term
-        return this.cloneAndAdaptParameterNames(strippedResult);
+        return strippedResult;
       }));
   }
 
@@ -1780,8 +1780,9 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getProofStepMenuItem(step: ProofStepInfo, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
     // TODO if result is existentially quantified, insert UseExists
-    let action = new Menu.ImmediateExpressionMenuAction(() => onInsertProofStep(step.step.clone()));
-    let renderedStep = onRenderProofStep(step.step);
+    let clonedStep = this.cloneAndAdaptParameterNames(step.step);
+    let action = new Menu.ImmediateExpressionMenuAction(() => onInsertProofStep(clonedStep));
+    let renderedStep = onRenderProofStep(clonedStep);
     if (step.linkedObject) {
       let semanticLink = new Notation.SemanticLink(step.linkedObject);
       if (renderedStep.semanticLinks) {

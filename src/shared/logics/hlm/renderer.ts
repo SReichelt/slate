@@ -1719,9 +1719,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             let arg = ArgumentWithInfo.getValue(args[param.name]);
             let notation = this.renderNotationExpression(abbreviation.originalParameterValue, abbreviationArgs, omitArguments, negationCount);
             let originalExpression = expression;
-            let abbreviationPromise = this.renderUtils.matchParameterizedNotation(arg, notation, abbreviationArgs).then((canAbbreviate: boolean) => {
+            let semanticLinks: Notation.SemanticLink[] = [];
+            let abbreviationPromise = this.renderUtils.matchParameterizedNotation(arg, notation, abbreviationArgs, semanticLinks).then((canAbbreviate: boolean) => {
               if (canAbbreviate) {
-                return this.renderNotationExpression(abbreviation.abbreviation, abbreviationArgs, omitArguments, negationCount);
+                for (let abbreviationParam of abbreviation.parameters) {
+                  // This check aims to make sure that we never abbreviate to single variables, e.g. that we don't
+                  // abbreviate (X -> Y, x |-> f(x)) to f.
+                  // We may want to restrict it to the case that abbreviation.abbreviation is a simple reference
+                  // to abbreviationParam.
+                  if (this.renderUtils.isRenderedVariable(abbreviationArgs[abbreviationParam.name])) {
+                    return originalExpression;
+                  }
+                }
+                let result = this.renderNotationExpression(abbreviation.abbreviation, abbreviationArgs, omitArguments, negationCount);
+                result.semanticLinks = semanticLinks;
+                return result;
               } else {
                 return originalExpression;
               }
