@@ -119,9 +119,9 @@ Equivalence.
        Take φ := i.
 4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
      1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
-     Take n := m, i := h∣_S^(ℕ_(≤m)). h∣_S^(ℕ_(≤m)) is injective by 1.4.16.
+     Take n := m, i := h∣_S^(ℕ_(≤m)). h∣_S^(ℕ_(≤m)) is injective by 1.4.17.
 5⇒4. Let n ∈ ℕ, i : S → ℕ_(≤n) be an injective function. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-     Take m := n + 1, h := i∣_S^(ℕ_(<(n+1))). i∣_S^(ℕ_(<(n+1))) is injective by 1.4.16.
+     Take m := n + 1, h := i∣_S^(ℕ_(<(n+1))). i∣_S^(ℕ_(<(n+1))) is injective by 1.4.17.
 
 Remarks.
 
@@ -145,7 +145,7 @@ Proof 1.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is 
 
 S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
-Take m := n, f := g∣_T. g∣_T is injective by 1.4.17.
+Take m := n, f := g∣_T. g∣_T is injective by 1.4.18.
 
 Proof 2.  We show that |T| is finite:
 
@@ -1496,8 +1496,19 @@ References.
 * https://en.wikipedia.org/wiki/Preimage"
 `;
 
-exports[`render hlm library: 1.4.5 Essentials/Functions/mapping%20as%20function 1`] = `
-"Definition 1.4.5.  Let S, T be sets, ≺ be a mapping from S to T. We define:
+exports[`render hlm library: 1.4.5 Essentials/Functions/Preimage%20of%20codomain%20is%20domain 1`] = `
+"Proposition 1.4.5.  Let X, Y be sets, f : X → Y be a function. Then:
+
+  f^-1(Y) = X
+
+Proof.
+
+⊆. Trivial.
+⊇. Let x ∈ X. Then x ∈ f^-1(Y) by definition."
+`;
+
+exports[`render hlm library: 1.4.6 Essentials/Functions/mapping%20as%20function 1`] = `
+"Definition 1.4.6.  Let S, T be sets, ≺ be a mapping from S to T. We define:
 
   (≺)_(S→T) :  S → T, s ↦ ≺(s)
 
@@ -1506,8 +1517,8 @@ Remarks.
 This definition shows that mappings and functions, as defined in this library, are interchangeable. (The other direction is straightforward as well.)"
 `;
 
-exports[`render hlm library: 1.4.6 Essentials/Functions/identity 1`] = `
-"Definition 1.4.6.  Let X be a set. We define:
+exports[`render hlm library: 1.4.7 Essentials/Functions/identity 1`] = `
+"Definition 1.4.7.  Let X be a set. We define:
 
   id_X :  X → X, x ↦ x
 
@@ -1519,8 +1530,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#id"
 `;
 
-exports[`render hlm library: 1.4.7 Essentials/Functions/generalized%20restriction 1`] = `
-"Definition 1.4.7.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.8 Essentials/Functions/generalized%20restriction 1`] = `
+"Definition 1.4.8.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function. We define:
 
   f∣_A^B :  A → B, x ↦ f(x)
 
@@ -1531,8 +1542,8 @@ This definition is a slight extension of \`$restriction\` that simultaneously ex
 It might seem tempting to remove the need for this definition by implicitly treating a function to \`Y\` as a function to a superset \`B\` of \`Y\`, without explicitly specifying \`B\`. However, this could lead to confusion as the resulting function may not be surjective even though the original function is."
 `;
 
-exports[`render hlm library: 1.4.8 Essentials/Functions/codomain%20restriction 1`] = `
-"Definition 1.4.8.  Let X be a set, A ⊆ X, Y be a set, B ⊆ Y, f : X → Y be a function such that f(A) ⊆ B. We define:
+exports[`render hlm library: 1.4.9 Essentials/Functions/codomain%20restriction 1`] = `
+"Definition 1.4.9.  Let X be a set, A ⊆ X, Y be a set, B ⊆ Y, f : X → Y be a function such that f(A) ⊆ B. We define:
 
   f∣_A^B :  A → B, x ↦ f(x)
 
@@ -1545,8 +1556,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Restriction/Mapping"
 `;
 
-exports[`render hlm library: 1.4.9 Essentials/Functions/restriction 1`] = `
-"Definition 1.4.9.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.10 Essentials/Functions/restriction 1`] = `
+"Definition 1.4.10.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. We define:
 
   f∣_A := f∣_A^Y
 
@@ -1558,8 +1569,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/subtype.html#subtype.restrict"
 `;
 
-exports[`render hlm library: 1.4.10 Essentials/Functions/composition 1`] = `
-"Definition 1.4.10.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions. We define:
+exports[`render hlm library: 1.4.11 Essentials/Functions/composition 1`] = `
+"Definition 1.4.11.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions. We define:
 
   g ∘ f :  X → Z, x ↦ g(f(x))
 
@@ -1573,8 +1584,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp"
 `;
 
-exports[`render hlm library: 1.4.11 Essentials/Functions/Composition%20is%20associative 1`] = `
-"Proposition 1.4.11.  Let W, X, Y, Z be sets, f : W → X, g : X → Y, h : Y → Z be functions. Then:
+exports[`render hlm library: 1.4.12 Essentials/Functions/Composition%20is%20associative 1`] = `
+"Proposition 1.4.12.  Let W, X, Y, Z be sets, f : W → X, g : X → Y, h : Y → Z be functions. Then:
 
   (h ∘ g) ∘ f = h ∘ (g ∘ f)
 
@@ -1589,8 +1600,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp.assoc"
 `;
 
-exports[`render hlm library: 1.4.12 Essentials/Functions/cartesian%20product 1`] = `
-"Definition 1.4.12.  Let V, W, X, Y be sets, f : V → W, g : X → Y be functions. We define:
+exports[`render hlm library: 1.4.13 Essentials/Functions/cartesian%20product 1`] = `
+"Definition 1.4.13.  Let V, W, X, Y be sets, f : V → W, g : X → Y be functions. We define:
 
   f × g :  V × X → W × Y, (v, x) ↦ (f(v), g(x))
 
@@ -1599,8 +1610,8 @@ Remarks.
 This definition is not standard in mathematics but convenient in some cases."
 `;
 
-exports[`render hlm library: 1.4.13 Essentials/Functions/injective 1`] = `
-"Definition 1.4.13.  Let X, Y be sets, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.14 Essentials/Functions/injective 1`] = `
+"Definition 1.4.14.  Let X, Y be sets, f : X → Y be a function. We define:
 
   f is injective  :⇔  ∀ a, b ∈ X s.t. f(a) = f(b) : a = b
     ⇔  ∀ c ∈ Y, d, e ∈ f^-1({c}) : d = e
@@ -1618,8 +1629,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.injective"
 `;
 
-exports[`render hlm library: 1.4.14 Essentials/Functions/surjective 1`] = `
-"Definition 1.4.14.  Let X, Y be sets, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.15 Essentials/Functions/surjective 1`] = `
+"Definition 1.4.15.  Let X, Y be sets, f : X → Y be a function. We define:
 
   f is surjective  :⇔  ∀ y ∈ Y : ∃ x ∈ X : f(x) = y
     ⇔  Y ⊆ f(X)
@@ -1636,8 +1647,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.surjective"
 `;
 
-exports[`render hlm library: 1.4.15 Essentials/Functions/bijective 1`] = `
-"Definition 1.4.15.  Let X, Y be sets, f : X → Y be a function. We define:
+exports[`render hlm library: 1.4.16 Essentials/Functions/bijective 1`] = `
+"Definition 1.4.16.  Let X, Y be sets, f : X → Y be a function. We define:
 
   f is bijective  :⇔  f is injective and f is surjective
     ⇔  ∀ y ∈ Y : ∃! x ∈ X : f(x) = y
@@ -1657,8 +1668,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.bijective_iff_has_inverse"
 `;
 
-exports[`render hlm library: 1.4.16 Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
-"Proposition 1.4.16.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be an injective function. Then:
+exports[`render hlm library: 1.4.17 Essentials/Functions/Generalized%20restriction%20preserves%20injectivity 1`] = `
+"Proposition 1.4.17.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be an injective function. Then:
 
   f∣_A^B is injective
 
@@ -1670,36 +1681,18 @@ f is injective ⇒^def ∀ x, y ∈ X s.t. f(x) = f(y) : x =
  ⇒ a = b"
 `;
 
-exports[`render hlm library: 1.4.17 Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
-"Corollary 1.4.17.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be an injective function. Then:
+exports[`render hlm library: 1.4.18 Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
+"Corollary 1.4.18.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be an injective function. Then:
 
   f∣_A is injective
 
 Proof.
 
-1.4.16 ⇒ f∣_A^Y is injective"
+1.4.17 ⇒ f∣_A^Y is injective"
 `;
 
-exports[`render hlm library: 1.4.18 Essentials/Functions/Injectivity%20by%20generalized%20restriction 1`] = `
-"Proposition 1.4.18.  Let X be a set, B be a set, Y ⊆ B, f : X → Y be a function. Then:
-
-  f∣_(f^-1(Y))^B is injective
-
-No proof."
-`;
-
-exports[`render hlm library: 1.4.19 Essentials/Functions/Injectivity%20by%20restriction 1`] = `
-"Corollary 1.4.19.  Let X, Y be sets, f : X → Y be a function. Then:
-
-  f∣_(f^-1(Y)) is injective
-
-Proof.
-
-1.4.18 ⇒ f∣_(f^-1(Y))^Y is injective"
-`;
-
-exports[`render hlm library: 1.4.20 Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
-"Proposition 1.4.20.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
+exports[`render hlm library: 1.4.19 Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
+"Proposition 1.4.19.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
 
   f is surjective
 
@@ -1712,18 +1705,18 @@ f∣_A^B is surjective ⇒^def ∀ b ∈ B : ∃ a ∈ A : f
 Take x := a."
 `;
 
-exports[`render hlm library: 1.4.21 Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
-"Corollary 1.4.21.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
+exports[`render hlm library: 1.4.20 Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
+"Corollary 1.4.20.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
 
   f is surjective
 
 Proof.
 
-1.4.20 ⇒ f is surjective"
+1.4.19 ⇒ f is surjective"
 `;
 
-exports[`render hlm library: 1.4.22 Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
-"Proposition 1.4.22.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
+exports[`render hlm library: 1.4.21 Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
+"Proposition 1.4.21.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
 
   f∣_A^(f(A)) is surjective
 
@@ -1734,8 +1727,8 @@ y ∈ f(A) ⇒^def ∃ a ∈ A : y = f(a)
 Take x := a. f(a) = y."
 `;
 
-exports[`render hlm library: 1.4.23 Essentials/Functions/Bijections 1`] = `
-"Definition 1.4.23.  Let X, Y be sets. We define:
+exports[`render hlm library: 1.4.22 Essentials/Functions/Bijections 1`] = `
+"Definition 1.4.22.  Let X, Y be sets. We define:
 
   (X ↔ Y) := {f : X → Y : f is bijective}
 
@@ -1753,8 +1746,8 @@ References.
 * https://ncatlab.org/nlab/show/bijection"
 `;
 
-exports[`render hlm library: 1.4.24 Essentials/Functions/inverse 1`] = `
-"Definition 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
+exports[`render hlm library: 1.4.23 Essentials/Functions/inverse 1`] = `
+"Definition 1.4.23.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
 
   f^-1 = g  :⇔  g ∘ f = id_X
     ⇔  f ∘ g = id_Y
@@ -1772,32 +1765,32 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.inv_fun"
 `;
 
-exports[`render hlm library: 1.4.25 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
-"Proposition 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
+exports[`render hlm library: 1.4.24 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
+"Proposition 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
 
   f^-1(f(x)) = x
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.26 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
-"Proposition 1.4.26.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
+exports[`render hlm library: 1.4.25 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
+"Proposition 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
 
   f(f^-1(y)) = y
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.27 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
-"Proposition 1.4.27.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
+exports[`render hlm library: 1.4.26 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
+"Proposition 1.4.26.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
 
   (f^-1)^-1 = f
 
-Proof.  f^-1 ∘ f = id_X by 1.4.24."
+Proof.  f^-1 ∘ f = id_X by 1.4.23."
 `;
 
-exports[`render hlm library: 1.4.28 Essentials/Functions/power%20to%20natural%20number 1`] = `
-"Definition 1.4.28.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
+exports[`render hlm library: 1.4.27 Essentials/Functions/power%20to%20natural%20number 1`] = `
+"Definition 1.4.27.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
 
   f^n
 
@@ -1812,14 +1805,14 @@ References.
 * https://mathworld.wolfram.com/IteratedMap.html"
 `;
 
-exports[`render hlm library: 1.4.29 Essentials/Functions/power%20to%20integer 1`] = `
-"Definition 1.4.29.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
+exports[`render hlm library: 1.4.28 Essentials/Functions/power%20to%20integer 1`] = `
+"Definition 1.4.28.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
 
   f^a := {f^a if a ≥ 0, (f^-1)^(−a) if a < 0"
 `;
 
-exports[`render hlm library: 1.4.30 Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
-"Proposition 1.4.30.  Let X be a set, a ∈ ℤ. Then:
+exports[`render hlm library: 1.4.29 Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
+"Proposition 1.4.29.  Let X be a set, a ∈ ℤ. Then:
 
   (id_X)^a = id_X
 
