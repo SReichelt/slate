@@ -1169,7 +1169,7 @@ export class HLMEditHandler extends GenericEditHandler {
           proveByCasesRow = undefined;
         }
         if (context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
-          rows.push(this.getUseForAllRow());
+          rows.push(this.getUseForAllRow(context.previousResult, context, onInsertProofStep, onRenderProofStep));
         }
         let useDefinitionRow = this.getUseDefinitionRow(context.previousResult, context, onInsertProofStep, onRenderProofStep);
         if (useDefinitionRow) {
@@ -1322,11 +1322,20 @@ export class HLMEditHandler extends GenericEditHandler {
     });
   }
 
-  private getUseForAllRow(): Menu.ExpressionMenuRow {
+  private getUseForAllRow(previousResult: FmtHLM.MetaRefExpression_forall, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
     let useForAllRow = new Menu.StandardExpressionMenuRow('Specialize');
-    // TODO
-    useForAllRow.titleAction = this.getNotImplementedAction();
+    let step = this.createUseForAllStep(previousResult, context);
+    useForAllRow.subMenu = this.getProofStepMenuItem(step, onInsertProofStep, onRenderProofStep);
     return useForAllRow;
+  }
+
+  private createUseForAllStep(previousResult: FmtHLM.MetaRefExpression_forall, context: HLMCheckerProofStepContext): ProofStepInfo {
+    let args = new Fmt.ArgumentList;
+    let createPlaceholder = (placeholderType: HLMExpressionType) => new Fmt.PlaceholderExpression(placeholderType);
+    let createParameterList = (source: Fmt.ParameterList) => this.utils.createParameterList(source, undefined, this.getUsedParameterNames());
+    this.utils.fillPlaceholderArguments(previousResult.parameters, args, createPlaceholder, createParameterList);
+    let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseForAll(args), '_');
+    return {step: step};
   }
 
   private getUseDefinitionRow(previousResult: Fmt.Expression, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow | undefined {

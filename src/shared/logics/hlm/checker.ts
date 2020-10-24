@@ -798,7 +798,7 @@ export class HLMDefinitionChecker {
   }
 
   private checkArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
-    let rawArg = this.utils.getRawArgument([argumentList], param);
+    let rawArg = argumentList.getOptionalValue(param.name);
     this.checkRawArgument(param, argumentList, rawArg, param.type, context, substitutionContext);
   }
 
@@ -1704,12 +1704,13 @@ export class HLMDefinitionChecker {
                 this.checkUnfolding([strippedClaim], useTheorem.result, false));
             }
           } else {
-            this.error(step, 'Referenced definition must be a construction or set operator');
+            // TODO also support definitions (and render as "by definition")
+            this.error(step, 'Referenced definition must be a theorem');
           }
         });
         this.addPendingCheck(step, checkDefinitionRef);
       } else {
-        this.error(step, 'Referenced definition must be a construction or set operator');
+        this.error(step, 'Definition reference required');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
       if (context.goal) {

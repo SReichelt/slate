@@ -54,7 +54,7 @@ Equivalence.
 3⇒2. Assume ∄ x ∈ S. Then S ⊆ ∅:
      Let a ∈ S.
      We have ∃ x ∈ S: ↯
-       Choose x := a.
+       Take x := a.
 2⇒1. Assume S ⊆ ∅. Then S = ∅:
      ⊆. Trivial.
      ⊇. 1.1.2 ⇒ ∅ ⊆ S
@@ -99,29 +99,29 @@ Equivalence.
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
      |S| is finite ⇒^def ∃ n ∈ ℕ : |S| = n
       ⇒^def ∃ r : S ↔ ℕ_(<n)
-     Choose k := n, f := r.
+     Take k := n, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
-     Choose l := k, g := f^-1.
+     Take l := k, g := f^-1.
 3⇒1. Let l ∈ ℕ, g : ℕ_(<l) ↔ S be a bijection. Then |S| is finite:
      We show that |S| ∈ ℕ:
      We have l = |S|:
        We show that ∃ s : ℕ_(<l) ↔ S:
-       Choose s := g.
+       Take s := g.
      l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
      f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
       ⇒^def f is injective
-     Choose m := k, h := f.
+     Take m := k, h := f.
 4⇒1. Let n ∈ ℕ, i : S → ℕ_(<n) be an injective function. Then |S| is finite:
      We show that ∃ y ∈ ℕ : |S| ≤ y:
-     Choose y := n. We show that |S| ≤ n:
+     Take y := n. We show that |S| ≤ n:
        We show that ∃ φ : |S| → n : φ is injective:
-       Choose φ := i.
+       Take φ := i.
 4⇒5. Let m ∈ ℕ, h : S → ℕ_(<m) be an injective function. Then ∃ n ∈ ℕ, i : S → ℕ_(≤n) : i is injective:
      1.7.1.17.6 ⇒ ℕ_(<m) ⊆ ℕ_(≤m)
-     Choose n := m, i := h∣_S^(ℕ_(≤m)). h∣_S^(ℕ_(≤m)) is injective by 1.4.16.
+     Take n := m, i := h∣_S^(ℕ_(≤m)). h∣_S^(ℕ_(≤m)) is injective by 1.4.16.
 5⇒4. Let n ∈ ℕ, i : S → ℕ_(≤n) be an injective function. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-     Choose m := n + 1, h := i∣_S^(ℕ_(<(n+1))). i∣_S^(ℕ_(<(n+1))) is injective by 1.4.16.
+     Take m := n + 1, h := i∣_S^(ℕ_(<(n+1))). i∣_S^(ℕ_(<(n+1))) is injective by 1.4.16.
 
 Remarks.
 
@@ -145,7 +145,7 @@ Proof 1.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is 
 
 S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
-Choose m := n, f := g∣_T. g∣_T is injective by 1.4.17.
+Take m := n, f := g∣_T. g∣_T is injective by 1.4.17.
 
 Proof 2.  We show that |T| is finite:
 
@@ -1662,7 +1662,12 @@ exports[`render hlm library: 1.4.16 Essentials/Functions/Generalized%20restricti
 
   f∣_A^B is injective
 
-No proof."
+Proof.  Let a, b ∈ A such that f∣_A^B(a) = f∣_A^B(b). Then a = b:
+
+f∣_A^B(a) = f∣_A^B(b) ⇒^def f(a) = f(b)
+
+f is injective ⇒^def ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
+ ⇒ a = b"
 `;
 
 exports[`render hlm library: 1.4.17 Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
@@ -1670,35 +1675,67 @@ exports[`render hlm library: 1.4.17 Essentials/Functions/Restriction%20preserves
 
   f∣_A is injective
 
+Proof.
+
+1.4.16 ⇒ f∣_A^Y is injective"
+`;
+
+exports[`render hlm library: 1.4.18 Essentials/Functions/Injectivity%20by%20generalized%20restriction 1`] = `
+"Proposition 1.4.18.  Let X be a set, B be a set, Y ⊆ B, f : X → Y be a function. Then:
+
+  f∣_(f^-1(Y))^B is injective
+
 No proof."
 `;
 
-exports[`render hlm library: 1.4.18 Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
-"Proposition 1.4.18.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
+exports[`render hlm library: 1.4.19 Essentials/Functions/Injectivity%20by%20restriction 1`] = `
+"Corollary 1.4.19.  Let X, Y be sets, f : X → Y be a function. Then:
+
+  f∣_(f^-1(Y)) is injective
+
+Proof.
+
+1.4.18 ⇒ f∣_(f^-1(Y))^Y is injective"
+`;
+
+exports[`render hlm library: 1.4.20 Essentials/Functions/Generalized%20extension%20preserves%20surjectivity 1`] = `
+"Proposition 1.4.20.  Let X be a set, A ⊆ X, B be a set, Y ⊆ B, f : X → Y be a function such that f∣_A^B is surjective. Then:
 
   f is surjective
 
-No proof."
+Proof.  Let y ∈ Y. Then ∃ x ∈ X : f(x) = y:
+
+f∣_A^B is surjective ⇒^def ∀ b ∈ B : ∃ a ∈ A : f∣_A^B(a) = b
+ ⇒ ∃ a ∈ A : f∣_A^B(a) = y
+ ⇒^def f(a) = y
+
+Take x := a."
 `;
 
-exports[`render hlm library: 1.4.19 Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
-"Corollary 1.4.19.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
+exports[`render hlm library: 1.4.21 Essentials/Functions/Extension%20preserves%20surjectivity 1`] = `
+"Corollary 1.4.21.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function such that f∣_A is surjective. Then:
 
   f is surjective
 
-No proof."
+Proof.
+
+1.4.20 ⇒ f is surjective"
 `;
 
-exports[`render hlm library: 1.4.20 Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
-"Proposition 1.4.20.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
+exports[`render hlm library: 1.4.22 Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
+"Proposition 1.4.22.  Let X be a set, A ⊆ X, Y be a set, f : X → Y be a function. Then:
 
   f∣_A^(f(A)) is surjective
 
-No proof."
+Proof.  Let y ∈ f(A). Then ∃ x ∈ A : f∣_A^(f(A))(x) = y:
+
+y ∈ f(A) ⇒^def ∃ a ∈ A : y = f(a)
+
+Take x := a. f(a) = y."
 `;
 
-exports[`render hlm library: 1.4.21 Essentials/Functions/Bijections 1`] = `
-"Definition 1.4.21.  Let X, Y be sets. We define:
+exports[`render hlm library: 1.4.23 Essentials/Functions/Bijections 1`] = `
+"Definition 1.4.23.  Let X, Y be sets. We define:
 
   (X ↔ Y) := {f : X → Y : f is bijective}
 
@@ -1716,8 +1753,8 @@ References.
 * https://ncatlab.org/nlab/show/bijection"
 `;
 
-exports[`render hlm library: 1.4.22 Essentials/Functions/inverse 1`] = `
-"Definition 1.4.22.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
+exports[`render hlm library: 1.4.24 Essentials/Functions/inverse 1`] = `
+"Definition 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
 
   f^-1 = g  :⇔  g ∘ f = id_X
     ⇔  f ∘ g = id_Y
@@ -1735,37 +1772,32 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.inv_fun"
 `;
 
-exports[`render hlm library: 1.4.23 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
-"Proposition 1.4.23.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
-
-  (f^-1)^-1 = f
-
-Proof.  We show that f^-1 ∘ f = id_X:
-
-Let g := f^-1.
-
-⇒^def id_X = g ∘ f
- =^def f^-1 ∘ f"
-`;
-
-exports[`render hlm library: 1.4.24 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
-"Corollary 1.4.24.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
+exports[`render hlm library: 1.4.25 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
+"Proposition 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
 
   f^-1(f(x)) = x
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.25 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
-"Corollary 1.4.25.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
+exports[`render hlm library: 1.4.26 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
+"Proposition 1.4.26.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
 
   f(f^-1(y)) = y
 
 No proof."
 `;
 
-exports[`render hlm library: 1.4.26 Essentials/Functions/power%20to%20natural%20number 1`] = `
-"Definition 1.4.26.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
+exports[`render hlm library: 1.4.27 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
+"Proposition 1.4.27.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
+
+  (f^-1)^-1 = f
+
+Proof.  f^-1 ∘ f = id_X by 1.4.24."
+`;
+
+exports[`render hlm library: 1.4.28 Essentials/Functions/power%20to%20natural%20number 1`] = `
+"Definition 1.4.28.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
 
   f^n
 
@@ -1780,14 +1812,14 @@ References.
 * https://mathworld.wolfram.com/IteratedMap.html"
 `;
 
-exports[`render hlm library: 1.4.27 Essentials/Functions/power%20to%20integer 1`] = `
-"Definition 1.4.27.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
+exports[`render hlm library: 1.4.29 Essentials/Functions/power%20to%20integer 1`] = `
+"Definition 1.4.29.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
 
   f^a := {f^a if a ≥ 0, (f^-1)^(−a) if a < 0"
 `;
 
-exports[`render hlm library: 1.4.28 Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
-"Proposition 1.4.28.  Let X be a set, a ∈ ℤ. Then:
+exports[`render hlm library: 1.4.30 Essentials/Functions/Power%20of%20identity%20is%20identity 1`] = `
+"Proposition 1.4.30.  Let X be a set, a ∈ ℤ. Then:
 
   (id_X)^a = id_X
 
@@ -2542,7 +2574,7 @@ a < b ⇒^def ∃ y ∈ ℕ_+ : a + y = b
 
 b ≤ c ⇒^def ∃ z ∈ ℕ : b + z = c
 
-Choose x := y + z.
+Take x := y + z.
 
 References.
 
@@ -2584,7 +2616,7 @@ exports[`render hlm library: 1.7.1.16 Essentials/Numbers/Natural/Successor%20is%
 
 Proof.  We show that ∃ x ∈ ℕ_+ : n + x = n + 1:
 
-Choose x := 1.
+Take x := 1.
 
 References.
 
@@ -2698,11 +2730,11 @@ exports[`render hlm library: 1.7.1.18 Essentials/Numbers/Natural/Finiteness%20cr
 Proof.  By induction on k.
 
 * Assume k = 0. Then ∃ m ∈ M : m is a ≤-greatest element of M:
-  Choose m := f(0).
+  Take m := f(0).
 * Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
   Let N := f(ℕ_(≤x)).
   ⇒^1.7.1.18 ∃ n ∈ N : n is a ≤-greatest element of N
-  Choose m := {f(k) if f(k) > n, n if f(k) ≤ n.
+  Take m := {f(k) if f(k) > n, n if f(k) ≤ n.
 
 Remarks.
 
@@ -2731,13 +2763,13 @@ Proof.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
        ⇒^def M = ∅
-       Choose a := 0. We show that M ⊆ ℕ_(≤0):
+       Take a := 0. We show that M ⊆ ℕ_(≤0):
          1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
           ⇒^[M = ∅] M ⊆ ℕ_(≤0)
      * Let m ∈ M such that m is a ≤-greatest element of M.
-       Choose a := m.
+       Take a := m.
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
-     Choose b := a + 1.
+     Take b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
      1.7.1.17.7 ⇒ ℕ_(<b) is finite
       ⇒^1.1.5 M is finite"
@@ -3761,7 +3793,7 @@ exports[`render hlm library: 1.7.2.7 Essentials/Numbers/Cardinal/Cardinality%20o
 
 Proof.  We show that ∃ X ⊆ S : |X| = |T|:
 
-Choose X := T."
+Take X := T."
 `;
 
 exports[`render hlm library: 1.7.2.8.1 Essentials/Numbers/Cardinal/Subsets/Segment%20(less) 1`] = `
@@ -5646,7 +5678,7 @@ Proof.  Assume n√p is rational.
 
   n ∈ ℕ_(>1) ⇒^def ∃ m ∈ ℕ : 2 + m = n
 
-  Choose y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
+  Take y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
     p ⋅ a^n = b^n
      = b^(2+m)

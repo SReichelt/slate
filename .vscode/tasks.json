@@ -13,6 +13,15 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "util: sleep 30s",
+            "type": "shell",
+            "command": "sleep 30",
+            "group": "none",
+            "presentation": {
+                "reveal": "silent"
+            }
         }
     ]
 }

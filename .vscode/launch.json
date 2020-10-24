@@ -25,7 +25,8 @@
                 "webpack:///./*":  "${webRoot}/*",
                 "webpack:///../*": "${webRoot}/../*",
                 "webpack:///*":    "*"
-            }
+            },
+            "preLaunchTask": "util: sleep 30s"
         },
         {
             "type": "firefox",
@@ -33,7 +34,8 @@
             "name": "Launch Firefox",
             "reAttach": true,
             "url": "http://localhost:3000/",
-            "webRoot": "${workspaceFolder}/src/client"
+            "webRoot": "${workspaceFolder}/src/client",
+            "preLaunchTask": "util: sleep 30s"
         },
         {
             "type": "node",

@@ -8,7 +8,6 @@ import * as HLMMacro from './macro';
 import * as HLMMacros from './macros/macros';
 import { LibraryDefinition } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
-import { Context } from '../../format/context';
 
 export class HLMSubstitutionContext extends SubstitutionContext {}
 
@@ -182,22 +181,29 @@ export interface HLMEquivalenceListInfo {
 }
 
 export class HLMUtils extends GenericUtils {
-  getRawArgument(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter): Fmt.Expression | undefined {
-    for (let argumentList of argumentLists) {
-      let rawArg = argumentList.getOptionalValue(param.name);
-      if (rawArg) {
-        return rawArg;
-      }
-    }
-    return undefined;
+  getRawArgument(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression {
+    return argumentList.getValue(param.name);
   }
 
-  getArgument<ContentClass extends Fmt.ObjectContents>(argumentLists: Fmt.ArgumentList[], param: Fmt.Parameter, contentClass: {createFromExpression(expression: Fmt.Expression): ContentClass}): ContentClass | undefined {
-    let rawArg = this.getRawArgument(argumentLists, param);
-    if (rawArg) {
-      return contentClass.createFromExpression(rawArg);
+  getArgument<ContentClass extends Fmt.ObjectContents>(argumentList: Fmt.ArgumentList, param: Fmt.Parameter, contentClass: {createFromExpression(expression: Fmt.Expression): ContentClass}): ContentClass {
+    let rawArg = this.getRawArgument(argumentList, param);
+    return contentClass.createFromExpression(rawArg);
+  }
+
+  getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression {
+    let arg = this.getRawArgument(argumentList, param);
+    return this.extractArgValue(arg);
+  }
+
+  extractArgValue(arg: Fmt.Expression): Fmt.Expression {
+    if (arg instanceof Fmt.CompoundExpression) {
+      if (arg.arguments.length && (arg.arguments[0].name === undefined || arg.arguments.length === 1)) {
+        return arg.arguments[0].value;
+      } else {
+        throw new Error('Missing argument');
+      }
     } else {
-      return undefined;
+      return arg;
     }
   }
 
@@ -215,27 +221,6 @@ export class HLMUtils extends GenericUtils {
       return HLMExpressionType.ElementTerm;
     } else {
       return undefined;
-    }
-  }
-
-  getArgValue(argumentList: Fmt.ArgumentList, param: Fmt.Parameter): Fmt.Expression | undefined {
-    let arg = this.getRawArgument([argumentList], param);
-    if (arg) {
-      return this.extractArgValue(arg);
-    } else {
-      return undefined;
-    }
-  }
-
-  extractArgValue(arg: Fmt.Expression): Fmt.Expression | undefined {
-    if (arg instanceof Fmt.CompoundExpression) {
-      if (arg.arguments.length && (arg.arguments[0].name === undefined || arg.arguments.length === 1)) {
-        return arg.arguments[0].value;
-      } else {
-        return undefined;
-      }
-    } else {
-      return arg;
     }
   }
 
@@ -432,15 +417,11 @@ export class HLMUtils extends GenericUtils {
       let type = param.type;
       if (this.isValueParamType(type)) {
         let argValue = this.getArgValue(args, param);
-        if (argValue) {
-          this.addVariableSubstitution(param, argValue, context);
-        }
+        this.addVariableSubstitution(param, argValue, context);
       } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-        let argValue = this.getArgument([args], param, FmtHLM.ObjectContents_BinderArg);
-        if (argValue) {
-          this.addParameterListSubstitution(type.sourceParameters, argValue.sourceParameters, context);
-          this.addArgumentListSubstitution(type.targetParameters, argValue.targetArguments, targetPath, context);
-        }
+        let argValue = this.getArgument(args, param, FmtHLM.ObjectContents_BinderArg);
+        this.addParameterListSubstitution(type.sourceParameters, argValue.sourceParameters, context);
+        this.addArgumentListSubstitution(type.targetParameters, argValue.targetArguments, targetPath, context);
       } else if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
         let value = type instanceof FmtHLM.MetaRefExpression_SetDef ? type._set : type.element;
         let valueContext = new SubstitutionContext;
@@ -453,7 +434,7 @@ export class HLMUtils extends GenericUtils {
           type = type.body;
         }
         if (type instanceof FmtHLM.MetaRefExpression_Bool || type instanceof FmtHLM.MetaRefExpression_Nat) {
-          let argValue = this.getRawArgument([args], param);
+          let argValue = this.getRawArgument(args, param);
           if (argValue) {
             this.addVariableSubstitution(param, argValue, context);
           }
@@ -1106,83 +1087,80 @@ export class HLMUtils extends GenericUtils {
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
           result = this.concatResults(result, () => {
             let argValue = this.getArgValue(args, param);
-            if (argValue) {
-              if (unfoldParameters.extractStructuralCases && argValue instanceof FmtHLM.MetaRefExpression_structural && argValue.cases.length === 1) {
-                let structuralCase = argValue.cases[0];
-                let clonedExpressionInfo = cloneExpression();
-                this.replaceArgValue(clonedExpressionInfo.targetObject, param, structuralCase.value);
-                return [this.buildSingleStructuralCaseTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, clonedExpressionInfo.clonedExpression, clonedExpressionInfo.expressionType)];
-              } else if (unfoldParameters.unfoldArguments) {
-                return this.getNextFormulas(argValue, unfoldParameters).then((newArgValues: Fmt.Expression[] | undefined) => {
-                  if (newArgValues) {
-                    return newArgValues.map((newArgValue: Fmt.Expression) => {
-                      let clonedExpressionInfo = cloneExpression();
-                      this.replaceArgValue(clonedExpressionInfo.targetObject, param, newArgValue);
-                      return clonedExpressionInfo.clonedExpression;
-                    });
-                  } else {
-                    return undefined;
-                  }
-                });
-              }
+            if (unfoldParameters.extractStructuralCases && argValue instanceof FmtHLM.MetaRefExpression_structural && argValue.cases.length === 1) {
+              let structuralCase = argValue.cases[0];
+              let clonedExpressionInfo = cloneExpression();
+              this.replaceArgValue(clonedExpressionInfo.targetObject, param, structuralCase.value);
+              return [this.buildSingleStructuralCaseTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, clonedExpressionInfo.clonedExpression, clonedExpressionInfo.expressionType)];
+            } else if (unfoldParameters.unfoldArguments) {
+              return this.getNextFormulas(argValue, unfoldParameters).then((newArgValues: Fmt.Expression[] | undefined) => {
+                if (newArgValues) {
+                  return newArgValues.map((newArgValue: Fmt.Expression) => {
+                    let clonedExpressionInfo = cloneExpression();
+                    this.replaceArgValue(clonedExpressionInfo.targetObject, param, newArgValue);
+                    return clonedExpressionInfo.clonedExpression;
+                  });
+                } else {
+                  return undefined;
+                }
+              });
+            } else {
+              return undefined;
             }
-            return undefined;
           });
         } else if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) {
           let embedSubsets = type.embedSubsets instanceof FmtHLM.MetaRefExpression_true;
           result = this.concatResults(result, () => {
             let argValue = this.getArgValue(args, param);
-            if (argValue) {
-              if (unfoldParameters.extractStructuralCases && argValue instanceof FmtHLM.MetaRefExpression_setStructuralCases && argValue.cases.length === 1) {
-                let structuralCase = argValue.cases[0];
-                let clonedExpressionInfo = cloneExpression();
-                this.replaceArgValue(clonedExpressionInfo.targetObject, param, structuralCase.value);
-                return [this.buildSingleStructuralCaseTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, clonedExpressionInfo.clonedExpression, clonedExpressionInfo.expressionType)];
-              } else if (unfoldParameters.unfoldArguments) {
-                let innerSearchParameters: HLMTypeSearchParameters = {
-                  ...unfoldParameters,
-                  followSupersets: embedSubsets,
-                  followEmbeddings: embedSubsets
-                };
-                return this.getNextSetTerms(argValue, innerSearchParameters).then((newArgValues: Fmt.Expression[] | undefined) => {
-                  if (newArgValues) {
-                    return newArgValues.map((newArgValue: Fmt.Expression) => {
-                      let clonedExpressionInfo = cloneExpression();
-                      this.replaceArgValue(clonedExpressionInfo.targetObject, param, newArgValue);
-                      return clonedExpressionInfo.clonedExpression;
-                    });
-                  } else {
-                    return undefined;
-                  }
-                });
-              }
+            if (unfoldParameters.extractStructuralCases && argValue instanceof FmtHLM.MetaRefExpression_setStructuralCases && argValue.cases.length === 1) {
+              let structuralCase = argValue.cases[0];
+              let clonedExpressionInfo = cloneExpression();
+              this.replaceArgValue(clonedExpressionInfo.targetObject, param, structuralCase.value);
+              return [this.buildSingleStructuralCaseTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, clonedExpressionInfo.clonedExpression, clonedExpressionInfo.expressionType)];
+            } else if (unfoldParameters.unfoldArguments) {
+              let innerSearchParameters: HLMTypeSearchParameters = {
+                ...unfoldParameters,
+                followSupersets: embedSubsets,
+                followEmbeddings: embedSubsets
+              };
+              return this.getNextSetTerms(argValue, innerSearchParameters).then((newArgValues: Fmt.Expression[] | undefined) => {
+                if (newArgValues) {
+                  return newArgValues.map((newArgValue: Fmt.Expression) => {
+                    let clonedExpressionInfo = cloneExpression();
+                    this.replaceArgValue(clonedExpressionInfo.targetObject, param, newArgValue);
+                    return clonedExpressionInfo.clonedExpression;
+                  });
+                } else {
+                  return undefined;
+                }
+              });
+            } else {
+              return undefined;
             }
-            return undefined;
           });
         } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
           result = this.concatResults(result, () => {
             let argValue = this.getArgValue(args, param);
-            if (argValue) {
-              if (unfoldParameters.extractStructuralCases && argValue instanceof FmtHLM.MetaRefExpression_structuralCases && argValue.cases.length === 1) {
-                let structuralCase = argValue.cases[0];
-                let clonedExpressionInfo = cloneExpression();
-                this.replaceArgValue(clonedExpressionInfo.targetObject, param, structuralCase.value);
-                return [this.buildSingleStructuralCaseTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, clonedExpressionInfo.clonedExpression, clonedExpressionInfo.expressionType)];
-              } else if (unfoldParameters.unfoldArguments) {
-                return this.getNextElementTerms(argValue, unfoldParameters).then((newArgValues: Fmt.Expression[] | undefined) => {
-                  if (newArgValues) {
-                    return newArgValues.map((newArgValue: Fmt.Expression) => {
-                      let clonedExpressionInfo = cloneExpression();
-                      this.replaceArgValue(clonedExpressionInfo.targetObject, param, newArgValue);
-                      return clonedExpressionInfo.clonedExpression;
-                    });
-                  } else {
-                    return undefined;
-                  }
-                });
-              }
+            if (unfoldParameters.extractStructuralCases && argValue instanceof FmtHLM.MetaRefExpression_structuralCases && argValue.cases.length === 1) {
+              let structuralCase = argValue.cases[0];
+              let clonedExpressionInfo = cloneExpression();
+              this.replaceArgValue(clonedExpressionInfo.targetObject, param, structuralCase.value);
+              return [this.buildSingleStructuralCaseTerm(argValue.term, argValue.construction, structuralCase._constructor, structuralCase.parameters, clonedExpressionInfo.clonedExpression, clonedExpressionInfo.expressionType)];
+            } else if (unfoldParameters.unfoldArguments) {
+              return this.getNextElementTerms(argValue, unfoldParameters).then((newArgValues: Fmt.Expression[] | undefined) => {
+                if (newArgValues) {
+                  return newArgValues.map((newArgValue: Fmt.Expression) => {
+                    let clonedExpressionInfo = cloneExpression();
+                    this.replaceArgValue(clonedExpressionInfo.targetObject, param, newArgValue);
+                    return clonedExpressionInfo.clonedExpression;
+                  });
+                } else {
+                  return undefined;
+                }
+              });
+            } else {
+              return undefined;
             }
-            return undefined;
           });
         }
       }
