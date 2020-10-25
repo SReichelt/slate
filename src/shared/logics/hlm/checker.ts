@@ -534,6 +534,7 @@ export class HLMDefinitionChecker {
       followSupersets: true,
       followEmbeddings: true,
       followAllAlternatives: false,
+      allowStructuralCaseResults: true,
       unfoldArguments: false,
       substituteStructuralCases: false,
       extractStructuralCases: false
@@ -1311,6 +1312,7 @@ export class HLMDefinitionChecker {
       followSupersets: true,
       followEmbeddings: false,
       followAllAlternatives: false,
+      allowStructuralCaseResults: true,
       unfoldArguments: false,
       substituteStructuralCases: true,
       extractStructuralCases: false
@@ -2151,6 +2153,7 @@ export class HLMDefinitionChecker {
           followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings && !checkSubset,
           followAllAlternatives: false,
+          allowStructuralCaseResults: true,
           unfoldArguments: nextStatus.followedEmbeddings,
           substituteStructuralCases: true,
           extractStructuralCases: nextStatus.followedEmbeddings

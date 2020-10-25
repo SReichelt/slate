@@ -28,6 +28,9 @@ export interface HLMUnfoldParameters {
   // Unfold explicit operator definitions. In HLMTypeSearchParameters, also influences followSupersets and followEmbeddings.
   followDefinitions: boolean;
 
+  // If false, avoid unfolding operator definitions that yield unsubstituted structural case expressions.
+  allowStructuralCaseResults: boolean;
+
   // If true, all other settings apply to arguments as well, including indices.
   // Otherwise they only apply to the root, or, in the case of substituteStructuralCases and extractStructuralCases, to root arguments.
   unfoldArguments: boolean;
@@ -51,6 +54,7 @@ export interface HLMUnfoldParameters {
 export const unfoldAll: HLMUnfoldParameters = {
   unfoldVariableDefinitions: true,
   followDefinitions: true,
+  allowStructuralCaseResults: false,
   unfoldArguments: true,
   substituteStructuralCases: true,
   extractStructuralCases: true
@@ -59,6 +63,7 @@ export const unfoldAll: HLMUnfoldParameters = {
 export const unfoldStrictSimplifications: HLMUnfoldParameters = {
   unfoldVariableDefinitions: false,
   followDefinitions: false,
+  allowStructuralCaseResults: false,
   unfoldArguments: true,
   substituteStructuralCases: true,
   extractStructuralCases: false
@@ -82,6 +87,7 @@ export const eliminateVariablesOnly: HLMTypeSearchParameters = {
   followSupersets: true,
   followEmbeddings: false,
   followAllAlternatives: false,
+  allowStructuralCaseResults: false,
   unfoldArguments: false,
   substituteStructuralCases: false,
   extractStructuralCases: false
@@ -93,6 +99,7 @@ export const findExplicitlyDeclaredSuperset: HLMTypeSearchParameters = {
   followSupersets: true,
   followEmbeddings: false,
   followAllAlternatives: true,
+  allowStructuralCaseResults: true,
   unfoldArguments: false,
   substituteStructuralCases: false,
   extractStructuralCases: false
@@ -104,6 +111,7 @@ export const findFinalSuperset: HLMTypeSearchParameters = {
   followSupersets: true,
   followEmbeddings: false,
   followAllAlternatives: false,
+  allowStructuralCaseResults: true,
   unfoldArguments: false,
   substituteStructuralCases: false,
   extractStructuralCases: false
@@ -115,6 +123,7 @@ export const followEmbedding: HLMTypeSearchParameters = {
   followSupersets: false,
   followEmbeddings: true,
   followAllAlternatives: true,
+  allowStructuralCaseResults: true,
   unfoldArguments: false,
   substituteStructuralCases: false,
   extractStructuralCases: false
@@ -1022,24 +1031,28 @@ export class HLMUtils extends GenericUtils {
         && (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === expression)) {
       for (let item of definitionList) {
         resultPromise = resultPromise.then((currentResult: Fmt.Expression[] | undefined) => {
+          let simplifiedResultPromise: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
           let substituted: Fmt.Expression | undefined = undefined;
-          if (item instanceof FmtHLM.MetaRefExpression_structural || item instanceof FmtHLM.MetaRefExpression_setStructuralCases || item instanceof FmtHLM.MetaRefExpression_structuralCases) {
+          let isStructuralExpression = (item instanceof FmtHLM.MetaRefExpression_structural || item instanceof FmtHLM.MetaRefExpression_setStructuralCases || item instanceof FmtHLM.MetaRefExpression_structuralCases);
+          if (isStructuralExpression && unfoldParameters.substituteStructuralCases) {
             substituted = this.substitutePath(item, expression.path, definitions);
             let structuralExpression = substituted as FmtHLM.MetaRefExpression_structural | FmtHLM.MetaRefExpression_setStructuralCases | FmtHLM.MetaRefExpression_structuralCases;
-            let simplifiedResultPromise = this.substituteStructuralCase(structuralExpression, structuralExpression.term);
-            if (simplifiedResultPromise) {
-              return simplifiedResultPromise.then((simplifiedResult: Fmt.Expression) =>
-                currentResult ? currentResult.concat(simplifiedResult) : [simplifiedResult]);
-            }
+            simplifiedResultPromise = this.substituteStructuralCase(structuralExpression);
           }
-          if (unfoldParameters.followDefinitions && expressionType !== HLMExpressionType.Formula) {
-            if (!substituted) {
-              substituted = this.substitutePath(item, expression.path, definitions);
+          return simplifiedResultPromise.then((simplifiedResult: Fmt.Expression[] | undefined) => {
+            if (simplifiedResult) {
+              return currentResult ? currentResult.concat(simplifiedResult) : simplifiedResult;
+            } else if (unfoldParameters.followDefinitions
+                       && expressionType !== HLMExpressionType.Formula
+                       && (!isStructuralExpression || unfoldParameters.allowStructuralCaseResults)) {
+              if (!substituted) {
+                substituted = this.substitutePath(item, expression.path, definitions);
+              }
+              return currentResult ? currentResult.concat(substituted) : [substituted];
+            } else {
+              return currentResult;
             }
-            return currentResult ? currentResult.concat(substituted) : [substituted];
-          } else {
-            return currentResult;
-          }
+          });
         });
       }
     }
@@ -1198,29 +1211,14 @@ export class HLMUtils extends GenericUtils {
       }
     }
 
-    let constructorResultPromise: CachedPromise<Fmt.Expression[]>;
+    let constructorResultPromise: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
     if (unfoldParameters.substituteStructuralCases
         && (!unfoldParameters.requiredUnfoldLocation || unfoldParameters.requiredUnfoldLocation === expression)) {
-      constructorResultPromise = this.castAndFullyUnfoldElementTermOutside(expression.term, expression.construction).then((constructorTerms: Fmt.Expression[]) => {
-        let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-        for (let constructorTerm of constructorTerms) {
-          resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) => {
-            let substitutionResultPromise = this.substituteStructuralCase(expression, constructorTerm);
-            if (substitutionResultPromise) {
-              return substitutionResultPromise.then((substitutionResult: Fmt.Expression) => currentResult.concat(substitutionResult));
-            } else {
-              return currentResult;
-            }
-          });
-        }
-        return resultPromise;
-      });
-    } else {
-      constructorResultPromise = CachedPromise.resolve([]);
+      constructorResultPromise = this.substituteStructuralCase(expression);
     }
 
-    return constructorResultPromise.then((constructorResult: Fmt.Expression[]) => {
-      if (constructorResult.length) {
+    return constructorResultPromise.then((constructorResult: Fmt.Expression[] | undefined) => {
+      if (constructorResult) {
         return constructorResult;
       } else if (unfoldParameters.requiredUnfoldLocation !== expression) {
         return this.getNextElementTerms(expression.term, unfoldParameters).then((nextTerms: Fmt.Expression[] | undefined) =>
@@ -1231,7 +1229,25 @@ export class HLMUtils extends GenericUtils {
     });
   }
 
-  private substituteStructuralCase(expression: FmtHLM.MetaRefExpression_structural | FmtHLM.MetaRefExpression_setStructuralCases | FmtHLM.MetaRefExpression_structuralCases, constructorTerm: Fmt.Expression): CachedPromise<Fmt.Expression> | undefined {
+  private substituteStructuralCase(expression: FmtHLM.MetaRefExpression_structural | FmtHLM.MetaRefExpression_setStructuralCases | FmtHLM.MetaRefExpression_structuralCases): CachedPromise<Fmt.Expression[] | undefined> {
+    return this.castAndFullyUnfoldElementTermOutside(expression.term, expression.construction).then((constructorTerms: Fmt.Expression[]) => {
+      let resultPromise: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
+      for (let constructorTerm of constructorTerms) {
+        resultPromise = resultPromise.then((currentResult: Fmt.Expression[] | undefined) => {
+          let substitutionResultPromise = this.substituteStructuralCaseInternal(expression, constructorTerm);
+          if (substitutionResultPromise) {
+            return substitutionResultPromise.then((substitutionResult: Fmt.Expression) =>
+              (currentResult ? currentResult.concat(substitutionResult) : [substitutionResult]));
+          } else {
+            return currentResult;
+          }
+        });
+      }
+      return resultPromise;
+    });
+  }
+
+  private substituteStructuralCaseInternal(expression: FmtHLM.MetaRefExpression_structural | FmtHLM.MetaRefExpression_setStructuralCases | FmtHLM.MetaRefExpression_structuralCases, constructorTerm: Fmt.Expression): CachedPromise<Fmt.Expression> | undefined {
     if (constructorTerm instanceof Fmt.DefinitionRefExpression
         && constructorTerm.path.parentPath instanceof Fmt.Path
         && expression.construction instanceof Fmt.DefinitionRefExpression
@@ -1542,6 +1558,7 @@ export class HLMUtils extends GenericUtils {
     let unfoldOutside: HLMUnfoldParameters = {
       unfoldVariableDefinitions: true,
       followDefinitions: true,
+      allowStructuralCaseResults: false,
       unfoldArguments: false,
       substituteStructuralCases: true,
       extractStructuralCases: false,
@@ -1654,11 +1671,7 @@ export class HLMUtils extends GenericUtils {
     for (let unfoldLocation of unfoldLocationsToCheck) {
       if (this.canUnfoldAt(unfoldLocation, source)) {
         let unfoldParameters: HLMUnfoldParameters = {
-          unfoldVariableDefinitions: true,
-          followDefinitions: true,
-          unfoldArguments: true,
-          substituteStructuralCases: true,
-          extractStructuralCases: true,
+          ...unfoldAll,
           requiredUnfoldLocation: unfoldLocation
         };
         resultPromise = resultPromise.or(() =>
