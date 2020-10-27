@@ -2100,14 +2100,20 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
     source,
     $OverUnder(
       body = '⇒',
-      over = source,
+      over = $Style(
+        body = source,
+        styleClass = 'miniature'
+      ),
       style = 'shallow'
     ),
     %opt(
       formula,
       $OverUnder(
         body = '⇒',
-        over = formula,
+        over = $Style(
+          body = formula,
+          styleClass = 'miniature'
+        ),
         style = 'shallow'
       ),
       '⇒'

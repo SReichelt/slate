@@ -1535,7 +1535,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       items.push(this.renderTemplate('SubsetRelation', {
                                        'operands': [
                                          this.renderGroup(args),
-                                         this.renderSetTerm(superset, fullSetTermSelection)
+                                         this.readOnlyRenderer.renderSetTerm(superset, fullSetTermSelection)
                                        ]
                                      }));
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
@@ -1547,7 +1547,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       items.push(this.renderTemplate('ElementRelation', {
                                        'operands': [
                                          this.renderGroup(args),
-                                         this.renderSetTerm(set, fullSetTermSelection)
+                                         this.readOnlyRenderer.renderSetTerm(set, fullSetTermSelection)
                                        ]
                                      }));
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
@@ -2937,7 +2937,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             if (!sourceFormula.styleClasses) {
               sourceFormula.styleClasses = [];
             }
-            sourceFormula.styleClasses.push('miniature');
             this.readOnlyRenderer.addSemanticLink(sourceFormula, type.source);
           }
         }
@@ -2945,13 +2944,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
             || sourceType instanceof FmtHLM.MetaRefExpression_Unfold) {
           source = new Notation.TextExpression('def');
-          source.styleClasses = ['miniature'];
           // TODO link to definition
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseForAll && context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
           source = this.renderArgumentList(context.previousResult.parameters, sourceType.arguments, undefined, ArgumentListStyle.Formulas);
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
           source = this.renderItemNumber(sourceType.theorem);
-          source.styleClasses = ['miniature'];
           dependsOnPrevious = (type instanceof FmtHLM.MetaRefExpression_Substitute
                                || (context.previousStep !== undefined && this.utils.referencesParameter(sourceType, context.previousStep)));
         }
