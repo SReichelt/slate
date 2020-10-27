@@ -32,6 +32,13 @@ interface ArgumentRenderingOptions extends ParameterOverrides {
   macroInvocation?: HLMMacro.HLMMacroInvocation;
 }
 
+enum ArgumentListStyle {
+  Group,
+  Tuple,
+  Definitions,
+  Formulas
+}
+
 interface ParameterListState {
   fullSentence: boolean;
   sentence: boolean;
@@ -1279,7 +1286,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           indices = [];
         }
         if (expression.parameters) {
-          indices.unshift(this.renderArgumentList(expression.parameters, expression.arguments, undefined, false));
+          indices.unshift(this.renderArgumentList(expression.parameters, expression.arguments, undefined, ArgumentListStyle.Group));
         } else if (expression.arguments) {
           // Fallback when rendering code within markdown.
           for (let argIndex = expression.arguments.length - 1; argIndex >= 0; argIndex--) {
@@ -1455,28 +1462,37 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return args;
   }
 
-  private renderArgumentList(parameters: Fmt.ParameterList, argumentList?: Fmt.ArgumentList, indices?: Notation.RenderedExpression[], addParentheses: boolean = true): Notation.RenderedExpression {
-    let options: ArgumentRenderingOptions = {
-      indices: indices
-    };
-    let args: RenderedTemplateArgument[] = [];
-    this.fillArguments(parameters, argumentList, options, undefined, args);
-    return this.renderArgumentTuple(args, addParentheses);
-  }
-
-  private renderArgumentTuple(args: RenderedTemplateArgument[], addParentheses: boolean = true): Notation.RenderedExpression {
-    if (args.length === 1) {
-      return ArgumentWithInfo.getValue(args[0]);
+  private renderArgumentList(parameters: Fmt.ParameterList, argumentList?: Fmt.ArgumentList, indices?: Notation.RenderedExpression[], style: ArgumentListStyle = ArgumentListStyle.Tuple): Notation.RenderedExpression {
+    if (style === ArgumentListStyle.Formulas) {
+      return this.renderArgumentFormulas(parameters, argumentList);
     } else {
-      return this.renderTemplate(addParentheses ? 'Tuple' : 'Group', {'items': args});
+      let options: ArgumentRenderingOptions = {
+        indices: indices
+      };
+      let params: Fmt.Parameter[] | undefined = style === ArgumentListStyle.Definitions ? [] : undefined;
+      let args: RenderedTemplateArgument[] = [];
+      this.fillArguments(parameters, argumentList, options, params, args);
+      switch (style) {
+      case ArgumentListStyle.Group:
+        return this.renderArgumentTuple(args, 'Group');
+      case ArgumentListStyle.Tuple:
+        return this.renderArgumentTuple(args, 'Tuple');
+      case ArgumentListStyle.Definitions:
+        return this.renderArgumentDefinitionList(params!, args);
+      }
     }
   }
 
-  private renderArgumentDefinitionList(parameters: Fmt.ParameterList, argumentList: Fmt.ArgumentList): Notation.RenderedExpression {
-    let params: Fmt.Parameter[] = [];
-    let args: RenderedTemplateArgument[] = [];
-    // TODO handle binders better
-    this.fillArguments(parameters, argumentList, {}, params, args);
+  private renderArgumentTuple(args: RenderedTemplateArgument[], templateName: string = 'Tuple'): Notation.RenderedExpression {
+    if (args.length === 1) {
+      return ArgumentWithInfo.getValue(args[0]);
+    } else {
+      return this.renderTemplate(templateName, {'items': args});
+    }
+  }
+
+  private renderArgumentDefinitionList(params: Fmt.Parameter[], args: RenderedTemplateArgument[]): Notation.RenderedExpression {
+    // TODO better handling of binders?
     let items = params.map((param: Fmt.Parameter, index: number) =>
       this.renderTemplate('EqualityDefinition', {
         'operands': [
@@ -1485,6 +1501,59 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         ]
       }));
     return this.renderGroup(items, ', ');
+  }
+
+  private renderArgumentFormulas(parameters: Fmt.Parameter[], argumentList?: Fmt.ArgumentList): Notation.RenderedExpression {
+    let substitutionContext: HLMSubstitutionContext | undefined = undefined;
+    if (argumentList) {
+      substitutionContext = new HLMSubstitutionContext;
+      this.utils.addArgumentListSubstitution(parameters, argumentList, undefined, substitutionContext);
+    }
+    let items: Notation.RenderedExpression[] = [];
+    let currentGroup: Fmt.Parameter[] = [];
+    for (let param of parameters) {
+      if (currentGroup.length && param.type !== currentGroup[0].type) {
+        this.addArgumentFormula(currentGroup, substitutionContext, items);
+        currentGroup.length = 0;
+      }
+      currentGroup.push(param);
+    }
+    if (currentGroup.length) {
+      this.addArgumentFormula(currentGroup, substitutionContext, items);
+    }
+    return this.renderGroup(items, ', ');
+  }
+
+  private addArgumentFormula(params: Fmt.Parameter[], substitutionContext: HLMSubstitutionContext | undefined, items: Notation.RenderedExpression[]): void {
+    let type = params[0].type;
+    if (type instanceof FmtHLM.MetaRefExpression_Subset) {
+      let argValues = params.map((param: Fmt.Parameter) =>
+        this.utils.applySubstitutionContext(new Fmt.VariableRefExpression(param), substitutionContext));
+      let args = argValues.map((argValue: Fmt.Expression) =>
+        this.renderSetTerm(argValue, fullSetTermSelection));
+      let superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
+      items.push(this.renderTemplate('SubsetRelation', {
+                                       'operands': [
+                                         this.renderGroup(args),
+                                         this.renderSetTerm(superset, fullSetTermSelection)
+                                       ]
+                                     }));
+    } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
+      let argValues = params.map((param: Fmt.Parameter) =>
+        this.utils.applySubstitutionContext(new Fmt.VariableRefExpression(param), substitutionContext));
+      let args = argValues.map((argValue: Fmt.Expression) =>
+        this.renderElementTerm(argValue, fullElementTermSelection));
+      let set = this.utils.applySubstitutionContext(type._set, substitutionContext);
+      items.push(this.renderTemplate('ElementRelation', {
+                                       'operands': [
+                                         this.renderGroup(args),
+                                         this.renderSetTerm(set, fullSetTermSelection)
+                                       ]
+                                     }));
+    } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
+      let formula = this.utils.applySubstitutionContext(type.formula, substitutionContext);
+      items.push(this.renderFormula(formula, fullFormulaSelection));
+    }
   }
 
   private fillArguments(parameters: Fmt.ParameterList, argumentList: Fmt.ArgumentList | undefined, options: ArgumentRenderingOptions, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
@@ -1681,7 +1750,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndices(type: FmtHLM.MetaRefExpression_Binder, indices: Notation.RenderedExpression[] | undefined): Notation.RenderedExpression[] {
-    let index = this.renderArgumentList(type.sourceParameters, undefined, undefined, false);
+    let index = this.renderArgumentList(type.sourceParameters, undefined, undefined, ArgumentListStyle.Group);
     return indices ? indices.concat(index) : [index];
   }
 
@@ -2878,6 +2947,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           source = new Notation.TextExpression('def');
           source.styleClasses = ['miniature'];
           // TODO link to definition
+        } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseForAll && context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
+          source = this.renderArgumentList(context.previousResult.parameters, sourceType.arguments, undefined, ArgumentListStyle.Formulas);
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
           source = this.renderItemNumber(sourceType.theorem);
           source.styleClasses = ['miniature'];
@@ -2913,7 +2984,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
         this.commitImplications(state, false);
         if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
-          let argumentList = this.renderArgumentDefinitionList(context.goal.parameters, type.arguments);
+          let argumentList = this.renderArgumentList(context.goal.parameters, type.arguments, undefined, ArgumentListStyle.Definitions);
           state.startRow = [
             new Notation.TextExpression('Take '),
             argumentList,

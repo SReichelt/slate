@@ -813,11 +813,11 @@ export class HLMDefinitionChecker {
         this.error(rawArg, 'Array expression expected');
       }
     } else {
-      this.checkArgumentValue(rawArg ?? argumentList, param, rawArg, argumentList, context, substitutionContext);
+      this.checkArgumentValue(rawArg ?? argumentList, param, rawArg, context, substitutionContext);
     }
   }
 
-  private checkArgumentValue(object: Object, param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, argumentList: Fmt.ArgumentList, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
+  private checkArgumentValue(object: Object, param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let missingArgument = false;
     let type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Set) {

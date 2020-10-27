@@ -67,7 +67,7 @@ Equivalence.
      1.7.2.10 ⇒ ≤ is a partial order
       ⇒^def ≤ is reflexive
       ⇒^def ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
-      ⇒ 0 ≤ 0
+      ⇒^(0 ∈ 𝓒𝓻𝓭) 0 ≤ 0
 5⇒3. Assume |S| ≤ 0. Then ∄ x ∈ S:
      |S| ≤ 0 ⇒^def ∃ φ : |S| → 0 : φ is injective
      Let x ∈ S.
@@ -1678,7 +1678,7 @@ Proof.  Let a, b ∈ A such that f∣_A^B(a) = f∣_A^B(b). Then a =
 f∣_A^B(a) = f∣_A^B(b) ⇒^def f(a) = f(b)
 
 f is injective ⇒^def ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
- ⇒ a = b"
+ ⇒^a,b ∈ X, f(a) = f(b) a = b"
 `;
 
 exports[`render hlm library: 1.4.18 Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
@@ -1699,7 +1699,7 @@ exports[`render hlm library: 1.4.19 Essentials/Functions/Generalized%20extension
 Proof.  Let y ∈ Y. Then ∃ x ∈ X : f(x) = y:
 
 f∣_A^B is surjective ⇒^def ∀ b ∈ B : ∃ a ∈ A : f∣_A^B(a) = b
- ⇒ ∃ a ∈ A : f∣_A^B(a) = y
+ ⇒^(y ∈ B) ∃ a ∈ A : f∣_A^B(a) = y
  ⇒^def f(a) = y
 
 Take x := a."
@@ -3007,7 +3007,7 @@ Proof.  By induction on n.
   M is inductive ⇒^def 0 ∈ M
 * Let x ∈ ℕ such that x ∈ M. Then x + 1 ∈ M:
   M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
-   ⇒ x + 1 ∈ M
+   ⇒^(x ∈ M) x + 1 ∈ M
 
 Remarks.
 
