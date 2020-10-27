@@ -1425,7 +1425,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
       let parameters = new Fmt.ParameterList;
       this.utils.addProofConstraint(parameters, negatedGoal);
-      return this.createSubProof(parameters, newGoal, true, context, new Fmt.ParameterList, index).then((subProof: FmtHLM.ObjectContents_Proof) => {
+      return this.createSubProof(parameters, newGoal, false, context, undefined, index).then((subProof: FmtHLM.ObjectContents_Proof) => {
         let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveByContradiction(subProof), '_');
         return {step: step};
       });
@@ -1440,7 +1440,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createProveForAllStep(goal: FmtHLM.MetaRefExpression_forall, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo> {
-    return this.createSubProof(goal.parameters, undefined, true, context).then((subProof: FmtHLM.ObjectContents_Proof) => {
+    return this.createSubProof(goal.parameters, goal.formula, true, context).then((subProof: FmtHLM.ObjectContents_Proof) => {
       let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveForAll(subProof), '_');
       return {step: step};
     });
@@ -1496,7 +1496,7 @@ export class HLMEditHandler extends GenericEditHandler {
             subParameters = undefined;
           }
           subProofsPromise = subProofsPromise.then((currentSubProofs: FmtHLM.ObjectContents_Proof[]) =>
-            this.createSubProof(subParameters, subGoal, true, context, undefined, fromIndex, toIndex).then((subProof: FmtHLM.ObjectContents_Proof) =>
+            this.createSubProof(subParameters, subGoal, false, context, fromIndex, toIndex).then((subProof: FmtHLM.ObjectContents_Proof) =>
               currentSubProofs.concat(subProof)));
         }
         return subProofsPromise.then((subProofs: FmtHLM.ObjectContents_Proof[]) => ({
@@ -1525,25 +1525,31 @@ export class HLMEditHandler extends GenericEditHandler {
         let resultPromise: CachedPromise<ProofStepInfo[]> = CachedPromise.resolve([]);
         for (let definition of definitions) {
           resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) => {
-            let subStepsPromise: CachedPromise<Fmt.ParameterList>;
             // Clone formula now and prevent cloning of the entire step.
             // This makes sure that (only in this editing session), the parameter list of the (optional) inner
             // ProveForAll step is tied to the outer parameter list, so variable name changes are propagated.
             let formula = definition.formula.clone();
+            let subProofPromise = this.createSubProof(undefined, formula, false, context);
             if (formula instanceof FmtHLM.MetaRefExpression_forall) {
-              subStepsPromise = this.createProveForAllStep(formula, context).then((proveForAllStep: ProofStepInfo) => new Fmt.ParameterList(proveForAllStep.step));
-            } else {
-              subStepsPromise = CachedPromise.resolve(new Fmt.ParameterList);
+              subProofPromise = subProofPromise.then((subProof: FmtHLM.ObjectContents_Proof) => {
+                if (subProof.goal instanceof FmtHLM.MetaRefExpression_forall && !subProof.steps.length) {
+                  return this.createProveForAllStep(subProof.goal, context).then((proveForAllStep: ProofStepInfo) => {
+                    subProof.steps.push(proveForAllStep.step);
+                    return subProof;
+                  });
+                } else {
+                  return subProof;
+                }
+              });
             }
-            return subStepsPromise.then((subSteps: Fmt.ParameterList) =>
-              this.createSubProof(undefined, formula, false, context, subSteps).then((subProof: FmtHLM.ObjectContents_Proof) => {
-                let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveDef(this.utils.internalToExternalIndex(definition.side), subProof), '_');
-                return currentSteps.concat({
-                  step: step,
-                  linkedObject: definition.definitionRef,
-                  preventCloning: true
-                });
-              }));
+            return subProofPromise.then((subProof: FmtHLM.ObjectContents_Proof) => {
+              let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveDef(this.utils.internalToExternalIndex(definition.side), subProof), '_');
+              return currentSteps.concat({
+                step: step,
+                linkedObject: definition.definitionRef,
+                preventCloning: true
+              });
+            });
           });
         }
         return resultPromise;
@@ -1728,24 +1734,24 @@ export class HLMEditHandler extends GenericEditHandler {
       }));
   }
 
-  private createSubProof(parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression | undefined, mayOmitGoal: boolean, context: HLMCheckerProofStepContext, steps: Fmt.ParameterList = new Fmt.ParameterList(), fromIndex?: number, toIndex?: number): CachedPromise<FmtHLM.ObjectContents_Proof> {
+  private createSubProof(parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression | undefined, mayOmitGoal: boolean, context: HLMCheckerProofStepContext, fromIndex?: number, toIndex?: number): CachedPromise<FmtHLM.ObjectContents_Proof> {
     let subContext = parameters ? this.checker.getParameterListContext(parameters, context) : context;
     return this.simplifyGoal(goal, subContext).then((simplifiedGoal: Fmt.Expression | undefined) => {
       let from = this.utils.internalToExternalIndex(fromIndex);
       let to = this.utils.internalToExternalIndex(toIndex);
       let finalGoal = simplifiedGoal;
-      if (goal && mayOmitGoal && simplifiedGoal?.isEquivalentTo(goal) && !parameters) {
+      if (goal && mayOmitGoal && simplifiedGoal?.isEquivalentTo(goal)) {
         finalGoal = undefined;
       }
-      let result = new FmtHLM.ObjectContents_Proof(from, to, parameters, finalGoal, steps);
-      if (simplifiedGoal && !steps.length) {
+      let result = new FmtHLM.ObjectContents_Proof(from, to, parameters, finalGoal, new Fmt.ParameterList);
+      if (simplifiedGoal) {
         let byDefinitionStepPromise = this.createByDefinitionStep(simplifiedGoal, subContext);
         if (byDefinitionStepPromise) {
           return byDefinitionStepPromise.then((byDefinitionStep: Fmt.Parameter | undefined) => {
             if (byDefinitionStep) {
               return this.checker.isTriviallyProvable(simplifiedGoal, subContext).then((triviallyProvable: boolean) => {
                 if (!triviallyProvable) {
-                  steps.push(byDefinitionStep);
+                  result.steps.push(byDefinitionStep);
                 }
                 return result;
               });

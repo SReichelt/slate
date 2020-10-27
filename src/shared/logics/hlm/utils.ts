@@ -1274,6 +1274,14 @@ export class HLMUtils extends GenericUtils {
     let paramIndex = 0;
     for (let param of parameterList) {
       let curParamIndex = paramIndex;
+      let cloneAndAnalyze = (): [ClonedExpressionInfo<Fmt.ParameterList>, Fmt.Parameter, HLMSubstitutionContext] => {
+        let clonedExpressionInfo = cloneExpression();
+        let clonedParameterList = clonedExpressionInfo.targetObject;
+        let clonedParam = clonedParameterList[curParamIndex];
+        let substitutionContext = new HLMSubstitutionContext;
+        this.addParameterListSubstitution(parameterList.slice(0, curParamIndex), clonedParameterList.slice(0, curParamIndex), substitutionContext);
+        return [clonedExpressionInfo, clonedParam, substitutionContext];
+      };
       resultPromise = this.concatResults(resultPromise, () => {
         let type = param.type;
         if (type instanceof FmtHLM.MetaRefExpression_Subset) {
@@ -1281,10 +1289,9 @@ export class HLMUtils extends GenericUtils {
             if (nextSetTerms) {
               let result: Fmt.Expression[] = [];
               for (let nextSetTerm of nextSetTerms) {
-                let clonedExpressionInfo = cloneExpression();
-                let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+                let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
                 let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_Subset;
-                clonedType.superset = nextSetTerm;
+                clonedType.superset = this.applySubstitutionContext(nextSetTerm, substitutionContext);
                 result.push(clonedExpressionInfo.clonedExpression);
               }
               return result;
@@ -1297,10 +1304,9 @@ export class HLMUtils extends GenericUtils {
             if (nextSetTerms) {
               let result: Fmt.Expression[] = [];
               for (let nextSetTerm of nextSetTerms) {
-                let clonedExpressionInfo = cloneExpression();
-                let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+                let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
                 let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_Element;
-                clonedType._set = nextSetTerm;
+                clonedType._set = this.applySubstitutionContext(nextSetTerm, substitutionContext);
                 result.push(clonedExpressionInfo.clonedExpression);
               }
               return result;
@@ -1313,10 +1319,9 @@ export class HLMUtils extends GenericUtils {
             if (nextFormulas) {
               let result: Fmt.Expression[] = [];
               for (let nextFormula of nextFormulas) {
-                let clonedExpressionInfo = cloneExpression();
-                let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+                let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
                 let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_Constraint;
-                clonedType.formula = nextFormula;
+                clonedType.formula = this.applySubstitutionContext(nextFormula, substitutionContext);
                 result.push(clonedExpressionInfo.clonedExpression);
               }
               return result;
@@ -1329,10 +1334,9 @@ export class HLMUtils extends GenericUtils {
             if (nextSetTerms) {
               let result: Fmt.Expression[] = [];
               for (let nextSetTerm of nextSetTerms) {
-                let clonedExpressionInfo = cloneExpression();
-                let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+                let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
                 let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_SetDef;
-                clonedType._set = nextSetTerm;
+                clonedType._set = this.applySubstitutionContext(nextSetTerm, substitutionContext);
                 result.push(clonedExpressionInfo.clonedExpression);
               }
               return result;
@@ -1345,10 +1349,9 @@ export class HLMUtils extends GenericUtils {
             if (nextElementTerms) {
               let result: Fmt.Expression[] = [];
               for (let nextElementTerm of nextElementTerms) {
-                let clonedExpressionInfo = cloneExpression();
-                let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+                let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
                 let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_Def;
-                clonedType.element = nextElementTerm;
+                clonedType.element = this.applySubstitutionContext(nextElementTerm, substitutionContext);
                 result.push(clonedExpressionInfo.clonedExpression);
               }
               return result;
@@ -1359,22 +1362,20 @@ export class HLMUtils extends GenericUtils {
         } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
           let binder = type;
           let cloneExpressionForSource = (): ClonedExpressionInfo<Fmt.ParameterList> => {
-            let clonedExpressionInfo = cloneExpression();
-            let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+            let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
             let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_Binder;
             return {
               ...clonedExpressionInfo,
-              targetObject: clonedType.sourceParameters
+              targetObject: this.applySubstitutionContextToParameterList(clonedType.sourceParameters, substitutionContext)
             };
           };
           let sourceResult = this.unfoldParameters(binder.sourceParameters, unfoldParameters, cloneExpressionForSource);
           let cloneExpressionForTarget = (): ClonedExpressionInfo<Fmt.ParameterList> => {
-            let clonedExpressionInfo = cloneExpression();
-            let clonedParam = clonedExpressionInfo.targetObject[curParamIndex];
+            let [clonedExpressionInfo, clonedParam, substitutionContext] = cloneAndAnalyze();
             let clonedType = clonedParam.type as FmtHLM.MetaRefExpression_Binder;
             return {
               ...clonedExpressionInfo,
-              targetObject: clonedType.targetParameters
+              targetObject: this.applySubstitutionContextToParameterList(clonedType.targetParameters, substitutionContext)
             };
           };
           return this.concatResults(sourceResult, () => this.unfoldParameters(binder.targetParameters, unfoldParameters, cloneExpressionForTarget));

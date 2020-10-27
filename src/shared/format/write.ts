@@ -313,9 +313,6 @@ export class Writer {
     let currentGroup: Fmt.Parameter[] = [];
     let firstGroup = true;
     for (let parameter of parameters) {
-      if (this.skipOmittableParameters && parameter.type instanceof Fmt.MetaRefExpression && parameter.type.canOmit()) {
-        continue;
-      }
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
         if (firstGroup && multiLine) {
           groupIndent = this.indent(groupIndent);
@@ -461,6 +458,9 @@ export class Writer {
   }
 
   writeType(type: Fmt.Expression, indent?: IndentInfo): void {
+    if (this.skipOmittableParameters && type instanceof Fmt.MetaRefExpression && type.canOmit()) {
+      return;
+    }
     this.write(':');
     this.writeOptionalSpace();
     this.writeExpression(type, indent);
