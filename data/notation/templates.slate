@@ -2100,9 +2100,11 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
     source,
     $OverUnder(
       body = '⇒',
-      over = $Style(
-        body = source,
-        styleClass = 'miniature'
+      over = $OuterParens(
+        body = $Style(
+          body = source,
+          styleClass = 'miniature'
+        )
       ),
       style = 'shallow'
     ),
@@ -2110,9 +2112,11 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
       formula,
       $OverUnder(
         body = '⇒',
-        over = $Style(
-          body = formula,
-          styleClass = 'miniature'
+        over = $OuterParens(
+          body = $Style(
+            body = formula,
+            styleClass = 'miniature'
+          )
         ),
         style = 'shallow'
       ),

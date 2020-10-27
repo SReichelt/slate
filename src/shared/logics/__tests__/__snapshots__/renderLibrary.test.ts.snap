@@ -26,7 +26,7 @@ exports[`render hlm library: 1.1.2 Essentials/Sets/Empty%20set%20is%20subset%20o
 
 Proof.  Let x ∈ ∅.
 
-⇒^def ↯
+⇒^(def) ↯
 
 References.
 
@@ -49,8 +49,8 @@ Equivalence.
 
 1⇒3. Assume S = ∅. Then ∄ x ∈ S:
      Let x ∈ S.
-     ⇒^[S = ∅] x ∈ ∅
-     ⇒^def ↯
+     ⇒^(S = ∅) x ∈ ∅
+     ⇒^(def) ↯
 3⇒2. Assume ∄ x ∈ S. Then S ⊆ ∅:
      Let a ∈ S.
      We have ∃ x ∈ S: ↯
@@ -65,14 +65,14 @@ Equivalence.
 4⇒5. Assume |S| = 0. Then |S| ≤ 0:
      We show that 0 ≤ 0:
      1.7.2.10 ⇒ ≤ is a partial order
-      ⇒^def ≤ is reflexive
-      ⇒^def ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
+      ⇒^(def) ≤ is reflexive
+      ⇒^(def) ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
       ⇒^(0 ∈ 𝓒𝓻𝓭) 0 ≤ 0
 5⇒3. Assume |S| ≤ 0. Then ∄ x ∈ S:
-     |S| ≤ 0 ⇒^def ∃ φ : |S| → 0 : φ is injective
+     |S| ≤ 0 ⇒^(def) ∃ φ : |S| → 0 : φ is injective
      Let x ∈ S.
-     We have φ(x) ∈ ℕ_(<0) ⇒^def φ(x) < 0
-      ⇒^def ↯.
+     We have φ(x) ∈ ℕ_(<0) ⇒^(def) φ(x) < 0
+      ⇒^(def) ↯.
 
 Remarks.
 
@@ -97,8 +97,8 @@ exports[`render hlm library: 1.1.4 Essentials/Sets/finite 1`] = `
 Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-     |S| is finite ⇒^def ∃ n ∈ ℕ : |S| = n
-      ⇒^def ∃ r : S ↔ ℕ_(<n)
+     |S| is finite ⇒^(def) ∃ n ∈ ℕ : |S| = n
+      ⇒^(def) ∃ r : S ↔ ℕ_(<n)
      Take k := n, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
      Take l := k, g := f^-1.
@@ -107,10 +107,10 @@ Equivalence.
      We have l = |S|:
        We show that ∃ s : ℕ_(<l) ↔ S:
        Take s := g.
-     l ∈ ℕ ⇒^[l = |S|] |S| ∈ ℕ
+     l ∈ ℕ ⇒^(l = |S|) |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-     f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
-      ⇒^def f is injective
+     f ∈ (S ↔ ℕ_(<k)) ⇒^(def) f is bijective
+      ⇒^(def) f is injective
      Take m := k, h := f.
 4⇒1. Let n ∈ ℕ, i : S → ℕ_(<n) be an injective function. Then |S| is finite:
      We show that ∃ y ∈ ℕ : |S| ≤ y:
@@ -143,7 +143,7 @@ exports[`render hlm library: 1.1.5 Essentials/Sets/Subsets%20of%20finite%20sets%
 
 Proof 1.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
 
-S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
+S is finite ⇒^(def) ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
 Take m := n, f := g∣_T. g∣_T is injective by 1.4.18.
 
@@ -151,8 +151,8 @@ Proof 2.  We show that |T| is finite:
 
 1.7.2.7 ⇒ |T| ≤ |S|
 
-S is finite ⇒^def |S| is finite
- ⇒^1.7.2.18 |T| is finite
+S is finite ⇒^(def) |S| is finite
+ ⇒^(1.7.2.18) |T| is finite
 
 References.
 
@@ -224,13 +224,13 @@ Proof.
 
 ⊆. Let x ∈ (R ∩ S) ∩ T. Then x ∈ R ∩ (S ∩ T):
    We show that x ∈ R and x ∈ S ∩ T:
-   x ∈ (R ∩ S) ∩ T ⇒^def x ∈ R ∩ S and x ∈ T
-   x ∈ R ∩ S ⇒^def x ∈ R and x ∈ S
+   x ∈ (R ∩ S) ∩ T ⇒^(def) x ∈ R ∩ S and x ∈ T
+   x ∈ R ∩ S ⇒^(def) x ∈ R and x ∈ S
    We have x ∈ S ∩ T by definition.
 ⊇. Let x ∈ R ∩ (S ∩ T). Then x ∈ (R ∩ S) ∩ T:
    We show that x ∈ R ∩ S and x ∈ T:
-   x ∈ R ∩ (S ∩ T) ⇒^def x ∈ R and x ∈ S ∩ T
-   x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
+   x ∈ R ∩ (S ∩ T) ⇒^(def) x ∈ R and x ∈ S ∩ T
+   x ∈ S ∩ T ⇒^(def) x ∈ S and x ∈ T
    We have x ∈ R ∩ S by definition.
 
 References.
@@ -249,10 +249,10 @@ Proof.
 
 ⊆. Let x ∈ S ∩ T. Then x ∈ T ∩ S:
    We show that x ∈ T and x ∈ S:
-   x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
+   x ∈ S ∩ T ⇒^(def) x ∈ S and x ∈ T
 ⊇. Let x ∈ T ∩ S. Then x ∈ S ∩ T:
    We show that x ∈ S and x ∈ T:
-   x ∈ T ∩ S ⇒^def x ∈ T and x ∈ S
+   x ∈ T ∩ S ⇒^(def) x ∈ T and x ∈ S
 
 References.
 
@@ -285,7 +285,7 @@ exports[`render hlm library: 1.1.12 Essentials/Sets/Intersection%20is%20subset%2
 
 Proof.  Let x ∈ S ∩ T.
 
-⇒^def x ∈ S
+⇒^(def) x ∈ S
 
 References.
 
@@ -301,7 +301,7 @@ exports[`render hlm library: 1.1.13 Essentials/Sets/Intersection%20is%20subset%2
 
 Proof.  Let x ∈ S ∩ T.
 
-⇒^def x ∈ T
+⇒^(def) x ∈ T
 
 References.
 
@@ -369,20 +369,20 @@ exports[`render hlm library: 1.1.17 Essentials/Sets/Union%20is%20associative 1`]
 Proof.
 
 ⊆. Let x ∈ (R ∪ S) ∪ T. Then x ∈ R ∪ (S ∪ T):
-   x ∈ (R ∪ S) ∪ T ⇒^def x ∈ R ∪ S or x ∈ T
+   x ∈ (R ∪ S) ∪ T ⇒^(def) x ∈ R ∪ S or x ∈ T
    * Assume x ∈ R ∪ S. Then x ∈ R ∪ (S ∪ T):
-     x ∈ R ∪ S ⇒^def x ∈ R or x ∈ S
+     x ∈ R ∪ S ⇒^(def) x ∈ R or x ∈ S
      * Assume x ∈ R. Then x ∈ R ∪ (S ∪ T) by definition.
      * Assume x ∈ S. Then x ∈ R ∪ (S ∪ T):
        We have x ∈ S ∪ T by definition.
    * Assume x ∈ T. Then x ∈ R ∪ (S ∪ T):
      We have x ∈ S ∪ T by definition.
 ⊇. Let x ∈ R ∪ (S ∪ T). Then x ∈ (R ∪ S) ∪ T:
-   x ∈ R ∪ (S ∪ T) ⇒^def x ∈ R or x ∈ S ∪ T
+   x ∈ R ∪ (S ∪ T) ⇒^(def) x ∈ R or x ∈ S ∪ T
    * Assume x ∈ R. Then x ∈ (R ∪ S) ∪ T:
      We have x ∈ R ∪ S by definition.
    * Assume x ∈ S ∪ T. Then x ∈ (R ∪ S) ∪ T:
-     x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
+     x ∈ S ∪ T ⇒^(def) x ∈ S or x ∈ T
      * Assume x ∈ S. Then x ∈ (R ∪ S) ∪ T:
        We have x ∈ R ∪ S by definition.
      * Assume x ∈ T. Then x ∈ (R ∪ S) ∪ T by definition.
@@ -403,10 +403,10 @@ Proof.
 
 ⊆. Let x ∈ S ∪ T. Then x ∈ T ∪ S:
    We show that x ∈ T or x ∈ S:
-   x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
+   x ∈ S ∪ T ⇒^(def) x ∈ S or x ∈ T
 ⊇. Let x ∈ T ∪ S. Then x ∈ S ∪ T:
    We show that x ∈ S or x ∈ T:
-   x ∈ T ∪ S ⇒^def x ∈ T or x ∈ S
+   x ∈ T ∪ S ⇒^(def) x ∈ T or x ∈ S
 
 References.
 
@@ -1675,10 +1675,10 @@ exports[`render hlm library: 1.4.17 Essentials/Functions/Generalized%20restricti
 
 Proof.  Let a, b ∈ A such that f∣_A^B(a) = f∣_A^B(b). Then a = b:
 
-f∣_A^B(a) = f∣_A^B(b) ⇒^def f(a) = f(b)
+f∣_A^B(a) = f∣_A^B(b) ⇒^(def) f(a) = f(b)
 
-f is injective ⇒^def ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
- ⇒^a,b ∈ X, f(a) = f(b) a = b"
+f is injective ⇒^(def) ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
+ ⇒^(a,b ∈ X, f(a) = f(b)) a = b"
 `;
 
 exports[`render hlm library: 1.4.18 Essentials/Functions/Restriction%20preserves%20injectivity 1`] = `
@@ -1698,9 +1698,9 @@ exports[`render hlm library: 1.4.19 Essentials/Functions/Generalized%20extension
 
 Proof.  Let y ∈ Y. Then ∃ x ∈ X : f(x) = y:
 
-f∣_A^B is surjective ⇒^def ∀ b ∈ B : ∃ a ∈ A : f∣_A^B(a) = b
+f∣_A^B is surjective ⇒^(def) ∀ b ∈ B : ∃ a ∈ A : f∣_A^B(a) = b
  ⇒^(y ∈ B) ∃ a ∈ A : f∣_A^B(a) = y
- ⇒^def f(a) = y
+ ⇒^(def) f(a) = y
 
 Take x := a."
 `;
@@ -1722,7 +1722,7 @@ exports[`render hlm library: 1.4.21 Essentials/Functions/Surjectivity%20by%20cod
 
 Proof.  Let y ∈ f(A). Then ∃ x ∈ A : f∣_A^(f(A))(x) = y:
 
-y ∈ f(A) ⇒^def ∃ a ∈ A : y = f(a)
+y ∈ f(A) ⇒^(def) ∃ a ∈ A : y = f(a)
 
 Take x := a. f(a) = y."
 `;
@@ -2461,7 +2461,7 @@ Proof.  By induction on n.
 
 * (0) = (0).
 * Let x ∈ ℕ such that (0) + x = x. Then (((0) + x)+1) = (x+1):
-  We have (x+1) = (x+1) ⇒^[(0)+x = x] (((0) + x)+1) = (x+1).
+  We have (x+1) = (x+1) ⇒^((0)+x = x) (((0) + x)+1) = (x+1).
 
 References.
 
@@ -2482,7 +2482,7 @@ Proof.  By induction on n.
 
 * (m+1) = (m+1).
 * Let x ∈ ℕ such that (m+1) + x = ((m + x)+1). Then (((m+1) + x)+1) = (((m + x)+1)+1):
-  We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^[(m+1)+x = ((m+x)+1)] (((m+1) + x)+1) = (((m + x)+1)+1).
+  We have (((m + x)+1)+1) = (((m + x)+1)+1) ⇒^((m+1)+x = ((m+x)+1)) (((m+1) + x)+1) = (((m + x)+1)+1).
 
 References.
 
@@ -2563,9 +2563,9 @@ exports[`render hlm library: 1.7.1.12 Essentials/Numbers/Natural/Less%20and%20le
 
 Proof.  We show that ∃ x ∈ ℕ_+ : a + x = c:
 
-a < b ⇒^def ∃ y ∈ ℕ_+ : a + y = b
+a < b ⇒^(def) ∃ y ∈ ℕ_+ : a + y = b
 
-b ≤ c ⇒^def ∃ z ∈ ℕ : b + z = c
+b ≤ c ⇒^(def) ∃ z ∈ ℕ : b + z = c
 
 Take x := y + z.
 
@@ -2726,7 +2726,7 @@ Proof.  By induction on k.
   Take m := f(0).
 * Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
   Let N := f(ℕ_(≤x)).
-  ⇒^1.7.1.18 ∃ n ∈ N : n is a ≤-greatest element of N
+  ⇒^(1.7.1.18) ∃ n ∈ N : n is a ≤-greatest element of N
   Take m := {f(k) if f(k) > n, n if f(k) ≤ n.
 
 Remarks.
@@ -2746,26 +2746,26 @@ exports[`render hlm library: 1.7.1.19 Essentials/Numbers/Natural/Finiteness%20cr
 Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
-     M is finite ⇒^def |M| is finite
-      ⇒^def |M| ∈ ℕ
+     M is finite ⇒^(def) |M| is finite
+      ⇒^(def) |M| ∈ ℕ
      * Assume |M| = 0. Then M is empty by definition.
      * Let k ∈ ℕ such that |M| = k + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
-       We have |M| = k + 1 ⇒^def ∃ f : M ↔ ℕ_(<(k+1)).
+       We have |M| = k + 1 ⇒^(def) ∃ f : M ↔ ℕ_(<(k+1)).
        1.7.1.18 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
 3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
-       ⇒^def M = ∅
+       ⇒^(def) M = ∅
        Take a := 0. We show that M ⊆ ℕ_(≤0):
          1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
-          ⇒^[M = ∅] M ⊆ ℕ_(≤0)
+          ⇒^(M = ∅) M ⊆ ℕ_(≤0)
      * Let m ∈ M such that m is a ≤-greatest element of M.
        Take a := m.
 4⇒5. Let a ∈ ℕ such that M ⊆ ℕ_(≤a). Then ∃ b ∈ ℕ : M ⊆ ℕ_(<b):
      Take b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
      1.7.1.17.7 ⇒ ℕ_(<b) is finite
-      ⇒^1.1.5 M is finite"
+      ⇒^(1.1.5) M is finite"
 `;
 
 exports[`render hlm library: 1.7.1.20 Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -3004,9 +3004,9 @@ exports[`render hlm library: 1.7.1.36 Essentials/Numbers/Natural/Induction%20lem
 Proof.  By induction on n.
 
 * We show that 0 ∈ M:
-  M is inductive ⇒^def 0 ∈ M
+  M is inductive ⇒^(def) 0 ∈ M
 * Let x ∈ ℕ such that x ∈ M. Then x + 1 ∈ M:
-  M is inductive ⇒^def ∀ m ∈ M : m + 1 ∈ M
+  M is inductive ⇒^(def) ∀ m ∈ M : m + 1 ∈ M
    ⇒^(x ∈ M) x + 1 ∈ M
 
 Remarks.
@@ -3026,7 +3026,7 @@ Proof.
      ⊆. Trivial.
      ⊇. Let n ∈ ℕ. Then n ∈ M by 1.7.1.36.
 2⇒1. Assume M = ℕ. Then M is inductive:
-     We have ℕ is inductive by definition ⇒^[M = ℕ] M is inductive.
+     We have ℕ is inductive by definition ⇒^(M = ℕ) M is inductive.
 
 Remarks.
 
@@ -3455,20 +3455,20 @@ Let a := ∏_(p ∈ ℙ) p.
 ⇒ a ≥ 1:
 
   1.7.1.49.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
-   ⇒^1.5.18.8 1 ≤ ∏_(p ∈ ℙ) p
+   ⇒^(1.5.18.8) 1 ≤ ∏_(p ∈ ℙ) p
 
-⇒^1.7.1.13 a + 1 > 1
-⇒^1.7.1.50.5 ∃ prime q : q ∣ (a + 1)
+⇒^(1.7.1.13) a + 1 > 1
+⇒^(1.7.1.50.5) ∃ prime q : q ∣ (a + 1)
 
 We have q ∣ a:
 
   1.7.1.49.9 ⇒ q ∣ (∏_(p ∈ ℙ) p)
 
-⇒^1.7.1.31 q ∣ 1
-⇒^1.7.1.30 q ≤ 1
+⇒^(1.7.1.31) q ∣ 1
+⇒^(1.7.1.30) q ≤ 1
 
-q ∈ ℙ ⇒^def q ∈ ℕ_(>1)
- ⇒^def q > 1 ↯
+q ∈ ℙ ⇒^(def) q ∈ ℕ_(>1)
+ ⇒^(def) q > 1 ↯
 
 References.
 
@@ -3623,7 +3623,7 @@ n = |ℕ_(<n)|
 
   Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|. Then m = n:
 
-  |ℕ_(<m)| = |ℕ_(<n)| ⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
+  |ℕ_(<m)| = |ℕ_(<n)| ⇒^(def) ∃ f : ℕ_(<m) ↔ ℕ_(<n)
 
   1.7.2.1 ⇒ m = n
 
@@ -4422,8 +4422,8 @@ x = (x-0)
 
   Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
 
-  (x-0) = (y-0) ⇒^def x + 0 = y + 0
-   ⇒^def x = y
+  (x-0) = (y-0) ⇒^(def) x + 0 = y + 0
+   ⇒^(def) x = y
 
 Remarks.
 
@@ -5655,21 +5655,21 @@ exports[`render hlm library: 1.7.6.18 Essentials/Numbers/Real/Roots%20of%20prime
 
 Proof.  Assume n√p is rational.
 
-⇒^def ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+⇒^(def) ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
-⇒^def p = (b∕a)^n
+⇒^(def) p = (b∕a)^n
  =^1.7.6.13 b^n∕a^n
 
-⇒^def p ⋅ a^n = b^n
+⇒^(def) p ⋅ a^n = b^n
 ⇒ p ∣ b^n by definition
-⇒^1.7.4.23.1 p ∣ b
+⇒^(1.7.4.23.1) p ∣ b
 ⇒ p ∣ a^n:
 
   We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
 
-  p ∣ b ⇒^def ∃ z ∈ ℤ : p ⋅ z = b
+  p ∣ b ⇒^(def) ∃ z ∈ ℤ : p ⋅ z = b
 
-  n ∈ ℕ_(>1) ⇒^def ∃ m ∈ ℕ : 2 + m = n
+  n ∈ ℕ_(>1) ⇒^(def) ∃ m ∈ ℕ : 2 + m = n
 
   Take y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
@@ -5678,9 +5678,9 @@ Proof.  Assume n√p is rational.
      =^def b^m ⋅ b ⋅ b
      = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
-    ⇒^1.7.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
+    ⇒^(1.7.4.20) a^n = b^m ⋅ z ⋅ p ⋅ z
 
-⇒^1.7.4.23.1 p ∣ a
+⇒^(1.7.4.23.1) p ∣ a
 
 p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
 
