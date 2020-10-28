@@ -2468,7 +2468,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.commitStartRow(state);
         return;
       } else {
-        if (!hasContents) {
+        if (showExternalGoal && !hasContents) {
           state.startRow.push(new Notation.TextExpression('We show that '));
         }
         state.startRow.push(
@@ -2965,15 +2965,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
                  || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
         let subProofContext: HLMProofStepContext = {
-          goal: context.goal,
           stepResults: context.stepResults
         };
+        if (type instanceof FmtHLM.MetaRefExpression_UseCases) {
+          subProofContext.goal = context.goal;
+        }
         this.addSubProofList(type.caseProofs, undefined, subProofContext, state);
       } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
         if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists || context.previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
           context.originalParameters.push(...type.parameters);
           context.substitutedParameters.push(...context.previousResult.parameters);
-          return context.previousResult.formula;
+          let result = context.previousResult.formula;
+          let insertionContext: HLMProofStepRenderContext = {
+            ...context,
+            previousStep: step,
+            previousResult: result
+          };
+          this.addConditionalProofStepInsertButton(proof, insertionContext, false, state);
+          return result;
         } else {
           this.commitImplications(state, false);
           state.paragraphs.push(new Notation.ErrorExpression('Previous result is not existentially quantified'));
