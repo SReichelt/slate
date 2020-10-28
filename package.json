@@ -30,7 +30,7 @@
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\""
   },
   "engines": {
-    "node": ">=13.9.0"
+    "node": "14.13.1"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
