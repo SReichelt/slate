@@ -2377,7 +2377,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let proofNumber = 1;
       for (let proof of proofs) {
         let proofHeading = heading && proofs.length > 1 ? `${heading} ${proofNumber}` : heading;
-        this.addProofInternal(proof, proofHeading, context, false, indentSteps, state);
+        this.addProofInternal(proof, proofHeading, context, false, indentSteps, false, state);
         proofNumber++;
       }
       if (this.editHandler && onInsertProof) {
@@ -2395,7 +2395,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private addProofInternal(proof: FmtHLM.ObjectContents_Proof, heading: string | undefined, context: HLMProofStepContext, showExternalGoal: boolean, indentSteps: boolean, state: ProofOutputState): void {
+  private addOptionalProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, showExternalGoal: boolean, isListItem: boolean, indentSteps: boolean, onInsertProof: InsertProofFn | undefined, state: ProofOutputState): void {
+    if (proof) {
+      this.addProofInternal(proof, heading, context, showExternalGoal, isListItem, indentSteps, state);
+    } else if (!this.utils.containsPlaceholders()) {
+      this.addNoProofPlaceholder(heading, onInsertProof, state);
+    }
+  }
+
+  private addProofInternal(proof: FmtHLM.ObjectContents_Proof, heading: string | undefined, context: HLMProofStepContext, showExternalGoal: boolean, isListItem: boolean, indentSteps: boolean, state: ProofOutputState): void {
     if (!state.startRow) {
       state.startRow = [];
     }
@@ -2468,7 +2476,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.commitStartRow(state);
         return;
       } else {
-        if (showExternalGoal && !hasContents) {
+        if (!hasContents && !isListItem) {
           state.startRow.push(new Notation.TextExpression('We show that '));
         }
         state.startRow.push(
@@ -2562,7 +2570,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.commitImplications(state, false);
     if (proof) {
       let showExternalGoal = !(proof.steps.length && this.isDependentProofStepType(proof.steps[0].type));
-      this.addProofInternal(proof, undefined, context, showExternalGoal, indentSteps, state);
+      this.addOptionalProofInternal(proof, undefined, context, showExternalGoal, false, indentSteps, undefined, state);
     } else if (context.goal) {
       if (!state.startRow) {
         state.startRow = [];
@@ -2597,12 +2605,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
     // TODO add conditional proof step insertion button
-    let proofs = proof ? [proof] : undefined;
     let indentedState: ProofOutputState = {
       paragraphs: [],
       isPreview: state.isPreview
     };
-    this.addProofsInternal(proofs, heading, context, false, undefined, indentedState);
+    this.addOptionalProofInternal(proof, heading, context, false, false, false, undefined, indentedState);
     let indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
     indentedProof.styleClasses = ['indented'];
     state.paragraphs.push(indentedProof);
@@ -2624,7 +2631,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addProofListInternal(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
     if (proofs.every((proof) => !proof)) {
-      this.addProofsInternal(undefined, heading, context, false, undefined, state);
+      this.addNoProofPlaceholder(heading, undefined, state);
     } else {
       if (heading) {
         state.paragraphs.push(this.renderSubHeading(heading));
@@ -2638,7 +2645,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             paragraphs: [],
             isPreview: state.isPreview
           };
-          this.addProofsInternal(proof ? [proof] : undefined, undefined, context, false, undefined, itemState);
+          this.addOptionalProofInternal(proof, undefined, context, false, true, false, undefined, itemState);
           return new Notation.ParagraphExpression(itemState.paragraphs);
         });
         let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
