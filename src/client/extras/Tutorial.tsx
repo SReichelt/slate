@@ -138,7 +138,9 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
         toolTipElement = <PermanentToolTip active={toolTip.contents !== null} parent={toolTipParent} position={toolTip.position} arrow={toolTip.arrow} group={`tutorial-${toolTip.index}`} refreshInterval={100} getContents={getContents} key="tutorial-tooltip"/>;
       }
       let ref = (refNode: HTMLElement | null) => {
-        parentNode = refNode;
+        if (refNode) {
+          parentNode = refNode;
+        }
         if (entry.elementAction && refNode) {
           entry.elementAction(node as any, refNode);
         }

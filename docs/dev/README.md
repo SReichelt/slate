@@ -25,31 +25,17 @@ Rerun `npm install` and `npm run build` after a pulling a new version from the r
 
 ## Running Slate locally
 
-1. First build Slate as described above. (However, the output of `npm run build` will not be used when running locally, so that step can be skipped.)
-2. Create a script `chrome-remote-debug` as follows, in a directory that is referenced by the `PATH` environment variable:
-   * On Linux, create a text file `chrome-remote-debug` with the contents
-     ```
-     #! /bin/sh
-     set -e
-     /usr/bin/google-chrome --remote-debugging-port=9222 "$@"
-     ```
-     and make it executable via `chmod +x`.
-   * On Windows, create a text file `chrome-remote-debug.cmd` with the contents
-     ```
-     "<path>\chrome.exe" --remote-debugging-port=9222 %*
-     ```
-     replacing `<path>` with the correct path.
-3. Start Visual Studio Code, and open the workspace `Slate.code-workspace`.
-4. Now you should be able to execute the app via "Run / Start debugging" (F5). If successful, a browser will open.
-5. If the app does not start, check all output/console/terminal windows of Visual Studio Code for errors.
-6. _Optional:_ If you would like to debug the application, select the launch configuration called "Launch and attach", which attaches the VSCode debugger to Chrome.
-7. _Optional:_ To debug GitHub support, set up an OAuth application at https://github.com/settings/developers.
+1. First, follow the steps for 'Building Slate' above, except for `npm run build`.
+2. Start Visual Studio Code, and open the workspace `Slate.code-workspace`.
+3. Now you should be able to execute the app via the run configuration "Launch with Chrome" or "Launch with Firefox".
+4. If the app does not start, check all output/console/terminal windows of Visual Studio Code for errors.
+5. _Optional:_ To debug GitHub support, set up an OAuth application at https://github.com/settings/developers.
    * Enter http://localhost:3000/ for the callback URL.
    * After creating the application, add environment variables `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` to your local machine, according to the values reported by GitHub.
 
 ## Running the VSCode extension
 
-1. First build Slate as described above. (Note that in contrast to the first item under "Running Slate locally", the embedded webview of the VSCode extension will actually use the output of `npm run build`.)
+1. First, follow the steps for 'Building Slate' above. (Note that in contrast to the first item under "Running Slate locally", the embedded webview of the VSCode extension will actually use the output of `npm run build`.)
 2. Open the separate workspace `Slate-vscode.code-workspace`.
 3. Click "Run / Start debugging" (F5).
 

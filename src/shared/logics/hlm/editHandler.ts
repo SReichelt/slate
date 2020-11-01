@@ -1386,6 +1386,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getUnfoldRow(previousResult: Fmt.Expression, previousStep: Fmt.Parameter | undefined, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
     // TODO (low priority) check whether unfoldsTo returns false, and don't merge steps if it does
+    // TODO display implication symbol
     let unfoldRow = new Menu.StandardExpressionMenuRow('Unfold');
     let unfoldedFormulasPromise = this.getUnfoldedFormulas(previousResult, previousResult);
     let rowsPromise = unfoldedFormulasPromise.then((unfoldedFormulas: Fmt.Expression[] | undefined) =>

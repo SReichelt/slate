@@ -103,7 +103,7 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
       }
     }
     return (
-      <ToolTip active={visible} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} style={ExpressionToolTip.toolTipStyle}>
+      <ToolTip active={visible} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} style={ExpressionToolTip.toolTipStyle} useHover={false}>
         <div className={'tooltip preview'}>{ExpressionToolTip.currentContents}</div>
       </ToolTip>
     );
@@ -164,7 +164,7 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
       className += ' fixed-width';
     }
     return (
-      <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} group={this.props.group} style={PermanentToolTip.toolTipStyle}>
+      <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} group={this.props.group} style={PermanentToolTip.toolTipStyle} useHover={false}>
         <div className={className}>{this.contents}</div>
       </ToolTip>
     );
