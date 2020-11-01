@@ -2530,7 +2530,9 @@ exports[`render hlm library: 1.7.1.11 Essentials/Numbers/Natural/Zero%20is%20the
 
   n = 0
 
-No proof."
+Proof.
+
+We have n + m = 0 + m ⇒^(1.7.1.10) n = 0."
 `;
 
 exports[`render hlm library: 1.7.1.12 Essentials/Numbers/Natural/less%20or%20equal 1`] = `
