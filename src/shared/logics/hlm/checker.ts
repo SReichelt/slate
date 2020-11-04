@@ -167,19 +167,36 @@ export class HLMDefinitionChecker {
     return this.check(() => this.checkRootDefinition());
   }
 
-  checkExpression(expression: Fmt.Expression, expressionType: HLMExpressionType): CachedPromise<HLMCheckResult> {
+  checkExpression(expression: Fmt.Expression, expressionType: HLMExpressionType, context: Ctx.Context): CachedPromise<HLMCheckResult> {
     return this.check(() => {
+      let checkContext: HLMCheckerContext = {
+        ...this.rootContext,
+        context: context
+      };
       switch (expressionType) {
       case HLMExpressionType.SetTerm:
-        this.checkSetTerm(expression, this.rootContext);
+        this.checkSetTerm(expression, checkContext);
         break;
       case HLMExpressionType.ElementTerm:
-        this.checkElementTerm(expression, this.rootContext);
+        this.checkElementTerm(expression, checkContext);
         break;
       case HLMExpressionType.Formula:
-        this.checkFormula(expression, this.rootContext);
+        this.checkFormula(expression, checkContext);
         break;
       }
+    });
+  }
+
+  checkSingleProofStep(step: Fmt.Parameter, context: HLMCheckerProofStepContext): CachedPromise<HLMCheckResult> {
+    return this.check(() => {
+      let checkContext: HLMCheckerProofStepContext = {
+        ...context,
+        editData: this.rootContext.editData,
+        currentRecheckFn: undefined,
+        currentPlaceholderCollection: this.rootContext.currentPlaceholderCollection,
+        rechecking: false
+      };
+      this.checkProofStep(step, checkContext);
     });
   }
 

@@ -2430,7 +2430,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     if (displayedGoal && proof.steps.length) {
       let firstStepType = proof.steps[0].type;
-      if (firstStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && displayedGoal instanceof FmtHLM.MetaRefExpression_forall) {
+      if ((firstStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && displayedGoal instanceof FmtHLM.MetaRefExpression_forall)
+          || firstStepType instanceof FmtHLM.MetaRefExpression_ProveCases) {
         displayedGoal = undefined;
       }
     }
@@ -2773,6 +2774,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
+        let sourceContext: HLMProofStepRenderContext = {
+          ...context,
+          goal: undefined,
+          isLastStep: false,
+          originalGoal: undefined,
+          previousResult: undefined,
+          previousStep: undefined
+        };
+        let calculationResult = this.renderCalculation(type, context, undefined, addImplication);
+        if (calculationResult) {
+          return undefined;
+        } else if (calculationResult === undefined && !(type.source.type instanceof FmtHLM.MetaRefExpression_Consider)) {
+          this.addProofStep(proof, type.source, sourceContext, state);
+        }
         let subProofContext: HLMProofStepContext = {
           goal: type.goal,
           stepResults: context.stepResults
@@ -2952,6 +2967,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || sourceType instanceof FmtHLM.MetaRefExpression_Unfold) {
           source = new Notation.TextExpression('def');
           // TODO link to definition
+          if (state.isPreview) {
+            dependsOnPrevious = true;
+          }
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseForAll && context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
           source = this.renderArgumentList(context.previousResult.parameters, sourceType.arguments, undefined, ArgumentListStyle.Formulas);
         } else if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
@@ -2959,7 +2977,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           dependsOnPrevious = (type instanceof FmtHLM.MetaRefExpression_Substitute
                                || (context.previousStep !== undefined && this.utils.referencesParameter(sourceType, context.previousStep)));
         }
-        // TODO for UseForAll, display substituted parameters as formulas, e.g. "42 in S" if formula was "for all x in S: ..."
         addImplication({
           dependsOnPrevious: dependsOnPrevious,
           source: source,
@@ -3045,12 +3062,76 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || type instanceof FmtHLM.MetaRefExpression_Substitute);
   }
 
+  private renderCalculation(type: FmtHLM.MetaRefExpression_ProveBySubstitution, context: HLMProofStepContext, leftTerm: Fmt.Expression | undefined, addImplication: (implication: ProofOutputImplication) => void): boolean | undefined {
+    if (type.proof
+        && ((context.goal instanceof FmtHLM.MetaRefExpression_setEquals && type.goal instanceof FmtHLM.MetaRefExpression_setEquals)
+            || (context.goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
+        && context.goal.terms.length === 2
+        && type.goal.terms.length === 2
+        && context.goal.terms[1].isEquivalentTo(type.goal.terms[1])) {
+      let dependsOnPrevious = (leftTerm !== undefined);
+      if (!leftTerm) {
+        leftTerm = context.goal.terms[0];
+      }
+      let rightTerm = type.goal.terms[0];
+      let equality = context.goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+      let source: Notation.RenderedExpression | undefined = undefined;
+      let sourceType = type.source.type;
+      if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
+        source = this.renderItemNumber(sourceType.theorem);
+      }
+      addImplication({
+        dependsOnPrevious: dependsOnPrevious,
+        result: equality,
+        resultIsEditable: false,
+        source: source
+      });
+      let subProofContext: HLMProofStepContext = {
+        goal: type.goal,
+        stepResults: context.stepResults
+      };
+      return this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, addImplication);
+    } else {
+      return undefined;
+    }
+  }
+
+  private continueCalculation(subProof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, addImplication: (implication: ProofOutputImplication) => void): boolean {
+    if (subProof.steps.length === 1) {
+      let firstStep = subProof.steps[0];
+      let type = firstStep.type;
+      if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
+        return this.renderCalculation(type, context, leftTerm, addImplication) ?? false;
+      } else {
+        let firstStepResult = this.utils.getProofStepResult(firstStep, context);
+        if ((firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals || firstStepResult instanceof FmtHLM.MetaRefExpression_equals)
+            && firstStepResult.terms.length === 2
+            && firstStepResult.terms[0].isEquivalentTo(previousRightTerm)) {
+          let rightTerm = firstStepResult.terms[1];
+          let finalEquality = firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+          let source: Notation.RenderedExpression | undefined = undefined;
+          if (firstStep.type instanceof FmtHLM.MetaRefExpression_UseTheorem && firstStep.type.theorem instanceof Fmt.DefinitionRefExpression) {
+            source = this.renderItemNumber(firstStep.type.theorem);
+          }
+          addImplication({
+            dependsOnPrevious: true,
+            result: finalEquality,
+            resultIsEditable: false,
+            source: source
+          });
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {
     if (this.editHandler) {
       if (!this.utils.containsPlaceholders()) {
         let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
         let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
-        let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
+        let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
         state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
       }
       return true;
@@ -3176,7 +3257,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private outputImplication(implication: ProofOutputImplication, gridState: ProofGridState, mergeEquality: boolean, row: Notation.RenderedExpression[]): void {
-    if ((implication.dependsOnPrevious || implication.source) && gridState.equalitySymbolColumn === undefined) {
+    if ((implication.dependsOnPrevious || (implication.source && !mergeEquality)) && gridState.equalitySymbolColumn === undefined) {
       this.outputImplicationSymbol(implication, gridState, row);
     }
     if (mergeEquality || gridState.equalitySymbolColumn !== undefined) {

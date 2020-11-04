@@ -267,7 +267,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
           let type = variableInfo.parameter.type;
           if (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef) {
-            return this.getVariableRefExpressions(expressionEditInfo, variableInfo, true);
+            return this.getVariableRefExpressions(variableInfo, expressionEditInfo);
           }
           return CachedPromise.resolve([]);
         };
@@ -329,7 +329,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
           let type = variableInfo.parameter.type;
           if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
-            return this.getVariableRefExpressions(expressionEditInfo, variableInfo, true);
+            return this.getVariableRefExpressions(variableInfo, expressionEditInfo);
           }
           return CachedPromise.resolve([]);
         };
@@ -386,7 +386,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let onGetExpressions = (variableInfo: Ctx.VariableInfo) => {
           let type = variableInfo.parameter.type;
           if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-            return this.getVariableRefExpressions(expressionEditInfo, variableInfo, false)
+            return this.getVariableRefExpressions(variableInfo)
               .then(addNegations);
           }
           return CachedPromise.resolve([]);
@@ -607,7 +607,7 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  private getVariableRefExpressions(expressionEditInfo: Edit.ExpressionEditInfo, variableInfo: Ctx.VariableInfo, checkType: boolean): CachedPromise<Fmt.Expression[]> {
+  private getVariableRefExpressions(variableInfo: Ctx.VariableInfo, expressionEditInfo?: Edit.ExpressionEditInfo): CachedPromise<Fmt.Expression[]> {
     let expression: Fmt.Expression = new Fmt.VariableRefExpression(variableInfo.parameter);
     if (variableInfo.indexParameterLists) {
       for (let indexParameterList of variableInfo.indexParameterLists) {
@@ -619,7 +619,7 @@ export class HLMEditHandler extends GenericEditHandler {
         expression = new Fmt.IndexedExpression(expression, index);
       }
     }
-    if (checkType && expressionEditInfo.expression) {
+    if (expressionEditInfo?.expression) {
       return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
         .then((checkResult: HLMCheckResultWithExpression) => {
           if (checkResult.hasErrors) {
@@ -788,6 +788,27 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getStructuralCaseItems(createStructuralExpression: (term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[]) => Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn, expressionType: HLMExpressionType): CachedPromise<Menu.ExpressionMenuItem[]> {
+    let createEmptyStructuralExpression = (term: Fmt.Expression) =>
+      createStructuralExpression(term, new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), []);
+    let createAndCheckStructuralExpression = (variableRefExpression: Fmt.Expression, structuralChecker: HLMDefinitionChecker) => {
+      let structuralExpression = createEmptyStructuralExpression(variableRefExpression);
+      return structuralChecker.checkExpression(structuralExpression, expressionType, expressionEditInfo.context)
+        .then((checkResult: HLMCheckResultWithExpression) => (checkResult.hasErrors ? undefined : structuralExpression))
+        .catch(() => undefined);
+    };
+    let createItem = (structuralExpression: Fmt.Expression, variableRefExpression: Fmt.Expression) =>
+      this.getInductionItem(structuralExpression, variableRefExpression, (structuralExpression as any).cases, expressionEditInfo, onRenderExpression);
+    let result = this.getInductionItems(expressionEditInfo.context, createAndCheckStructuralExpression, createItem);
+
+    result = result.then((menuItems: Menu.ExpressionMenuItem[]) => {
+      let structuralExpression = createEmptyStructuralExpression(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
+      return menuItems.concat(this.getExpressionItem(structuralExpression, expressionEditInfo, onRenderExpression));
+    });
+
+    return result;
+  }
+
+  private getInductionItems<T>(context: Ctx.Context, createAndCheckStructuralExpression: (variableRefExpression: Fmt.Expression, structuralChecker: HLMDefinitionChecker) => CachedPromise<Fmt.Expression | undefined>, createItem: (structuralExpression: Fmt.Expression, variableRefExpression: Fmt.Expression) => T): CachedPromise<T[]> {
     let options: Logic.LogicCheckerOptions = {
       supportPlaceholders: true,
       supportRechecking: false,
@@ -795,52 +816,34 @@ export class HLMEditHandler extends GenericEditHandler {
     };
     let structuralChecker = new HLMDefinitionChecker(this.definition, this.libraryDataProvider, this.utils, options);
 
-    let result = CachedPromise.resolve<Menu.ExpressionMenuItem[]>([]);
-    let variables = expressionEditInfo.context.getVariables();
+    let resultPromise = CachedPromise.resolve<T[]>([]);
+    let variables = context.getVariables();
     for (let variableInfo of variables) {
       let type = variableInfo.parameter.type;
       if (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def) {
-        result = result.then((menuItems: Menu.ExpressionMenuItem[]) =>
-          this.getVariableRefExpressions(expressionEditInfo, variableInfo, false).then((variableRefExpressions: Fmt.Expression[]) => {
-            let currentMenuItems = CachedPromise.resolve(menuItems);
+        resultPromise = resultPromise.then((currentResult: T[]) =>
+          this.getVariableRefExpressions(variableInfo).then((variableRefExpressions: Fmt.Expression[]) => {
+            let innerResultPromise = CachedPromise.resolve(currentResult);
             for (let variableRefExpression of variableRefExpressions) {
-              currentMenuItems = currentMenuItems.then((items: Menu.ExpressionMenuItem[]) => {
-                let inductionExpression = createStructuralExpression(
-                  variableRefExpression,
-                  new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm),
-                  []
-                );
-                return structuralChecker.checkExpression(inductionExpression, expressionType)
-                  .then((checkResult: HLMCheckResultWithExpression) => {
-                    if (checkResult.hasErrors) {
-                      return items;
-                    } else {
-                      let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
-                        this.adaptNewParameterLists(newParameterLists, filledExpression);
-                        inductionExpression = FmtUtils.substituteExpression(inductionExpression, originalExpression, filledExpression);
-                      };
-                      return structuralChecker.autoFill(onFillExpression).then(() =>
-                        items.concat(this.getInductionItem(inductionExpression, variableRefExpression, (inductionExpression as any).cases, expressionEditInfo, onRenderExpression)));
-                    }
-                  })
-                  .catch(() => items);
-              });
+              innerResultPromise = innerResultPromise.then((innerResult: T[]) =>
+                createAndCheckStructuralExpression(variableRefExpression, structuralChecker).then((structuralExpression?: Fmt.Expression) => {
+                  if (structuralExpression) {
+                    let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
+                      this.adaptNewParameterLists(newParameterLists, filledExpression);
+                      structuralExpression = FmtUtils.substituteExpression(structuralExpression!, originalExpression, filledExpression);
+                    };
+                    return structuralChecker.autoFill(onFillExpression).then(() =>
+                      innerResult.concat(createItem(structuralExpression!, variableRefExpression)));
+                  } else {
+                    return innerResult;
+                  }
+                }));
             }
-            return currentMenuItems;
+            return innerResultPromise;
           }));
       }
     }
-
-    result = result.then((menuItems: Menu.ExpressionMenuItem[]) => {
-      let structuralExpression = createStructuralExpression(
-        new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm),
-        new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm),
-        []
-      );
-      return menuItems.concat(this.getExpressionItem(structuralExpression, expressionEditInfo, onRenderExpression));
-    });
-
-    return result;
+    return resultPromise;
   }
 
   private getInductionItem(expression: Fmt.Expression, variableRefExpression: Fmt.Expression, cases: FmtHLM.ObjectContents_Case[], expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
@@ -1243,7 +1246,6 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getProveByCasesRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn, proveByCasesInfo: ProveByCasesInfo): Menu.ExpressionMenuRow | undefined {
-    // TODO include ProveByInduction
     let stepsPromises: CachedPromise<ProofStepInfo[]>[] = [];
     if (context.previousResult) {
       let useCasesStepsPromise = this.createUseCasesSteps(context.previousResult, context);
@@ -1259,14 +1261,26 @@ export class HLMEditHandler extends GenericEditHandler {
         stepsPromises.push(proveCasesStepsPromise);
       }
     }
-    if (stepsPromises.length) {
-      let stepsPromise = CachedPromise.all(stepsPromises).then((steps: ProofStepInfo[][]) => ([] as ProofStepInfo[]).concat(...steps));
-      let proveByCasesRow = new Menu.StandardExpressionMenuRow('Prove by cases');
-      proveByCasesRow.subMenu = this.getProofStepSubMenu(stepsPromise, context, onInsertProofStep, onRenderProofStep);
-      return proveByCasesRow;
-    } else {
-      return undefined;
-    }
+    stepsPromises.push(this.createProveByInductionSteps(context));
+    let stepsPromise = CachedPromise.all(stepsPromises).then((steps: ProofStepInfo[][]) => ([] as ProofStepInfo[]).concat(...steps));
+    let proveByCasesRow = new Menu.StandardExpressionMenuRow('Prove by cases');
+    proveByCasesRow.subMenu = this.getProofStepSubMenu(stepsPromise, context, onInsertProofStep, onRenderProofStep);
+    return proveByCasesRow;
+  }
+
+  private createProveByInductionSteps(context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo[]> {
+    let createAndCheckStructuralExpression = (variableRefExpression: Fmt.Expression, structuralChecker: HLMDefinitionChecker) => {
+      let structuralExpression = new FmtHLM.MetaRefExpression_ProveByInduction(variableRefExpression, new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), []);
+      let step = this.utils.createParameter(structuralExpression, '_');
+      return structuralChecker.checkSingleProofStep(step, context)
+        .then((checkResult: HLMCheckResultWithExpression) => (checkResult.hasErrors ? undefined : structuralExpression))
+        .catch(() => undefined);
+    };
+    let createItem = (structuralExpression: Fmt.Expression, variableRefExpression: Fmt.Expression) => {
+      let step = this.utils.createParameter(structuralExpression, '_');
+      return {step: step};
+    };
+    return this.getInductionItems(context.context, createAndCheckStructuralExpression, createItem);
   }
 
   private createUseCasesSteps(previousResult: Fmt.Expression, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo[]> | undefined {
