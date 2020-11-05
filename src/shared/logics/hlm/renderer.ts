@@ -2774,25 +2774,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
-        let sourceContext: HLMProofStepRenderContext = {
-          ...context,
-          goal: undefined,
-          isLastStep: false,
-          originalGoal: undefined,
-          previousResult: undefined,
-          previousStep: undefined
-        };
-        let calculationResult = this.renderCalculation(type, context, undefined, addImplication);
-        if (calculationResult) {
-          return undefined;
-        } else if (calculationResult === undefined && !(type.source.type instanceof FmtHLM.MetaRefExpression_Consider)) {
-          this.addProofStep(proof, type.source, sourceContext, state);
-        }
-        let subProofContext: HLMProofStepContext = {
-          goal: type.goal,
-          stepResults: context.stepResults
-        };
-        this.addSubProof(type.proof, subProofContext, false, state);
+        this.renderProofBySubstitution(proof, type, context, undefined, state, addImplication);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
         let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
@@ -3062,17 +3044,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             || type instanceof FmtHLM.MetaRefExpression_Substitute);
   }
 
-  private renderCalculation(type: FmtHLM.MetaRefExpression_ProveBySubstitution, context: HLMProofStepContext, leftTerm: Fmt.Expression | undefined, addImplication: (implication: ProofOutputImplication) => void): boolean | undefined {
+  private renderProofBySubstitution(proof: FmtHLM.ObjectContents_Proof, type: FmtHLM.MetaRefExpression_ProveBySubstitution, context: HLMProofStepRenderContext, originalLeftTerm: Fmt.Expression | undefined, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): void {
+    let sourceContext: HLMProofStepRenderContext = {
+      ...context,
+      goal: undefined,
+      isLastStep: false,
+      originalGoal: undefined,
+      previousResult: undefined,
+      previousStep: undefined
+    };
+    let subProofContext: HLMProofStepRenderContext = {
+      ...sourceContext,
+      goal: type.goal
+    };
     if (type.proof
         && ((context.goal instanceof FmtHLM.MetaRefExpression_setEquals && type.goal instanceof FmtHLM.MetaRefExpression_setEquals)
             || (context.goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
         && context.goal.terms.length === 2
         && type.goal.terms.length === 2
         && context.goal.terms[1].isEquivalentTo(type.goal.terms[1])) {
-      let dependsOnPrevious = (leftTerm !== undefined);
-      if (!leftTerm) {
-        leftTerm = context.goal.terms[0];
-      }
+      let leftTerm = originalLeftTerm ?? context.goal.terms[0];
       let rightTerm = type.goal.terms[0];
       let equality = context.goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
       let source: Notation.RenderedExpression | undefined = undefined;
@@ -3081,27 +3072,28 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         source = this.renderItemNumber(sourceType.theorem);
       }
       addImplication({
-        dependsOnPrevious: dependsOnPrevious,
+        dependsOnPrevious: originalLeftTerm !== undefined,
         result: equality,
         resultIsEditable: false,
         source: source
       });
-      let subProofContext: HLMProofStepContext = {
-        goal: type.goal,
-        stepResults: context.stepResults
-      };
-      return this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, addImplication);
-    } else {
-      return undefined;
+      if (this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication)) {
+        return;
+      }
     }
+    if (!(type.source.type instanceof FmtHLM.MetaRefExpression_Consider)) {
+      this.addProofStep(proof, type.source, sourceContext, state);
+    }
+    this.addSubProof(type.proof, subProofContext, false, state);
   }
 
-  private continueCalculation(subProof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, addImplication: (implication: ProofOutputImplication) => void): boolean {
+  private continueCalculation(subProof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): boolean {
     if (subProof.steps.length === 1) {
       let firstStep = subProof.steps[0];
       let type = firstStep.type;
       if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
-        return this.renderCalculation(type, context, leftTerm, addImplication) ?? false;
+        this.renderProofBySubstitution(subProof, type, context, leftTerm, state, addImplication);
+        return true;
       } else {
         let firstStepResult = this.utils.getProofStepResult(firstStep, context);
         if ((firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals || firstStepResult instanceof FmtHLM.MetaRefExpression_equals)
