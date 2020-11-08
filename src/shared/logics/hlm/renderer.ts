@@ -2180,8 +2180,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
       let definitionNotation = this.renderUtils.getDefinitionNotation(definition);
       if (definitionNotation) {
-          let substitutionContext = new HLMSubstitutionContext;
-        let args = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+        let args = this.utils.getParameterArguments(definition.parameters);
         let path = new Fmt.Path(definition.name, args);
         let term = new Fmt.DefinitionRefExpression(path);
         let type = new FmtHLM.MetaRefExpression_Element(term);
@@ -2216,10 +2215,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       for (let constructorDefinition of definition.innerDefinitions) {
         let constructorDefinitionNotation = this.renderUtils.getDefinitionNotation(constructorDefinition);
         if (constructorDefinitionNotation) {
-          let substitutionContext = new HLMSubstitutionContext;
-          let parentArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+          let parentArgs = this.utils.getParameterArguments(definition.parameters);
           let parentPath = new Fmt.Path(definition.name, parentArgs);
-          let args = this.utils.getParameterArguments(constructorDefinition.parameters, substitutionContext);
+          let args = this.utils.getParameterArguments(constructorDefinition.parameters);
           let path = new Fmt.Path(constructorDefinition.name, args);
           path.parentPath = parentPath;
           let term = new Fmt.DefinitionRefExpression(path);
@@ -2463,7 +2461,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           );
           this.commitStartRow(state);
           return;
-        } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression && type.result.isEquivalentTo(displayedGoal)) {
+        } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression && this.utils.areExpressionsSyntacticallyEquivalent(type.result, displayedGoal)) {
           state.startRow.push(
             renderedGoal,
             new Notation.TextExpression(' by '),
@@ -3183,16 +3181,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     // If the first step is a reference to our own theorem, display it as an induction hypothesis instead.
     // However, since this replaces subProof.steps, don't do it while editing. Otherwise, we would need to
     // apply changes manually after they have been performed on the replaced steps.
-    if (subProof.steps.length && !this.editHandler) {
-      let firstStep = subProof.steps[0];
-      let firstStepType = firstStep.type;
-      if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
-        let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
-        subProof.parameters = new Fmt.ParameterList(...subProof.parameters!, inductionHypothesis);
-        subProof.steps = new Fmt.ParameterList(...subProof.steps.slice(1));
-        let substitutionContext = new HLMSubstitutionContext;
-        this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
-        subProof.steps = this.utils.applySubstitutionContextToParameterList(subProof.steps, substitutionContext);
+    if (!this.editHandler) {
+      while (subProof.steps.length) {
+        let firstStep = subProof.steps[0];
+        let firstStepType = firstStep.type;
+        if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
+          let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
+          subProof.parameters = new Fmt.ParameterList(...subProof.parameters!, inductionHypothesis);
+          subProof.steps = new Fmt.ParameterList(...subProof.steps.slice(1));
+          let substitutionContext = new HLMSubstitutionContext;
+          this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
+          subProof.steps = this.utils.applySubstitutionContextToParameterList(subProof.steps, substitutionContext);
+        } else {
+          break;
+        }
       }
     }
     return subProof;

@@ -236,7 +236,7 @@ export class HLMUtils extends GenericUtils {
     }
   }
 
-  getParameterArgument(param: Fmt.Parameter, context: HLMSubstitutionContext, targetParam?: Fmt.Parameter, addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.Argument | undefined {
+  getParameterArgument(param: Fmt.Parameter, context?: HLMSubstitutionContext, targetParam?: Fmt.Parameter, addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.Argument | undefined {
     let type = param.type;
     if (this.isValueParamType(type) || type instanceof FmtHLM.MetaRefExpression_Binder) {
       let value: Fmt.Expression;
@@ -266,7 +266,7 @@ export class HLMUtils extends GenericUtils {
     return undefined;
   }
 
-  getParameterArguments(parameters: Fmt.Parameter[], context: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.ArgumentList {
+  getParameterArguments(parameters: Fmt.Parameter[], context?: HLMSubstitutionContext, targetParameters?: Fmt.Parameter[], addIndices?: (expression: Fmt.Expression) => Fmt.Expression): Fmt.ArgumentList {
     let result = new Fmt.ArgumentList;
     for (let paramIndex = 0; paramIndex < parameters.length; paramIndex++) {
       let param = parameters[paramIndex];
@@ -2007,7 +2007,7 @@ export class HLMUtils extends GenericUtils {
   // * existence of constraint arguments
   // * proofs in arguments
   // * different variants of associative expressions
-  private areExpressionsSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
+  areExpressionsSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
     let fn = (leftPart: Fmt.Expression, rightPart: Fmt.Expression) => {
       if ((leftPart instanceof FmtHLM.MetaRefExpression_setAssociative || leftPart instanceof FmtHLM.MetaRefExpression_associative || leftPart instanceof FmtHLM.MetaRefExpression_asElementOf)
           && !(rightPart instanceof FmtHLM.MetaRefExpression_setAssociative || rightPart instanceof FmtHLM.MetaRefExpression_associative || rightPart instanceof FmtHLM.MetaRefExpression_asElementOf)) {
