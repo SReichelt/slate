@@ -449,7 +449,7 @@ class App extends React.Component<AppProps, AppState> {
             if (this.state.tutorialState) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently in tutorial mode. No changes will be submitted. <Button className={'standalone'} onClick={this.endTutorial}>{getButtonIcon(ButtonType.Close)} Exit tutorial</Button></Message>, mainContentsResult];
             } else if (this.state.gitHubAuthInfo && !this.state.gitHubUserInfo && !config.runningLocally) {
-              mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. By logging in with a <a href="https://github.com/" target="_blank">GitHub</a> account, you can submit your contribution as a pull request instead.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
+              mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. To get credit for your work, you can either log in with a <a href="https://github.com/" target="_blank">GitHub</a> account or use the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
             } else if (this.state.selectedItemRepository) {
               let repository = this.state.selectedItemRepository;
               if (!repository.hasWriteAccess) {

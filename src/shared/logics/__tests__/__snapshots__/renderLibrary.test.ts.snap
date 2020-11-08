@@ -1726,9 +1726,7 @@ exports[`render hlm library: 1.4.22 Essentials/Functions/Extension%20preserves%2
 
   f is surjective
 
-Proof.
-
-1.4.21 ⇒ f is surjective"
+Proof.  By 1.4.21."
 `;
 
 exports[`render hlm library: 1.4.23 Essentials/Functions/Surjectivity%20by%20codomain%20restriction 1`] = `
@@ -2466,8 +2464,45 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#nat.add"
 `;
 
-exports[`render hlm library: 1.7.1.4 Essentials/Numbers/Natural/Addition%20of%20one%20yields%20successor 1`] = `
+exports[`render hlm library: 1.7.1.4 Essentials/Numbers/Natural/Left-addition%20of%20zero%20is%20neutral 1`] = `
 "Proposition 1.7.1.4.  Let n ∈ ℕ. Then:
+
+  (0) + n = n
+
+Proof.  By induction on n.
+
+* (0) = (0).
+* Let x ∈ ℕ such that (0) + x = x. Then (((0) + x)+1) = (x+1).
+
+References.
+
+* https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_identity_element
+* https://proofwiki.org/wiki/Identity_Element_of_Natural_Number_Addition_is_Zero
+* https://proofwiki.org/wiki/Natural_Number_Addition_Commutes_with_Zero
+* https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_0_l
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_0_l
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.zero_add"
+`;
+
+exports[`render hlm library: 1.7.1.5 Essentials/Numbers/Natural/Successor%20can%20be%20pulled%20over%20addition 1`] = `
+"Proposition 1.7.1.5.  Let m, n ∈ ℕ. Then:
+
+  (m+1) + n = ((m + n)+1)
+
+Proof.  By induction on n.
+
+* (m+1) = (m+1).
+* Let x ∈ ℕ such that (m+1) + x = ((m + x)+1). Then (((m+1) + x)+1) = (((m + x)+1)+1).
+
+References.
+
+* https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_succ_l
+* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l
+* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.succ_add"
+`;
+
+exports[`render hlm library: 1.7.1.6 Essentials/Numbers/Natural/Addition%20of%20one%20yields%20successor 1`] = `
+"Proposition 1.7.1.6.  Let n ∈ ℕ. Then:
 
   (n+1) = n + 1
 
@@ -2484,8 +2519,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.add_one"
 `;
 
-exports[`render hlm library: 1.7.1.5 Essentials/Numbers/Natural/Sum%20is%20associative%20lemma 1`] = `
-"Lemma 1.7.1.5.  Let l, m, n ∈ ℕ. Then:
+exports[`render hlm library: 1.7.1.7 Essentials/Numbers/Natural/Sum%20is%20associative%20lemma 1`] = `
+"Lemma 1.7.1.7.  Let l, m, n ∈ ℕ. Then:
 
   (l + m) + n = l + (m + n)
 
@@ -2495,57 +2530,18 @@ Proof.  By induction on n.
 * Let x ∈ ℕ such that (l + m) + x = l + (m + x). Then (((l + m) + x)+1) = ((l + (m + x))+1)."
 `;
 
-exports[`render hlm library: 1.7.1.6 Essentials/Numbers/Natural/Sum%20is%20associative 1`] = `
-"Proposition 1.7.1.6.
+exports[`render hlm library: 1.7.1.8 Essentials/Numbers/Natural/Sum%20is%20associative 1`] = `
+"Proposition 1.7.1.8.
 
   + is associative
 
-Proof.  Let l, m, n ∈ ℕ. Then (l + m) + n = l + (m + n) by 1.7.1.5.
+Proof.  Let l, m, n ∈ ℕ. Then (l + m) + n = l + (m + n) by 1.7.1.7.
 
 References.
 
 * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_associativity
 * https://proofwiki.org/wiki/Natural_Number_Addition_is_Associative
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_assoc"
-`;
-
-exports[`render hlm library: 1.7.1.7 Essentials/Numbers/Natural/Left-addition%20of%20zero%20is%20neutral 1`] = `
-"Lemma 1.7.1.7.  Let n ∈ ℕ. Then:
-
-  0 + n = n
-
-Proof.  By induction on n.
-
-* 0 = 0.
-* Let x ∈ ℕ such that 0 + x = x. Then ((0 + x)+1) = (x+1).
-
-References.
-
-* https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_identity_element
-* https://proofwiki.org/wiki/Identity_Element_of_Natural_Number_Addition_is_Zero
-* https://proofwiki.org/wiki/Natural_Number_Addition_Commutes_with_Zero
-* https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_0_l
-* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_0_l
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.zero_add"
-`;
-
-exports[`render hlm library: 1.7.1.8 Essentials/Numbers/Natural/Successor%20can%20be%20pulled%20over%20addition 1`] = `
-"Lemma 1.7.1.8.  Let m, n ∈ ℕ. Then:
-
-  (m + 1) + n = (m + n) + 1
-
-Proof.  By induction on n.
-
-* m + 1 = m + 1.
-* Let x ∈ ℕ such that (m + 1) + x = (m + x) + 1. Then (((m + 1) + x)+1) = ((m + x)+1) + 1:
-  (((m + 1) + x)+1) = (((m + x) + 1)+1)
-  (((m + x)+1)+1) = (((m + x)+1)+1).
-
-References.
-
-* https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_succ_l
-* https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.succ_add"
 `;
 
 exports[`render hlm library: 1.7.1.9 Essentials/Numbers/Natural/Sum%20is%20commutative%20lemma 1`] = `
@@ -2555,9 +2551,9 @@ exports[`render hlm library: 1.7.1.9 Essentials/Numbers/Natural/Sum%20is%20commu
 
 Proof.  By induction on m.
 
-* 0 + n = n by 1.7.1.7.
+* (0) + n = n by 1.7.1.4.
 * Let x ∈ ℕ such that x + n = n + x. Then (x+1) + n = ((n + x)+1):
-  (x+1) + n =^1.7.1.8 ((x + n)+1)
+  (x+1) + n =^1.7.1.5 ((x + n)+1)
    = ((n + x)+1)"
 `;
 
@@ -2707,7 +2703,13 @@ exports[`render hlm library: 1.7.1.18 Essentials/Numbers/Natural/Less%20or%20equ
 
   a < c
 
-No proof."
+Proof.  We show that ∃ x ∈ ℕ_+ : a + x = c:
+
+a ≤ b ⇒^(def) ∃ y ∈ ℕ : a + y = b
+
+b < c ⇒^(def) ∃ z ∈ ℕ_+ : b + z = c
+
+Take x := y + z."
 `;
 
 exports[`render hlm library: 1.7.1.19 Essentials/Numbers/Natural/Zero%20is%20the%20smallest%20number 1`] = `
@@ -2715,7 +2717,7 @@ exports[`render hlm library: 1.7.1.19 Essentials/Numbers/Natural/Zero%20is%20the
 
   n ≥ 0
 
-Proof.  true.
+Proof.  By definition.
 
 References.
 

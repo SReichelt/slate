@@ -2412,9 +2412,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       state.startRow.push(this.renderSubHeading(heading));
       state.startRowSpacing = '  ';
     }
-    if (proof.parameters && proof.parameters.length) {
+    // If the first step is a reference to our own theorem, display it as an induction hypothesis instead.
+    let parameters = proof.parameters;
+    let steps = proof.steps;
+    while (steps.length) {
+      let firstStep = steps[0];
+      let firstStepType = firstStep.type;
+      if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
+        let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
+        parameters = parameters ? new Fmt.ParameterList(...parameters, inductionHypothesis) : new Fmt.ParameterList(inductionHypothesis);
+        let newSteps = new Fmt.ParameterList(...steps.slice(1));
+        let substitutionContext = new HLMSubstitutionContext;
+        this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
+        steps = this.utils.applySubstitutionContextToParameterList(newSteps, substitutionContext);
+      } else {
+        break;
+      }
+    }
+    if (parameters && parameters.length) {
       this.outputStartRowSpacing(state);
-      state.startRow.push(this.readOnlyRenderer.renderParameterList(proof.parameters, true, false, false));
+      state.startRow.push(this.readOnlyRenderer.renderParameterList(parameters, true, false, false));
       state.startRowSpacing = ' ';
       hasContents = true;
     }
@@ -2428,8 +2445,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (showExternalGoal) {
       displayedGoal = this.getDisplayedGoal(context.goal);
     }
-    if (displayedGoal && proof.steps.length) {
-      let firstStepType = proof.steps[0].type;
+    if (displayedGoal && steps.length) {
+      let firstStepType = steps[0].type;
       if ((firstStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && displayedGoal instanceof FmtHLM.MetaRefExpression_forall)
           || firstStepType instanceof FmtHLM.MetaRefExpression_ProveCases) {
         displayedGoal = undefined;
@@ -2441,19 +2458,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (hasContents) {
         state.startRow.push(new Notation.TextExpression('Then '));
       }
-      if (proof.steps.length === 1) {
-        let type = proof.steps[0].type;
+      if (steps.length === 1) {
+        let type = steps[0].type;
         while (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution && !type.proof && !this.editHandler) {
           type = type.source.type;
         }
         if (type instanceof FmtHLM.MetaRefExpression_Consider && !this.editHandler) {
+          this.outputStartRowSpacing(state);
           state.startRow.push(
             renderedGoal,
             new Notation.TextExpression('.')
           );
           this.commitStartRow(state);
           return;
-        } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef && !type.proof) {
+        } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef && (!type.proof || (type.proof.goal && this.utils.isTrueFormula(type.proof.goal)))) {
+          this.outputStartRowSpacing(state);
           // TODO link to definition
           state.startRow.push(
             renderedGoal,
@@ -2462,6 +2481,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.commitStartRow(state);
           return;
         } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression && this.utils.areExpressionsSyntacticallyEquivalent(type.result, displayedGoal)) {
+          this.outputStartRowSpacing(state);
           state.startRow.push(
             renderedGoal,
             new Notation.TextExpression(' by '),
@@ -2472,7 +2492,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           return;
         }
       }
-      if ((!proof.steps.length && !this.editHandler) || state.isPreview) {
+      if ((!steps.length && !this.editHandler) || state.isPreview) {
         state.startRow.push(renderedGoal);
         if (hasContents || !state.isPreview) {
           state.startRow.push(new Notation.TextExpression('.'));
@@ -2490,8 +2510,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       state.startRowSpacing = ' ';
       hasContents = true;
+    } else {
+      if (steps.length === 1) {
+        let type = steps[0].type;
+        while (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution && !type.proof && !this.editHandler) {
+          type = type.source.type;
+        }
+        if (type instanceof FmtHLM.MetaRefExpression_ProveDef && (!type.proof || (type.proof.goal && this.utils.isTrueFormula(type.proof.goal)))) {
+          this.outputStartRowSpacing(state);
+          // TODO link to definition
+          state.startRow.push(new Notation.TextExpression('By definition.'));
+          this.commitStartRow(state);
+          return;
+        } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression && context.goal && this.utils.areExpressionsSyntacticallyEquivalent(type.result, context.goal)) {
+          this.outputStartRowSpacing(state);
+          state.startRow.push(
+            new Notation.TextExpression('By '),
+            this.readOnlyRenderer.renderItemNumber(type.theorem),
+            new Notation.TextExpression('.')
+          );
+          this.commitStartRow(state);
+          return;
+        }
+      }
     }
-    if (proof.steps.length) {
+    if (steps.length) {
       if (hasContents || indentSteps) {
         this.commitStartRow(state);
       }
@@ -2501,12 +2544,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           isPreview: state.isPreview,
           onApply: state.onApply
         };
-        this.addProofSteps(proof, context, indentedState, displayedGoal !== undefined);
-        let steps = new Notation.ParagraphExpression(indentedState.paragraphs);
-        steps.styleClasses = ['indented'];
-        state.paragraphs.push(steps);
+        this.addProofSteps(proof, steps, context, indentedState, displayedGoal !== undefined);
+        let indentedSteps = new Notation.ParagraphExpression(indentedState.paragraphs);
+        indentedSteps.styleClasses = ['indented'];
+        state.paragraphs.push(indentedSteps);
       } else {
-        this.addProofSteps(proof, context, state, displayedGoal !== undefined);
+        this.addProofSteps(proof, steps, context, state, displayedGoal !== undefined);
       }
     } else if (!state.isPreview) {
       this.outputStartRowSpacing(state);
@@ -2529,7 +2572,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getDisplayedGoal(goal: Fmt.Expression | undefined): Fmt.Expression | undefined {
-    if (goal && !this.utils.isFalseFormula(goal)) {
+    if (goal && !this.utils.isFalseFormula(goal) && !this.utils.isTrueFormula(goal)) {
       return goal;
     } else {
       return undefined;
@@ -2703,7 +2746,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.addProofListInternal(proofs, undefined, labels, context, state);
   }
 
-  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepContext, state: ProofOutputState, hasDisplayedGoal: boolean): void {
+  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, steps: Fmt.ParameterList, context: HLMProofStepContext, state: ProofOutputState, hasDisplayedGoal: boolean): void {
     let renderContext: HLMProofStepRenderContext = {
       ...context,
       originalParameters: [],
@@ -2711,12 +2754,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       isLastStep: false
     };
     this.utils.updateInitialProofStepContext(proof, renderContext, !hasDisplayedGoal);
-    for (let stepIndex = 0; stepIndex < proof.steps.length; stepIndex++) {
-      let step = proof.steps[stepIndex];
-      if (stepIndex === proof.steps.length - 1) {
+    for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
+      let step = steps[stepIndex];
+      if (stepIndex === steps.length - 1) {
         renderContext.isLastStep = true;
       } else if (step.type instanceof FmtHLM.MetaRefExpression_Consider) {
-        let nextStep = proof.steps[stepIndex + 1];
+        let nextStep = steps[stepIndex + 1];
         if (nextStep.type instanceof FmtHLM.MetaRefExpression_UseCases) {
           continue;
         }
@@ -2801,7 +2844,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
         let term = type.term;
-        if (type.cases.length > 1 && type.cases.some((structuralCase: FmtHLM.ObjectContents_StructuralCase) => this.utils.referencesSelf(structuralCase.value))) {
+        let hasCases = type.cases.length > 1;
+        let isInduction = hasCases && type.cases.some((structuralCase: FmtHLM.ObjectContents_StructuralCase) => this.utils.referencesSelf(structuralCase.value));
+        if (isInduction || state.isPreview) {
           if (!state.startRow) {
             state.startRow = [];
           }
@@ -2811,43 +2856,45 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             allowConstructors: false
           };
           state.startRow.push(
-            new Notation.TextExpression('By induction on '),
+            new Notation.TextExpression(isInduction ? 'By induction on ' : hasCases ? 'Split on ' : 'Decompose '),
             this.readOnlyRenderer.renderElementTerm(term, termSelection),
             new Notation.TextExpression('.')
           );
         }
         this.commitStartRow(state);
-        this.commitImplications(state, false);
-        if (type.construction instanceof Fmt.DefinitionRefExpression) {
-          let path = type.construction.path;
-          let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
-            let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
-            let renderedSubProof = this.createInductionSubProofForRendering(structuralCase);
-            let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
-            let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
-              let subProofContext: HLMProofStepContext = {
-                goal: context.goal && !subProof.parameters ? this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm) : context.goal,
-                stepResults: context.stepResults
-              };
-              let subState: ProofOutputState = {
-                paragraphs: [],
-                isPreview: state.isPreview,
-                onApply: () => {
-                  // Need to manually apply goal (but not steps) as the proof object we are operating on has been created temporarily from an expression.
-                  // TODO this should be improved, by generating code where structuralCase.value already has the correct type
-                  // TODO also reflect the correct type in the VSCode extension
-                  subProof.goal = renderedSubProof.goal;
-                  structuralCase.value = subProof.toExpression(false);
-                  state.onApply();
-                }
-              };
-              this.addSubProof(renderedSubProof, subProofContext, false, subState);
-              return new Notation.ParagraphExpression(subState.paragraphs);
+        if (!state.isPreview) {
+          this.commitImplications(state, false);
+          if (type.construction instanceof Fmt.DefinitionRefExpression) {
+            let path = type.construction.path;
+            let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
+              let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+              let renderedSubProof = this.createInductionSubProofForRendering(structuralCase);
+              let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
+              let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
+                let subProofContext: HLMProofStepContext = {
+                  goal: context.goal && !subProof.parameters ? this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm) : context.goal,
+                  stepResults: context.stepResults
+                };
+                let subState: ProofOutputState = {
+                  paragraphs: [],
+                  isPreview: state.isPreview,
+                  onApply: () => {
+                    // Need to manually apply goal (but not steps) as the proof object we are operating on has been created temporarily from an expression.
+                    // TODO this should be improved, by generating code where structuralCase.value already has the correct type
+                    // TODO also reflect the correct type in the VSCode extension
+                    subProof.goal = renderedSubProof.goal;
+                    structuralCase.value = subProof.toExpression(false);
+                    state.onApply();
+                  }
+                };
+                this.addSubProof(renderedSubProof, subProofContext, false, subState);
+                return new Notation.ParagraphExpression(subState.paragraphs);
+              });
+              return new Notation.PromiseExpression(subProofPromise);
             });
-            return new Notation.PromiseExpression(subProofPromise);
-          });
-          let list = new Notation.ListExpression(items, '*');
-          state.paragraphs.push(list);
+            let list = new Notation.ListExpression(items, '*');
+            state.paragraphs.push(list);
+          }
         }
         return undefined;
       }
@@ -3176,25 +3223,6 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         subProof.parameters = new Fmt.ParameterList(...structuralCase.parameters, ...subProof.parameters);
       } else {
         subProof.parameters = structuralCase.parameters;
-      }
-    }
-    // If the first step is a reference to our own theorem, display it as an induction hypothesis instead.
-    // However, since this replaces subProof.steps, don't do it while editing. Otherwise, we would need to
-    // apply changes manually after they have been performed on the replaced steps.
-    if (!this.editHandler) {
-      while (subProof.steps.length) {
-        let firstStep = subProof.steps[0];
-        let firstStepType = firstStep.type;
-        if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
-          let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
-          subProof.parameters = new Fmt.ParameterList(...subProof.parameters!, inductionHypothesis);
-          subProof.steps = new Fmt.ParameterList(...subProof.steps.slice(1));
-          let substitutionContext = new HLMSubstitutionContext;
-          this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
-          subProof.steps = this.utils.applySubstitutionContextToParameterList(subProof.steps, substitutionContext);
-        } else {
-          break;
-        }
       }
     }
     return subProof;

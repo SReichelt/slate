@@ -1286,6 +1286,8 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createProveByInductionSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo[]> {
+    // TODO omit variables that we have already split on
+    // TODO display tooltip also on left side
     let createAndCheckStructuralExpression = (variableRefExpression: Fmt.Expression, structuralChecker: HLMDefinitionChecker) => {
       let structuralExpression = new FmtHLM.MetaRefExpression_ProveByInduction(variableRefExpression, new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), []);
       let step = this.utils.createParameter(structuralExpression, '_');
@@ -1293,7 +1295,7 @@ export class HLMEditHandler extends GenericEditHandler {
         .then((checkResult: HLMCheckResultWithExpression) => (checkResult.hasErrors ? undefined : structuralExpression))
         .catch(() => undefined);
     };
-    let createItem = (structuralExpression: FmtHLM.MetaRefExpression_ProveByInduction, variableRefExpression: Fmt.Expression) => {
+    let createItem = (structuralExpression: FmtHLM.MetaRefExpression_ProveByInduction, variableRefExpression: Fmt.Expression): ProofStepInfo => {
       if (structuralExpression.cases.length > 1
           && variableRefExpression instanceof Fmt.VariableRefExpression
           && this.definition.parameters.indexOf(variableRefExpression.variable) >= 0
@@ -1321,7 +1323,10 @@ export class HLMEditHandler extends GenericEditHandler {
         }
       }
       let step = this.utils.createParameter(structuralExpression, '_');
-      return {step: step};
+      return {
+        step: step,
+        linkedObject: structuralExpression.construction
+      };
     };
     return this.getInductionItems(context.context, createAndCheckStructuralExpression, createItem);
   }
