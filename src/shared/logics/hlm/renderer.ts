@@ -2418,7 +2418,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     while (steps.length) {
       let firstStep = steps[0];
       let firstStepType = firstStep.type;
-      if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {
+      if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem) && firstStepType.result) {
         let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
         parameters = parameters ? new Fmt.ParameterList(...parameters, inductionHypothesis) : new Fmt.ParameterList(inductionHypothesis);
         let newSteps = new Fmt.ParameterList(...steps.slice(1));
@@ -2505,7 +2505,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         );
         this.commitStartRow(state);
         return;
-      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && this.utils.areExpressionsSyntacticallyEquivalent(singleStepType.result, displayedGoal)) {
+      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && !singleStepType.result) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           renderedGoal,
@@ -2541,7 +2541,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         state.startRow.push(new Notation.TextExpression('By definition.'));
         this.commitStartRow(state);
         return;
-      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && context.goal && this.utils.areExpressionsSyntacticallyEquivalent(singleStepType.result, context.goal)) {
+      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && !singleStepType.result) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           new Notation.TextExpression('By '),
@@ -3734,7 +3734,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
                || type instanceof FmtHLM.MetaRefExpression_Unfold) {
-      this.addFormulaParts(type.result, result);
+      if (type.result) {
+        this.addFormulaParts(type.result, result);
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
                || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
       this.addProofListParts(type.caseProofs, result);
@@ -3748,7 +3750,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
       this.addGenericExpressionParts(type.theorem, result);
-      this.addFormulaParts(type.result, result);
+      if (type.result) {
+        this.addFormulaParts(type.result, result);
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
       this.addArgumentListParts(type.arguments, result);
       this.addProofParts(type.proof, result);
@@ -3756,7 +3760,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addProofListParts(type.proofs, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       this.addProofStepParts(type.source, result);
-      this.addFormulaParts(type.result, result);
+      if (type.result) {
+        this.addFormulaParts(type.result, result);
+      }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
       this.addElementTermParts(type.term, result);
       this.addGenericExpressionParts(type.construction, result);

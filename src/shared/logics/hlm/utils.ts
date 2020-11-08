@@ -600,7 +600,7 @@ export class HLMUtils extends GenericUtils {
                || type instanceof FmtHLM.MetaRefExpression_Unfold
                || type instanceof FmtHLM.MetaRefExpression_UseTheorem
                || type instanceof FmtHLM.MetaRefExpression_Substitute) {
-      return type.result;
+      return this.getImplicationResult(type.result, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
                || type instanceof FmtHLM.MetaRefExpression_UseForAll) {
       if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
@@ -621,6 +621,10 @@ export class HLMUtils extends GenericUtils {
     } else {
       return this.getParameterConstraint(step, context);
     }
+  }
+
+  getImplicationResult(declaredResult: Fmt.Expression | undefined, context: HLMProofStepContext): Fmt.Expression {
+    return declaredResult ?? context.goal ?? new FmtHLM.MetaRefExpression_or;
   }
 
   getParameterConstraint(param: Fmt.Parameter, context: HLMBaseContext, variableRefExpression?: Fmt.VariableRefExpression, indexContext?: SubstitutionContext): Fmt.Expression | undefined {

@@ -57,7 +57,7 @@ Equivalence.
        Take x := a.
 2⇒1. Assume S ⊆ ∅. Then S = ∅:
      ⊆. Trivial.
-     ⊇. 1.1.2 ⇒ ∅ ⊆ S
+     ⊇. By 1.1.2.
 1⇒4. Assume S = ∅. Then |S| = 0:
      We have |S| = |∅|
       = |ℕ_(<0)|
@@ -468,7 +468,7 @@ exports[`render hlm library: 1.1.22 Essentials/Sets/Union%20with%20empty%20right
 Proof.
 
 ⊆. Trivial.
-⊇. 1.1.20 ⇒ S ⊆ S ∪ ∅
+⊇. By 1.1.20.
 
 References.
 
@@ -485,7 +485,7 @@ exports[`render hlm library: 1.1.23 Essentials/Sets/Union%20with%20empty%20left%
 Proof.
 
 ⊆. Trivial.
-⊇. 1.1.21 ⇒ S ⊆ ∅ ∪ S
+⊇. By 1.1.21.
 
 References.
 
@@ -2552,8 +2552,7 @@ exports[`render hlm library: 1.7.1.9 Essentials/Numbers/Natural/Sum%20is%20commu
 
 Proof.  By induction on m.
 
-* We show that (0) + n = n = n + (0):
-  1.7.1.4 ⇒ (0) + n = n
+* (0) + n = n = n + (0) by 1.7.1.4.
 * Let x ∈ ℕ such that x + n = n + x. Then (x+1) + n = ((n + x)+1) = n + (x+1):
   (x+1) + n =^1.7.1.5 ((x + n)+1)
    = ((n + x)+1)"
@@ -2942,9 +2941,7 @@ exports[`render hlm library: 1.7.1.27 Essentials/Numbers/Natural/Multiplication%
 
   n ⋅ 1 = n
 
-Proof.  We show that 0 + n = n:
-
-1.7.1.4 ⇒ (0) + n = n
+Proof.  (0) + n = n by 1.7.1.4.
 
 References.
 

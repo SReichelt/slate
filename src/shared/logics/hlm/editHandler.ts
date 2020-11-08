@@ -1426,7 +1426,8 @@ export class HLMEditHandler extends GenericEditHandler {
         for (let definition of definitions) {
           resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) =>
             this.simplifyResult(definition.formula, context).then((simplifiedResult: Fmt.Expression) => {
-              let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseDef(this.utils.internalToExternalIndex(definition.side), simplifiedResult), '_');
+              let declaredResult = context.goal?.isEquivalentTo(simplifiedResult) ? undefined : simplifiedResult;
+              let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseDef(this.utils.internalToExternalIndex(definition.side), declaredResult), '_');
               return currentSteps.concat({
                 step: step,
                 linkedObject: definition.definitionRef
@@ -1452,13 +1453,13 @@ export class HLMEditHandler extends GenericEditHandler {
     let unfoldRow = new Menu.StandardExpressionMenuRow('Unfold');
     let unfoldedFormulasPromise = this.getUnfoldedFormulas(previousResult, previousResult);
     let rowsPromise = unfoldedFormulasPromise.then((unfoldedFormulas: Fmt.Expression[] | undefined) =>
-      (unfoldedFormulas ? unfoldedFormulas.map((unfoldedFormula: Fmt.Expression) => this.getUnfoldMenuItem(unfoldedFormula, previousStep, onInsertProofStep, onRenderProofStep)) : []));
+      (unfoldedFormulas ? unfoldedFormulas.map((unfoldedFormula: Fmt.Expression) => this.getUnfoldMenuItem(unfoldedFormula, previousStep, context, onInsertProofStep, onRenderProofStep)) : []));
     unfoldRow.subMenu = new Menu.ExpressionMenu(rowsPromise);
     return unfoldRow;
   }
 
-  private getUnfoldMenuItem(unfoldedFormula: Fmt.Expression, previousStep: Fmt.Parameter | undefined, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
-    let clonedFormula = this.cloneAndAdaptParameterNames(unfoldedFormula);
+  private getUnfoldMenuItem(unfoldedFormula: Fmt.Expression, previousStep: Fmt.Parameter | undefined, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
+    let clonedFormula = context.goal?.isEquivalentTo(unfoldedFormula) ? undefined : this.cloneAndAdaptParameterNames(unfoldedFormula);
     let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_Unfold(clonedFormula), '_');
     let action = new Menu.ImmediateExpressionMenuAction(() => {
       if (previousStep?.type instanceof FmtHLM.MetaRefExpression_Unfold) {

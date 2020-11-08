@@ -268,7 +268,7 @@ $Consider(variable: %Any, result?: $Formula): %ParameterType($Formula) {
 $State(statement: $Formula, proof?: $Proof): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseDef(side?: %Int, result: $Formula): %ParameterType($Formula) {
+$UseDef(side?: %Int, result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $UseCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
@@ -281,13 +281,13 @@ $UseExists(parameters: %ParameterList): %ParameterType($Formula) {
   superType = $IntermediateProofStep,
   exports = [parameters]
 }
-$Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result: $Formula): %ParameterType($Formula) {
+$Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$Unfold(result: $Formula): %ParameterType($Formula) {
+$Unfold(result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseTheorem(theorem: $Theorem, input?: %SingleParameter($IntermediateProofStep), result: $Formula): %ParameterType($Formula) {
+$UseTheorem(theorem: $Theorem, input?: %SingleParameter($IntermediateProofStep), result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $ProveDef(side?: %Int, proof?: $Proof): %ParameterType {

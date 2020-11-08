@@ -4901,7 +4901,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
-  constructor(public side: Fmt.BN | undefined, public result: Fmt.Expression) {
+  constructor(public side?: Fmt.BN, public result?: Fmt.Expression) {
     super();
   }
 
@@ -4918,7 +4918,7 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
         throw new Error('side: Integer expected');
       }
     }
-    this.result = argumentList.getValue('result', 1);
+    this.result = argumentList.getOptionalValue('result', 1);
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
@@ -4927,15 +4927,20 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
       let sideExpr = new Fmt.IntegerExpression(this.side);
       argumentList.push(new Fmt.Argument('side', sideExpr, true));
     }
-    argumentList.push(new Fmt.Argument('result', this.result, false));
+    if (this.result !== undefined) {
+      argumentList.push(new Fmt.Argument('result', this.result, true));
+    }
     return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let resultResult = this.result.substitute(fn, replacedParameters);
-    if (resultResult !== this.result) {
-      changed = true;
+    let resultResult: Fmt.Expression | undefined = undefined;
+    if (this.result) {
+      resultResult = this.result.substitute(fn, replacedParameters);
+      if (resultResult !== this.result) {
+        changed = true;
+      }
     }
     if (fn && !changed) {
       return fn(this);
@@ -5152,7 +5157,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
-  constructor(public source: Fmt.Parameter, public sourceSide: Fmt.BN, public result: Fmt.Expression) {
+  constructor(public source: Fmt.Parameter, public sourceSide: Fmt.BN, public result?: Fmt.Expression) {
     super();
   }
 
@@ -5173,7 +5178,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     } else {
       throw new Error('sourceSide: Integer expected');
     }
-    this.result = argumentList.getValue('result', 2);
+    this.result = argumentList.getOptionalValue('result', 2);
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
@@ -5182,7 +5187,9 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     argumentList.push(new Fmt.Argument(undefined, sourceExpr, false));
     let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
     argumentList.push(new Fmt.Argument(undefined, sourceSideExpr, false));
-    argumentList.push(new Fmt.Argument(undefined, this.result, false));
+    if (this.result !== undefined) {
+      argumentList.push(new Fmt.Argument('result', this.result, true));
+    }
     return argumentList;
   }
 
@@ -5192,9 +5199,12 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     if (sourceResult !== this.source) {
       changed = true;
     }
-    let resultResult = this.result.substitute(fn, replacedParameters);
-    if (resultResult !== this.result) {
-      changed = true;
+    let resultResult: Fmt.Expression | undefined = undefined;
+    if (this.result) {
+      resultResult = this.result.substitute(fn, replacedParameters);
+      if (resultResult !== this.result) {
+        changed = true;
+      }
     }
     if (fn && !changed) {
       return fn(this);
@@ -5223,7 +5233,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
-  constructor(public result: Fmt.Expression) {
+  constructor(public result?: Fmt.Expression) {
     super();
   }
 
@@ -5232,20 +5242,25 @@ export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    this.result = argumentList.getValue('result', 0);
+    this.result = argumentList.getOptionalValue('result', 0);
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
     let argumentList = new Fmt.ArgumentList;
-    argumentList.push(new Fmt.Argument(undefined, this.result, false));
+    if (this.result !== undefined) {
+      argumentList.push(new Fmt.Argument('result', this.result, true));
+    }
     return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let resultResult = this.result.substitute(fn, replacedParameters);
-    if (resultResult !== this.result) {
-      changed = true;
+    let resultResult: Fmt.Expression | undefined = undefined;
+    if (this.result) {
+      resultResult = this.result.substitute(fn, replacedParameters);
+      if (resultResult !== this.result) {
+        changed = true;
+      }
     }
     if (fn && !changed) {
       return fn(this);
@@ -5266,7 +5281,7 @@ export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
-  constructor(public theorem: Fmt.Expression, public input: Fmt.Parameter | undefined, public result: Fmt.Expression) {
+  constructor(public theorem: Fmt.Expression, public input?: Fmt.Parameter, public result?: Fmt.Expression) {
     super();
   }
 
@@ -5284,7 +5299,7 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
         throw new Error('input: Parameter expression with single parameter expected');
       }
     }
-    this.result = argumentList.getValue('result', 2);
+    this.result = argumentList.getOptionalValue('result', 2);
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
@@ -5294,7 +5309,9 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
       let inputExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.input));
       argumentList.push(new Fmt.Argument('input', inputExpr, true));
     }
-    argumentList.push(new Fmt.Argument('result', this.result, false));
+    if (this.result !== undefined) {
+      argumentList.push(new Fmt.Argument('result', this.result, true));
+    }
     return argumentList;
   }
 
@@ -5311,9 +5328,12 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
         changed = true;
       }
     }
-    let resultResult = this.result.substitute(fn, replacedParameters);
-    if (resultResult !== this.result) {
-      changed = true;
+    let resultResult: Fmt.Expression | undefined = undefined;
+    if (this.result) {
+      resultResult = this.result.substitute(fn, replacedParameters);
+      if (resultResult !== this.result) {
+        changed = true;
+      }
     }
     if (fn && !changed) {
       return fn(this);

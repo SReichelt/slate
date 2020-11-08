@@ -1484,7 +1484,7 @@ export class HLMDefinitionChecker {
   private checkProofValidity(object: Object, proof: FmtHLM.ObjectContents_Proof, goals: Fmt.Expression[], context: HLMCheckerContext): void {
     if (proof.goal) {
       this.checkFormula(proof.goal, context);
-      this.checkUnfolding(goals, proof.goal, true);
+      this.checkUnfolding(proof.goal, goals, proof.goal, true);
     }
     let originalGoal = goals.length ? goals[0] : undefined;
     let stepContext: HLMCheckerProofStepContext | undefined = {
@@ -1573,7 +1573,7 @@ export class HLMDefinitionChecker {
         if (variableRefExpression) {
           let constraint = this.utils.getParameterConstraint(variableRefExpression.variable, context, variableRefExpression, indexContext);
           if (constraint) {
-            this.checkUnfolding([constraint], type.result, false);
+            this.checkUnfolding(type.result, [constraint], type.result, false);
           } else {
             this.error(type.result, 'Invalid result');
           }
@@ -1591,8 +1591,7 @@ export class HLMDefinitionChecker {
             let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
               if (previousResultDefinitions.length) {
                 let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
-                this.stripConstraintsFromFormulas(sources, false, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
-                  this.checkUnfolding(strippedSources, useDef.result, false));
+                this.checkDeclaredResult(step, useDef.result, sources, context);
               } else {
                 this.error(step, `${context.previousResult} does not have any definition`);
               }
@@ -1674,8 +1673,10 @@ export class HLMDefinitionChecker {
             let sourceTerm = terms[sourceIndex];
             let targetTerms = terms.slice();
             targetTerms.splice(sourceIndex, 1);
-            this.checkFormula(type.result, context);
-            if (!this.utils.substitutesTo(context.previousResult, type.result, sourceTerm, targetTerms)) {
+            if (type.result) {
+              this.checkFormula(type.result, context);
+            }
+            if (!this.utils.substitutesTo(context.previousResult, this.utils.getImplicationResult(type.result, context), sourceTerm, targetTerms)) {
               this.error(step, `Substitution from ${context.previousResult} to ${type.result} is invalid`);
             }
           } else {
@@ -1690,8 +1691,7 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Unfold) {
       if (context.previousResult) {
-        this.checkFormula(type.result, context);
-        this.checkUnfolding([context.previousResult], type.result, false);
+        this.checkDeclaredResult(step, type.result, [context.previousResult], context);
       } else {
         this.error(step, 'Previous result not set');
         return undefined;
@@ -1714,10 +1714,10 @@ export class HLMDefinitionChecker {
                 if (inputResultContext?.previousResult) {
                   let previousResult = inputResultContext.previousResult;
                   let conditions = definition.contents.conditions.map((condition: Fmt.Expression) => this.utils.substitutePath(condition, theorem.path, [definition]));
-                  this.stripConstraintsFromFormulas(conditions, true, true, false, true, context).then((strippedConditions: Fmt.Expression[]) =>
+                  let checkInput = this.stripConstraintsFromFormulas(conditions, true, true, false, true, context).then((strippedConditions: Fmt.Expression[]) =>
                     this.checkImplication(step, previousResult, strippedConditions));
-                  this.stripConstraintsFromFormulas(conditions, false, false, true, true, context).then((strippedConditions: Fmt.Expression[]) =>
-                    this.checkUnfolding(strippedConditions, useTheorem.result, false));
+                  this.checkDeclaredResult(step, useTheorem.result, conditions, context);
+                  return checkInput;
                 } else {
                   this.error(step, 'Invalid input proof step');
                 }
@@ -1726,13 +1726,13 @@ export class HLMDefinitionChecker {
               }
             } else {
               let claim = this.utils.substitutePath(definition.contents.claim, theorem.path, [definition]);
-              this.stripConstraintsFromFormula(claim, false, false, true, true, context).then((strippedClaim: Fmt.Expression) =>
-                this.checkUnfolding([strippedClaim], useTheorem.result, false));
+              this.checkDeclaredResult(step, useTheorem.result, [claim], context);
             }
           } else {
             // TODO also support definitions (and render as "by definition")
             this.error(step, 'Referenced definition must be a theorem');
           }
+          return CachedPromise.resolve();
         });
         this.addPendingCheck(step, checkDefinitionRef);
       } else {
@@ -2010,11 +2010,20 @@ export class HLMDefinitionChecker {
     });
   }
 
-  private checkUnfolding(sources: Fmt.Expression[], target: Fmt.Expression, sourceIsResult: boolean): void {
+  private checkDeclaredResult(object: Object, result: Fmt.Expression | undefined, sources: Fmt.Expression[], context: HLMCheckerProofStepContext): void {
+    if (result) {
+      this.checkFormula(result, context);
+    }
+    let check = this.stripConstraintsFromFormulas(sources, false, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
+      this.checkUnfolding(result ?? object, strippedSources, this.utils.getImplicationResult(result, context), false));
+    this.addPendingCheck(object, check);
+  }
+
+  private checkUnfolding(object: Object, sources: Fmt.Expression[], target: Fmt.Expression, sourceIsResult: boolean): void {
     if (target instanceof (sourceIsResult ? FmtHLM.MetaRefExpression_or : FmtHLM.MetaRefExpression_and)) {
       if (target.formulas) {
         for (let innerTarget of target.formulas) {
-          this.checkUnfolding(sources, innerTarget, sourceIsResult);
+          this.checkUnfolding(object, sources, innerTarget, sourceIsResult);
         }
       }
     } else {
@@ -2032,10 +2041,10 @@ export class HLMDefinitionChecker {
           } else {
             message = 'No source found';
           }
-          this.error(target, message);
+          this.error(object, message);
         }
       });
-      this.addPendingCheck(target, check);
+      this.addPendingCheck(object, check);
     }
   }
 
