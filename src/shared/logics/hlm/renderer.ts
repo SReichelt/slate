@@ -77,6 +77,7 @@ interface ProofOutputState {
   implications?: ProofOutputImplication[];
   additionalRow?: Notation.RenderedExpression;
   isPreview: boolean;
+  onApply: () => void;
 }
 
 interface ProofGridState {
@@ -2366,7 +2367,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       let state: ProofOutputState = {
         paragraphs: paragraphs,
-       isPreview: false
+        isPreview: false,
+        onApply: () => {}
       };
       this.addProofsInternal(proofs, heading, context, false, onInsertProof, state);
     }
@@ -2443,7 +2445,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (proof.steps.length === 1) {
         let type = proof.steps[0].type;
-        if (type instanceof FmtHLM.MetaRefExpression_Consider && !hasContents && !this.editHandler) {
+        while (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution && !type.proof && !this.editHandler) {
+          type = type.source.type;
+        }
+        if (type instanceof FmtHLM.MetaRefExpression_Consider && !this.editHandler) {
           state.startRow.push(
             renderedGoal,
             new Notation.TextExpression('.')
@@ -2495,7 +2500,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (indentSteps) {
         let indentedState: ProofOutputState = {
           paragraphs: [],
-          isPreview: state.isPreview
+          isPreview: state.isPreview,
+          onApply: state.onApply
         };
         this.addProofSteps(proof, context, indentedState, displayedGoal !== undefined);
         let steps = new Notation.ParagraphExpression(indentedState.paragraphs);
@@ -2516,7 +2522,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, renderContext);
         let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
-        state.startRow.push(this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep, onRenderFormula));
+        state.startRow.push(this.editHandler.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula));
       } else {
         state.startRow.push(this.getTrivialProofPlaceholder());
       }
@@ -2593,7 +2599,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       let state: ProofOutputState = {
         paragraphs: paragraphs,
-        isPreview: false
+        isPreview: false,
+        onApply: () => {}
       };
       this.addIndentedProofInternal(proof, heading, context, state);
     }
@@ -2608,7 +2615,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     // TODO add conditional proof step insertion button
     let indentedState: ProofOutputState = {
       paragraphs: [],
-      isPreview: state.isPreview
+      isPreview: state.isPreview,
+      onApply: state.onApply
     };
     this.addOptionalProofInternal(proof, heading, context, false, false, false, undefined, indentedState);
     let indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
@@ -2624,7 +2632,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       let state: ProofOutputState = {
         paragraphs: paragraphs,
-        isPreview: false
+        isPreview: false,
+        onApply: () => {}
       };
       this.addProofListInternal(proofs, heading, labels, context, state);
     }
@@ -2644,7 +2653,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let items = proofs.map((proof) => {
           let itemState: ProofOutputState = {
             paragraphs: [],
-            isPreview: state.isPreview
+            isPreview: state.isPreview,
+            onApply: state.onApply
           };
           this.addOptionalProofInternal(proof, undefined, context, false, true, false, undefined, itemState);
           return new Notation.ParagraphExpression(itemState.paragraphs);
@@ -2663,7 +2673,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else {
         let state: ProofOutputState = {
           paragraphs: paragraphs,
-          isPreview: false
+          isPreview: false,
+          onApply: () => {}
         };
         // TODO implement insertion
         this.addNoProofPlaceholder(heading, undefined, state);
@@ -2690,7 +2701,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addSubProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], labels: string[] | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
-    this.commitImplications(state, true);
+    this.commitImplications(state, false);
     this.addProofListInternal(proofs, undefined, labels, context, state);
   }
 
@@ -2812,18 +2823,27 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (type.construction instanceof Fmt.DefinitionRefExpression) {
           let path = type.construction.path;
           let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
-            let subProof = this.createInductionSubProofForRendering(structuralCase);
+            let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+            let renderedSubProof = this.createInductionSubProofForRendering(structuralCase);
             let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
             let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
               let subProofContext: HLMProofStepContext = {
-                goal: context.goal ? this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm) : undefined,
+                goal: context.goal && !subProof.parameters ? this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm) : context.goal,
                 stepResults: context.stepResults
               };
               let subState: ProofOutputState = {
                 paragraphs: [],
-                isPreview: state.isPreview
+                isPreview: state.isPreview,
+                onApply: () => {
+                  // Need to manually apply goal (but not steps) as the proof object we are operating on has been created temporarily from an expression.
+                  // TODO this should be improved, by generating code where structuralCase.value already has the correct type
+                  // TODO also reflect the correct type in the VSCode extension
+                  subProof.goal = renderedSubProof.goal;
+                  structuralCase.value = subProof.toExpression(false);
+                  state.onApply();
+                }
               };
-              this.addSubProof(subProof, subProofContext, false, subState);
+              this.addSubProof(renderedSubProof, subProofContext, false, subState);
               return new Notation.ParagraphExpression(subState.paragraphs);
             });
             return new Notation.PromiseExpression(subProofPromise);
@@ -3124,7 +3144,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
         let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
         let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
-        state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
+        state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
       }
       return true;
     } else {
@@ -3139,7 +3159,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     };
     let state: ProofOutputState = {
       paragraphs: [],
-      isPreview: true
+      isPreview: true,
+      onApply: () => {}
     };
     this.addProofStep(proof, step, context, state);
     this.commitImplications(state, false);
@@ -3159,7 +3180,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         subProof.parameters = structuralCase.parameters;
       }
     }
-    if (subProof.steps.length) {
+    // If the first step is a reference to our own theorem, display it as an induction hypothesis instead.
+    // However, since this replaces subProof.steps, don't do it while editing. Otherwise, we would need to
+    // apply changes manually after they have been performed on the replaced steps.
+    if (subProof.steps.length && !this.editHandler) {
       let firstStep = subProof.steps[0];
       let firstStepType = firstStep.type;
       if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem)) {

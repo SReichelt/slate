@@ -96,6 +96,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private hoveredChildren: Expression[] = [];
   private permanentlyHighlighted = false;
   private highlightPermanentlyTimer: any;
+  private autoOpenTimer: any;
   private shrinkMathSpaces = true;
   private toolTipPosition: ToolTipPosition;
 
@@ -182,6 +183,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private cleanupDependentState(props: ExpressionProps): void {
+    if (this.autoOpenTimer) {
+      clearTimeout(this.autoOpenTimer);
+      this.autoOpenTimer = undefined;
+    }
     this.clearHoverAndMenu(props);
     this.disableInteractionBlocker(props);
     this.disableWindowClickListener();
@@ -254,6 +259,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (semanticLink.onMenuOpened) {
           onMenuOpened = semanticLink.onMenuOpened;
           alwaysShowMenu = semanticLink.alwaysShowMenu || expression instanceof Notation.PlaceholderExpression;
+          if (semanticLink.autoOpenMenu && !this.autoOpenTimer) {
+            let autoOpenMenu = () => {
+              if (onMenuOpened && !this.state.openMenu) {
+                this.openMenu(onMenuOpened);
+              }
+            };
+            this.autoOpenTimer = setTimeout(autoOpenMenu, 0);
+          }
         }
       }
     }
@@ -1275,22 +1288,30 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private menuClicked(onMenuOpened: () => Menu.ExpressionMenu, event: React.SyntheticEvent<HTMLElement>): void {
     if (this.state.openMenu) {
-      this.disableInteractionBlocker(this.props);
-      if (!this.permanentlyHighlighted) {
-        this.disableWindowClickListener();
-      }
-      this.setState({openMenu: undefined});
-      this.addToHoveredChildren();
+      this.closeMenu();
     } else {
       if (this.props.interactionHandler && this.props.interactionHandler.isBlocked()) {
         return;
       }
-      this.enableInteractionBlocker(this.props);
-      this.clearHoverAndMenuRecursively();
-      this.setState({openMenu: onMenuOpened()});
-      this.enableWindowClickListener();
+      this.openMenu(onMenuOpened);
     }
     eventHandled(event);
+  }
+
+  private openMenu(onMenuOpened: () => Menu.ExpressionMenu): void {
+    this.enableInteractionBlocker(this.props);
+    this.clearHoverAndMenuRecursively();
+    this.setState({openMenu: onMenuOpened()});
+    this.enableWindowClickListener();
+  }
+
+  private closeMenu(): void {
+    this.disableInteractionBlocker(this.props);
+    if (!this.permanentlyHighlighted) {
+      this.disableWindowClickListener();
+    }
+    this.setState({openMenu: undefined});
+    this.addToHoveredChildren();
   }
 
   private onMenuItemClicked = (action: Menu.ExpressionMenuAction) => {

@@ -1930,6 +1930,31 @@ export class HLMUtils extends GenericUtils {
         .or(() => this.unfoldsTo(sourceFormula, targetFormula))
         .or(() => this.unfoldsTo(targetFormula, sourceFormula));
     }
+    if ((targetFormula instanceof FmtHLM.MetaRefExpression_setEquals || targetFormula instanceof FmtHLM.MetaRefExpression_equals) && targetFormula.terms.length > 2) {
+      let chainEqualities: Fmt.Expression[] = [];
+      let listEqualities: Fmt.Expression[] = [];
+      let listRightTerm = targetFormula.terms[targetFormula.terms.length - 1];
+      for (let leftIndex = 0; leftIndex < targetFormula.terms.length - 1; leftIndex++) {
+        let leftTerm = targetFormula.terms[leftIndex];
+        let chainRightTerm = targetFormula.terms[leftIndex + 1];
+        let chainEquality = (targetFormula instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, chainRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, chainRightTerm));
+        chainEqualities.push(chainEquality);
+        let listEquality = (targetFormula instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, listRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, listRightTerm));
+        listEqualities.push(listEquality);
+      }
+      resultPromise = resultPromise
+        .or(() => this.triviallyImplies(sourceFormula, new FmtHLM.MetaRefExpression_and(...chainEqualities), followDefinitions))
+        .or(() => this.triviallyImplies(sourceFormula, new FmtHLM.MetaRefExpression_and(...listEqualities), followDefinitions));
+    } else if ((sourceFormula instanceof FmtHLM.MetaRefExpression_setEquals || sourceFormula instanceof FmtHLM.MetaRefExpression_equals) && sourceFormula.terms.length > 2) {
+      for (let leftIndex = 0; leftIndex < sourceFormula.terms.length - 1; leftIndex++) {
+        let leftTerm = sourceFormula.terms[leftIndex];
+        for (let rightIndex = leftIndex + 1; rightIndex < sourceFormula.terms.length; rightIndex++) {
+          let rightTerm = sourceFormula.terms[rightIndex];
+          let partialEquality = (sourceFormula instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm));
+          resultPromise = resultPromise.or(() => this.triviallyImplies(partialEquality, targetFormula, followDefinitions));
+        }
+      }
+    }
     if (sourceFormula instanceof FmtHLM.MetaRefExpression_and) {
       if (sourceFormula.formulas) {
         for (let item of sourceFormula.formulas) {

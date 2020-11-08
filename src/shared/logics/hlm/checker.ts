@@ -46,7 +46,7 @@ export interface HLMCheckerProofStepContext extends HLMCheckerContext, HLMProofS
 }
 
 export interface HLMCheckResult extends Logic.LogicCheckResult {
-  incompleteProofs: Map<FmtHLM.ObjectContents_Proof, HLMCheckerProofStepContext>;
+  incompleteProofs: Map<Fmt.ParameterList, HLMCheckerProofStepContext>;
 }
 
 export interface HLMCheckResultWithExpression extends HLMCheckResult {
@@ -158,7 +158,7 @@ export class HLMDefinitionChecker {
   private resetResult(): void {
     this.result = {
       diagnostics: [],
-      incompleteProofs: new Map<FmtHLM.ObjectContents_Proof, HLMCheckerProofStepContext>(),
+      incompleteProofs: new Map<Fmt.ParameterList, HLMCheckerProofStepContext>(),
       hasErrors: false
     };
   }
@@ -1223,7 +1223,7 @@ export class HLMDefinitionChecker {
         this.checkProof(structuralCase.value, structuralCase.wellDefinednessProof, clonedParameters, goal, caseContext);
       }
     };
-    this.checkStructuralCasesInternal(term, construction, cases, checkCaseInternal, replaceCases, context);
+    this.checkStructuralCasesInternal(term, construction, cases, checkCaseInternal, undefined, replaceCases, context);
 
     if (checkCompatibility) {
       let values = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => structuralCase.value);
@@ -1231,8 +1231,8 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkStructuralCasesInternal(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCaseInternal: (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => void, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
-    this.checkStructuralCaseTerm(term, construction, replaceCases, context);
+  private checkStructuralCasesInternal(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCaseInternal: (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => void, prepareCaseInternal: ((structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
+    this.checkStructuralCaseTerm(term, construction, prepareCaseInternal, replaceCases, context);
     if (construction instanceof Fmt.DefinitionRefExpression) {
       let constructionPath = construction.path;
       let constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
@@ -1290,14 +1290,15 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkStructuralCaseTerm(term: Fmt.Expression, construction: Fmt.Expression, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
-    let recheckFn = (substitutedTerm: Fmt.Expression, recheckContext: HLMCheckerContext) => this.checkStructuralCaseTerm(substitutedTerm, construction, replaceCases, recheckContext);
+  private checkStructuralCaseTerm(term: Fmt.Expression, construction: Fmt.Expression, prepareCaseInternal: ((structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
+    let recheckFn = (substitutedTerm: Fmt.Expression, recheckContext: HLMCheckerContext) => this.checkStructuralCaseTerm(substitutedTerm, construction, prepareCaseInternal, replaceCases, recheckContext);
     let autoFillFn = undefined;
     if (context.editData && construction instanceof Fmt.PlaceholderExpression) {
       autoFillFn = (placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn) => {
         let filledConstruction = placeholderValues.get(construction);
         if (filledConstruction instanceof Fmt.DefinitionRefExpression) {
-          let constructionPathWithoutArguments = new Fmt.Path(filledConstruction.path.name, undefined, filledConstruction.path.parentPath);
+          let constructionPath = filledConstruction.path;
+          let constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
           let newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
           let newParameterLists: Fmt.ParameterList[] = [];
           let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
@@ -1309,7 +1310,13 @@ export class HLMDefinitionChecker {
               newParameterLists.push(clonedParameters);
             }
             let rewrite = constructorContents.rewrite ? new FmtHLM.MetaRefExpression_true : undefined;
-            newCases.push(new FmtHLM.ObjectContents_StructuralCase(constructorExpression, clonedParameters, new Fmt.PlaceholderExpression(undefined), rewrite));
+            let structuralCase = new FmtHLM.ObjectContents_StructuralCase(constructorExpression, clonedParameters, new Fmt.PlaceholderExpression(undefined), rewrite);
+            if (prepareCaseInternal) {
+              let structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
+              let constraintParam = this.utils.getStructuralCaseConstraintParameter(term, structuralCaseTerm);
+              prepareCaseInternal(structuralCase, constructorContents, structuralCaseTerm, constraintParam);
+            }
+            newCases.push(structuralCase);
           };
           return this.forAllConstructors(filledConstruction, addCase)
             .then(() => {
@@ -1492,13 +1499,13 @@ export class HLMDefinitionChecker {
       if (stepContext.goal) {
         let check = this.isTriviallyProvable(stepContext.goal, stepContext).then((result: boolean) => {
           if (!result) {
-            this.result.incompleteProofs.set(proof, stepContext!);
+            this.result.incompleteProofs.set(proof.steps, stepContext!);
             this.message(object, `Proof of ${stepContext!.goal} is incomplete`, Logic.DiagnosticSeverity.Warning);
           }
         });
         this.addPendingCheck(object, check);
       } else {
-        this.result.incompleteProofs.set(proof, stepContext);
+        this.result.incompleteProofs.set(proof.steps, stepContext);
         this.message(object, `Proof is incomplete`, Logic.DiagnosticSeverity.Warning);
       }
     }
@@ -1830,27 +1837,29 @@ export class HLMDefinitionChecker {
         let checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
           let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
           let parameters: Fmt.ParameterList | undefined = undefined;
+          let caseGoal = goal;
           if (subProof.parameters) {
             parameters = new Fmt.ParameterList(constraintParam);
+          } else {
+            caseGoal = this.utils.getInductionProofGoal(goal, proveByInduction.term, structuralCaseTerm);
           }
-          let caseGoal = this.utils.getInductionProofGoal(goal, proveByInduction.term, structuralCaseTerm);
           this.checkProof(structuralCase.value, subProof, parameters, caseGoal, caseContext);
           if (structuralCase.wellDefinednessProof) {
             this.error(structuralCase.wellDefinednessProof, 'Superfluous well-definedness proof');
           }
         };
+        let prepareCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => {
+          let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, new Fmt.ParameterList(constraintParam), undefined, new Fmt.ParameterList);
+          structuralCase.value = subProof.toExpression(true);
+        };
         let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
-          for (let newCase of newCases) {
-            let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, undefined, undefined, new Fmt.ParameterList);
-            newCase.value = subProof.toExpression(true);
-          }
           let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction(proveByInduction.term, proveByInduction.construction, newCases);
           return {
             originalExpression: proveByInduction,
             filledExpression: newProveByInduction
           };
         };
-        this.checkStructuralCasesInternal(proveByInduction.term, proveByInduction.construction, proveByInduction.cases, checkCase, replaceCases, context);
+        this.checkStructuralCasesInternal(proveByInduction.term, proveByInduction.construction, proveByInduction.cases, checkCase, prepareCase, replaceCases, context);
       } else {
         this.error(step, 'Goal not set');
       }

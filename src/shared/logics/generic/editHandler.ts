@@ -119,8 +119,12 @@ export abstract class GenericEditHandler {
     return insertButton;
   }
 
-  protected getMenuInsertButton(onMenuOpened: () => Menu.ExpressionMenu, mandatory: boolean = false): Notation.RenderedExpression {
-    return this.getSemanticLinkInsertButton((semanticLink: Notation.SemanticLink) => (semanticLink.onMenuOpened = onMenuOpened), mandatory);
+  protected getMenuInsertButton(onMenuOpened: () => Menu.ExpressionMenu, mandatory: boolean = false, autoOpen: boolean = false): Notation.RenderedExpression {
+    let onInitialize = (semanticLink: Notation.SemanticLink) => {
+      semanticLink.onMenuOpened = onMenuOpened;
+      semanticLink.autoOpenMenu = autoOpen;
+    };
+    return this.getSemanticLinkInsertButton(onInitialize, mandatory);
   }
 
   protected addListItemInsertButton(renderedItems: Notation.ExpressionValue[], innerType: Fmt.Expression, onInsertItem: () => void, enabledPromise: CachedPromise<boolean>): void {
