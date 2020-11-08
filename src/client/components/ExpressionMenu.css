@@ -54,6 +54,7 @@
 
 .open-menu-separator {
   padding: 1px 0 0 0;
+  background-color: var(--menu-title-background-color);
 }
 
 .open-menu-title-cell, .open-menu-item {

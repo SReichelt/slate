@@ -410,7 +410,8 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
 
   render(): React.ReactNode {
     let className = 'open-menu-item clickable';
-    if (this.state.hovered || this.props.hoveredExternally) {
+    let hovered = this.props.hoveredExternally || this.state.hovered;
+    if (hovered) {
       className += ' hover';
     }
     if (this.props.item.selected) {
@@ -454,7 +455,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
         }
         return null;
       };
-      toolTip = <ExpressionToolTip active={this.state.hovered} position="right" parent={this.htmlNode} getContents={getToolTipContents} delay={100} key="tooltip"/>;
+      toolTip = <ExpressionToolTip active={hovered} position="right" parent={this.htmlNode} getContents={getToolTipContents} delay={100} key="tooltip"/>;
     }
     return (
       <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={(event) => eventHandled(event)} onMouseUp={onClick} onTouchStart={(event) => eventHandled(event)} onTouchCancel={(event) => eventHandled(event)} onTouchEnd={onClick} ref={(node) => (this.htmlNode = node)}>

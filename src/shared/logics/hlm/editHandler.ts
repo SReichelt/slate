@@ -15,7 +15,7 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll, HLMSubstitutionContext, HLMEquivalenceListInfo } from './utils';
 import { HLMRenderUtils } from './renderUtils';
-import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext } from './checker';
+import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext, HLMCheckerStructuralCaseRef } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
@@ -1286,9 +1286,10 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createProveByInductionSteps(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo[]> {
-    // TODO omit variables that we have already split on
-    // TODO display tooltip also on left side
     let createAndCheckStructuralExpression = (variableRefExpression: Fmt.Expression, structuralChecker: HLMDefinitionChecker) => {
+      if (context.parentStructuralCases.some((structuralCaseRef: HLMCheckerStructuralCaseRef) => variableRefExpression.isEquivalentTo(structuralCaseRef.term))) {
+        return CachedPromise.resolve(undefined);
+      }
       let structuralExpression = new FmtHLM.MetaRefExpression_ProveByInduction(variableRefExpression, new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm), []);
       let step = this.utils.createParameter(structuralExpression, '_');
       return structuralChecker.checkSingleProofStep(step, context)

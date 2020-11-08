@@ -19,7 +19,7 @@ export class HLMChecker implements Logic.LogicChecker {
   }
 }
 
-interface HLMCheckerStructuralCaseRef {
+export interface HLMCheckerStructuralCaseRef {
   term: Fmt.Expression;
   construction: Fmt.Expression;
   _constructor: Fmt.Expression;
@@ -30,7 +30,7 @@ type HLMCheckerRecheckFn = (originalExpression: Fmt.Expression, substitutedExpre
 type HLMCheckerCheckFormulaFn = (formula: Fmt.Expression) => HLMCheckerContext;
 type HLMCheckerFillExpressionFn = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => void;
 
-interface HLMCheckerContext extends HLMBaseContext {
+export interface HLMCheckerContext extends HLMBaseContext {
   context: Ctx.Context;
   binderSourceParameters: Fmt.Parameter[];
   temporaryParameters: Fmt.Parameter[];
