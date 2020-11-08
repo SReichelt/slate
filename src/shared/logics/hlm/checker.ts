@@ -1676,8 +1676,9 @@ export class HLMDefinitionChecker {
             if (type.result) {
               this.checkFormula(type.result, context);
             }
-            if (!this.utils.substitutesTo(context.previousResult, this.utils.getImplicationResult(type.result, context), sourceTerm, targetTerms)) {
-              this.error(step, `Substitution from ${context.previousResult} to ${type.result} is invalid`);
+            let implicationResult = this.utils.getImplicationResult(type.result, context);
+            if (!this.utils.substitutesTo(context.previousResult, implicationResult, sourceTerm, targetTerms)) {
+              this.error(step, `Substitution from ${context.previousResult} to ${implicationResult} is invalid`);
             }
           } else {
             this.error(step, 'Source side is invalid');
@@ -2010,15 +2011,6 @@ export class HLMDefinitionChecker {
     });
   }
 
-  private checkDeclaredResult(object: Object, result: Fmt.Expression | undefined, sources: Fmt.Expression[], context: HLMCheckerProofStepContext): void {
-    if (result) {
-      this.checkFormula(result, context);
-    }
-    let check = this.stripConstraintsFromFormulas(sources, false, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
-      this.checkUnfolding(result ?? object, strippedSources, this.utils.getImplicationResult(result, context), false));
-    this.addPendingCheck(object, check);
-  }
-
   private checkUnfolding(object: Object, sources: Fmt.Expression[], target: Fmt.Expression, sourceIsResult: boolean): void {
     if (target instanceof (sourceIsResult ? FmtHLM.MetaRefExpression_or : FmtHLM.MetaRefExpression_and)) {
       if (target.formulas) {
@@ -2072,6 +2064,15 @@ export class HLMDefinitionChecker {
         this.error(object, `${source} does not trivially imply ${targets.join(' or ')}`);
       }
     });
+    this.addPendingCheck(object, check);
+  }
+
+  private checkDeclaredResult(object: Object, result: Fmt.Expression | undefined, sources: Fmt.Expression[], context: HLMCheckerProofStepContext): void {
+    if (result) {
+      this.checkFormula(result, context);
+    }
+    let check = this.stripConstraintsFromFormulas(sources, false, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
+      this.checkUnfolding(result ?? object, strippedSources, this.utils.getImplicationResult(result, context), false));
     this.addPendingCheck(object, check);
   }
 

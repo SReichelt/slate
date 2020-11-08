@@ -2550,12 +2550,14 @@ exports[`render hlm library: 1.7.1.9 Essentials/Numbers/Natural/Sum%20is%20commu
 
   m + n = n + m
 
-Proof.  By induction on m.
+Proof.  By induction on n.
 
-* (0) + n = n = n + (0) by 1.7.1.4.
-* Let x ∈ ℕ such that x + n = n + x. Then (x+1) + n = ((n + x)+1) = n + (x+1):
-  (x+1) + n =^1.7.1.5 ((x + n)+1)
-   = ((n + x)+1)"
+* We show that m + (0) = m = (0) + m:
+  1.7.1.4 ⇒ (0) + m = m
+* Let x ∈ ℕ such that m + x = x + m. Then:
+  m + (x+1) = ((m + x)+1)
+   = ((x + m)+1)
+   =^1.7.1.5 (x+1) + m"
 `;
 
 exports[`render hlm library: 1.7.1.10 Essentials/Numbers/Natural/Sum%20is%20commutative 1`] = `
@@ -2595,7 +2597,14 @@ exports[`render hlm library: 1.7.1.12 Essentials/Numbers/Natural/Addition%20of%2
 
   a = b
 
-No proof.
+Proof.  By induction on c.
+
+* Assume c = 0. Then a = b:
+  a + c = b + c ⇒^(c = 0) a + 0 = b + 0
+* Let x ∈ ℕ such that c = x + 1. Then a = b:
+  a + c = b + c ⇒^(c = x+1) a + (x + 1) = b + (x + 1)
+   ⇒^(def) a + x = b + x
+   ⇒^(1.7.1.12) a = b
 
 References.
 

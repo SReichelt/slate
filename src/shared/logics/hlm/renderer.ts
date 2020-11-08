@@ -3228,9 +3228,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else {
         let firstStepResult = this.utils.getProofStepResult(firstStep, context);
         if ((firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals || firstStepResult instanceof FmtHLM.MetaRefExpression_equals)
-            && firstStepResult.terms.length === 2
-            && firstStepResult.terms[0].isEquivalentTo(previousRightTerm)) {
-          let rightTerm = firstStepResult.terms[1];
+            && firstStepResult.terms.length === 2) {
+          let rightTerm: Fmt.Expression;
+          if (firstStepResult.terms[0].isEquivalentTo(previousRightTerm)) {
+            rightTerm = firstStepResult.terms[1];
+          } else if (firstStepResult.terms[1].isEquivalentTo(previousRightTerm)) {
+            rightTerm = firstStepResult.terms[0];
+          } else {
+            return false;
+          }
           let finalEquality = firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
           let source: Notation.RenderedExpression | undefined = undefined;
           if (firstStep.type instanceof FmtHLM.MetaRefExpression_UseTheorem && firstStep.type.theorem instanceof Fmt.DefinitionRefExpression) {
