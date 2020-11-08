@@ -317,8 +317,8 @@ exports[`render hlm library: 1.1.14 Essentials/Sets/Intersection%20with%20empty%
 
 Proof.
 
-⊆. 1.1.13 ⇒ S ∩ ∅ ⊆ ∅
-⊇. 1.1.2 ⇒ ∅ ⊆ S ∩ ∅
+⊆. By 1.1.13.
+⊇. By 1.1.2.
 
 References.
 
@@ -334,8 +334,8 @@ exports[`render hlm library: 1.1.15 Essentials/Sets/Intersection%20with%20empty%
 
 Proof.
 
-⊆. 1.1.12 ⇒ ∅ ∩ S ⊆ ∅
-⊇. 1.1.2 ⇒ ∅ ⊆ ∅ ∩ S
+⊆. By 1.1.12.
+⊇. By 1.1.2.
 
 References.
 
