@@ -583,14 +583,12 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.powerset"
 `;
 
-exports[`render hlm library: 1.1.28 Essentials/Sets/Truth%20values 1`] = `
+exports[`render hlm library: 1.1.28 Essentials/Sets/Boolean%20values 1`] = `
 "Definition 1.1.28.  We define:
 
-  𝓣𝓻𝓾𝓽𝓱 :=: {[p] | p is a proposition}
+  𝓑𝓸𝓸𝓵 :=: {[p] | p is a proposition}
 
   [p] = [q]  :⇔  [p  ⇔  q]  (p is a proposition, q is a proposition)
-
-We write “let p be a truth value” for “let p ∈ 𝓣𝓻𝓾𝓽𝓱.”
 
 Remarks.
 
@@ -598,19 +596,38 @@ This definition captures propositions up to equivalence. Since HLM uses classica
 
 References.
 
-* https://en.wikipedia.org/wiki/Truth_value
+* https://en.wikipedia.org/wiki/Boolean_data_type
 * https://proofwiki.org/wiki/Definition:Truth_Value
-* https://ncatlab.org/nlab/show/truth+value"
+* https://ncatlab.org/nlab/show/truth+value
+* https://coq.inria.fr/library/Coq.Bool.Bool.html
+* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#bool"
 `;
 
-exports[`render hlm library: 1.1.29 Essentials/Sets/maximal%20subset 1`] = `
-"Definition 1.1.29.  Let S be a set, T ⊆ S, let p_I be a proposition for each I ⊆ S. We define:
+exports[`render hlm library: 1.1.29 Essentials/Sets/true 1`] = `
+"Definition 1.1.29.  Let b ∈ 𝓑𝓸𝓸𝓵. We define
+
+  b is true
+
+by:
+
+  [p] is true  :⇔  p  (p is a proposition)
+
+  b is false  :⇔  b is not true
+
+References.
+
+* https://coq.inria.fr/library/Coq.Bool.Bool.html#Is_true
+* https://leanprover-community.github.io/mathlib_docs/core/init/coe.html#coe_bool_to_Prop"
+`;
+
+exports[`render hlm library: 1.1.30 Essentials/Sets/maximal%20subset 1`] = `
+"Definition 1.1.30.  Let S be a set, T ⊆ S, let p_I be a proposition for each I ⊆ S. We define:
 
   T is a maximal subset I of S such that p_I  :⇔  p_T and ∀ I ⊆ S s.t. p_I and T ⊆ I : T = I"
 `;
 
-exports[`render hlm library: 1.1.30.1 Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
-"Definition 1.1.30.1.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.31.1 Essentials/Sets/Generalized%20operators/Generalized%20intersection 1`] = `
+"Definition 1.1.31.1.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋂_(i ∈ I) S_i := {x ∈ U : ∀ j ∈ I : x ∈ S_j}
 
@@ -624,8 +641,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Intersection/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.30.2 Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
-"Definition 1.1.30.2.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.31.2 Essentials/Sets/Generalized%20operators/Generalized%20intersection%20using%20power%20set 1`] = `
+"Definition 1.1.31.2.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋂S := ⋂_((T) ∈ S) T
 
@@ -634,8 +651,8 @@ References.
 * https://en.wikipedia.org/wiki/Intersection_(set_theory)#Arbitrary_intersections"
 `;
 
-exports[`render hlm library: 1.1.30.3 Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
-"Definition 1.1.30.3.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
+exports[`render hlm library: 1.1.31.3 Essentials/Sets/Generalized%20operators/Generalized%20union 1`] = `
+"Definition 1.1.31.3.  Let U be a set, I be a set, let S_i ⊆ U for each i ∈ I. We define:
 
   ⋃_(i ∈ I) S_i := {x ∈ U : ∃ j ∈ I : x ∈ S_j}
 
@@ -645,8 +662,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Union/Family_of_Sets"
 `;
 
-exports[`render hlm library: 1.1.30.4 Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
-"Definition 1.1.30.4.  Let U be a set, S ⊆ 𝒫(U). We define:
+exports[`render hlm library: 1.1.31.4 Essentials/Sets/Generalized%20operators/Generalized%20union%20using%20power%20set 1`] = `
+"Definition 1.1.31.4.  Let U be a set, S ⊆ 𝒫(U). We define:
 
   ⋃S := ⋃_((T) ∈ S) T
 
@@ -655,8 +672,8 @@ References.
 * https://en.wikipedia.org/wiki/Union_(set_theory)#Arbitrary_unions"
 `;
 
-exports[`render hlm library: 1.1.30.5 Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
-"Definition 1.1.30.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
+exports[`render hlm library: 1.1.31.5 Essentials/Sets/Generalized%20operators/Generalized%20disjoint%20union 1`] = `
+"Definition 1.1.31.5.  Let I be a set, let S_i be a set for each i ∈ I, let ≃ be a dependent equality on S_i (i ∈ I). We define:
 
   ⨄_(i ∈ I)^≃ S_i :=: {(j, s) | j ∈ I, s ∈ S_j}
 
@@ -672,8 +689,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sigma"
 `;
 
-exports[`render hlm library: 1.1.30.6 Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
-"Definition 1.1.30.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
+exports[`render hlm library: 1.1.31.6 Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
+"Definition 1.1.31.6.  Let I be a set, let S_i be a set for each i ∈ I. We define:
 
   ∏_(i ∈ I) S_i :=: {(s_j)_(j ∈ I) | s_j ∈ S_j for each j ∈ I}
 
@@ -690,8 +707,8 @@ References.
 * https://ncatlab.org/nlab/show/cartesian+product#in_sets"
 `;
 
-exports[`render hlm library: 1.1.31.1 Essentials/Sets/Choice/Choice%20functions 1`] = `
-"Definition 1.1.31.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.32.1 Essentials/Sets/Choice/Choice%20functions 1`] = `
+"Definition 1.1.32.1.  Let S be a set. We define:
 
   𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
 
@@ -702,14 +719,14 @@ References.
 * https://en.wikipedia.org/wiki/Axiom_of_choice#Variants"
 `;
 
-exports[`render hlm library: 1.1.31.2 Essentials/Sets/Choice/choice 1`] = `
-"Definition 1.1.31.2.  Let S be a set. We define:
+exports[`render hlm library: 1.1.32.2 Essentials/Sets/Choice/choice 1`] = `
+"Definition 1.1.32.2.  Let S be a set. We define:
 
   S has a choice function  :⇔  𝓒𝓱𝓸𝓲𝓬𝓮(S) is nonempty"
 `;
 
-exports[`render hlm library: 1.1.31.3 Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
-"Axiom 1.1.31.3 (Axiom of choice).  We define:
+exports[`render hlm library: 1.1.32.3 Essentials/Sets/Choice/axiom%20of%20choice 1`] = `
+"Axiom 1.1.32.3 (Axiom of choice).  We define:
 
   AC  :⇔  ∀ sets S : S has a choice function
 
@@ -741,8 +758,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
-exports[`render hlm library: 1.1.32.1 Essentials/Sets/Multisets/Multisets 1`] = `
-"Definition 1.1.32.1.  Let S be a set. We define:
+exports[`render hlm library: 1.1.33.1 Essentials/Sets/Multisets/Multisets 1`] = `
+"Definition 1.1.33.1.  Let S be a set. We define:
 
   𝓜𝓾𝓵𝓽𝓲𝓢𝓮𝓽(S) :=: {{s^(m_s)} | m_s ∈ ℕ for each s ∈ S}
 
@@ -766,8 +783,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/data/multiset/basic.html#multiset"
 `;
 
-exports[`render hlm library: 1.1.32.2 Essentials/Sets/Multisets/multiplicity 1`] = `
-"Definition 1.1.32.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
+exports[`render hlm library: 1.1.33.2 Essentials/Sets/Multisets/multiplicity 1`] = `
+"Definition 1.1.33.2.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define
 
   mult_𝑻(t)
 
@@ -776,22 +793,22 @@ by:
   mult_{s^(m_s)}(t) := m_t  (m_s ∈ ℕ for each s ∈ S)"
 `;
 
-exports[`render hlm library: 1.1.32.3 Essentials/Sets/Multisets/Set 1`] = `
-"Definition 1.1.32.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.33.3 Essentials/Sets/Multisets/Set 1`] = `
+"Definition 1.1.33.3.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Set(𝑻) := {s ∈ S : mult_𝑻(s) ≠ 0}
 
 We write “let t ∈ 𝑻” for “let t ∈ Set(𝑻).”"
 `;
 
-exports[`render hlm library: 1.1.32.4 Essentials/Sets/Multisets/Items 1`] = `
-"Definition 1.1.32.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
+exports[`render hlm library: 1.1.33.4 Essentials/Sets/Multisets/Items 1`] = `
+"Definition 1.1.33.4.  Let S be a set, 𝑻 be a/an S-multiset, t ∈ S. We define:
 
   Items_𝑻(t) := {(t, n) : n ∈ ℕ_(<mult_𝑻(t))}"
 `;
 
-exports[`render hlm library: 1.1.32.5 Essentials/Sets/Multisets/Elements 1`] = `
-"Definition 1.1.32.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.33.5 Essentials/Sets/Multisets/Elements 1`] = `
+"Definition 1.1.33.5.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   Elems(𝑻) := {(t, n) : t ∈ S, n ∈ ℕ_(<mult_𝑻(t))}
    = ⋃_(t ∈ S) Items_𝑻(t)
@@ -799,8 +816,8 @@ exports[`render hlm library: 1.1.32.5 Essentials/Sets/Multisets/Elements 1`] = `
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.32.6 Essentials/Sets/Multisets/cardinality 1`] = `
-"Definition 1.1.32.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.33.6 Essentials/Sets/Multisets/cardinality 1`] = `
+"Definition 1.1.33.6.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   |𝑻| := |Elems(𝑻)|
    = {∑_(i ∈ Set(𝑻)) mult_𝑻(i) if 𝑻 is finite, |Set(𝑻)| if 𝑻 is infinite
@@ -809,8 +826,8 @@ exports[`render hlm library: 1.1.32.6 Essentials/Sets/Multisets/cardinality 1`] 
 Equality.  No proof."
 `;
 
-exports[`render hlm library: 1.1.32.7 Essentials/Sets/Multisets/finite 1`] = `
-"Definition 1.1.32.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
+exports[`render hlm library: 1.1.33.7 Essentials/Sets/Multisets/finite 1`] = `
+"Definition 1.1.33.7.  Let S be a set, 𝑻 be a/an S-multiset. We define:
 
   𝑻 is finite  :⇔  |𝑻| is finite
     ⇔  Elems(𝑻) is finite
@@ -2851,7 +2868,7 @@ Remarks.
 
 There are, of course, many equivalent definitions of binary digits. The simplest definition would be a construction with two constructors. However, we also want the sets to be embedded in the natural numbers, and (currently) this requires everything to be mapped to a single constructor of the target set. So we simply define binary digits as a subset of the natural numbers.
 
-In some cases, the set \`$../../../Sets/\\"Truth values\\"\` of truth values may be more convenient to use.
+In some cases, the set \`$../../../Sets/\\"Boolean values\\"\` of Boolean values may be more convenient to use.
 
 References.
 

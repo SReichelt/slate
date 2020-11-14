@@ -1109,11 +1109,11 @@ export class HLMEditHandler extends GenericEditHandler {
     return item;
   }
 
-  private createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_EqualityDefinition {
+  private createEqualityDefinition(parameters: Fmt.ParameterList): FmtHLM.ObjectContents_ConstructorEqualityDefinition {
     let leftParameters = parameters.clone();
     let rightParameters = parameters.clone();
     this.addApostrophes(rightParameters);
-    return new FmtHLM.ObjectContents_EqualityDefinition(leftParameters, rightParameters, [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)]);
+    return new FmtHLM.ObjectContents_ConstructorEqualityDefinition(leftParameters, rightParameters, [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)]);
   }
 
   private addApostrophes(parameters: Fmt.ParameterList): void {

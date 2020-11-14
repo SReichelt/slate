@@ -11,7 +11,10 @@ export class HLMEditAnalysis extends Edit.EditAnalysis {
       if (contents.wellDefinednessProof) {
         this.analyzeObjectContents(contents.wellDefinednessProof, context);
       }
-    } else if (contents instanceof FmtHLM.ObjectContents_EqualityDefinition) {
+    } else if (contents instanceof FmtHLM.ObjectContents_ConstructionRewriteDefinition) {
+      this.analyzeParameter(contents.parameter, context);
+      this.analyzeExpression(contents.value, false, (value) => (contents.value = value!), undefined, context);
+    } else if (contents instanceof FmtHLM.ObjectContents_ConstructorEqualityDefinition) {
       this.analyzeEquivalenceList(contents.definition, 1, contents.equivalenceProofs, context);
       if (contents.reflexivityProof) {
         this.analyzeObjectContents(contents.reflexivityProof, context);
@@ -22,6 +25,8 @@ export class HLMEditAnalysis extends Edit.EditAnalysis {
       if (contents.transitivityProof) {
         this.analyzeObjectContents(contents.transitivityProof, context);
       }
+    } else if (contents instanceof FmtHLM.ObjectContents_ConstructorRewriteDefinition) {
+      this.analyzeExpression(contents.value, false, (value) => (contents.value = value!), undefined, context);
     } else if (contents instanceof FmtHLM.ObjectContents_SetOperator
                || contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
       this.analyzeEquivalenceList(contents.definition, 1, contents.equalityProofs, context);

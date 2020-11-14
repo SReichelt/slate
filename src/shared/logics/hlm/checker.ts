@@ -454,6 +454,9 @@ export class HLMDefinitionChecker {
     if (contents.embedding) {
       this.checkEmbedding(contents.embedding, context);
     }
+    if (contents.rewrite) {
+      this.checkConstructionRewriteDefinition(contents.rewrite, context);
+    }
   }
 
   private checkConstructor(innerDefinition: Fmt.Definition, innerContents: FmtHLM.ObjectContents_Constructor, context: HLMCheckerContext, innerContext: HLMCheckerContext): void {
@@ -463,11 +466,11 @@ export class HLMDefinitionChecker {
       this.error(innerDefinition, 'Constructor with parameters requires equality definition');
     }
     if (innerContents.rewrite) {
-      this.checkRewriteDefinition(innerDefinition, innerContents.rewrite, innerContext);
+      this.checkConstructorRewriteDefinition(innerDefinition, innerContents.rewrite, innerContext);
     }
   }
 
-  private checkEqualityDefinition(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_EqualityDefinition, context: HLMCheckerContext): void {
+  private checkEqualityDefinition(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_ConstructorEqualityDefinition, context: HLMCheckerContext): void {
     let constructorParameters = innerDefinition.parameters;
     if (!equalityDefinition.leftParameters.isEquivalentTo(constructorParameters)) {
       this.error(equalityDefinition.leftParameters, 'Parameters of equality definition must match constructor parameters');
@@ -481,7 +484,7 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkEqualityDefinitionProofs(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_EqualityDefinition, context: HLMCheckerContext): void {
+  private checkEqualityDefinitionProofs(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_ConstructorEqualityDefinition, context: HLMCheckerContext): void {
     let isomorphic = (equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true);
     if (isomorphic) {
       this.checkIsomorphicProperty(equalityDefinition.leftParameters, equalityDefinition.rightParameters, equalityDefinition.definition[0], context);
@@ -511,13 +514,13 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private getSubstitutedEqualityDefinition(equalityDefinition: FmtHLM.ObjectContents_EqualityDefinition, leftParameters: Fmt.ParameterList, rightParameters: Fmt.ParameterList): Fmt.Expression {
+  private getSubstitutedEqualityDefinition(equalityDefinition: FmtHLM.ObjectContents_ConstructorEqualityDefinition, leftParameters: Fmt.ParameterList, rightParameters: Fmt.ParameterList): Fmt.Expression {
     let formula = equalityDefinition.definition[0];
     formula = this.utils.substituteParameters(formula, equalityDefinition.leftParameters, leftParameters);
     return this.utils.substituteParameters(formula, equalityDefinition.rightParameters, rightParameters);
   }
 
-  private checkRewriteDefinition(innerDefinition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_RewriteDefinition, context: HLMCheckerContext): void {
+  private checkConstructorRewriteDefinition(innerDefinition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_ConstructorRewriteDefinition, context: HLMCheckerContext): void {
     this.checkElementTerm(rewriteDefinition.value, context);
     let substitutionContext = new HLMSubstitutionContext;
     let constructionArgs = this.utils.getParameterArguments(this.definition.parameters, substitutionContext);
@@ -578,6 +581,20 @@ export class HLMDefinitionChecker {
     let rightVariableRef = new Fmt.VariableRefExpression(rightParam);
     let goal = new FmtHLM.MetaRefExpression_equals(leftVariableRef, rightVariableRef);
     this.checkProof(embedding, embedding.wellDefinednessProof, parameters, goal, context);
+  }
+
+  private checkConstructionRewriteDefinition(rewriteDefinition: FmtHLM.ObjectContents_ConstructionRewriteDefinition, context: HLMCheckerContext): void {
+    let substitutionContext = new HLMSubstitutionContext;
+    let constructionArgs = this.utils.getParameterArguments(this.definition.parameters, substitutionContext);
+    let constructionPath = new Fmt.Path(this.definition.name, constructionArgs);
+    let constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
+    let [set, innerContext] = this.checkElementParameter(rewriteDefinition.parameter, context);
+    if (set && !this.utils.areExpressionsSyntacticallyEquivalent(set, constructionExpression)) {
+      this.error(set, 'Rewrite parameter must match construction');
+    }
+    this.checkElementTerm(rewriteDefinition.value, context);
+    this.checkCompatibility(rewriteDefinition.value, [rewriteDefinition.value], [constructionExpression], context);
+    // TODO check whether rewrite definition matches referenced theorem
   }
 
   private checkSetOperator(contents: FmtHLM.ObjectContents_SetOperator, context: HLMCheckerContext): void {

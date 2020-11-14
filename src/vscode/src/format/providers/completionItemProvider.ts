@@ -78,7 +78,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         }
         if (context.triggerKind === vscode.CompletionTriggerKind.Invoke || signatureInfo) {
             if ((isEmptyExpression && (!rangeInfo.metaDefinitions || rangeInfo.metaDefinitions.allowArbitraryReferences())) || rangeInfo.object instanceof Fmt.VariableRefExpression) {
-                this.prependVariables(document, parsedDocument, rangeInfo, variableNames, result);
+                this.appendVariables(document, parsedDocument, rangeInfo, variableNames, result);
             }
         }
         if (isEmptyExpression || (rangeInfo.object instanceof Fmt.MetaRefExpression && rangeInfo.nameRange && rangeInfo.nameRange.contains(position))) {
@@ -407,23 +407,17 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         }
     }
 
-    private prependVariables(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, variableNames: Set<string>, result: vscode.CompletionItem[]): void {
+    private appendVariables(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, variableNames: Set<string>, result: vscode.CompletionItem[]): void {
         if (rangeInfo.context) {
-            let variables = rangeInfo.context.getVariables();
-            for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
-                let param = variables[variableIndex].parameter;
-                if (variableNames.has(param.name)) {
-                    // Cannot reference shadowed variable.
-                    continue;
-                } else {
-                    variableNames.add(param.name);
+            for (let variableInfo of rangeInfo.context.getVariables()) {
+                if (variableInfo.parameter.name !== '_') {
+                    this.appendVariable(document, parsedDocument, rangeInfo, variableInfo.parameter, result);
                 }
-                this.prependVariable(document, parsedDocument, rangeInfo, param, result);
             }
         }
     }
 
-    private prependVariable(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, param: Fmt.Parameter, result: vscode.CompletionItem[]): void {
+    private appendVariable(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, param: Fmt.Parameter, result: vscode.CompletionItem[]): void {
         let paramRangeInfo = parsedDocument.rangeMap.get(param);
         if (paramRangeInfo && paramRangeInfo.nameRange) {
             let paramCode = readRange(parsedDocument.uri, paramRangeInfo.nameRange, false, document);
@@ -434,7 +428,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                     documentation = new vscode.MarkdownString;
                     documentation.appendCodeblock(paramDefinition);
                 }
-                result.unshift({
+                result.push({
                     label: paramCode,
                     range: rangeInfo.object instanceof Fmt.VariableRefExpression ? (rangeInfo.nameRange ?? rangeInfo.range) : undefined,
                     documentation: documentation,

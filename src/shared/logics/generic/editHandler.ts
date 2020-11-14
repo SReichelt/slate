@@ -695,21 +695,12 @@ export abstract class GenericEditHandler {
   }
 
   protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: (variableInfo: Ctx.VariableInfo) => CachedPromise<Fmt.Expression[]>, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let variables = expressionEditInfo.context.getVariables();
     let variableItems: CachedPromise<Menu.ExpressionMenuItem[]> = CachedPromise.resolve([]);
-    let variableNames = new Set<string>();
-    for (let variableIndex = variables.length - 1; variableIndex >= 0; variableIndex--) {
-      let variableInfo = variables[variableIndex];
-      if (variableNames.has(variableInfo.parameter.name)) {
-        // Cannot reference shadowed variable.
-        continue;
-      } else {
-        variableNames.add(variableInfo.parameter.name);
-      }
+    for (let variableInfo of expressionEditInfo.context.getVariables()) {
       variableItems = variableItems.then((items: Menu.ExpressionMenuItem[]) =>
         onGetExpressions(variableInfo).then((expressions: Fmt.Expression[]) => {
           let newItems = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
-          return newItems.concat(items);
+          return items.concat(newItems);
         })
       );
     }

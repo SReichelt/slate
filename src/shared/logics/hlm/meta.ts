@@ -154,7 +154,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
 }
 
 export class ObjectContents_Construction extends ObjectContents_Definition {
-  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public embedding?: ObjectContents_Embedding) {
+  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public embedding?: ObjectContents_Embedding, public rewrite?: ObjectContents_ConstructionRewriteDefinition) {
     super(properties, notation, abbreviations, definitionNotation);
   }
 
@@ -172,6 +172,12 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
       this.embedding = newItem;
       reportFn?.(embeddingRaw, newItem);
     }
+    let rewriteRaw = argumentList.getOptionalValue('rewrite', 5);
+    if (rewriteRaw !== undefined) {
+      let newItem = ObjectContents_ConstructionRewriteDefinition.createFromExpression(rewriteRaw, reportFn);
+      this.rewrite = newItem;
+      reportFn?.(rewriteRaw, newItem);
+    }
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
@@ -180,6 +186,11 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
       let embeddingExpr = this.embedding.toExpression(true, reportFn);
       argumentList.push(new Fmt.Argument('embedding', embeddingExpr, true));
       reportFn?.(embeddingExpr, this.embedding);
+    }
+    if (this.rewrite !== undefined) {
+      let rewriteExpr = this.rewrite.toExpression(true, reportFn);
+      argumentList.push(new Fmt.Argument('rewrite', rewriteExpr, true));
+      reportFn?.(rewriteExpr, this.rewrite);
     }
     return argumentList;
   }
@@ -200,6 +211,9 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     if (this.embedding) {
       this.embedding.traverse(fn);
     }
+    if (this.rewrite) {
+      this.rewrite.traverse(fn);
+    }
   }
 
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Construction, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
@@ -207,6 +221,12 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     if (this.embedding) {
       result.embedding = Object.create(ObjectContents_Embedding.prototype) as ObjectContents_Embedding;
       if (this.embedding.substituteExpression(fn, result.embedding, replacedParameters)) {
+        changed = true;
+      }
+    }
+    if (this.rewrite) {
+      result.rewrite = Object.create(ObjectContents_ConstructionRewriteDefinition.prototype) as ObjectContents_ConstructionRewriteDefinition;
+      if (this.rewrite.substituteExpression(fn, result.rewrite, replacedParameters)) {
         changed = true;
       }
     }
@@ -218,6 +238,9 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
       return true;
     }
     if (!Fmt.areObjectsEquivalent(this.embedding, objectContents.embedding, fn, replacedParameters)) {
+      return false;
+    }
+    if (!Fmt.areObjectsEquivalent(this.rewrite, objectContents.rewrite, fn, replacedParameters)) {
       return false;
     }
     return super.isEquivalentTo(objectContents, fn, replacedParameters);
@@ -382,8 +405,105 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
   }
 }
 
+export class ObjectContents_ConstructionRewriteDefinition extends Fmt.ObjectContents {
+  constructor(public parameter: Fmt.Parameter, public value: Fmt.Expression, public theorem?: Fmt.Expression) {
+    super();
+  }
+
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstructionRewriteDefinition {
+    let result: ObjectContents_ConstructionRewriteDefinition = Object.create(ObjectContents_ConstructionRewriteDefinition.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    let parameterRaw = argumentList.getValue('parameter', 0);
+    if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
+      this.parameter = parameterRaw.parameters[0];
+    } else {
+      throw new Error('parameter: Parameter expression with single parameter expected');
+    }
+    this.value = argumentList.getValue('value', 1);
+    this.theorem = argumentList.getOptionalValue('theorem', 2);
+  }
+
+  toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
+    let parameterExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.parameter));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
+    argumentList.push(new Fmt.Argument(outputAllNames ? 'value' : undefined, this.value, false));
+    if (this.theorem !== undefined) {
+      argumentList.push(new Fmt.Argument('theorem', this.theorem, true));
+    }
+    return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstructionRewriteDefinition {
+    let result: ObjectContents_ConstructionRewriteDefinition = Object.create(ObjectContents_ConstructionRewriteDefinition.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstructionRewriteDefinition {
+    let result: ObjectContents_ConstructionRewriteDefinition = Object.create(ObjectContents_ConstructionRewriteDefinition.prototype);
+    this.substituteExpression(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+    if (this.parameter) {
+      this.parameter.traverse(fn);
+    }
+    if (this.value) {
+      this.value.traverse(fn);
+    }
+    if (this.theorem) {
+      this.theorem.traverse(fn);
+    }
+  }
+
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructionRewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    if (this.parameter) {
+      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
+      if (result.parameter !== this.parameter) {
+        changed = true;
+      }
+    }
+    if (this.value) {
+      result.value = this.value.substitute(fn, replacedParameters);
+      if (result.value !== this.value) {
+        changed = true;
+      }
+    }
+    if (this.theorem) {
+      result.theorem = this.theorem.substitute(fn, replacedParameters);
+      if (result.theorem !== this.theorem) {
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_ConstructionRewriteDefinition, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    if (!Fmt.areObjectsEquivalent(this.parameter, objectContents.parameter, fn, replacedParameters)) {
+      return false;
+    }
+    if (!Fmt.areObjectsEquivalent(this.value, objectContents.value, fn, replacedParameters)) {
+      return false;
+    }
+    if (!Fmt.areObjectsEquivalent(this.theorem, objectContents.theorem, fn, replacedParameters)) {
+      return false;
+    }
+    return true;
+  }
+}
+
 export class ObjectContents_Constructor extends ObjectContents_Definition {
-  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public equalityDefinition?: ObjectContents_EqualityDefinition, public rewrite?: ObjectContents_RewriteDefinition) {
+  constructor(properties?: Fmt.ArgumentList, notation?: Fmt.Expression, abbreviations?: Fmt.Expression[], definitionNotation?: Fmt.Expression, public equalityDefinition?: ObjectContents_ConstructorEqualityDefinition, public rewrite?: ObjectContents_ConstructorRewriteDefinition) {
     super(properties, notation, abbreviations, definitionNotation);
   }
 
@@ -397,13 +517,13 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     super.fromArgumentList(argumentList, reportFn);
     let equalityDefinitionRaw = argumentList.getOptionalValue('equalityDefinition', 4);
     if (equalityDefinitionRaw !== undefined) {
-      let newItem = ObjectContents_EqualityDefinition.createFromExpression(equalityDefinitionRaw, reportFn);
+      let newItem = ObjectContents_ConstructorEqualityDefinition.createFromExpression(equalityDefinitionRaw, reportFn);
       this.equalityDefinition = newItem;
       reportFn?.(equalityDefinitionRaw, newItem);
     }
     let rewriteRaw = argumentList.getOptionalValue('rewrite', 5);
     if (rewriteRaw !== undefined) {
-      let newItem = ObjectContents_RewriteDefinition.createFromExpression(rewriteRaw, reportFn);
+      let newItem = ObjectContents_ConstructorRewriteDefinition.createFromExpression(rewriteRaw, reportFn);
       this.rewrite = newItem;
       reportFn?.(rewriteRaw, newItem);
     }
@@ -448,13 +568,13 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
   substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Constructor, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = super.substituteExpression(fn, result, replacedParameters);
     if (this.equalityDefinition) {
-      result.equalityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype) as ObjectContents_EqualityDefinition;
+      result.equalityDefinition = Object.create(ObjectContents_ConstructorEqualityDefinition.prototype) as ObjectContents_ConstructorEqualityDefinition;
       if (this.equalityDefinition.substituteExpression(fn, result.equalityDefinition, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rewrite) {
-      result.rewrite = Object.create(ObjectContents_RewriteDefinition.prototype) as ObjectContents_RewriteDefinition;
+      result.rewrite = Object.create(ObjectContents_ConstructorRewriteDefinition.prototype) as ObjectContents_ConstructorRewriteDefinition;
       if (this.rewrite.substituteExpression(fn, result.rewrite, replacedParameters)) {
         changed = true;
       }
@@ -509,13 +629,13 @@ export class MetaRefExpression_Constructor extends Fmt.MetaRefExpression {
   }
 }
 
-export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
+export class ObjectContents_ConstructorEqualityDefinition extends Fmt.ObjectContents {
   constructor(public leftParameters: Fmt.ParameterList, public rightParameters: Fmt.ParameterList, public definition: Fmt.Expression[], public equivalenceProofs?: ObjectContents_Proof[], public reflexivityProof?: ObjectContents_Proof, public symmetryProof?: ObjectContents_Proof, public transitivityProof?: ObjectContents_Proof, public isomorphic?: Fmt.Expression) {
     super();
   }
 
-  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_EqualityDefinition {
-    let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstructorEqualityDefinition {
+    let result: ObjectContents_ConstructorEqualityDefinition = Object.create(ObjectContents_ConstructorEqualityDefinition.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -616,14 +736,14 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     return argumentList;
   }
 
-  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_EqualityDefinition {
-    let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstructorEqualityDefinition {
+    let result: ObjectContents_ConstructorEqualityDefinition = Object.create(ObjectContents_ConstructorEqualityDefinition.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EqualityDefinition {
-    let result: ObjectContents_EqualityDefinition = Object.create(ObjectContents_EqualityDefinition.prototype);
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstructorEqualityDefinition {
+    let result: ObjectContents_ConstructorEqualityDefinition = Object.create(ObjectContents_ConstructorEqualityDefinition.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -659,7 +779,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_EqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructorEqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.leftParameters) {
       result.leftParameters = this.leftParameters.substituteExpression(fn, replacedParameters);
@@ -720,7 +840,7 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_EqualityDefinition, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_ConstructorEqualityDefinition, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -770,13 +890,13 @@ export class ObjectContents_EqualityDefinition extends Fmt.ObjectContents {
   }
 }
 
-export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
+export class ObjectContents_ConstructorRewriteDefinition extends Fmt.ObjectContents {
   constructor(public value: Fmt.Expression, public theorem?: Fmt.Expression) {
     super();
   }
 
-  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_RewriteDefinition {
-    let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstructorRewriteDefinition {
+    let result: ObjectContents_ConstructorRewriteDefinition = Object.create(ObjectContents_ConstructorRewriteDefinition.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -795,8 +915,8 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     return argumentList;
   }
 
-  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_RewriteDefinition {
-    let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ConstructorRewriteDefinition {
+    let result: ObjectContents_ConstructorRewriteDefinition = Object.create(ObjectContents_ConstructorRewriteDefinition.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
@@ -817,8 +937,8 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     }
   }
 
-  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_RewriteDefinition {
-    let result: ObjectContents_RewriteDefinition = Object.create(ObjectContents_RewriteDefinition.prototype);
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstructorRewriteDefinition {
+    let result: ObjectContents_ConstructorRewriteDefinition = Object.create(ObjectContents_ConstructorRewriteDefinition.prototype);
     this.substituteExpression(undefined, result, replacedParameters);
     return result;
   }
@@ -832,7 +952,7 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_RewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructorRewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.value) {
       result.value = this.value.substitute(fn, replacedParameters);
@@ -849,7 +969,7 @@ export class ObjectContents_RewriteDefinition extends Fmt.ObjectContents {
     return changed;
   }
 
-  isEquivalentTo(objectContents: ObjectContents_RewriteDefinition, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  isEquivalentTo(objectContents: ObjectContents_ConstructorRewriteDefinition, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
@@ -6274,6 +6394,9 @@ export class MetaModel extends Meta.MetaModel {
           if (argument.name === 'embedding' || (argument.name === undefined && argumentIndex === 4)) {
             context = new ArgumentTypeContext(ObjectContents_Embedding, context);
           }
+          if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 5)) {
+            context = new ArgumentTypeContext(ObjectContents_ConstructionRewriteDefinition, context);
+          }
         }
         if (type instanceof MetaRefExpression_Constructor) {
           if (argument.name === 'notation' || (argument.name === undefined && argumentIndex === 1)) {
@@ -6297,10 +6420,10 @@ export class MetaModel extends Meta.MetaModel {
                 break;
               }
             }
-            context = new ArgumentTypeContext(ObjectContents_EqualityDefinition, context);
+            context = new ArgumentTypeContext(ObjectContents_ConstructorEqualityDefinition, context);
           }
           if (argument.name === 'rewrite' || (argument.name === undefined && argumentIndex === 5)) {
-            context = new ArgumentTypeContext(ObjectContents_RewriteDefinition, context);
+            context = new ArgumentTypeContext(ObjectContents_ConstructorRewriteDefinition, context);
           }
         }
         if (type instanceof MetaRefExpression_SetOperator) {
@@ -6436,7 +6559,21 @@ export class MetaModel extends Meta.MetaModel {
               context = new ArgumentTypeContext(ObjectContents_Proof, context);
             }
           }
-          if (currentContext.objectContentsClass === ObjectContents_EqualityDefinition) {
+          if (currentContext.objectContentsClass === ObjectContents_ConstructionRewriteDefinition) {
+            if (argument.name === 'value' || (argument.name === undefined && argumentIndex === 1)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+            }
+            if (argument.name === 'theorem' || (argument.name === undefined && argumentIndex === 2)) {
+              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              if (parameterValue instanceof Fmt.ParameterExpression) {
+                context = this.getParameterListContext(parameterValue.parameters, context);
+              }
+            }
+          }
+          if (currentContext.objectContentsClass === ObjectContents_ConstructorEqualityDefinition) {
             if (argument.name === 'definition' || (argument.name === undefined && argumentIndex === 2)) {
               let leftParametersValue = previousArguments.getOptionalValue('leftParameters', 0);
               if (leftParametersValue instanceof Fmt.ParameterExpression) {

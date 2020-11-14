@@ -32,7 +32,8 @@ $Definition: %DefinitionType {
 $Construction: %DefinitionType($SetTerm) {
   superType = $Definition,
   members = #(
-    embedding?: $Embedding
+    embedding?: $Embedding,
+    rewrite?: $ConstructionRewriteDefinition
   ),
   innerDefinitionTypes = [$Constructor]
 }
@@ -46,15 +47,23 @@ $Embedding: %ExpressionType {
   )
 }
 
-$Constructor: %DefinitionType($ElementTerm) {
-  superType = $Definition,
+$ConstructionRewriteDefinition: %ExpressionType {
   members = #(
-    equalityDefinition[$Construction]?: $EqualityDefinition,
-    rewrite?: $RewriteDefinition
+    parameter: %SingleParameter($Element),
+    value[parameter]: $ElementTerm,
+    theorem[parameter]?: $Theorem
   )
 }
 
-$EqualityDefinition: %ExpressionType {
+$Constructor: %DefinitionType($ElementTerm) {
+  superType = $Definition,
+  members = #(
+    equalityDefinition[$Construction]?: $ConstructorEqualityDefinition,
+    rewrite?: $ConstructorRewriteDefinition
+  )
+}
+
+$ConstructorEqualityDefinition: %ExpressionType {
   members = #(
     leftParameters, rightParameters: %ParameterList,
     definition[leftParameters, rightParameters]: $Formula[],
@@ -66,7 +75,7 @@ $EqualityDefinition: %ExpressionType {
   )
 }
 
-$RewriteDefinition: %ExpressionType {
+$ConstructorRewriteDefinition: %ExpressionType {
   members = #(
     value: $ElementTerm,
     theorem?: $Theorem
