@@ -430,6 +430,9 @@ $PrefixUnaryOperator(symbol: %Expr, operand: %Expr, space: %String = '', minPare
 }
 
 /**
+ * A unary operator representing negation. 
+ * The operator symbol is set to "−" by default, but can be altered.
+ *
  * @example `$NegationOperator(operand = a)`
  */
 $NegationOperator(symbol: %Expr = '−', operand: %Expr, space: %String = ''): %Template {
