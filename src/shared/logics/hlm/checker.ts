@@ -19,6 +19,10 @@ export class HLMChecker implements Logic.LogicChecker {
   }
 }
 
+export interface HLMDefinitionCheckerOptions extends Logic.LogicCheckerOptions {
+  doNotAutoFillRewriteableCases?: boolean;
+}
+
 export interface HLMCheckerStructuralCaseRef {
   term: Fmt.Expression;
   construction: Fmt.Expression;
@@ -127,7 +131,7 @@ export class HLMDefinitionChecker {
   private pendingChecks: PendingCheck[] = [];
   private pendingChecksPromise?: CachedPromise<HLMCheckResult>;
 
-  constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private options: Logic.LogicCheckerOptions) {
+  constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private options: HLMDefinitionCheckerOptions) {
     this.reset();
   }
 
@@ -1319,6 +1323,9 @@ export class HLMDefinitionChecker {
           let newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
           let newParameterLists: Fmt.ParameterList[] = [];
           let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
+            if (constructionContents.rewrite && this.options.doNotAutoFillRewriteableCases) {
+              return;
+            }
             let constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
             let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
             let clonedParameters: Fmt.ParameterList | undefined = undefined;
@@ -1580,7 +1587,7 @@ export class HLMDefinitionChecker {
     if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
       return {
         ...this.checkParameter(step, context),
-        previousResult: this.utils.getProofStepResult(step, context)
+        previousResult: undefined
       };
     } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
       let checkType = () => true;
@@ -1682,19 +1689,18 @@ export class HLMDefinitionChecker {
           goal: undefined,
           previousResult: undefined
         };
-        let sourceResultContext = this.checkProofStep(type.source, sourceContext);
-        if (sourceResultContext && (sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
-          let terms = sourceResultContext.previousResult.terms;
+        let expressions = this.checkEqualitySource(type.source, sourceContext);
+        if (expressions) {
           let sourceIndex = this.utils.externalToInternalIndex(type.sourceSide);
-          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < terms.length) {
-            let sourceTerm = terms[sourceIndex];
-            let targetTerms = terms.slice();
-            targetTerms.splice(sourceIndex, 1);
+          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < expressions.length) {
+            let sourceExpression = expressions[sourceIndex];
+            let targetExpressions = expressions.slice();
+            targetExpressions.splice(sourceIndex, 1);
             if (type.result) {
               this.checkFormula(type.result, context);
             }
             let implicationResult = this.utils.getImplicationResult(type.result, context);
-            if (!this.utils.substitutesTo(context.previousResult, implicationResult, sourceTerm, targetTerms)) {
+            if (!this.utils.substitutesTo(context.previousResult, implicationResult, sourceExpression, targetExpressions)) {
               this.error(step, `Substitution from ${context.previousResult} to ${implicationResult} is invalid`);
             }
           } else {
@@ -1889,15 +1895,14 @@ export class HLMDefinitionChecker {
           goal: undefined,
           previousResult: undefined
         };
-        let sourceResultContext = this.checkProofStep(type.source, sourceContext);
-        if (sourceResultContext && (sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_setEquals || sourceResultContext.previousResult instanceof FmtHLM.MetaRefExpression_equals)) {
-          let terms = sourceResultContext.previousResult.terms;
+        let expressions = this.checkEqualitySource(type.source, sourceContext);
+        if (expressions) {
           let sourceIndex = this.utils.externalToInternalIndex(type.sourceSide);
-          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < terms.length) {
-            let sourceTerm = terms[sourceIndex];
-            let targetTerms = terms.slice();
-            targetTerms.splice(sourceIndex, 1);
-            if (this.utils.substitutesTo(context.goal, type.goal, sourceTerm, targetTerms)) {
+          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < expressions.length) {
+            let sourceExpression = expressions[sourceIndex];
+            let targetExpressions = expressions.slice();
+            targetExpressions.splice(sourceIndex, 1);
+            if (this.utils.substitutesTo(context.goal, type.goal, sourceExpression, targetExpressions)) {
               this.checkProof(step, type.proof, undefined, type.goal, context);
             } else {
               this.error(step, `Substitution from ${context.goal} to ${type.goal} is invalid`);
@@ -2091,6 +2096,19 @@ export class HLMDefinitionChecker {
     let check = this.stripConstraintsFromFormulas(sources, false, false, true, true, context).then((strippedSources: Fmt.Expression[]) =>
       this.checkUnfolding(result ?? object, strippedSources, this.utils.getImplicationResult(result, context), false));
     this.addPendingCheck(object, check);
+  }
+
+  private checkEqualitySource(source: Fmt.Parameter, context: HLMCheckerProofStepContext): Fmt.Expression[] | undefined {
+    let resultContext = this.checkProofStep(source, context);
+    if (resultContext) {
+      let result = resultContext.previousResult;
+      if (result instanceof FmtHLM.MetaRefExpression_setEquals || result instanceof FmtHLM.MetaRefExpression_equals) {
+        return result.terms;
+      } else if (result instanceof FmtHLM.MetaRefExpression_equiv) {
+        return result.formulas;
+      }
+    }
+    return undefined;
   }
 
   private checkBoolConstant(expression: Fmt.Expression | undefined): void {

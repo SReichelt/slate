@@ -15,7 +15,7 @@ import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll, HLMSubstitutionContext, HLMEquivalenceListInfo } from './utils';
 import { HLMRenderUtils } from './renderUtils';
-import { HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext, HLMCheckerStructuralCaseRef } from './checker';
+import { HLMDefinitionCheckerOptions, HLMDefinitionChecker, HLMCheckResult, HLMCheckResultWithExpression, HLMCheckerProofStepContext, HLMCheckerStructuralCaseRef } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
@@ -666,7 +666,7 @@ export class HLMEditHandler extends GenericEditHandler {
         let expression = new Fmt.DefinitionRefExpression(resultPath);
         if (checkType && expressionEditInfo.expression) {
           return this.checker.recheckWithSubstitution(expressionEditInfo.expression, expression)
-            .then((checkResult: HLMCheckResultWithExpression) => checkResult.hasErrors ? undefined : checkResult.expression)
+            .then((checkResult: HLMCheckResultWithExpression) => checkResult.hasErrors ? undefined : this.cloneAndAdaptParameterNames(checkResult.expression))
             .catch(() => undefined);
         } else {
           return expression;
@@ -811,10 +811,11 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getInductionItems<T, E extends Fmt.Expression>(context: Ctx.Context, createAndCheckStructuralExpression: (variableRefExpression: Fmt.Expression, structuralChecker: HLMDefinitionChecker) => CachedPromise<E | undefined>, createItem: (structuralExpression: E, variableRefExpression: Fmt.Expression) => T): CachedPromise<T[]> {
-    let options: Logic.LogicCheckerOptions = {
+    let options: HLMDefinitionCheckerOptions = {
       supportPlaceholders: true,
       supportRechecking: false,
-      warnAboutMissingProofs: false
+      warnAboutMissingProofs: false,
+      doNotAutoFillRewriteableCases: true
     };
     let structuralChecker = new HLMDefinitionChecker(this.definition, this.libraryDataProvider, this.utils, options);
 
@@ -834,8 +835,13 @@ export class HLMEditHandler extends GenericEditHandler {
                       this.adaptNewParameterLists(newParameterLists, filledExpression);
                       structuralExpression = FmtUtils.substituteExpression(structuralExpression!, originalExpression, filledExpression) as E;
                     };
-                    return structuralChecker.autoFill(onFillExpression).then(() =>
-                      innerResult.concat(createItem(structuralExpression!, variableRefExpression)));
+                    return structuralChecker.autoFill(onFillExpression).then(() => {
+                      if ((structuralExpression as any).cases.length) {
+                        return innerResult.concat(createItem(structuralExpression!, variableRefExpression));
+                      } else {
+                        return innerResult;
+                      }
+                    });
                   } else {
                     return innerResult;
                   }

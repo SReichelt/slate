@@ -2201,7 +2201,7 @@ export class HLMUtils extends GenericUtils {
     return this.getCommonFinalSet([left, right]).then((set: Fmt.Expression) =>
       this.castAndFullyUnfoldElementTermOutside(left, set).then((unfoldedLeftTerms: Fmt.Expression[]) =>
         this.castAndFullyUnfoldElementTermOutside(right, set).then((unfoldedRightTerms: Fmt.Expression[]) => {
-          let resultPromise: CachedPromise<HLMFormulaDefinition[]> = CachedPromise.resolve([]);
+          let resultPromise: CachedPromise<HLMFormulaDefinition[]> | undefined = undefined;
           for (let unfoldedLeft of unfoldedLeftTerms) {
             if (unfoldedLeft instanceof Fmt.DefinitionRefExpression && unfoldedLeft.path.parentPath instanceof Fmt.Path) {
               for (let unfoldedRight of unfoldedRightTerms) {
@@ -2212,6 +2212,9 @@ export class HLMUtils extends GenericUtils {
                       let constructionPath = unfoldedLeft.path.parentPath;
                       let leftPath = unfoldedLeft.path;
                       let rightPath = unfoldedRight.path;
+                      if (!resultPromise) {
+                        resultPromise = CachedPromise.resolve([]);
+                      }
                       resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) => {
                         if (unfoldedLeft.isEquivalentTo(unfoldedRight)) {
                           return currentResult.concat({
@@ -2237,6 +2240,17 @@ export class HLMUtils extends GenericUtils {
                     }
                   }
                 }
+              }
+            }
+          }
+          if (!resultPromise) {
+            resultPromise = CachedPromise.resolve([]);
+            for (let unfoldedLeft of unfoldedLeftTerms) {
+              if (unfoldedLeft instanceof Fmt.DefinitionRefExpression && unfoldedLeft.path.parentPath instanceof Fmt.Path) {
+              }
+            }
+            for (let unfoldedRight of unfoldedRightTerms) {
+              if (unfoldedRight instanceof Fmt.DefinitionRefExpression && unfoldedRight.path.parentPath instanceof Fmt.Path) {
               }
             }
           }

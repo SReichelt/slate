@@ -2544,6 +2544,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return;
       }
     }
+    this.utils.updateInitialProofStepContext(proof, context, true);
     if (steps.length) {
       if (hasContents || indentSteps) {
         this.commitStartRow(state);
@@ -2554,12 +2555,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           isPreview: state.isPreview,
           onApply: state.onApply
         };
-        this.addProofSteps(proof, steps, context, indentedState, displayedGoal !== undefined);
+        this.addProofSteps(proof, steps, context, indentedState);
         let indentedSteps = new Notation.ParagraphExpression(indentedState.paragraphs);
         indentedSteps.styleClasses = ['indented'];
         state.paragraphs.push(indentedSteps);
       } else {
-        this.addProofSteps(proof, steps, context, state, displayedGoal !== undefined);
+        this.addProofSteps(proof, steps, context, state);
       }
     } else if (!state.isPreview) {
       this.outputStartRowSpacing(state);
@@ -2776,14 +2777,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     this.addProofListInternal(proofs, undefined, labels, context, state);
   }
 
-  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, steps: Fmt.ParameterList, context: HLMProofStepContext, state: ProofOutputState, hasDisplayedGoal: boolean): void {
+  private addProofSteps(proof: FmtHLM.ObjectContents_Proof, steps: Fmt.ParameterList, context: HLMProofStepContext, state: ProofOutputState): void {
     let renderContext: HLMProofStepRenderContext = {
       ...context,
       originalParameters: [],
       substitutedParameters: [],
       isLastStep: false
     };
-    this.utils.updateInitialProofStepContext(proof, renderContext, !hasDisplayedGoal);
     for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
       let step = steps[stepIndex];
       if (stepIndex === steps.length - 1) {
@@ -3157,7 +3157,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
          || (goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
         && goal.terms.length >= 2
         && type.goal.terms.length === 2
-        && goal.terms[1].isEquivalentTo(type.goal.terms[1])) {
+        && goal.terms[1].isEquivalentTo(type.goal.terms[1])
+        && (originalLeftTerm || !type.goal.terms[0].isEquivalentTo(type.goal.terms[1]))) {
       let leftTerm = originalLeftTerm ?? goal.terms[0];
       let rightTerm = type.goal.terms[0];
       let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
@@ -3206,6 +3207,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addProofStep(proof, type.source, sourceContext, state);
     }
     this.addSubProof(type.proof, subProofContext, false, state);
+    if (goal && !type.proof) {
+      addImplication({
+        dependsOnPrevious: true,
+        result: goal,
+        resultIsEditable: false
+      });
+    }
   }
 
   private continueCalculation(subProof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): boolean {
@@ -3419,18 +3427,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (implication.resultLink) {
       renderer.addSemanticLink(result, implication.result);
     }
+    let resultWithParens = new Notation.InnerParenExpression(result);
+    resultWithParens.maxLevel = -3;
     if (implication.resultPrefixes || implication.resultSuffixes) {
       let resultRow: Notation.RenderedExpression[] = [];
       if (implication.resultPrefixes) {
         resultRow.push(...implication.resultPrefixes);
       }
-      resultRow.push(result);
+      resultRow.push(resultWithParens);
       if (implication.resultSuffixes) {
         resultRow.push(...implication.resultSuffixes);
       }
       row.push(new Notation.RowExpression(resultRow));
     } else {
-      row.push(result);
+      row.push(resultWithParens);
     }
   }
 
