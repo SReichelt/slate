@@ -67,7 +67,7 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Template {
     let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -89,7 +89,7 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Template, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Template, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.notation) {
       result.notation = this.notation.substitute(fn, replacedParameters);
@@ -111,13 +111,13 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     }
     if (this.elements) {
       result.elements = Object.create(ObjectContents_TemplateElements.prototype) as ObjectContents_TemplateElements;
-      if (this.elements.substituteExpression(fn, result.elements, replacedParameters)) {
+      if (this.elements.substitute(fn, result.elements, replacedParameters)) {
         changed = true;
       }
     }
     if (this.context) {
       result.context = Object.create(ObjectContents_TemplateContext.prototype) as ObjectContents_TemplateContext;
-      if (this.context.substituteExpression(fn, result.context, replacedParameters)) {
+      if (this.context.substitute(fn, result.context, replacedParameters)) {
         changed = true;
       }
     }
@@ -231,7 +231,7 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateElements {
     let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -256,7 +256,7 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_TemplateElements, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_TemplateElements, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.operand) {
       result.operand = this.operand.substitute(fn, replacedParameters);
@@ -366,7 +366,7 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateContext {
     let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -385,7 +385,7 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_TemplateContext, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_TemplateContext, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.operator) {
       result.operator = this.operator.substitute(fn, replacedParameters);
@@ -1153,7 +1153,7 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_NotationAbbreviation {
     let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1172,10 +1172,10 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_NotationAbbreviation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_NotationAbbreviation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameters) {
-      result.parameters = this.parameters.substituteExpression(fn, replacedParameters);
+      result.parameters = this.parameters.substitute(fn, replacedParameters);
       if (result.parameters !== this.parameters) {
         changed = true;
       }
@@ -1272,7 +1272,7 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionNotation {
     let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1294,10 +1294,10 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinitionNotation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinitionNotation, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
-      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
+      result.parameter = this.parameter.substitute(fn, replacedParameters);
       if (result.parameter !== this.parameter) {
         changed = true;
       }

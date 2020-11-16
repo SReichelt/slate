@@ -120,7 +120,7 @@ class MatrixRowOperations implements Macro.ArrayArgumentOperations {
     let newRow = MatrixRowOperations.createRow(this.config, this.itemsParam, this.items);
     if (newRow) {
       let newItems = new Fmt.ArrayExpression(this.items.items.concat(newRow));
-      return FmtUtils.substituteExpression(this.expression, this.items, newItems) as Fmt.DefinitionRefExpression;
+      return FmtUtils.substituteExpression<Fmt.Expression>(this.expression, this.items, newItems) as Fmt.DefinitionRefExpression;
     } else {
       return undefined;
     }
@@ -159,6 +159,6 @@ class MatrixColumnOperations implements Macro.ArrayArgumentOperations {
       }
     }
     let newItems = new Fmt.ArrayExpression(newRows);
-    return FmtUtils.substituteExpression(this.expression, this.items, newItems) as Fmt.DefinitionRefExpression;
+    return FmtUtils.substituteExpression<Fmt.Expression>(this.expression, this.items, newItems) as Fmt.DefinitionRefExpression;
   }
 }

@@ -19,10 +19,6 @@ export class HLMChecker implements Logic.LogicChecker {
   }
 }
 
-export interface HLMDefinitionCheckerOptions extends Logic.LogicCheckerOptions {
-  doNotAutoFillRewriteableCases?: boolean;
-}
-
 export interface HLMCheckerStructuralCaseRef {
   term: Fmt.Expression;
   construction: Fmt.Expression;
@@ -43,7 +39,6 @@ export interface HLMCheckerContext extends HLMBaseContext {
   editData?: HLMCheckerEditData;
   currentRecheckFn?: HLMCheckerRecheckFn;
   currentPlaceholderCollection?: HLMCheckerPlaceholderCollection;
-  rechecking: boolean;
 }
 
 export interface HLMCheckerProofStepContext extends HLMCheckerContext, HLMProofStepContext {
@@ -51,10 +46,6 @@ export interface HLMCheckerProofStepContext extends HLMCheckerContext, HLMProofS
 
 export interface HLMCheckResult extends Logic.LogicCheckResult {
   incompleteProofs: Map<Fmt.ParameterList, HLMCheckerProofStepContext>;
-}
-
-export interface HLMCheckResultWithExpression extends HLMCheckResult {
-  expression: Fmt.Expression;
 }
 
 interface HLMCheckerCompatibilityStatus {
@@ -96,7 +87,7 @@ interface HLMCheckerPlaceholderRestriction {
 
 interface HLMCheckerPlaceholderRestrictionState {
   newRestrictions?: Map<Fmt.PlaceholderExpression, HLMCheckerPlaceholderRestriction>;
-  exactValueRequried: boolean;
+  exactValueRequired: boolean;
   context: HLMCheckerContext;
 }
 
@@ -105,7 +96,6 @@ type AutoFillFn = (placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Express
 interface HLMCheckerPlaceholderCollection {
   placeholders?: Fmt.PlaceholderExpression[];
   containsNonAutoPlaceholders: boolean;
-  unfilledPlaceholderCount: number;
   parentCollection?: HLMCheckerPlaceholderCollection;
   childCollections?: HLMCheckerPlaceholderCollection[];
   autoFillFn?: AutoFillFn;
@@ -131,7 +121,7 @@ export class HLMDefinitionChecker {
   private pendingChecks: PendingCheck[] = [];
   private pendingChecksPromise?: CachedPromise<HLMCheckResult>;
 
-  constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private options: HLMDefinitionCheckerOptions) {
+  constructor(private definition: Fmt.Definition, private libraryDataAccessor: LibraryDataAccessor, private utils: HLMUtils, private options: Logic.LogicCheckerOptions) {
     this.reset();
   }
 
@@ -142,8 +132,7 @@ export class HLMDefinitionChecker {
       temporaryParameters: [],
       parentStructuralCases: [],
       inAutoArgument: false,
-      stepResults: new Map<Fmt.Parameter, Fmt.Expression>(),
-      rechecking: false
+      stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
     };
     if (this.options.supportPlaceholders) {
       this.rootContext.editData = {
@@ -152,8 +141,7 @@ export class HLMDefinitionChecker {
         constraintCheckFns: this.options.supportRechecking ? new Map<Fmt.ParameterList, HLMCheckerCheckFormulaFn>() : undefined
       };
       this.rootContext.currentPlaceholderCollection = {
-        containsNonAutoPlaceholders: false,
-        unfilledPlaceholderCount: 0
+        containsNonAutoPlaceholders: false
       };
     }
     this.resetResult();
@@ -168,43 +156,6 @@ export class HLMDefinitionChecker {
   }
 
   checkDefinition(): CachedPromise<HLMCheckResult> {
-    return this.check(() => this.checkRootDefinition());
-  }
-
-  checkExpression(expression: Fmt.Expression, expressionType: HLMExpressionType, context: Ctx.Context): CachedPromise<HLMCheckResult> {
-    return this.check(() => {
-      let checkContext: HLMCheckerContext = {
-        ...this.rootContext,
-        context: context
-      };
-      switch (expressionType) {
-      case HLMExpressionType.SetTerm:
-        this.checkSetTerm(expression, checkContext);
-        break;
-      case HLMExpressionType.ElementTerm:
-        this.checkElementTerm(expression, checkContext);
-        break;
-      case HLMExpressionType.Formula:
-        this.checkFormula(expression, checkContext);
-        break;
-      }
-    });
-  }
-
-  checkSingleProofStep(step: Fmt.Parameter, context: HLMCheckerProofStepContext): CachedPromise<HLMCheckResult> {
-    return this.check(() => {
-      let checkContext: HLMCheckerProofStepContext = {
-        ...context,
-        editData: this.rootContext.editData,
-        currentRecheckFn: undefined,
-        currentPlaceholderCollection: this.rootContext.currentPlaceholderCollection,
-        rechecking: false
-      };
-      this.checkProofStep(step, checkContext);
-    });
-  }
-
-  private check(checkFn: () => void): CachedPromise<HLMCheckResult> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
@@ -212,7 +163,7 @@ export class HLMDefinitionChecker {
     } else {
       this.reset();
       try {
-        checkFn();
+        this.checkRootDefinition();
       } catch (error) {
         this.error(this.definition, error.message);
       }
@@ -220,7 +171,7 @@ export class HLMDefinitionChecker {
     }
   }
 
-  recheckWithSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): CachedPromise<HLMCheckResultWithExpression> {
+  recheckWithSubstitution(originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): CachedPromise<Fmt.Expression | undefined> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
@@ -229,7 +180,6 @@ export class HLMDefinitionChecker {
       if (debugRecheck) {
         console.log(`Checking ${substitutedExpression}...`);
       }
-      this.resetResult();
       let recheckContext: HLMCheckerContext | undefined = undefined;
       if (this.rootContext.editData && this.rootContext.editData.recheckFns) {
         let recheckFn = this.rootContext.editData.recheckFns.get(originalExpression);
@@ -245,7 +195,7 @@ export class HLMDefinitionChecker {
     }
   }
 
-  checkConstraint(parameterList: Fmt.ParameterList, formula: Fmt.Expression): CachedPromise<HLMCheckResultWithExpression> {
+  checkConstraint(parameterList: Fmt.ParameterList, formula: Fmt.Expression): CachedPromise<Fmt.Expression | undefined> {
     if (this.pendingChecksPromise) {
       return this.pendingChecksPromise
         .catch(() => {})
@@ -254,7 +204,6 @@ export class HLMDefinitionChecker {
       if (debugRecheck) {
         console.log(`Checking ${formula}...`);
       }
-      this.resetResult();
       let recheckContext: HLMCheckerContext | undefined = undefined;
       if (this.rootContext.editData && this.rootContext.editData.constraintCheckFns) {
         let checkConstraintFn = this.rootContext.editData.constraintCheckFns.get(parameterList);
@@ -270,32 +219,46 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private getRecheckResult(expression: Fmt.Expression, recheckContext: HLMCheckerContext | undefined): CachedPromise<HLMCheckResultWithExpression> {
+  checkSingleProofStep(step: Fmt.Parameter, context: HLMCheckerProofStepContext): CachedPromise<Fmt.Parameter | undefined> {
+    if (this.pendingChecksPromise) {
+      return this.pendingChecksPromise
+        .catch(() => {})
+        .then(() => this.checkSingleProofStep(step, context));
+    } else {
+      if (debugRecheck) {
+        console.log(`Checking ${step}...`);
+      }
+      let recheckContext: HLMCheckerProofStepContext = {
+        ...context,
+        editData: this.rootContext.editData ? {
+          restrictions: this.rootContext.editData.restrictions
+        } : undefined,
+        currentRecheckFn: undefined,
+        currentPlaceholderCollection: {
+          containsNonAutoPlaceholders: false
+        }
+      };
+      this.checkProofStep(step, recheckContext);
+      return this.getRecheckResult(step, recheckContext);
+    }
+  }
+
+  private getRecheckResult<T extends Fmt.ExpressionObject<T>>(originalValue: T, recheckContext: HLMCheckerContext | undefined): CachedPromise<T | undefined> {
     return this.getPendingChecksPromise().then((result: HLMCheckResult) => {
-      let resultExpression = expression;
-      if (!result.hasErrors) {
-        let restrictions = recheckContext?.editData?.restrictions;
-        if (restrictions) {
-          resultExpression = resultExpression.substitute((subExpression: Fmt.Expression) => {
-            if (subExpression instanceof Fmt.PlaceholderExpression) {
-              let restriction = restrictions?.get(subExpression);
-              if (restriction && restriction.exactValue) {
-                return restriction.exactValue;
-              }
-            }
-            return subExpression;
-          });
-          for (let [placeholder, restriction] of restrictions) {
-            if (placeholder.onFill && restriction.exactValue) {
-              placeholder.onFill(restriction.exactValue);
-            }
+      if (result.hasErrors) {
+        return undefined;
+      } else if (recheckContext) {
+        let resultValue = originalValue;
+        let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression) => {
+          resultValue = FmtUtils.substituteExpression(resultValue, originalExpression, filledExpression);
+          if (originalExpression instanceof Fmt.PlaceholderExpression && originalExpression.onFill) {
+            originalExpression.onFill(filledExpression);
           }
         };
+        return this.autoFillWithContext(onFillExpression, recheckContext, true).then(() => resultValue);
+      } else {
+        return originalValue;
       }
-      return {
-        ...result,
-        expression: resultExpression
-      };
     });
   }
 
@@ -305,45 +268,68 @@ export class HLMDefinitionChecker {
         .catch(() => {})
         .then(() => this.autoFill(onFillExpression));
     } else {
-      if (this.rootContext.currentPlaceholderCollection) {
-        let placeholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
-        return this.getAutoPlaceholderValues(this.rootContext.currentPlaceholderCollection, placeholderValues)
-          .then(() => this.callAutoFillFns(this.rootContext.currentPlaceholderCollection!, placeholderValues, onFillExpression))
-          .then(() => this.autoFillPlaceholders(placeholderValues, onFillExpression));
-      }
-      return CachedPromise.resolve();
+      return this.autoFillWithContext(onFillExpression, this.rootContext, false);
     }
   }
 
-  private getAutoPlaceholderValues(placeholderCollection: HLMCheckerPlaceholderCollection, placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>): CachedPromise<void> {
-    let result = CachedPromise.resolve();
+  private autoFillWithContext(onFillExpression: HLMCheckerFillExpressionFn, context: HLMCheckerContext, fillAllExactValues: boolean): CachedPromise<void> {
+    if (context.currentPlaceholderCollection) {
+      let autoFilledPlaceholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
+      let allPlaceholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
+      return this.getAutoPlaceholderValues(context.currentPlaceholderCollection, context, fillAllExactValues, autoFilledPlaceholderValues, allPlaceholderValues)
+        .then(() => this.callAutoFillFns(context.currentPlaceholderCollection!, allPlaceholderValues, onFillExpression))
+        .then(() => this.autoFillPlaceholders(autoFilledPlaceholderValues, onFillExpression));
+    }
+    return CachedPromise.resolve();
+  }
+
+  private getAutoPlaceholderValues(placeholderCollection: HLMCheckerPlaceholderCollection, context: HLMCheckerContext, fillAllExactValues: boolean, autoFilledPlaceholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, allPlaceholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>): CachedPromise<boolean> {
+    let childResult = CachedPromise.resolve(true);
     if (placeholderCollection.childCollections) {
       for (let childCollection of placeholderCollection.childCollections) {
-        result = result.then(() => this.getAutoPlaceholderValues(childCollection, placeholderValues));
+        childResult = childResult.then((allFilled: boolean) =>
+          this.getAutoPlaceholderValues(childCollection, context, fillAllExactValues, autoFilledPlaceholderValues, allPlaceholderValues).then((filled: boolean) =>
+            (allFilled && filled)));
       }
     }
-    if (placeholderCollection.placeholders && !placeholderCollection.containsNonAutoPlaceholders && this.rootContext.editData) {
+    return childResult.then((allChildrenFilled: boolean) =>
+      this.getOwnAutoPlaceholderValues(placeholderCollection, context, allPlaceholderValues, true).then((ownValuesFilled: boolean) => {
+        if ((allChildrenFilled && ownValuesFilled) || fillAllExactValues) {
+          return this.getOwnAutoPlaceholderValues(placeholderCollection, context, autoFilledPlaceholderValues, !placeholderCollection.containsNonAutoPlaceholders);
+        } else {
+          return false;
+        }
+      }));
+  }
+
+  private getOwnAutoPlaceholderValues(placeholderCollection: HLMCheckerPlaceholderCollection, context: HLMCheckerContext, placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, includeSuggestions: boolean): CachedPromise<boolean> {
+    let result = CachedPromise.resolve(true);
+    if (placeholderCollection.placeholders) {
       for (let placeholder of placeholderCollection.placeholders) {
-        let placeholderRestriction = this.rootContext.editData.restrictions.get(placeholder);
-        if (placeholderRestriction) {
-          result = result.then((): void | CachedPromise<void> => {
-            if (placeholderRestriction) {
+        let placeholderRestriction = context.editData?.restrictions.get(placeholder);
+        result = result.then((allFilled: boolean) => {
+          if (placeholderRestriction) {
+            if (placeholderRestriction.exactValue) {
+              placeholderValues.set(placeholder, placeholderRestriction.exactValue);
+              return allFilled;
+            } else if (includeSuggestions) {
               if (placeholderRestriction.exactValueSuggestion) {
                 placeholderValues.set(placeholder, placeholderRestriction.exactValueSuggestion);
-                placeholderCollection.unfilledPlaceholderCount--;
+                return allFilled;
               } else if (placeholderRestriction.compatibleSets.length) {
-                let compatibleSets = placeholderRestriction.compatibleSets;
-                let context = placeholderRestriction.context;
-                return this.checkSetCompatibilityInternal(placeholder, compatibleSets, false, context, initialCompatibilityStatusWithoutElements).then((superset: Fmt.Expression | undefined) => {
+                return this.checkSetCompatibilityInternal(placeholder, placeholderRestriction.compatibleSets, false, placeholderRestriction.context, initialCompatibilityStatusWithoutElements).then((superset: Fmt.Expression | undefined) => {
                   if (superset && !(superset instanceof Fmt.PlaceholderExpression)) {
                     placeholderValues.set(placeholder, superset);
-                    placeholderCollection.unfilledPlaceholderCount--;
+                    return allFilled;
+                  } else {
+                    return false;
                   }
                 });
               }
             }
-          });
-        }
+          }
+          return false;
+        });
       }
     }
     return result;
@@ -377,15 +363,17 @@ export class HLMDefinitionChecker {
         result = result.then(() => this.callAutoFillFns(childCollection, placeholderValues, onFillExpression));
       }
     }
-    if (placeholderCollection.autoFillFn && !placeholderCollection.unfilledPlaceholderCount) {
-      let onFillExpressionWithPlaceholders = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
-        let onFillInnerPlaceholder = (originalPlaceholderExpression: Fmt.Expression, filledPlaceholderExpression: Fmt.Expression) => {
-          filledExpression = FmtUtils.substituteExpression(filledExpression, originalPlaceholderExpression, filledPlaceholderExpression);
+    if (placeholderCollection.autoFillFn) {
+      result = result.then(() => {
+        let onFillExpressionWithPlaceholders = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
+          let onFillInnerPlaceholder = (originalPlaceholderExpression: Fmt.Expression, filledPlaceholderExpression: Fmt.Expression) => {
+            filledExpression = FmtUtils.substituteExpression(filledExpression, originalPlaceholderExpression, filledPlaceholderExpression);
+          };
+          this.autoFillPlaceholders(placeholderValues, onFillInnerPlaceholder);
+          onFillExpression(originalExpression, filledExpression, newParameterLists);
         };
-        this.autoFillPlaceholders(placeholderValues, onFillInnerPlaceholder);
-        onFillExpression(originalExpression, filledExpression, newParameterLists);
-      };
-      result = result.then(() => placeholderCollection.autoFillFn!(placeholderValues, onFillExpressionWithPlaceholders));
+        return placeholderCollection.autoFillFn!(placeholderValues, onFillExpressionWithPlaceholders);
+      });
     }
     return result;
   }
@@ -410,7 +398,9 @@ export class HLMDefinitionChecker {
         });
     }
     this.pendingChecksPromise = undefined;
-    return CachedPromise.resolve({...this.result});
+    let result = this.result;
+    this.resetResult();
+    return CachedPromise.resolve(result);
   }
 
   private checkRootDefinition(): void {
@@ -476,10 +466,10 @@ export class HLMDefinitionChecker {
 
   private checkEqualityDefinition(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_ConstructorEqualityDefinition, context: HLMCheckerContext): void {
     let constructorParameters = innerDefinition.parameters;
-    if (!equalityDefinition.leftParameters.isEquivalentTo(constructorParameters)) {
+    if (!this.checkEquivalenceWithPlaceholders(equalityDefinition.leftParameters, constructorParameters, context)) {
       this.error(equalityDefinition.leftParameters, 'Parameters of equality definition must match constructor parameters');
     }
-    if (!equalityDefinition.rightParameters.isEquivalentTo(constructorParameters)) {
+    if (!this.checkEquivalenceWithPlaceholders(equalityDefinition.rightParameters, constructorParameters, context)) {
       this.error(equalityDefinition.rightParameters, 'Parameters of equality definition must match constructor parameters');
     }
     this.checkFormulaEquivalenceList(innerDefinition, equalityDefinition.definition, equalityDefinition.equivalenceProofs, context);
@@ -558,6 +548,7 @@ export class HLMDefinitionChecker {
       followSupersets: true,
       followEmbeddings: true,
       followAllAlternatives: false,
+      unfoldMacros: false,
       allowStructuralCaseResults: true,
       unfoldArguments: false,
       substituteStructuralCases: false,
@@ -654,7 +645,7 @@ export class HLMDefinitionChecker {
   }
 
   private setCurrentRecheckFn(expression: Fmt.Expression, checkFn: (substitutedExpression: Fmt.Expression, recheckContext: HLMCheckerContext) => void, autoFillFn: AutoFillFn | undefined, context: HLMCheckerContext): HLMCheckerContext {
-    if (context.editData && !context.rechecking) {
+    if (context.editData) {
       let newContext: HLMCheckerContext = {
         ...context,
         currentRecheckFn: (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression) => {
@@ -664,7 +655,6 @@ export class HLMDefinitionChecker {
         },
         currentPlaceholderCollection: {
           containsNonAutoPlaceholders: false,
-          unfilledPlaceholderCount: 0,
           parentCollection: context.currentPlaceholderCollection,
           autoFillFn: autoFillFn
         }
@@ -690,15 +680,16 @@ export class HLMDefinitionChecker {
       editData: {
         restrictions: restrictions
       },
-      currentPlaceholderCollection: undefined,
-      rechecking: true
+      currentPlaceholderCollection: {
+        containsNonAutoPlaceholders: false
+      }
     };
     fn(recheckContext);
     let lastSetsToCheckLength = 0;
     let checkRestrictions = () => {
       let setsToCheck: Fmt.Expression[][] = [];
       for (let [placeholder, restriction] of recheckContext.editData!.restrictions) {
-        if (!placeholder.isTemporary) {
+        if (placeholder.specialRole !== Fmt.SpecialPlaceholderRole.Temporary) {
           let sets = restriction.compatibleSets.concat(restriction.declaredSets);
           if (sets.length > 1) {
             setsToCheck.push(sets);
@@ -910,7 +901,7 @@ export class HLMDefinitionChecker {
       if (rawArg) {
         let binderArg = FmtHLM.ObjectContents_BinderArg.createFromExpression(rawArg);
         let expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
-        if (!binderArg.sourceParameters.isEquivalentTo(expectedSourceParameters)) {
+        if (!this.checkEquivalenceWithPlaceholders(binderArg.sourceParameters, expectedSourceParameters, context)) {
           this.error(binderArg.sourceParameters, 'Parameter list must match binder');
         }
         let innerSubstitutionContext = new HLMSubstitutionContext(substitutionContext);
@@ -1268,7 +1259,7 @@ export class HLMDefinitionChecker {
             }
             if (constructorPath.name === constructorDefinition.name) {
               if (structuralCase.parameters) {
-                if (!structuralCase.parameters.isEquivalentTo(substitutedParameters)) {
+                if (!this.checkEquivalenceWithPlaceholders(structuralCase.parameters, substitutedParameters, context)) {
                   this.error(structuralCase.parameters, 'Case parameters must match constructor parameters');
                 }
               } else if (substitutedParameters.length) {
@@ -1323,7 +1314,7 @@ export class HLMDefinitionChecker {
           let newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
           let newParameterLists: Fmt.ParameterList[] = [];
           let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
-            if (constructionContents.rewrite && this.options.doNotAutoFillRewriteableCases) {
+            if (constructionContents.rewrite && construction.specialRole === Fmt.SpecialPlaceholderRole.Preview) {
               return;
             }
             let constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
@@ -1360,6 +1351,7 @@ export class HLMDefinitionChecker {
       followSupersets: true,
       followEmbeddings: false,
       followAllAlternatives: false,
+      unfoldMacros: false,
       allowStructuralCaseResults: true,
       unfoldArguments: false,
       substituteStructuralCases: true,
@@ -1367,7 +1359,7 @@ export class HLMDefinitionChecker {
     };
     let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters).then((finalSet: Fmt.Expression) => {
       if (!((finalSet instanceof Fmt.DefinitionRefExpression || finalSet instanceof Fmt.PlaceholderExpression)
-            && this.checkSetTermEquivalence(construction, finalSet, context))) {
+            && this.checkEquivalenceOfTemporarySetTerms(construction, finalSet, context))) {
         this.error(term, 'Term must be an element of the specified construction');
       }
     });
@@ -1404,17 +1396,20 @@ export class HLMDefinitionChecker {
         this.error(expression, 'Placeholder type mismatch');
       }
     }
-    if (context.currentPlaceholderCollection && !expression.isTemporary) {
+    this.addPlaceholderToCurrentCollection(expression, context);
+  }
+
+  private addPlaceholderToCurrentCollection(placeholder: Fmt.PlaceholderExpression, context: HLMCheckerContext): void {
+    if (context.currentPlaceholderCollection && placeholder.specialRole !== Fmt.SpecialPlaceholderRole.Temporary) {
       if (context.currentPlaceholderCollection.placeholders) {
-        context.currentPlaceholderCollection.placeholders = [...context.currentPlaceholderCollection.placeholders, expression];
+        context.currentPlaceholderCollection.placeholders = [...context.currentPlaceholderCollection.placeholders, placeholder];
       } else {
-        context.currentPlaceholderCollection.placeholders = [expression];
+        context.currentPlaceholderCollection.placeholders = [placeholder];
       }
       for (let placeholderCollection: HLMCheckerPlaceholderCollection | undefined = context.currentPlaceholderCollection; placeholderCollection && !placeholderCollection.containsNonAutoPlaceholders; placeholderCollection = placeholderCollection.parentCollection) {
         if (!context.inAutoArgument) {
           placeholderCollection.containsNonAutoPlaceholders = true;
         }
-        placeholderCollection.unfilledPlaceholderCount++;
       }
     }
   }
@@ -1477,7 +1472,7 @@ export class HLMDefinitionChecker {
         if (!proof.parameters) {
           this.error(proof, 'Parameter list required');
           return;
-        } else if (!proof.parameters.isEquivalentTo(parameters)) {
+        } else if (!this.checkEquivalenceWithPlaceholders(proof.parameters, parameters, context)) {
           this.error(proof.parameters, 'Invalid proof parameters');
           return;
         }
@@ -1673,7 +1668,7 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
       if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists || context.previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
-        if (type.parameters.isEquivalentTo(context.previousResult.parameters)) {
+        if (this.checkEquivalenceWithPlaceholders(type.parameters, context.previousResult.parameters, context)) {
           context = this.getParameterListContext(type.parameters, context);
         } else {
           this.error(type.parameters, 'Proof step parameters must match existential quantifier');
@@ -2203,7 +2198,7 @@ export class HLMDefinitionChecker {
         let firstTerm = setTerms[0];
         for (let index = 1; index < setTerms.length; index++) {
           let term = setTerms[index];
-          if (status.checkedForDirectEquivalence || !this.checkSetTermEquivalence(firstTerm, term, context)) {
+          if (status.checkedForDirectEquivalence || !this.checkEquivalenceOfTemporarySetTerms(firstTerm, term, context)) {
             return CachedPromise.resolve(undefined);
           }
         }
@@ -2224,6 +2219,7 @@ export class HLMDefinitionChecker {
           followSupersets: true,
           followEmbeddings: nextStatus.followedEmbeddings && !checkSubset,
           followAllAlternatives: false,
+          unfoldMacros: false,
           allowStructuralCaseResults: true,
           unfoldArguments: nextStatus.followedEmbeddings,
           substituteStructuralCases: true,
@@ -2248,7 +2244,7 @@ export class HLMDefinitionChecker {
         let firstTerm = setTerms[0];
         for (let index = 1; index < setTerms.length; index++) {
           let term = setTerms[index];
-          if (!checkForDirectEquivalence || !this.checkSetTermEquivalence(firstTerm, term, context)) {
+          if (!checkForDirectEquivalence || !this.checkEquivalenceOfTemporarySetTerms(firstTerm, term, context)) {
             nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) =>
               this.utils.getFinalSuperset(term, typeSearchParameters).then((finalSuperset: Fmt.Expression) => {
                 if (this.utils.isWildcardFinalSet(finalSuperset)) {
@@ -2285,9 +2281,58 @@ export class HLMDefinitionChecker {
     }
   }
 
-  private checkSetTermEquivalence(left: Fmt.Expression, right: Fmt.Expression, context: HLMCheckerContext): boolean {
+  private checkEquivalenceWithPlaceholders<T extends Fmt.Comparable<T>>(left: T, right: T, context: HLMCheckerContext): boolean {
     let state: HLMCheckerPlaceholderRestrictionState = {
-      exactValueRequried: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
+      exactValueRequired: true,
+      context: context
+    };
+    let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
+    if (context.editData) {
+      unificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
+        let recheck = false;
+        while (leftExpression instanceof Fmt.PlaceholderExpression) {
+          this.addPlaceholderToCurrentCollection(leftExpression, context);
+          let replacedRightExpression = rightExpression.substitute(undefined, Fmt.reverseReplacedParameters(replacedParameters));
+          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedRightExpression);
+          if (newLeftExpression) {
+            leftExpression = newLeftExpression;
+            recheck = true;
+          } else {
+            return true;
+          }
+        }
+        while (rightExpression instanceof Fmt.PlaceholderExpression) {
+          this.addPlaceholderToCurrentCollection(rightExpression, context);
+          let replacedLeftExpression = leftExpression.substitute(undefined, replacedParameters);
+          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedLeftExpression);
+          if (newRightExpression) {
+            rightExpression = newRightExpression;
+            recheck = true;
+          } else {
+            return true;
+          }
+        }
+        if (recheck) {
+          return leftExpression.isEquivalentTo(rightExpression, unificationFn, replacedParameters);
+        } else {
+          return false;
+        }
+      };
+    }
+
+    if (left.isEquivalentTo(right, unificationFn)) {
+      if (context.editData && state.newRestrictions) {
+        context.editData.restrictions = state.newRestrictions;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private checkEquivalenceOfTemporarySetTerms(left: Fmt.Expression, right: Fmt.Expression, context: HLMCheckerContext): boolean {
+    let state: HLMCheckerPlaceholderRestrictionState = {
+      exactValueRequired: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
       context: context
     };
     let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
@@ -2351,6 +2396,8 @@ export class HLMDefinitionChecker {
         let recheck = false;
         let isRoot = leftExpression === left && rightExpression === right;
         while (rightExpression instanceof Fmt.PlaceholderExpression) {
+          // Note: If replacedParameters is nonempty, those parameters are temporary if the original expression is a temporary object.
+          // We currently give up in that case, but we could also check whether leftExpression actually references one of the parameters.
           let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedParameters.length ? undefined : leftExpression);
           if (newRightExpression) {
             rightExpression = newRightExpression;
@@ -2360,6 +2407,8 @@ export class HLMDefinitionChecker {
           }
         }
         while (leftExpression instanceof Fmt.PlaceholderExpression) {
+          // Note: If replacedParameters is nonempty, those parameters are temporary if the original expression is a temporary object.
+          // We currently give up in that case, but we could also check whether rightExpression actually references one of the parameters.
           let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedParameters.length ? undefined : rightExpression);
           if (newLeftExpression) {
             leftExpression = newLeftExpression;
@@ -2369,7 +2418,7 @@ export class HLMDefinitionChecker {
           }
         }
         if (isRoot && leftExpression instanceof Fmt.DefinitionRefExpression && rightExpression instanceof Fmt.DefinitionRefExpression) {
-          state.exactValueRequried = true;
+          state.exactValueRequired = true;
         }
         if (recheck) {
           return leftExpression.isEquivalentTo(rightExpression, unificationFn, replacedParameters);
@@ -2390,7 +2439,7 @@ export class HLMDefinitionChecker {
   }
 
   private addCompatibleTermRestriction(state: HLMCheckerPlaceholderRestrictionState, placeholder: Fmt.PlaceholderExpression, expression: Fmt.Expression | undefined): Fmt.Expression | undefined {
-    let currentRestrictions = state.newRestrictions || state.context.editData!.restrictions;
+    let currentRestrictions = state.newRestrictions ?? state.context.editData!.restrictions;
     let restriction = currentRestrictions.get(placeholder);
     if (restriction && restriction.exactValue) {
       return restriction.exactValue;
@@ -2416,7 +2465,7 @@ export class HLMDefinitionChecker {
         restrictionModified = true;
       }
       if (setExactValueSuggestion) {
-        if (state.exactValueRequried && !restriction.exactValue) {
+        if (state.exactValueRequired && !restriction.exactValue) {
           restriction.exactValueSuggestion = expression;
           restriction.exactValue = expression;
           restrictionModified = true;
@@ -2439,7 +2488,7 @@ export class HLMDefinitionChecker {
     if (placeholder.placeholderType === undefined) {
       return;
     }
-    let currentRestrictions = state.newRestrictions || state.context.editData!.restrictions;
+    let currentRestrictions = state.newRestrictions ?? state.context.editData!.restrictions;
     let restriction = currentRestrictions.get(placeholder);
     if (restriction && HLMDefinitionChecker.containsEquivalentItem(restriction.declaredSets, declaredSet)) {
       return;

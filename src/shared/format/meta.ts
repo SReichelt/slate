@@ -81,7 +81,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MetaModel {
     let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -106,7 +106,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_MetaModel, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_MetaModel, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.definitionTypes) {
       result.definitionTypes = [];
@@ -286,7 +286,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinedType {
     let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -304,7 +304,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinedType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinedType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.superType) {
       result.superType = this.superType.substitute(fn, replacedParameters);
@@ -313,7 +313,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       }
     }
     if (this.members) {
-      result.members = this.members.substituteExpression(fn, replacedParameters);
+      result.members = this.members.substitute(fn, replacedParameters);
       if (result.members !== this.members) {
         changed = true;
       }
@@ -401,7 +401,7 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionType {
     let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -413,8 +413,8 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinitionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_DefinitionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.innerDefinitionTypes) {
       result.innerDefinitionTypes = [];
       for (let item of this.innerDefinitionTypes) {
@@ -524,15 +524,15 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExpressionType {
     let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
   traverse(fn: Fmt.ExpressionTraversalFn): void {
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ExpressionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ExpressionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     return changed;
   }
 
@@ -617,7 +617,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ParameterType {
     let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -633,8 +633,8 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ParameterType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ParameterType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.optional) {
       result.optional = this.optional.substitute(fn, replacedParameters);
       if (result.optional !== this.optional) {

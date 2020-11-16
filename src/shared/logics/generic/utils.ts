@@ -88,7 +88,7 @@ export class GenericUtils {
 
   applySubstitutionContextToParameter(parameter: Fmt.Parameter, context: SubstitutionContext | undefined): Fmt.Parameter {
     if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
-      return parameter.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
+      return parameter.substitute(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
     } else {
       return parameter;
     }
@@ -96,7 +96,7 @@ export class GenericUtils {
 
   applySubstitutionContextToParameterList(parameters: Fmt.ParameterList, context: SubstitutionContext | undefined): Fmt.ParameterList {
     if (context && (context.replacedParameters.length || context.substitutionFns.length)) {
-      return parameters.substituteExpression(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
+      return parameters.substitute(Fmt.composeSubstitutionFns(context.substitutionFns), context.replacedParameters.slice());
     } else {
       return parameters;
     }

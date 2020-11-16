@@ -44,7 +44,7 @@ export class DefaultArrayArgumentOperations implements ArrayArgumentOperations {
     let newItem = this.config.createArgumentExpression?.(this.param);
     if (newItem) {
       let newSubExpression = new Fmt.ArrayExpression(this.subExpression.items.concat(newItem));
-      return FmtUtils.substituteExpression(this.expression, this.subExpression, newSubExpression) as Fmt.DefinitionRefExpression;
+      return FmtUtils.substituteExpression<Fmt.Expression>(this.expression, this.subExpression, newSubExpression) as Fmt.DefinitionRefExpression;
     } else {
       return undefined;
     }

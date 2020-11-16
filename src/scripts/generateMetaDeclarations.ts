@@ -412,15 +412,11 @@ class MetaDeclarationGenerator {
           init += `: ${contentType}`;
         }
         outFileStr += `${indent}${init} = Object.create(${contentType}.prototype) as ${contentType};\n`;
-        outFileStr += `${indent}if (${source}.substituteExpression(fn, ${subTarget}, replacedParameters)) {\n`;
+        outFileStr += `${indent}if (${source}.substitute(fn, ${subTarget}, replacedParameters)) {\n`;
         outFileStr += `${indent}  changed = true;\n`;
         outFileStr += `${indent}}\n`;
       } else {
-        if (contentType) {
-          outFileStr += `${indent}${init} = ${source}.substituteExpression(fn, replacedParameters);\n`;
-        } else {
-          outFileStr += `${indent}${init} = ${source}.substitute(fn, replacedParameters);\n`;
-        }
+        outFileStr += `${indent}${init} = ${source}.substitute(fn, replacedParameters);\n`;
         outFileStr += `${indent}if (${subTarget} !== ${source}) {\n`;
         outFileStr += `${indent}  changed = true;\n`;
         outFileStr += `${indent}}\n`;
@@ -626,7 +622,7 @@ class MetaDeclarationGenerator {
     }
     outFileStr += `  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_${definition.name} {\n`;
     outFileStr += `    let result: ObjectContents_${definition.name} = Object.create(ObjectContents_${definition.name}.prototype);\n`;
-    outFileStr += `    this.substituteExpression(undefined, result, replacedParameters);\n`;
+    outFileStr += `    this.substitute(undefined, result, replacedParameters);\n`;
     outFileStr += `    return result;\n`;
     outFileStr += `  }\n`;
     outFileStr += `\n`;
@@ -643,9 +639,9 @@ class MetaDeclarationGenerator {
     }
     outFileStr += `  }\n`;
     outFileStr += `\n`;
-    outFileStr += `  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
+    outFileStr += `  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_${definition.name}, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {\n`;
     if (superDefinition) {
-      outFileStr += `    let changed = super.substituteExpression(fn, result, replacedParameters);\n`;
+      outFileStr += `    let changed = super.substitute(fn, result, replacedParameters);\n`;
     } else {
       outFileStr += `    let changed = false;\n`;
     }

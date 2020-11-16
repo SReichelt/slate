@@ -822,15 +822,46 @@ References.
 `;
 
 exports[`render hlm library: 1.2.2 Essentials/Boolean%20values/true 1`] = `
-"Definition 1.2.2.  Let b ∈ 𝓑𝓸𝓸𝓵. We define
+"Definition 1.2.2.  We define:
+
+  ⊤ := [true]"
+`;
+
+exports[`render hlm library: 1.2.3 Essentials/Boolean%20values/false 1`] = `
+"Definition 1.2.3.  We define:
+
+  ⊥ := [false]"
+`;
+
+exports[`render hlm library: 1.2.4 Essentials/Boolean%20values/is%20true 1`] = `
+"Definition 1.2.4.  Let b ∈ 𝓑𝓸𝓸𝓵. We define
 
   b is true
 
 by:
 
   [p] is true  :⇔  p  (p is a proposition)
+    ⇔  b = ⊤
+    ⇔  b ≠ ⊥
 
   b is false  :⇔  b is not true
+
+Equivalence.
+
+1⇒2. Assume p if b = [p] (p is a proposition). Then b = ⊤:
+     Let q be a proposition such that b = [q] and q. Then:
+     b = [q]
+      = ⊤:
+     We show that [q] = ⊤:
+     q.
+2⇒3. Assume b = ⊤. Then b ≠ ⊥:
+     Assume b = ⊥.
+     ⇒^(b = ⊤) ⊤ = ⊥
+     ⇒^(def) [true  ⇔  false] ↯
+3⇒1. Assume b ≠ ⊥.
+     Let q be a proposition such that b = [q]. Then q:
+     b ≠ ⊥ ⇒^(b = [q]) [q] ≠ ⊥
+      ⇒^(def) q
 
 References.
 
@@ -838,20 +869,42 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/core/init/coe.html#coe_bool_to_Prop"
 `;
 
-exports[`render hlm library: 1.2.3 Essentials/Boolean%20values/negation 1`] = `
-"Definition 1.2.3.  Let b ∈ 𝓑𝓸𝓸𝓵. We define:
+exports[`render hlm library: 1.2.5 Essentials/Boolean%20values/Set%20of%20boolean%20values%20only%20contains%20true%20and%20false 1`] = `
+"Proposition 1.2.5.
+
+  𝓑𝓸𝓸𝓵 = {⊤, ⊥}
+
+Proof.
+
+⊆. Let b ∈ 𝓑𝓸𝓸𝓵. Then b ∈ {⊤, ⊥}:
+   We show that b = ⊤ or b = ⊥:
+   Assume b ≠ ⊥. Then b = ⊤:
+   We have b is true by definition.
+⊇. Trivial."
+`;
+
+exports[`render hlm library: 1.2.6 Essentials/Boolean%20values/Exactly%20two%20boolean%20values 1`] = `
+"Corollary 1.2.6.
+
+  |𝓑𝓸𝓸𝓵| = 2
+
+No proof."
+`;
+
+exports[`render hlm library: 1.2.7 Essentials/Boolean%20values/negation 1`] = `
+"Definition 1.2.7.  Let b ∈ 𝓑𝓸𝓸𝓵. We define:
 
   ¬b := [b is false]"
 `;
 
-exports[`render hlm library: 1.2.4 Essentials/Boolean%20values/conjunction 1`] = `
-"Definition 1.2.4.  Let a, b ∈ 𝓑𝓸𝓸𝓵. We define:
+exports[`render hlm library: 1.2.8 Essentials/Boolean%20values/conjunction 1`] = `
+"Definition 1.2.8.  Let a, b ∈ 𝓑𝓸𝓸𝓵. We define:
 
   a ∧ b := [a is true and b is true]"
 `;
 
-exports[`render hlm library: 1.2.5 Essentials/Boolean%20values/disjunction 1`] = `
-"Definition 1.2.5.  Let a, b ∈ 𝓑𝓸𝓸𝓵. We define:
+exports[`render hlm library: 1.2.9 Essentials/Boolean%20values/disjunction 1`] = `
+"Definition 1.2.9.  Let a, b ∈ 𝓑𝓸𝓸𝓵. We define:
 
   a ∨ b := [a is true or b is true]"
 `;
@@ -962,13 +1015,13 @@ Proof.
 
 1⇒2. Assume s = t. Then ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)]:
      ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(s)].
-     ⇒ ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)]
+     ⇒^(s = t) ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)]
 2⇒1. Assume ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)]. Then s = t:
      Let q := [x = t]_(x ∈ S).
      ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)] ⇒^(q ∈ 𝓟𝓻𝓹(S)) [q(s)  ⇔  q(t)]
       ⇒^(def) [s = t  ⇔  t = t]
      t = t.
-     ⇒ s = t"
+     ⇒^(s = t ⇔ t = t) s = t"
 `;
 
 exports[`render hlm library: 1.4.1 Essentials/Relations/Relations 1`] = `
@@ -2794,7 +2847,7 @@ exports[`render hlm library: 1.8.1.20 Essentials/Numbers/Natural/Zero%20is%20the
 
 Proof.
 
-n ≤ 0 ⇒^(def) n = 0 or false"
+n ≤ 0 ⇒^(def) n = 0"
 `;
 
 exports[`render hlm library: 1.8.1.21 Essentials/Numbers/Natural/Successor%20is%20always%20greater 1`] = `
@@ -3202,7 +3255,7 @@ Proof.
         ⇒^(def) n ∈ M
 3⇒1. Assume M = ℕ. Then 0 ∈ M and ∀ m ∈ M : m + 1 ∈ M:
      0 ∈ ℕ and ∀ m ∈ ℕ : m + 1 ∈ ℕ.
-     ⇒ 0 ∈ M and ∀ m ∈ M : m + 1 ∈ M
+     ⇒^(M = ℕ) 0 ∈ M and ∀ m ∈ M : m + 1 ∈ M
 
 Remarks.
 

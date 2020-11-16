@@ -2731,8 +2731,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.addOptionalProofInternal(proof, undefined, context, false, true, false, undefined, itemState);
           return new Notation.ParagraphExpression(itemState.paragraphs);
         });
-        let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
-        state.paragraphs.push(list);
+        if (items.length) {
+          if (items.length === 1 && !labels) {
+            state.paragraphs.push(items[0]);
+          } else {
+            let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
+            state.paragraphs.push(list);
+          }
+        }
       }
     }
   }
@@ -3027,17 +3033,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (type.source.type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
             sourceType = type.source.type;
           }
-          let sourceContext: HLMProofStepContext = {
-            stepResults: context.stepResults
-          };
-          let sourceResult = this.utils.getProofStepResult(type.source, sourceContext);
-          if (sourceResult) {
-            sourceFormula = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
-            if (!sourceFormula.styleClasses) {
-              sourceFormula.styleClasses = [];
-            }
-            this.readOnlyRenderer.addSemanticLink(sourceFormula, type.source);
-          }
+          sourceFormula = this.getSourceFormula(type.source, context);
         }
         let source: Notation.RenderedExpression | undefined = undefined;
         if (sourceType instanceof FmtHLM.MetaRefExpression_UseDef
@@ -3171,16 +3167,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         dependsOnPrevious: originalLeftTerm !== undefined,
         result: equality,
         resultIsEditable: false,
-        source: source
+        source: source,
+        sourceFormula: this.getSourceFormula(type.source, context)
       });
       let finished = !type.proof || this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
-      for (let additionalRightTermIndex = 2; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
+      for (let additionalRightTermIndex = finished ? 2 : 1; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
         let additionalRightTerm = goal.terms[additionalRightTermIndex];
         let additionalEquality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, additionalRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, additionalRightTerm);
+        let punctuation = additionalRightTermIndex === goal.terms.length - 1 && !finished ? [new Notation.TextExpression(':')] : undefined;
         addImplication({
           dependsOnPrevious: true,
           result: additionalEquality,
-          resultIsEditable: false
+          resultIsEditable: false,
+          resultPunctuation: punctuation
         });
       }
       if (finished) {
@@ -3211,7 +3210,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       addImplication({
         dependsOnPrevious: true,
         result: goal,
-        resultIsEditable: false
+        resultIsEditable: false,
+        sourceFormula: this.getSourceFormula(type.source, context)
       });
     }
   }
@@ -3251,6 +3251,23 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     return false;
+  }
+
+  private getSourceFormula(source: Fmt.Parameter, context: HLMProofStepContext): Notation.RenderedExpression | undefined {
+    let sourceContext: HLMProofStepContext = {
+      stepResults: context.stepResults
+    };
+    let sourceResult = this.utils.getProofStepResult(source, sourceContext);
+    if (sourceResult) {
+      let sourceFormula = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
+      if (!sourceFormula.styleClasses) {
+        sourceFormula.styleClasses = [];
+      }
+      this.readOnlyRenderer.addSemanticLink(sourceFormula, source);
+      return sourceFormula;
+    } else {
+      return undefined;
+    }
   }
 
   private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {

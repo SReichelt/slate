@@ -41,8 +41,8 @@ export function getInnerDefinition(outerDefinition: Fmt.Definition, path: Fmt.Pa
   }
 }
 
-export function substituteExpression(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
-  return expression.substitute((subExpression: Fmt.Expression) => {
+export function substituteExpression<T extends Fmt.ExpressionObject<T>>(value: T, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): T {
+  return value.substitute((subExpression: Fmt.Expression) => {
     if (subExpression === originalExpression) {
       return substitutedExpression;
     } else {
@@ -51,8 +51,8 @@ export function substituteExpression(expression: Fmt.Expression, originalExpress
   });
 }
 
-export function substituteEquivalentExpressions(expression: Fmt.Expression, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): Fmt.Expression {
-  return expression.substitute((subExpression: Fmt.Expression) => {
+export function substituteEquivalentExpressions<T extends Fmt.ExpressionObject<T>>(value: T, originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression): T {
+  return value.substitute((subExpression: Fmt.Expression) => {
     if (originalExpression.isEquivalentTo(subExpression)) {
       return substitutedExpression;
     } else {
@@ -61,8 +61,8 @@ export function substituteEquivalentExpressions(expression: Fmt.Expression, orig
   });
 }
 
-export function substituteVariable(expression: Fmt.Expression, variable: Fmt.Parameter, substitution: Fmt.Expression): Fmt.Expression {
-  return expression.substitute((subExpression: Fmt.Expression) => {
+export function substituteVariable<T extends Fmt.ExpressionObject<T>>(value: T, variable: Fmt.Parameter, substitution: Fmt.Expression): T {
+  return value.substitute((subExpression: Fmt.Expression) => {
     if (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === variable) {
       return substitution;
     } else {

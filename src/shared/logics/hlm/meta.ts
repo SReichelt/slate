@@ -70,7 +70,7 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Definition {
     let result: ObjectContents_Definition = Object.create(ObjectContents_Definition.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -91,10 +91,10 @@ export class ObjectContents_Definition extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Definition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Definition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.properties) {
-      result.properties = this.properties.substituteExpression(fn, replacedParameters);
+      result.properties = this.properties.substitute(fn, replacedParameters);
       if (result.properties !== this.properties) {
         changed = true;
       }
@@ -203,7 +203,7 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Construction {
     let result: ObjectContents_Construction = Object.create(ObjectContents_Construction.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -216,17 +216,17 @@ export class ObjectContents_Construction extends ObjectContents_Definition {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Construction, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Construction, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.embedding) {
       result.embedding = Object.create(ObjectContents_Embedding.prototype) as ObjectContents_Embedding;
-      if (this.embedding.substituteExpression(fn, result.embedding, replacedParameters)) {
+      if (this.embedding.substitute(fn, result.embedding, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rewrite) {
       result.rewrite = Object.create(ObjectContents_ConstructionRewriteDefinition.prototype) as ObjectContents_ConstructionRewriteDefinition;
-      if (this.rewrite.substituteExpression(fn, result.rewrite, replacedParameters)) {
+      if (this.rewrite.substitute(fn, result.rewrite, replacedParameters)) {
         changed = true;
       }
     }
@@ -337,7 +337,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Embedding {
     let result: ObjectContents_Embedding = Object.create(ObjectContents_Embedding.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -356,10 +356,10 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Embedding, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Embedding, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
-      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
+      result.parameter = this.parameter.substitute(fn, replacedParameters);
       if (result.parameter !== this.parameter) {
         changed = true;
       }
@@ -378,7 +378,7 @@ export class ObjectContents_Embedding extends Fmt.ObjectContents {
     }
     if (this.wellDefinednessProof) {
       result.wellDefinednessProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
+      if (this.wellDefinednessProof.substitute(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -446,7 +446,7 @@ export class ObjectContents_ConstructionRewriteDefinition extends Fmt.ObjectCont
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstructionRewriteDefinition {
     let result: ObjectContents_ConstructionRewriteDefinition = Object.create(ObjectContents_ConstructionRewriteDefinition.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -462,10 +462,10 @@ export class ObjectContents_ConstructionRewriteDefinition extends Fmt.ObjectCont
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructionRewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructionRewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.parameter) {
-      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
+      result.parameter = this.parameter.substitute(fn, replacedParameters);
       if (result.parameter !== this.parameter) {
         changed = true;
       }
@@ -552,7 +552,7 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Constructor {
     let result: ObjectContents_Constructor = Object.create(ObjectContents_Constructor.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -565,17 +565,17 @@ export class ObjectContents_Constructor extends ObjectContents_Definition {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Constructor, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Constructor, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.equalityDefinition) {
       result.equalityDefinition = Object.create(ObjectContents_ConstructorEqualityDefinition.prototype) as ObjectContents_ConstructorEqualityDefinition;
-      if (this.equalityDefinition.substituteExpression(fn, result.equalityDefinition, replacedParameters)) {
+      if (this.equalityDefinition.substitute(fn, result.equalityDefinition, replacedParameters)) {
         changed = true;
       }
     }
     if (this.rewrite) {
       result.rewrite = Object.create(ObjectContents_ConstructorRewriteDefinition.prototype) as ObjectContents_ConstructorRewriteDefinition;
-      if (this.rewrite.substituteExpression(fn, result.rewrite, replacedParameters)) {
+      if (this.rewrite.substitute(fn, result.rewrite, replacedParameters)) {
         changed = true;
       }
     }
@@ -744,7 +744,7 @@ export class ObjectContents_ConstructorEqualityDefinition extends Fmt.ObjectCont
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstructorEqualityDefinition {
     let result: ObjectContents_ConstructorEqualityDefinition = Object.create(ObjectContents_ConstructorEqualityDefinition.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -779,16 +779,16 @@ export class ObjectContents_ConstructorEqualityDefinition extends Fmt.ObjectCont
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructorEqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructorEqualityDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.leftParameters) {
-      result.leftParameters = this.leftParameters.substituteExpression(fn, replacedParameters);
+      result.leftParameters = this.leftParameters.substitute(fn, replacedParameters);
       if (result.leftParameters !== this.leftParameters) {
         changed = true;
       }
     }
     if (this.rightParameters) {
-      result.rightParameters = this.rightParameters.substituteExpression(fn, replacedParameters);
+      result.rightParameters = this.rightParameters.substitute(fn, replacedParameters);
       if (result.rightParameters !== this.rightParameters) {
         changed = true;
       }
@@ -807,7 +807,7 @@ export class ObjectContents_ConstructorEqualityDefinition extends Fmt.ObjectCont
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -815,19 +815,19 @@ export class ObjectContents_ConstructorEqualityDefinition extends Fmt.ObjectCont
     }
     if (this.reflexivityProof) {
       result.reflexivityProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.reflexivityProof.substituteExpression(fn, result.reflexivityProof, replacedParameters)) {
+      if (this.reflexivityProof.substitute(fn, result.reflexivityProof, replacedParameters)) {
         changed = true;
       }
     }
     if (this.symmetryProof) {
       result.symmetryProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.symmetryProof.substituteExpression(fn, result.symmetryProof, replacedParameters)) {
+      if (this.symmetryProof.substitute(fn, result.symmetryProof, replacedParameters)) {
         changed = true;
       }
     }
     if (this.transitivityProof) {
       result.transitivityProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.transitivityProof.substituteExpression(fn, result.transitivityProof, replacedParameters)) {
+      if (this.transitivityProof.substitute(fn, result.transitivityProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -939,7 +939,7 @@ export class ObjectContents_ConstructorRewriteDefinition extends Fmt.ObjectConte
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstructorRewriteDefinition {
     let result: ObjectContents_ConstructorRewriteDefinition = Object.create(ObjectContents_ConstructorRewriteDefinition.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -952,7 +952,7 @@ export class ObjectContents_ConstructorRewriteDefinition extends Fmt.ObjectConte
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructorRewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstructorRewriteDefinition, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.value) {
       result.value = this.value.substitute(fn, replacedParameters);
@@ -1061,7 +1061,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetOperator {
     let result: ObjectContents_SetOperator = Object.create(ObjectContents_SetOperator.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1084,8 +1084,8 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_SetOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_SetOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.definition) {
       result.definition = [];
       for (let item of this.definition) {
@@ -1100,7 +1100,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
       result.equalityProofs = [];
       for (let item of this.equalityProofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equalityProofs.push(newItem);
@@ -1114,7 +1114,7 @@ export class ObjectContents_SetOperator extends ObjectContents_Definition {
     }
     if (this.setRestrictionProof) {
       result.setRestrictionProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof, replacedParameters)) {
+      if (this.setRestrictionProof.substitute(fn, result.setRestrictionProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -1216,15 +1216,15 @@ export class ObjectContents_Operator extends ObjectContents_Definition {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Operator {
     let result: ObjectContents_Operator = Object.create(ObjectContents_Operator.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
   traverse(fn: Fmt.ExpressionTraversalFn): void {
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Operator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Operator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     return changed;
   }
 
@@ -1314,7 +1314,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExplicitOperator {
     let result: ObjectContents_ExplicitOperator = Object.create(ObjectContents_ExplicitOperator.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1337,8 +1337,8 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ExplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ExplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.definition) {
       result.definition = [];
       for (let item of this.definition) {
@@ -1353,7 +1353,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
       result.equalityProofs = [];
       for (let item of this.equalityProofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equalityProofs.push(newItem);
@@ -1367,7 +1367,7 @@ export class ObjectContents_ExplicitOperator extends ObjectContents_Operator {
     }
     if (this.setRestrictionProof) {
       result.setRestrictionProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.setRestrictionProof.substituteExpression(fn, result.setRestrictionProof, replacedParameters)) {
+      if (this.setRestrictionProof.substitute(fn, result.setRestrictionProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -1527,7 +1527,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ImplicitOperator {
     let result: ObjectContents_ImplicitOperator = Object.create(ObjectContents_ImplicitOperator.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1550,10 +1550,10 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ImplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ImplicitOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.parameter) {
-      result.parameter = this.parameter.substituteExpression(fn, replacedParameters);
+      result.parameter = this.parameter.substitute(fn, replacedParameters);
       if (result.parameter !== this.parameter) {
         changed = true;
       }
@@ -1572,7 +1572,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -1580,7 +1580,7 @@ export class ObjectContents_ImplicitOperator extends ObjectContents_Operator {
     }
     if (this.wellDefinednessProof) {
       result.wellDefinednessProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
+      if (this.wellDefinednessProof.substitute(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -1710,7 +1710,7 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MacroOperator {
     let result: ObjectContents_MacroOperator = Object.create(ObjectContents_MacroOperator.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1723,16 +1723,16 @@ export class ObjectContents_MacroOperator extends ObjectContents_Operator {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_MacroOperator, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.variables) {
-      result.variables = this.variables.substituteExpression(fn, replacedParameters);
+      result.variables = this.variables.substitute(fn, replacedParameters);
       if (result.variables !== this.variables) {
         changed = true;
       }
     }
     if (this.references) {
-      result.references = this.references.substituteExpression(fn, replacedParameters);
+      result.references = this.references.substitute(fn, replacedParameters);
       if (result.references !== this.references) {
         changed = true;
       }
@@ -1850,7 +1850,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Predicate {
     let result: ObjectContents_Predicate = Object.create(ObjectContents_Predicate.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -1867,8 +1867,8 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Predicate, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Predicate, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.definition) {
       result.definition = [];
       for (let item of this.definition) {
@@ -1883,7 +1883,7 @@ export class ObjectContents_Predicate extends ObjectContents_Definition {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -2009,7 +2009,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StandardTheorem {
     let result: ObjectContents_StandardTheorem = Object.create(ObjectContents_StandardTheorem.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -2024,7 +2024,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_StandardTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_StandardTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.claim) {
       result.claim = this.claim.substitute(fn, replacedParameters);
@@ -2036,7 +2036,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
       result.proofs = [];
       for (let item of this.proofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.proofs.push(newItem);
@@ -2163,7 +2163,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_EquivalenceTheorem {
     let result: ObjectContents_EquivalenceTheorem = Object.create(ObjectContents_EquivalenceTheorem.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -2180,7 +2180,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_EquivalenceTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_EquivalenceTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.conditions) {
       result.conditions = [];
@@ -2196,7 +2196,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
       result.equivalenceProofs = [];
       for (let item of this.equivalenceProofs) {
         let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-        if (item.substituteExpression(fn, newItem, replacedParameters)) {
+        if (item.substitute(fn, newItem, replacedParameters)) {
           changed = true;
         }
         result.equivalenceProofs.push(newItem);
@@ -2704,11 +2704,11 @@ export class MetaRefExpression_Binder extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let sourceParametersResult = this.sourceParameters.substituteExpression(fn, replacedParameters);
+    let sourceParametersResult = this.sourceParameters.substitute(fn, replacedParameters);
     if (sourceParametersResult !== this.sourceParameters) {
       changed = true;
     }
-    let targetParametersResult = this.targetParameters.substituteExpression(fn, replacedParameters);
+    let targetParametersResult = this.targetParameters.substitute(fn, replacedParameters);
     if (targetParametersResult !== this.targetParameters) {
       changed = true;
     }
@@ -2864,7 +2864,7 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_PropArg {
     let result: ObjectContents_PropArg = Object.create(ObjectContents_PropArg.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -2874,7 +2874,7 @@ export class ObjectContents_PropArg extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_PropArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_PropArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.formula) {
       result.formula = this.formula.substitute(fn, replacedParameters);
@@ -2941,7 +2941,7 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SetArg {
     let result: ObjectContents_SetArg = Object.create(ObjectContents_SetArg.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -2951,7 +2951,7 @@ export class ObjectContents_SetArg extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_SetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_SetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this._set) {
       result._set = this._set.substitute(fn, replacedParameters);
@@ -3029,7 +3029,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_SubsetArg {
     let result: ObjectContents_SubsetArg = Object.create(ObjectContents_SubsetArg.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -3042,7 +3042,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_SubsetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_SubsetArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this._set) {
       result._set = this._set.substitute(fn, replacedParameters);
@@ -3052,7 +3052,7 @@ export class ObjectContents_SubsetArg extends Fmt.ObjectContents {
     }
     if (this.subsetProof) {
       result.subsetProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.subsetProof.substituteExpression(fn, result.subsetProof, replacedParameters)) {
+      if (this.subsetProof.substitute(fn, result.subsetProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -3129,7 +3129,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ElementArg {
     let result: ObjectContents_ElementArg = Object.create(ObjectContents_ElementArg.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -3142,7 +3142,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ElementArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ElementArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.element) {
       result.element = this.element.substitute(fn, replacedParameters);
@@ -3152,7 +3152,7 @@ export class ObjectContents_ElementArg extends Fmt.ObjectContents {
     }
     if (this.elementProof) {
       result.elementProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.elementProof.substituteExpression(fn, result.elementProof, replacedParameters)) {
+      if (this.elementProof.substitute(fn, result.elementProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -3211,7 +3211,7 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ConstraintArg {
     let result: ObjectContents_ConstraintArg = Object.create(ObjectContents_ConstraintArg.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -3221,11 +3221,11 @@ export class ObjectContents_ConstraintArg extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstraintArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ConstraintArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.proof) {
       result.proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, result.proof, replacedParameters)) {
+      if (this.proof.substitute(fn, result.proof, replacedParameters)) {
         changed = true;
       }
     }
@@ -3286,7 +3286,7 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_BinderArg {
     let result: ObjectContents_BinderArg = Object.create(ObjectContents_BinderArg.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -3299,16 +3299,16 @@ export class ObjectContents_BinderArg extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_BinderArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_BinderArg, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.sourceParameters) {
-      result.sourceParameters = this.sourceParameters.substituteExpression(fn, replacedParameters);
+      result.sourceParameters = this.sourceParameters.substitute(fn, replacedParameters);
       if (result.sourceParameters !== this.sourceParameters) {
         changed = true;
       }
     }
     if (this.targetArguments) {
-      result.targetArguments = this.targetArguments.substituteExpression(fn, replacedParameters);
+      result.targetArguments = this.targetArguments.substitute(fn, replacedParameters);
       if (result.targetArguments !== this.targetArguments) {
         changed = true;
       }
@@ -3440,7 +3440,7 @@ export class MetaRefExpression_subset extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let parameterResult = this.parameter.substituteExpression(fn, replacedParameters);
+    let parameterResult = this.parameter.substitute(fn, replacedParameters);
     if (parameterResult !== this.parameter) {
       changed = true;
     }
@@ -3498,7 +3498,7 @@ export class MetaRefExpression_extendedSubset extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let parametersResult = this.parameters.substituteExpression(fn, replacedParameters);
+    let parametersResult = this.parameters.substitute(fn, replacedParameters);
     if (parametersResult !== this.parameters) {
       changed = true;
     }
@@ -3580,7 +3580,7 @@ export class MetaRefExpression_setStructuralCases extends Fmt.MetaRefExpression 
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
       let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       casesResult.push(newItem);
@@ -3713,7 +3713,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     let casesResult: ObjectContents_Case[] = [];
     for (let item of this.cases) {
       let newItem: ObjectContents_Case = Object.create(ObjectContents_Case.prototype) as ObjectContents_Case;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       casesResult.push(newItem);
@@ -3721,7 +3721,7 @@ export class MetaRefExpression_cases extends Fmt.MetaRefExpression {
     let totalityProofResult: ObjectContents_Proof | undefined = undefined;
     if (this.totalityProof) {
       totalityProofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.totalityProof.substituteExpression(fn, totalityProofResult, replacedParameters)) {
+      if (this.totalityProof.substitute(fn, totalityProofResult, replacedParameters)) {
         changed = true;
       }
     }
@@ -3808,7 +3808,7 @@ export class MetaRefExpression_structuralCases extends Fmt.MetaRefExpression {
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
       let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       casesResult.push(newItem);
@@ -3891,7 +3891,7 @@ export class MetaRefExpression_asElementOf extends Fmt.MetaRefExpression {
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
       proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      if (this.proof.substitute(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
@@ -4266,7 +4266,7 @@ export class MetaRefExpression_forall extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let parametersResult = this.parameters.substituteExpression(fn, replacedParameters);
+    let parametersResult = this.parameters.substitute(fn, replacedParameters);
     if (parametersResult !== this.parameters) {
       changed = true;
     }
@@ -4326,7 +4326,7 @@ export class MetaRefExpression_exists extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let parametersResult = this.parameters.substituteExpression(fn, replacedParameters);
+    let parametersResult = this.parameters.substitute(fn, replacedParameters);
     if (parametersResult !== this.parameters) {
       changed = true;
     }
@@ -4389,7 +4389,7 @@ export class MetaRefExpression_existsUnique extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let parametersResult = this.parameters.substituteExpression(fn, replacedParameters);
+    let parametersResult = this.parameters.substitute(fn, replacedParameters);
     if (parametersResult !== this.parameters) {
       changed = true;
     }
@@ -4718,7 +4718,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
       let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       casesResult.push(newItem);
@@ -4831,7 +4831,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Proof {
     let result: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -4847,12 +4847,12 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Proof, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Proof, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     result._from = this._from;
     result._to = this._to;
     if (this.parameters) {
-      result.parameters = this.parameters.substituteExpression(fn, replacedParameters);
+      result.parameters = this.parameters.substitute(fn, replacedParameters);
       if (result.parameters !== this.parameters) {
         changed = true;
       }
@@ -4864,7 +4864,7 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
       }
     }
     if (this.steps) {
-      result.steps = this.steps.substituteExpression(fn, replacedParameters);
+      result.steps = this.steps.substitute(fn, replacedParameters);
       if (result.steps !== this.steps) {
         changed = true;
       }
@@ -4995,7 +4995,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
       proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      if (this.proof.substitute(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
@@ -5138,7 +5138,7 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     let caseProofsResult: ObjectContents_Proof[] = [];
     for (let item of this.caseProofs) {
       let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       caseProofsResult.push(newItem);
@@ -5205,7 +5205,7 @@ export class MetaRefExpression_UseForAll extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let argumentsResult = this.arguments.substituteExpression(fn, replacedParameters);
+    let argumentsResult = this.arguments.substitute(fn, replacedParameters);
     if (argumentsResult !== this.arguments) {
       changed = true;
     }
@@ -5254,7 +5254,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let parametersResult = this.parameters.substituteExpression(fn, replacedParameters);
+    let parametersResult = this.parameters.substitute(fn, replacedParameters);
     if (parametersResult !== this.parameters) {
       changed = true;
     }
@@ -5315,7 +5315,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let sourceResult = this.source.substituteExpression(fn, replacedParameters);
+    let sourceResult = this.source.substitute(fn, replacedParameters);
     if (sourceResult !== this.source) {
       changed = true;
     }
@@ -5443,7 +5443,7 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
     }
     let inputResult: Fmt.Parameter | undefined = undefined;
     if (this.input) {
-      inputResult = this.input.substituteExpression(fn, replacedParameters);
+      inputResult = this.input.substitute(fn, replacedParameters);
       if (inputResult !== this.input) {
         changed = true;
       }
@@ -5524,7 +5524,7 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
       proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      if (this.proof.substitute(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
@@ -5578,7 +5578,7 @@ export class MetaRefExpression_ProveByContradiction extends Fmt.MetaRefExpressio
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
     let proofResult: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-    if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+    if (this.proof.substitute(fn, proofResult, replacedParameters)) {
       changed = true;
     }
     if (fn && !changed) {
@@ -5626,7 +5626,7 @@ export class MetaRefExpression_ProveForAll extends Fmt.MetaRefExpression {
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
     let proofResult: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-    if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+    if (this.proof.substitute(fn, proofResult, replacedParameters)) {
       changed = true;
     }
     if (fn && !changed) {
@@ -5688,14 +5688,14 @@ export class MetaRefExpression_ProveExists extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let argumentsResult = this.arguments.substituteExpression(fn, replacedParameters);
+    let argumentsResult = this.arguments.substitute(fn, replacedParameters);
     if (argumentsResult !== this.arguments) {
       changed = true;
     }
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
       proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      if (this.proof.substitute(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
@@ -5761,7 +5761,7 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
     let proofsResult: ObjectContents_Proof[] = [];
     for (let item of this.proofs) {
       let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       proofsResult.push(newItem);
@@ -5846,7 +5846,7 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     let caseProofsResult: ObjectContents_Proof[] = [];
     for (let item of this.caseProofs) {
       let newItem: ObjectContents_Proof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       caseProofsResult.push(newItem);
@@ -5936,7 +5936,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
     let casesResult: ObjectContents_StructuralCase[] = [];
     for (let item of this.cases) {
       let newItem: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype) as ObjectContents_StructuralCase;
-      if (item.substituteExpression(fn, newItem, replacedParameters)) {
+      if (item.substitute(fn, newItem, replacedParameters)) {
         changed = true;
       }
       casesResult.push(newItem);
@@ -6022,7 +6022,7 @@ export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let sourceResult = this.source.substituteExpression(fn, replacedParameters);
+    let sourceResult = this.source.substitute(fn, replacedParameters);
     if (sourceResult !== this.source) {
       changed = true;
     }
@@ -6033,7 +6033,7 @@ export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression
     let proofResult: ObjectContents_Proof | undefined = undefined;
     if (this.proof) {
       proofResult = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.proof.substituteExpression(fn, proofResult, replacedParameters)) {
+      if (this.proof.substitute(fn, proofResult, replacedParameters)) {
         changed = true;
       }
     }
@@ -6108,7 +6108,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Case {
     let result: ObjectContents_Case = Object.create(ObjectContents_Case.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -6124,7 +6124,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Case, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Case, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this.formula) {
       result.formula = this.formula.substitute(fn, replacedParameters);
@@ -6140,7 +6140,7 @@ export class ObjectContents_Case extends Fmt.ObjectContents {
     }
     if (this.exclusivityProof) {
       result.exclusivityProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.exclusivityProof.substituteExpression(fn, result.exclusivityProof, replacedParameters)) {
+      if (this.exclusivityProof.substitute(fn, result.exclusivityProof, replacedParameters)) {
         changed = true;
       }
     }
@@ -6222,7 +6222,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_StructuralCase {
     let result: ObjectContents_StructuralCase = Object.create(ObjectContents_StructuralCase.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -6244,7 +6244,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_StructuralCase, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_StructuralCase, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     if (this._constructor) {
       result._constructor = this._constructor.substitute(fn, replacedParameters);
@@ -6253,7 +6253,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
       }
     }
     if (this.parameters) {
-      result.parameters = this.parameters.substituteExpression(fn, replacedParameters);
+      result.parameters = this.parameters.substitute(fn, replacedParameters);
       if (result.parameters !== this.parameters) {
         changed = true;
       }
@@ -6272,7 +6272,7 @@ export class ObjectContents_StructuralCase extends Fmt.ObjectContents {
     }
     if (this.wellDefinednessProof) {
       result.wellDefinednessProof = Object.create(ObjectContents_Proof.prototype) as ObjectContents_Proof;
-      if (this.wellDefinednessProof.substituteExpression(fn, result.wellDefinednessProof, replacedParameters)) {
+      if (this.wellDefinednessProof.substitute(fn, result.wellDefinednessProof, replacedParameters)) {
         changed = true;
       }
     }

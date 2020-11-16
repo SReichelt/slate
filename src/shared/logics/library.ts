@@ -53,7 +53,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
     let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
@@ -65,7 +65,7 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     }
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Section, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Section, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
     let changed = false;
     result.logic = this.logic;
     if (this.items) {
@@ -161,15 +161,15 @@ export class ObjectContents_Library extends ObjectContents_Section {
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
     let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
-    this.substituteExpression(undefined, result, replacedParameters);
+    this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
   traverse(fn: Fmt.ExpressionTraversalFn): void {
   }
 
-  substituteExpression(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Library, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substituteExpression(fn, result, replacedParameters);
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Library, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = super.substitute(fn, result, replacedParameters);
     return changed;
   }
 
