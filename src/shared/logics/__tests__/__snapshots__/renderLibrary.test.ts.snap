@@ -1703,7 +1703,7 @@ exports[`render hlm library: 1.5.13 Essentials/Functions/Left%20composition%20wi
 
   id_Y ∘ f = f
 
-No proof."
+Proof.  Let x ∈ X. Then f(x) = f(x)."
 `;
 
 exports[`render hlm library: 1.5.14 Essentials/Functions/Right%20composition%20with%20identity%20is%20neutral 1`] = `
@@ -1711,7 +1711,7 @@ exports[`render hlm library: 1.5.14 Essentials/Functions/Right%20composition%20w
 
   f ∘ id_X = f
 
-No proof."
+Proof.  Let x ∈ X. Then f(x) = f(x)."
 `;
 
 exports[`render hlm library: 1.5.15 Essentials/Functions/cartesian%20product 1`] = `
@@ -4743,7 +4743,7 @@ exports[`render hlm library: 1.8.4.7 Essentials/Numbers/Integer/Actual%20differe
 
   (n-m) = n − m
 
-No proof.
+Proof.  n + ((0) + m) = n + m by 1.8.1.4.
 
 Remarks.
 

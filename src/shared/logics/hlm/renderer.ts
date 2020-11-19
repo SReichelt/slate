@@ -2456,6 +2456,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       singleStep = steps[0];
       singleStepType = singleStep.type;
     }
+    let isSubstitutionSource = false;
+    while (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution && singleStepType.source.type instanceof FmtHLM.MetaRefExpression_UseTheorem && !singleStepType.proof) {
+      singleStep = singleStepType.source;
+      singleStepType = singleStep.type;
+      isSubstitutionSource = true;
+    }
     if (displayedGoal) {
       if (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution
           && (displayedGoal instanceof FmtHLM.MetaRefExpression_setEquals || displayedGoal instanceof FmtHLM.MetaRefExpression_equals)) {
@@ -2497,7 +2503,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         );
         this.commitStartRow(state);
         return;
-      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && !singleStepType.result) {
+      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && (!singleStepType.result || isSubstitutionSource)) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           renderedGoal,
@@ -2533,7 +2539,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         state.startRow.push(new Notation.TextExpression('By definition.'));
         this.commitStartRow(state);
         return;
-      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && !singleStepType.result) {
+      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && (!singleStepType.result || isSubstitutionSource)) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           new Notation.TextExpression('By '),

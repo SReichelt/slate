@@ -154,6 +154,12 @@ export interface HLMFormulaCases {
   side?: number;
 }
 
+export interface HLMEquivalenceListInfo {
+  items: Fmt.Expression[];
+  getEquivalenceGoal: (from: Fmt.Expression, to: Fmt.Expression, proofParameters: Fmt.ParameterList) => Fmt.Expression;
+  wrapAround: boolean;
+}
+
 type CreatePlaceholderFn = (placeholderType: HLMExpressionType) => Fmt.PlaceholderExpression;
 
 function createStandardPlaceholder(placeholderType: HLMExpressionType) {
@@ -195,10 +201,10 @@ interface ClonedExpressionInfo<T> {
   targetObject: T;
 }
 
-export interface HLMEquivalenceListInfo {
-  items: Fmt.Expression[];
-  getEquivalenceGoal: (from: Fmt.Expression, to: Fmt.Expression, proofParameters: Fmt.ParameterList) => Fmt.Expression;
-  wrapAround: boolean;
+interface ConstructionEqualityInstance {
+  constructionPath: Fmt.Path;
+  leftTerms: Fmt.DefinitionRefExpression[];
+  rightTerms: Fmt.DefinitionRefExpression[];
 }
 
 export class HLMUtils extends GenericUtils {
@@ -2310,61 +2316,87 @@ export class HLMUtils extends GenericUtils {
     return this.getCommonFinalSet([left, right]).then((set: Fmt.Expression) =>
       this.castAndFullyUnfoldElementTermOutside(left, set).then((unfoldedLeftTerms: Fmt.Expression[]) =>
         this.castAndFullyUnfoldElementTermOutside(right, set).then((unfoldedRightTerms: Fmt.Expression[]) => {
-          let resultPromise: CachedPromise<HLMFormulaDefinition[]> | undefined = undefined;
+          let instances: ConstructionEqualityInstance[] = [];
           for (let unfoldedLeft of unfoldedLeftTerms) {
             if (unfoldedLeft instanceof Fmt.DefinitionRefExpression && unfoldedLeft.path.parentPath instanceof Fmt.Path) {
-              for (let unfoldedRight of unfoldedRightTerms) {
-                if (unfoldedRight instanceof Fmt.DefinitionRefExpression && unfoldedRight.path.parentPath instanceof Fmt.Path) {
-                  if (unfoldedLeft.path.parentPath.isEquivalentTo(unfoldedRight.path.parentPath)) {
-                    let definitionRef = unfoldedLeft;
-                    if (unfoldedLeft.path.name === unfoldedRight.path.name) {
-                      let constructionPath = unfoldedLeft.path.parentPath;
-                      let leftPath = unfoldedLeft.path;
-                      let rightPath = unfoldedRight.path;
-                      if (!resultPromise) {
-                        resultPromise = CachedPromise.resolve([]);
-                      }
-                      resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) => {
-                        if (unfoldedLeft.isEquivalentTo(unfoldedRight)) {
-                          return currentResult.concat({
-                            formula: new FmtHLM.MetaRefExpression_and,
-                            definitionRef: definitionRef
-                          });
-                        } else {
-                          return this.getOuterDefinition(definitionRef).then((constructionDefinition: Fmt.Definition) => {
-                            let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(definitionRef.path.name);
-                            let equalityDefinitions = this.getConstructorEqualityDefinitions(constructionPath, constructionDefinition, constructorDefinition, leftPath.arguments, rightPath.arguments);
-                            return currentResult.concat(equalityDefinitions.map((equalityDefinition: Fmt.Expression) => ({
-                              formula: equalityDefinition,
-                              definitionRef: definitionRef
-                            })));
-                          });
-                        }
-                      });
-                    } else {
-                      return CachedPromise.resolve([{
-                        formula: new FmtHLM.MetaRefExpression_or,
-                        definitionRef: definitionRef
-                      }]);
+              let instance = this.getConstructionEqualityInstance(instances, unfoldedLeft.path.parentPath);
+              instance.leftTerms.push(unfoldedLeft);
+            }
+          }
+          for (let unfoldedRight of unfoldedRightTerms) {
+            if (unfoldedRight instanceof Fmt.DefinitionRefExpression && unfoldedRight.path.parentPath instanceof Fmt.Path) {
+              let instance = this.getConstructionEqualityInstance(instances, unfoldedRight.path.parentPath);
+              instance.rightTerms.push(unfoldedRight);
+            }
+          }
+          let resultPromise: CachedPromise<HLMFormulaDefinition[]> = CachedPromise.resolve([]);
+          for (let instance of instances) {
+            let definitionRef = new Fmt.DefinitionRefExpression(instance.constructionPath);
+            resultPromise = resultPromise.then((currentResult: HLMFormulaDefinition[]) =>
+              this.getDefinition(instance.constructionPath).then((constructionDefinition: Fmt.Definition) => {
+                if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction && constructionDefinition.contents.rewrite) {
+                  let rewriteDefinition = constructionDefinition.contents.rewrite;
+                  if (!instance.leftTerms.length) {
+                    let substitutedValue = this.substitutePath(rewriteDefinition.value, instance.constructionPath, [constructionDefinition]);
+                    let rewrittenLeft = FmtUtils.substituteVariable(substitutedValue, rewriteDefinition.parameter, left);
+                    if (rewrittenLeft instanceof Fmt.DefinitionRefExpression && rewrittenLeft.path.parentPath instanceof Fmt.Path && rewrittenLeft.path.parentPath.isEquivalentTo(instance.constructionPath)) {
+                      instance.leftTerms.push(rewrittenLeft);
+                    }
+                  }
+                  if (!instance.rightTerms.length) {
+                    let substitutedValue = this.substitutePath(rewriteDefinition.value, instance.constructionPath, [constructionDefinition]);
+                    let rewrittenRight = FmtUtils.substituteVariable(substitutedValue, rewriteDefinition.parameter, right);
+                    if (rewrittenRight instanceof Fmt.DefinitionRefExpression && rewrittenRight.path.parentPath instanceof Fmt.Path && rewrittenRight.path.parentPath.isEquivalentTo(instance.constructionPath)) {
+                      instance.rightTerms.push(rewrittenRight);
                     }
                   }
                 }
-              }
-            }
-          }
-          if (!resultPromise) {
-            resultPromise = CachedPromise.resolve([]);
-            for (let unfoldedLeft of unfoldedLeftTerms) {
-              if (unfoldedLeft instanceof Fmt.DefinitionRefExpression && unfoldedLeft.path.parentPath instanceof Fmt.Path) {
-              }
-            }
-            for (let unfoldedRight of unfoldedRightTerms) {
-              if (unfoldedRight instanceof Fmt.DefinitionRefExpression && unfoldedRight.path.parentPath instanceof Fmt.Path) {
-              }
-            }
+                for (let leftTerm of instance.leftTerms) {
+                  for (let rightTerm of instance.rightTerms) {
+                    if (leftTerm.path.name === rightTerm.path.name) {
+                      if (leftTerm.isEquivalentTo(rightTerm)) {
+                        currentResult.push({
+                          formula: new FmtHLM.MetaRefExpression_and,
+                          definitionRef: definitionRef
+                        });
+                      } else {
+                        let constructorDefinition = constructionDefinition.innerDefinitions.getDefinition(leftTerm.path.name);
+                        let equalityDefinitions = this.getConstructorEqualityDefinitions(instance.constructionPath, constructionDefinition, constructorDefinition, leftTerm.path.arguments, rightTerm.path.arguments);
+                        for (let equalityDefinition of equalityDefinitions) {
+                          currentResult.push({
+                            formula: equalityDefinition,
+                            definitionRef: definitionRef
+                          });
+                        }
+                      }
+                    } else {
+                      currentResult.push({
+                        formula: new FmtHLM.MetaRefExpression_or,
+                        definitionRef: definitionRef
+                      });
+                    }
+                  }
+                }
+                return currentResult;
+              }));
           }
           return resultPromise;
         })));
+  }
+
+  private getConstructionEqualityInstance(instances: ConstructionEqualityInstance[], constructionPath: Fmt.Path): ConstructionEqualityInstance {
+    for (let instance of instances) {
+      if (constructionPath.isEquivalentTo(instance.constructionPath)) {
+        return instance;
+      }
+    }
+    let newInstance: ConstructionEqualityInstance = {
+      constructionPath: constructionPath,
+      leftTerms: [],
+      rightTerms: []
+    };
+    instances.push(newInstance);
+    return newInstance;
   }
 
   private getConstructorEqualityDefinitions(constructionPath: Fmt.Path, constructionDefinition: Fmt.Definition, constructorDefinition: Fmt.Definition, leftArguments: Fmt.ArgumentList, rightArguments: Fmt.ArgumentList): Fmt.Expression[] {
