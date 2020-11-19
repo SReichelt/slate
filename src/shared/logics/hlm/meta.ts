@@ -5277,7 +5277,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
-  constructor(public source: Fmt.Parameter, public sourceSide: Fmt.BN, public result?: Fmt.Expression) {
+  constructor(public source: Fmt.Expression, public sourceSide: Fmt.BN, public result?: Fmt.Expression) {
     super();
   }
 
@@ -5286,12 +5286,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let sourceRaw = argumentList.getValue('source', 0);
-    if (sourceRaw instanceof Fmt.ParameterExpression && sourceRaw.parameters.length === 1) {
-      this.source = sourceRaw.parameters[0];
-    } else {
-      throw new Error('source: Parameter expression with single parameter expected');
-    }
+    this.source = argumentList.getValue('source', 0);
     let sourceSideRaw = argumentList.getValue('sourceSide', 1);
     if (sourceSideRaw instanceof Fmt.IntegerExpression) {
       this.sourceSide = sourceSideRaw.value;
@@ -5303,8 +5298,7 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
     let argumentList = new Fmt.ArgumentList;
-    let sourceExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.source));
-    argumentList.push(new Fmt.Argument(undefined, sourceExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.source, false));
     let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
     argumentList.push(new Fmt.Argument(undefined, sourceSideExpr, false));
     if (this.result !== undefined) {
@@ -5401,7 +5395,7 @@ export class MetaRefExpression_Unfold extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
-  constructor(public theorem: Fmt.Expression, public input?: Fmt.Parameter, public result?: Fmt.Expression) {
+  constructor(public theorem: Fmt.Expression, public input?: Fmt.Expression, public result?: Fmt.Expression) {
     super();
   }
 
@@ -5411,14 +5405,7 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.theorem = argumentList.getValue('theorem', 0);
-    let inputRaw = argumentList.getOptionalValue('input', 1);
-    if (inputRaw !== undefined) {
-      if (inputRaw instanceof Fmt.ParameterExpression && inputRaw.parameters.length === 1) {
-        this.input = inputRaw.parameters[0];
-      } else {
-        throw new Error('input: Parameter expression with single parameter expected');
-      }
-    }
+    this.input = argumentList.getOptionalValue('input', 1);
     this.result = argumentList.getOptionalValue('result', 2);
   }
 
@@ -5426,8 +5413,7 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
     let argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.theorem, false));
     if (this.input !== undefined) {
-      let inputExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.input));
-      argumentList.push(new Fmt.Argument('input', inputExpr, true));
+      argumentList.push(new Fmt.Argument('input', this.input, true));
     }
     if (this.result !== undefined) {
       argumentList.push(new Fmt.Argument('result', this.result, true));
@@ -5441,7 +5427,7 @@ export class MetaRefExpression_UseTheorem extends Fmt.MetaRefExpression {
     if (theoremResult !== this.theorem) {
       changed = true;
     }
-    let inputResult: Fmt.Parameter | undefined = undefined;
+    let inputResult: Fmt.Expression | undefined = undefined;
     if (this.input) {
       inputResult = this.input.substitute(fn, replacedParameters);
       if (inputResult !== this.input) {
@@ -5975,7 +5961,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression {
-  constructor(public source: Fmt.Parameter, public sourceSide: Fmt.BN, public goal: Fmt.Expression, public proof?: ObjectContents_Proof) {
+  constructor(public source: Fmt.Expression, public sourceSide: Fmt.BN, public goal: Fmt.Expression, public proof?: ObjectContents_Proof) {
     super();
   }
 
@@ -5984,12 +5970,7 @@ export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let sourceRaw = argumentList.getValue('source', 0);
-    if (sourceRaw instanceof Fmt.ParameterExpression && sourceRaw.parameters.length === 1) {
-      this.source = sourceRaw.parameters[0];
-    } else {
-      throw new Error('source: Parameter expression with single parameter expected');
-    }
+    this.source = argumentList.getValue('source', 0);
     let sourceSideRaw = argumentList.getValue('sourceSide', 1);
     if (sourceSideRaw instanceof Fmt.IntegerExpression) {
       this.sourceSide = sourceSideRaw.value;
@@ -6007,8 +5988,7 @@ export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
     let argumentList = new Fmt.ArgumentList;
-    let sourceExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.source));
-    argumentList.push(new Fmt.Argument(undefined, sourceExpr, false));
+    argumentList.push(new Fmt.Argument(undefined, this.source, false));
     let sourceSideExpr = new Fmt.IntegerExpression(this.sourceSide);
     argumentList.push(new Fmt.Argument(undefined, sourceSideExpr, false));
     argumentList.push(new Fmt.Argument(undefined, this.goal, false));
@@ -6322,7 +6302,7 @@ class ArgumentTypeContext extends Ctx.DerivedContext {
 
 const definitionTypes: Fmt.MetaDefinitionList = {'Construction': MetaRefExpression_Construction, 'SetOperator': MetaRefExpression_SetOperator, 'ExplicitOperator': MetaRefExpression_ExplicitOperator, 'ImplicitOperator': MetaRefExpression_ImplicitOperator, 'MacroOperator': MetaRefExpression_MacroOperator, 'Predicate': MetaRefExpression_Predicate, 'StandardTheorem': MetaRefExpression_StandardTheorem, 'EquivalenceTheorem': MetaRefExpression_EquivalenceTheorem};
 const expressionTypes: Fmt.MetaDefinitionList = {'Bool': MetaRefExpression_Bool, 'Nat': MetaRefExpression_Nat, 'Prop': MetaRefExpression_Prop, 'Set': MetaRefExpression_Set, 'Subset': MetaRefExpression_Subset, 'Element': MetaRefExpression_Element, 'Constraint': MetaRefExpression_Constraint, 'Binder': MetaRefExpression_Binder, 'SetDef': MetaRefExpression_SetDef, 'Def': MetaRefExpression_Def, 'Consider': MetaRefExpression_Consider, 'State': MetaRefExpression_State, 'UseDef': MetaRefExpression_UseDef, 'UseCases': MetaRefExpression_UseCases, 'UseForAll': MetaRefExpression_UseForAll, 'UseExists': MetaRefExpression_UseExists, 'Substitute': MetaRefExpression_Substitute, 'Unfold': MetaRefExpression_Unfold, 'UseTheorem': MetaRefExpression_UseTheorem, 'ProveDef': MetaRefExpression_ProveDef, 'ProveByContradiction': MetaRefExpression_ProveByContradiction, 'ProveForAll': MetaRefExpression_ProveForAll, 'ProveExists': MetaRefExpression_ProveExists, 'ProveEquivalence': MetaRefExpression_ProveEquivalence, 'ProveCases': MetaRefExpression_ProveCases, 'ProveByInduction': MetaRefExpression_ProveByInduction, 'ProveBySubstitution': MetaRefExpression_ProveBySubstitution};
-const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, '': null};
+const functions: Fmt.MetaDefinitionList = {'true': MetaRefExpression_true, 'false': MetaRefExpression_false, 'enumeration': MetaRefExpression_enumeration, 'subset': MetaRefExpression_subset, 'extendedSubset': MetaRefExpression_extendedSubset, 'setStructuralCases': MetaRefExpression_setStructuralCases, 'setAssociative': MetaRefExpression_setAssociative, 'cases': MetaRefExpression_cases, 'structuralCases': MetaRefExpression_structuralCases, 'asElementOf': MetaRefExpression_asElementOf, 'associative': MetaRefExpression_associative, 'not': MetaRefExpression_not, 'and': MetaRefExpression_and, 'or': MetaRefExpression_or, 'equiv': MetaRefExpression_equiv, 'forall': MetaRefExpression_forall, 'exists': MetaRefExpression_exists, 'existsUnique': MetaRefExpression_existsUnique, 'in': MetaRefExpression_in, 'sub': MetaRefExpression_sub, 'setEquals': MetaRefExpression_setEquals, 'equals': MetaRefExpression_equals, 'structural': MetaRefExpression_structural, 'State': MetaRefExpression_State, 'UseTheorem': MetaRefExpression_UseTheorem, '': null};
 
 export class MetaModel extends Meta.MetaModel {
   constructor() {

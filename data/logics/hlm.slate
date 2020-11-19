@@ -14,6 +14,7 @@ $hlm: %MetaModel {
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
                $not, $and, $or, $equiv, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
+               $State, $UseTheorem,
                %Any],
   lookup = %Any
 }
@@ -290,13 +291,13 @@ $UseExists(parameters: %ParameterList): %ParameterType($Formula) {
   superType = $IntermediateProofStep,
   exports = [parameters]
 }
-$Substitute(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, result?: $Formula): %ParameterType($Formula) {
+$Substitute(source: $IntermediateProofStep, sourceSide: %Int, result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $Unfold(result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
-$UseTheorem(theorem: $Theorem, input?: %SingleParameter($IntermediateProofStep), result?: $Formula): %ParameterType($Formula) {
+$UseTheorem(theorem: $Theorem, input?: $IntermediateProofStep, result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $ProveDef(side?: %Int, proof?: $Proof): %ParameterType {
@@ -320,7 +321,7 @@ $ProveCases(side?: %Int, caseProofs: $Proof[]): %ParameterType {
 $ProveByInduction(term: $ElementTerm, construction: $Construction, cases: $StructuralCase($Proof)[]): %ParameterType {
   superType = $FinalProofStep
 }
-$ProveBySubstitution(source: %SingleParameter($IntermediateProofStep), sourceSide: %Int, goal: $Formula, proof?: $Proof): %ParameterType($Formula) {
+$ProveBySubstitution(source: $IntermediateProofStep, sourceSide: %Int, goal: $Formula, proof?: $Proof): %ParameterType($Formula) {
   superType = $FinalProofStep
 }
 

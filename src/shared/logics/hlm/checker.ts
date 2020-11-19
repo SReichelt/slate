@@ -1584,6 +1584,28 @@ export class HLMDefinitionChecker {
         ...this.checkParameter(step, context),
         previousResult: undefined
       };
+    } else {
+      let result = this.checkProofStepType(type, context);
+      if (result !== null) {
+        try {
+          return {
+            ...this.getParameterContext(step, context),
+            previousResult: result
+          };
+        } catch (error) {
+          this.error(step, error.message);
+          return undefined;
+        }
+      } else {
+        return undefined;
+      }
+    }
+  }
+
+  private checkProofStepType(type: Fmt.Expression, context: HLMCheckerProofStepContext): Fmt.Expression | null | undefined {
+    if (type instanceof Fmt.VariableRefExpression || type instanceof Fmt.IndexedExpression) {
+      let checkType = () => true;
+      this.checkVariableRefExpression(type, checkType, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
       let checkType = () => true;
       this.checkVariableRefExpression(type.variable, checkType, context);
@@ -1600,7 +1622,7 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       this.checkFormula(type.statement, context);
-      this.checkProof(step, type.proof, undefined, type.statement, context);
+      this.checkProof(type, type.proof, undefined, type.statement, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef) {
       if (context.goal) {
         if (context.previousResult) {
@@ -1610,20 +1632,20 @@ export class HLMDefinitionChecker {
             let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
               if (previousResultDefinitions.length) {
                 let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
-                this.checkDeclaredResult(step, useDef.result, sources, context);
+                this.checkDeclaredResult(type, useDef.result, sources, context);
               } else {
-                this.error(step, `${context.previousResult} does not have any definition`);
+                this.error(type, `${context.previousResult} does not have any definition`);
               }
             });
-            this.addPendingCheck(step, checkDefinition);
+            this.addPendingCheck(type, checkDefinition);
           } else {
-            this.error(step, `${context.previousResult} does not have any definition`);
+            this.error(type, `${context.previousResult} does not have any definition`);
           }
         } else {
-          this.error(step, 'Previous result not set');
+          this.error(type, 'Previous result not set');
         }
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases) {
       if (context.goal) {
@@ -1640,7 +1662,7 @@ export class HLMDefinitionChecker {
                   let parameters = this.utils.getUseCasesProofParameters(previousResultCase);
                   this.checkProof(caseProof, caseProof, parameters, goal, context);
                 } else {
-                  this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+                  this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
                 }
                 index++;
               }
@@ -1648,22 +1670,22 @@ export class HLMDefinitionChecker {
                 this.error(caseProofs[index], 'Superfluous case proof');
               }
             });
-            this.addPendingCheck(step, checkCases);
+            this.addPendingCheck(type, checkCases);
           } else {
-            this.error(step, 'Invalid cases');
+            this.error(type, 'Invalid cases');
           }
         } else {
-          this.error(step, 'Previous result not set');
+          this.error(type, 'Previous result not set');
         }
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_UseForAll) {
       if (context.previousResult instanceof FmtHLM.MetaRefExpression_forall) {
         this.checkArgumentLists([type.arguments], [context.previousResult.parameters], undefined, context);
       } else {
-        this.error(step, 'Previous result is not a universally quantified expression');
+        this.error(type, 'Previous result is not a universally quantified expression');
         return undefined;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists) {
@@ -1674,7 +1696,7 @@ export class HLMDefinitionChecker {
           this.error(type.parameters, 'Proof step parameters must match existential quantifier');
         }
       } else {
-        this.error(step, 'Previous result is not an existentially quantified expression');
+        this.error(type, 'Previous result is not an existentially quantified expression');
         return undefined;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
@@ -1696,24 +1718,22 @@ export class HLMDefinitionChecker {
             }
             let implicationResult = this.utils.getImplicationResult(type.result, context);
             if (!this.utils.substitutesTo(context.previousResult, implicationResult, sourceExpression, targetExpressions)) {
-              this.error(step, `Substitution from ${context.previousResult} to ${implicationResult} is invalid`);
+              this.error(type, `Substitution from ${context.previousResult} to ${implicationResult} is invalid`);
             }
           } else {
-            this.error(step, 'Source side is invalid');
+            this.error(type, 'Source side is invalid');
           }
         } else {
           this.error(type.source, 'Source proof step does not result in an equality');
         }
       } else {
-        this.error(step, 'Previous result not set');
-        return undefined;
+        this.error(type, 'Previous result not set');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Unfold) {
       if (context.previousResult) {
-        this.checkDeclaredResult(step, type.result, [context.previousResult], context);
+        this.checkDeclaredResult(type, type.result, [context.previousResult], context);
       } else {
-        this.error(step, 'Previous result not set');
-        return undefined;
+        this.error(type, 'Previous result not set');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
       let useTheorem = type;
@@ -1729,33 +1749,32 @@ export class HLMDefinitionChecker {
                   goal: undefined,
                   previousResult: undefined
                 };
-                let inputResultContext = this.checkProofStep(useTheorem.input, inputContext);
-                if (inputResultContext?.previousResult) {
-                  let previousResult = inputResultContext.previousResult;
+                let inputResult = this.checkProofStepType(useTheorem.input, inputContext);
+                if (inputResult) {
                   let conditions = definition.contents.conditions.map((condition: Fmt.Expression) => this.utils.substitutePath(condition, theorem.path, [definition]));
                   let checkInput = this.stripConstraintsFromFormulas(conditions, true, true, false, true, context).then((strippedConditions: Fmt.Expression[]) =>
-                    this.checkImplication(step, previousResult, strippedConditions));
-                  this.checkDeclaredResult(step, useTheorem.result, conditions, context);
+                    this.checkImplication(type, inputResult!, strippedConditions));
+                  this.checkDeclaredResult(type, useTheorem.result, conditions, context);
                   return checkInput;
                 } else {
-                  this.error(step, 'Invalid input proof step');
+                  this.error(type, 'Invalid input proof step');
                 }
               } else {
-                this.error(step, 'Theorem input required');
+                this.error(type, 'Theorem input required');
               }
             } else {
               let claim = this.utils.substitutePath(definition.contents.claim, theorem.path, [definition]);
-              this.checkDeclaredResult(step, useTheorem.result, [claim], context);
+              this.checkDeclaredResult(type, useTheorem.result, [claim], context);
             }
           } else {
             // TODO also support definitions (and render as "by definition")
-            this.error(step, 'Referenced definition must be a theorem');
+            this.error(type, 'Referenced definition must be a theorem');
           }
           return CachedPromise.resolve();
         });
-        this.addPendingCheck(step, checkDefinitionRef);
+        this.addPendingCheck(type, checkDefinitionRef);
       } else {
-        this.error(step, 'Definition reference required');
+        this.error(type, 'Definition reference required');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
       if (context.goal) {
@@ -1764,16 +1783,16 @@ export class HLMDefinitionChecker {
         if (goalDefinitionsPromise) {
           let checkDefinition = goalDefinitionsPromise.then((goalDefinitions: HLMFormulaDefinition[]) => {
             let goals = goalDefinitions.map((goalDefinition: HLMFormulaDefinition) => goalDefinition.formula);
-            this.checkMultiGoalProof(step, proveDef.proof, undefined, goals, context);
+            this.checkMultiGoalProof(type, proveDef.proof, undefined, goals, context);
           });
-          this.addPendingCheck(step, checkDefinition);
+          this.addPendingCheck(type, checkDefinition);
         } else {
-          this.error(step, `${context.goal} cannot be proved by definition`);
+          this.error(type, `${context.goal} cannot be proved by definition`);
         }
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
       if (context.goal) {
         let proveByContradiction = type;
@@ -1788,39 +1807,39 @@ export class HLMDefinitionChecker {
         let check = this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
           let parameters = new Fmt.ParameterList;
           this.utils.addProofConstraint(parameters, negatedGoal);
-          this.checkProof(step, proveByContradiction.proof, parameters, newGoal, context);
+          this.checkProof(type, proveByContradiction.proof, parameters, newGoal, context);
         });
-        this.addPendingCheck(step, check);
+        this.addPendingCheck(type, check);
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveForAll) {
       if (context.goal instanceof FmtHLM.MetaRefExpression_forall) {
-        this.checkProof(step, type.proof, context.goal.parameters, context.goal.formula, context);
+        this.checkProof(type, type.proof, context.goal.parameters, context.goal.formula, context);
       } else {
-        this.error(step, 'Goal is not a universally quantified expression');
+        this.error(type, 'Goal is not a universally quantified expression');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
       if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
         this.checkArgumentLists([type.arguments], [context.goal.parameters], undefined, context);
         if (context.goal.formula) {
           let substitutedFormula = this.utils.substituteArguments(context.goal.formula, context.goal.parameters, type.arguments);
-          this.checkProof(step, type.proof, undefined, substitutedFormula, context);
+          this.checkProof(type, type.proof, undefined, substitutedFormula, context);
         }
       } else {
-        this.error(step, 'Goal is not an existentially quantified expression');
+        this.error(type, 'Goal is not an existentially quantified expression');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
       let list = this.utils.getEquivalenceListInfo(context.goal);
       if (list) {
         this.checkEquivalenceProofs(type.proofs, list, context);
       } else {
-        this.error(step, 'Goal is not an equivalence');
+        this.error(type, 'Goal is not an equivalence');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveCases) {
       if (context.goal) {
         let goalCasesPromise = this.utils.getFormulaCases(context.goal, this.utils.externalToInternalIndex(type.side), true);
@@ -1833,7 +1852,7 @@ export class HLMDefinitionChecker {
                 let caseProof = caseProofs[index];
                 this.checkProof(caseProof, caseProof, goalCase.parameters, goalCase.formula, context);
               } else {
-                this.message(step, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+                this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
               }
               index++;
             }
@@ -1841,14 +1860,14 @@ export class HLMDefinitionChecker {
               this.error(caseProofs[index], 'Superfluous case proof');
             }
           });
-          this.addPendingCheck(step, checkCases);
+          this.addPendingCheck(type, checkCases);
         } else {
-          this.error(step, 'Invalid cases');
+          this.error(type, 'Invalid cases');
         }
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
       if (context.goal) {
         let proveByInduction = type;
@@ -1880,9 +1899,9 @@ export class HLMDefinitionChecker {
         };
         this.checkStructuralCasesInternal(proveByInduction.term, proveByInduction.construction, proveByInduction.cases, checkCase, prepareCase, replaceCases, context);
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
-      return undefined;
+      return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
       if (context.goal) {
         let sourceContext: HLMCheckerProofStepContext = {
@@ -1898,33 +1917,25 @@ export class HLMDefinitionChecker {
             let targetExpressions = expressions.slice();
             targetExpressions.splice(sourceIndex, 1);
             if (this.utils.substitutesTo(context.goal, type.goal, sourceExpression, targetExpressions)) {
-              this.checkProof(step, type.proof, undefined, type.goal, context);
+              this.checkProof(type, type.proof, undefined, type.goal, context);
             } else {
-              this.error(step, `Substitution from ${context.goal} to ${type.goal} is invalid`);
+              this.error(type, `Substitution from ${context.goal} to ${type.goal} is invalid`);
             }
           } else {
-            this.error(step, 'Source side is invalid');
+            this.error(type, 'Source side is invalid');
           }
         } else {
           this.error(type.source, 'Source proof step does not result in an equality');
         }
       } else {
-        this.error(step, 'Goal not set');
+        this.error(type, 'Goal not set');
       }
-      return undefined;
+      return null;
     } else {
-      this.error(step, 'Invalid proof step');
+      this.error(type, 'Invalid proof step');
       return undefined;
     }
-    try {
-      return {
-        ...this.getParameterContext(step, context),
-        previousResult: this.utils.getProofStepResult(step, context)
-      };
-    } catch (error) {
-      this.error(step, error.message);
-      return undefined;
-    }
+    return this.utils.getProofStepTypeResult(type, context);
   }
 
   getAvailableConstraints(context: HLMCheckerContext, split: boolean): HLMCheckerConstraint[] {
@@ -2093,15 +2104,12 @@ export class HLMDefinitionChecker {
     this.addPendingCheck(object, check);
   }
 
-  private checkEqualitySource(source: Fmt.Parameter, context: HLMCheckerProofStepContext): Fmt.Expression[] | undefined {
-    let resultContext = this.checkProofStep(source, context);
-    if (resultContext) {
-      let result = resultContext.previousResult;
-      if (result instanceof FmtHLM.MetaRefExpression_setEquals || result instanceof FmtHLM.MetaRefExpression_equals) {
-        return result.terms;
-      } else if (result instanceof FmtHLM.MetaRefExpression_equiv) {
-        return result.formulas;
-      }
+  private checkEqualitySource(source: Fmt.Expression, context: HLMCheckerProofStepContext): Fmt.Expression[] | undefined {
+    let result = this.checkProofStepType(source, context);
+    if (result instanceof FmtHLM.MetaRefExpression_setEquals || result instanceof FmtHLM.MetaRefExpression_equals) {
+      return result.terms;
+    } else if (result instanceof FmtHLM.MetaRefExpression_equiv) {
+      return result.formulas;
     }
     return undefined;
   }

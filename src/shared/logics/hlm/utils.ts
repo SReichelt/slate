@@ -649,17 +649,23 @@ export class HLMUtils extends GenericUtils {
   }
 
   getProofStepResult(step: Fmt.Parameter, context: HLMProofStepContext): Fmt.Expression | undefined {
-    let type = step.type;
+    return this.getProofStepTypeResult(step.type, context) ?? this.getParameterConstraint(step, context);
+  }
+
+  getProofStepTypeResult(type: Fmt.Expression, context: HLMProofStepContext): Fmt.Expression | undefined {
     if (type instanceof FmtHLM.MetaRefExpression_Consider) {
       if (type.result) {
         return type.result;
       } else {
-        let [variableRefExpression, indexContext] = this.extractVariableRefExpression(type.variable);
-        if (variableRefExpression) {
-          return this.getParameterConstraint(variableRefExpression.variable, context, variableRefExpression, indexContext);
-        } else {
-          throw new Error('Variable reference expected');
-        }
+        type = type.variable;
+      }
+    }
+    if (type instanceof Fmt.VariableRefExpression || type instanceof Fmt.IndexedExpression) {
+      let [variableRefExpression, indexContext] = this.extractVariableRefExpression(type);
+      if (variableRefExpression) {
+        return this.getParameterConstraint(variableRefExpression.variable, context, variableRefExpression, indexContext);
+      } else {
+        throw new Error('Variable reference expected');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       return type.statement;
@@ -686,7 +692,7 @@ export class HLMUtils extends GenericUtils {
         throw new Error('Unknown proof step');
       }
     } else {
-      return this.getParameterConstraint(step, context);
+      return undefined;
     }
   }
 

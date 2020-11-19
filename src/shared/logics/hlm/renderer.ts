@@ -2456,11 +2456,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       singleStep = steps[0];
       singleStepType = singleStep.type;
     }
-    let isSubstitutionSource = false;
-    while (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution && singleStepType.source.type instanceof FmtHLM.MetaRefExpression_UseTheorem && !singleStepType.proof) {
-      singleStep = singleStepType.source;
-      singleStepType = singleStep.type;
-      isSubstitutionSource = true;
+    while (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution && singleStepType.source instanceof FmtHLM.MetaRefExpression_UseTheorem && !singleStepType.proof) {
+      singleStepType = singleStepType.source;
+      singleStep = undefined;
     }
     if (displayedGoal) {
       if (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution
@@ -2477,7 +2475,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           substitutedParameters: [],
           isLastStep: true
         };
-        this.addProofStep(proof, singleStep!, renderContext, state);
+        if (!singleStep) {
+          singleStep = new Fmt.Parameter('_', singleStepType);
+        }
+        this.addProofStep(proof, singleStep, renderContext, state);
         this.commitImplications(state, false, true);
         return;
       }
@@ -2486,7 +2487,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (hasContents) {
         state.startRow.push(new Notation.TextExpression('Then '));
       }
-      if (singleStepType instanceof FmtHLM.MetaRefExpression_Consider && !this.editHandler) {
+      if ((singleStepType instanceof Fmt.VariableRefExpression || singleStepType instanceof Fmt.IndexedExpression || singleStepType instanceof FmtHLM.MetaRefExpression_Consider) && !this.editHandler) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           renderedGoal,
@@ -2503,7 +2504,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         );
         this.commitStartRow(state);
         return;
-      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && (!singleStepType.result || isSubstitutionSource)) {
+      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && !(singleStep && singleStepType.result)) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           renderedGoal,
@@ -2539,7 +2540,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         state.startRow.push(new Notation.TextExpression('By definition.'));
         this.commitStartRow(state);
         return;
-      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && (!singleStepType.result || isSubstitutionSource)) {
+      } else if (singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && singleStepType.theorem instanceof Fmt.DefinitionRefExpression && !(singleStep && singleStepType.result)) {
         this.outputStartRowSpacing(state);
         state.startRow.push(
           new Notation.TextExpression('By '),
@@ -2954,13 +2955,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.addConditionalProofStepInsertButton(proof, insertionContext, false, state);
         }
         return result;
-      } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
-        let result = this.utils.getProofStepResult(step, context);
+      } else if (type instanceof FmtHLM.MetaRefExpression_Consider || type instanceof Fmt.VariableRefExpression || type instanceof Fmt.IndexedExpression) {
+        let result = this.utils.getProofStepTypeResult(type, context);
         if (result) {
+          if (type instanceof FmtHLM.MetaRefExpression_Consider) {
+            type = type.variable;
+          }
           addImplication({
             dependsOnPrevious: false,
             result: result,
-            resultLink: type.variable,
+            resultLink: type,
             resultIsEditable: false
           });
         }
@@ -3028,7 +3032,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         return type.statement;
       } else if (this.isDependentProofStepType(type) || type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
-        let result = this.utils.getProofStepResult(step, context);
+        let result = this.utils.getProofStepTypeResult(type, context);
         if (!result) {
           return undefined;
         }
@@ -3036,8 +3040,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let sourceFormula: Notation.RenderedExpression | undefined = undefined;
         let sourceType = type;
         if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
-          if (type.source.type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
-            sourceType = type.source.type;
+          if (type.source instanceof FmtHLM.MetaRefExpression_UseTheorem) {
+            sourceType = type.source;
           }
           sourceFormula = this.getSourceFormula(type.source, context);
         }
@@ -3165,7 +3169,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let rightTerm = type.goal.terms[0];
       let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
       let source: Notation.RenderedExpression | undefined = undefined;
-      let sourceType = type.source.type;
+      let sourceType = type.source;
       if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
         source = this.renderItemNumber(sourceType.theorem);
       }
@@ -3208,8 +3212,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.renderProofBySubstitution(proof, type, newContext, leftTerm, state, addImplication);
       return;
     }
-    if (!(type.source.type instanceof FmtHLM.MetaRefExpression_Consider)) {
-      this.addProofStep(proof, type.source, sourceContext, state);
+    if (!(type.source instanceof Fmt.VariableRefExpression || type.source instanceof Fmt.IndexedExpression || type.source instanceof FmtHLM.MetaRefExpression_Consider)) {
+      let step = new Fmt.Parameter('_', type.source);
+      this.addProofStep(proof, step, sourceContext, state);
     }
     this.addSubProof(type.proof, subProofContext, false, state);
     if (goal && !type.proof) {
@@ -3259,11 +3264,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return false;
   }
 
-  private getSourceFormula(source: Fmt.Parameter, context: HLMProofStepContext): Notation.RenderedExpression | undefined {
+  private getSourceFormula(source: Fmt.Expression, context: HLMProofStepContext): Notation.RenderedExpression | undefined {
     let sourceContext: HLMProofStepContext = {
       stepResults: context.stepResults
     };
-    let sourceResult = this.utils.getProofStepResult(source, sourceContext);
+    let sourceResult = this.utils.getProofStepTypeResult(source, sourceContext);
     if (sourceResult) {
       let sourceFormula = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
       if (!sourceFormula.styleClasses) {
@@ -3756,7 +3761,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let type = step.type;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
       this.addParameterParts(step, result);
-    } else if (type instanceof FmtHLM.MetaRefExpression_Consider && type.result) {
+    } else {
+      this.addProofStepTypeParts(type, result);
+    }
+  }
+
+  private addProofStepTypeParts(type: Fmt.Expression, result: Logic.ObjectRenderFns): void {
+    if (type instanceof FmtHLM.MetaRefExpression_Consider && type.result) {
       this.addFormulaParts(type.result, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_State) {
       this.addFormulaParts(type.statement, result);
@@ -3779,6 +3790,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addProofParts(type.proof, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
       this.addGenericExpressionParts(type.theorem, result);
+      if (type.input) {
+        this.addProofStepTypeParts(type.input, result);
+      }
       if (type.result) {
         this.addFormulaParts(type.result, result);
       }
@@ -3788,7 +3802,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
       this.addProofListParts(type.proofs, result);
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
-      this.addProofStepParts(type.source, result);
+      this.addProofStepTypeParts(type.source, result);
       if (type.result) {
         this.addFormulaParts(type.result, result);
       }
@@ -3801,7 +3815,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addProofParts(proof, result);
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
-      this.addProofStepParts(type.source, result);
+      this.addProofStepTypeParts(type.source, result);
       this.addFormulaParts(type.goal, result);
       this.addProofParts(type.proof, result);
     }
