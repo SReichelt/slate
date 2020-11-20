@@ -48,7 +48,9 @@ export class EditAnalysis {
     let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
     this.analyzeExpression(definition.type, false, (newValue) => (definition.type = newValue!), undefined, typeContext);
     let contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
-    this.definitionContentsContext.set(definition, contentsContext);
+    if (!this.definitionContentsContext.has(definition)) {
+      this.definitionContentsContext.set(definition, contentsContext);
+    }
     this.analyzeDefinitions(definition.innerDefinitions, contentsContext);
     if (definition.contents) {
       this.analyzeObjectContents(definition.contents, contentsContext);
@@ -60,7 +62,9 @@ export class EditAnalysis {
       this.analyzeParameter(parameter, context);
       context = context.metaModel.getNextParameterContext(parameter, context);
     }
-    this.newParameterContext.set(parameters, context);
+    if (!this.newParameterContext.has(parameters)) {
+      this.newParameterContext.set(parameters, context);
+    }
   }
 
   analyzeParameter(parameter: Fmt.Parameter, context: Ctx.Context): void {
@@ -86,7 +90,7 @@ export class EditAnalysis {
       context = context.metaModel.getNextArgumentContext(arg, index, context);
       previousArgs.push(arg);
     }
-    if (!onApplyConvertedArgument) {
+    if (!onApplyConvertedArgument && !this.newArgumentContext.has(args)) {
       this.newArgumentContext.set(args, context);
     }
   }
@@ -115,12 +119,14 @@ export class EditAnalysis {
   }
 
   analyzeExpression(expression: Fmt.Expression, optional: boolean, onSetValue: SetExpressionFn, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
-    this.expressionEditInfo.set(expression, {
-      expression: expression,
-      optional: optional,
-      onSetValue: onSetValue,
-      context: context
-    });
+    if (!this.expressionEditInfo.has(expression)) {
+      this.expressionEditInfo.set(expression, {
+        expression: expression,
+        optional: optional,
+        onSetValue: onSetValue,
+        context: context
+      });
+    }
     context = new Ctx.ParentInfoContext(expression, context);
     if (expression instanceof Fmt.MetaRefExpression) {
       this.analyzeMetaRefExpression(expression, context);
