@@ -31,6 +31,8 @@
         ],
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-redeclare": "warn",
+        "@typescript-eslint/no-shadow": "warn",
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/quotes": [
             "warn",
@@ -70,13 +72,6 @@
         "no-eval": "warn",
         "no-fallthrough": "warn",
         "no-new-wrappers": "warn",
-        "no-redeclare": "warn",
-        "no-shadow": [
-            "warn",
-            {
-                "hoist": "all"
-            }
-        ],
         "no-trailing-spaces": "warn",
         "no-underscore-dangle": "off",
         "no-unused-expressions": "off",  // currently conflicts with new TypeScript operators
