@@ -349,7 +349,7 @@ exports[`render hlm library: 1.1.16 Essentials/Sets/Union 1`] = `
 
 Remarks.
 
-Due to the type system of HLM, it is impossible to define the union of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset \`U\`, although the intersection is, of course, independent of \`U\`. Since a suitable value for \`U\` can always be inferred automatically, \`U\` can be omitted from the notation.
+Due to the type system of HLM, it is impossible to define the union of two arbitrary sets. Instead, both sets must be declared as subsets of a common superset \`U\`, although the union is, of course, independent of \`U\`. Since a suitable value for \`U\` can always be inferred automatically, \`U\` can be omitted from the notation.
 
 References.
 
@@ -1946,7 +1946,7 @@ Proof.  By induction on n.
 * Let x ∈ ℕ such that (id_X)^x = id_X. Then:
   (id_X)^(x+1) = id_X ∘ (id_X)^x
    = id_X ∘ id_X
-   =^1.5.13 id_X"
+   =^(1.5.13) id_X"
 `;
 
 exports[`render hlm library: 1.5.33 Essentials/Functions/Power%20of%20identity%20to%20integer%20is%20identity 1`] = `
@@ -1958,8 +1958,8 @@ Proof.
 
 * Assume a ≥ 0. Then (id_X)^a = id_X by 1.5.32.
 * Assume a < 0. Then:
-  ((id_X)^-1)^(−a) =^1.5.29 (id_X)^(−a)
-   =^1.5.32 id_X"
+  ((id_X)^-1)^(−a) =^(1.5.29) (id_X)^(−a)
+   =^(1.5.32) id_X"
 `;
 
 exports[`render hlm library: 1.6.1 Essentials/Operations/Operations 1`] = `
@@ -2663,7 +2663,7 @@ Proof.  By induction on n.
 * Let x ∈ ℕ such that m + x = x + m. Then:
   m + (x+1) = ((m + x)+1)
    = ((x + m)+1)
-   =^1.8.1.5 (x+1) + m"
+   =^(1.8.1.5) (x+1) + m"
 `;
 
 exports[`render hlm library: 1.8.1.10 Essentials/Numbers/Natural/Sum%20is%20commutative 1`] = `
@@ -4327,7 +4327,7 @@ exports[`render hlm library: 1.8.3.1 Essentials/Numbers/Ordinal/Ordinal%20number
 
   𝓞𝓻𝓭 :=: {[S, ⪯] | S is a set, ⪯ is a well-order on S}
 
-  [S, ⪯] = [T, ⊑]  :⇔  ∃ φ : S ↔ T : ⪯ ≃^φ ⊑  (S is a set, ⪯ is a relation on S, T is a set, ⊑ is a relation on T with suitable conditions)
+  [S, ⪯] = [T, ⊑]  :⇔  ∃ φ : S ↔ T : ⪯ ≃^φ ⊑  (S is a set, ⪯ is a well-order on S, T is a set, ⊑ is a well-order on T)
 
 ℕ ⊆: 𝓞𝓻𝓭 via
 n = [ℕ_(<n), ≤∣_(ℕ_(<n))]
@@ -4536,7 +4536,7 @@ exports[`render hlm library: 1.8.3.11 Essentials/Numbers/Ordinal/sum 1`] = `
 
 by:
 
-  [A, ⪯] + [B, ⊑] := [A ⊎ B, ⪯ ≪ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)
+  [A, ⪯] + [B, ⊑] := [A ⊎ B, ⪯ ≪ ⊑]  (A is a set, ⪯ is a well-order on A, B is a set, ⊑ is a well-order on B)
 
 References.
 
@@ -4554,7 +4554,7 @@ exports[`render hlm library: 1.8.3.12 Essentials/Numbers/Ordinal/product 1`] = `
 
 by:
 
-  [A, ⪯] ⋅ [B, ⊑] := [A × B, ⪯ ∠ ⊑]  (A is a set, ⪯ is a relation on A, B is a set, ⊑ is a relation on B with suitable conditions)
+  [A, ⪯] ⋅ [B, ⊑] := [A × B, ⪯ ∠ ⊑]  (A is a set, ⪯ is a well-order on A, B is a set, ⊑ is a well-order on B)
 
 References.
 
@@ -5538,7 +5538,7 @@ exports[`render hlm library: 1.8.6.1 Essentials/Numbers/Real/Real%20numbers 1`] 
 
   ℝ :=: {[r] | r is a Cauchy sequence on ℚ}
 
-  [r] = [r']  :⇔  r − r' converges to 0  (r is a sequence on ℚ, r' is a sequence on ℚ with suitable conditions)
+  [r] = [r']  :⇔  r − r' converges to 0  (r is a Cauchy sequence on ℚ, r' is a Cauchy sequence on ℚ)
 
     Reflexivity.  No proof.
 
@@ -5568,7 +5568,7 @@ exports[`render hlm library: 1.8.6.2 Essentials/Numbers/Real/sum 1`] = `
 
 by:
 
-  [r_a] + [r_b] := [r_a + r_b]  (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
+  [r_a] + [r_b] := [r_a + r_b]  (r_a is a Cauchy sequence on ℚ, r_b is a Cauchy sequence on ℚ)
 
 Well-definedness.  No proof.
 
@@ -5600,7 +5600,7 @@ exports[`render hlm library: 1.8.6.4 Essentials/Numbers/Real/difference 1`] = `
 
 by:
 
-  [r_a] − [r_b] := [r_a − r_b]  (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
+  [r_a] − [r_b] := [r_a − r_b]  (r_a is a Cauchy sequence on ℚ, r_b is a Cauchy sequence on ℚ)
    = a + (−b)
 
 Equality.  No proof.
@@ -5619,7 +5619,7 @@ exports[`render hlm library: 1.8.6.5 Essentials/Numbers/Real/less%20or%20equal 1
 
 by:
 
-  [(x_n)_(n ∈ ℕ)] ≤ [(y_n)_(n ∈ ℕ)]  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : x_m ≤ y_m + ε  ((x_n)_(n ∈ ℕ) is a sequence on ℚ, (y_n)_(n ∈ ℕ) is a sequence on ℚ with suitable conditions)
+  [(x_n)_(n ∈ ℕ)] ≤ [(y_n)_(n ∈ ℕ)]  :⇔  ∀ ε ∈ ℚ_+ : ∃ n ∈ ℕ : ∀ m ∈ ℕ_(≥n) : x_m ≤ y_m + ε  ((x_n)_(n ∈ ℕ) is a Cauchy sequence on ℚ, (y_n)_(n ∈ ℕ) is a Cauchy sequence on ℚ)
 
 Well-definedness.  No proof.
 
@@ -5735,7 +5735,7 @@ exports[`render hlm library: 1.8.6.8 Essentials/Numbers/Real/product 1`] = `
 
 by:
 
-  [r_a] ⋅ [r_b] := [r_a ⋅ r_b]  (r_a is a sequence on ℚ, r_b is a sequence on ℚ with suitable conditions)
+  [r_a] ⋅ [r_b] := [r_a ⋅ r_b]  (r_a is a Cauchy sequence on ℚ, r_b is a Cauchy sequence on ℚ)
 
 Well-definedness.  No proof.
 
@@ -5869,7 +5869,7 @@ Proof.  Assume n√p is rational.
 ⇒^(def) ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
 ⇒^(def) p = (b∕a)^n
- =^1.8.6.13 b^n∕a^n
+ =^(1.8.6.13) b^n∕a^n
 
 ⇒^(def) p ⋅ a^n = b^n
 ⇒ p ∣ b^n by definition
@@ -5886,7 +5886,7 @@ Proof.  Assume n√p is rational.
 
     p ⋅ a^n = b^n
      = b^(2+m)
-     =^def b^m ⋅ b ⋅ b
+     =^(def) b^m ⋅ b ⋅ b
      = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
     ⇒^(1.8.4.20) a^n = b^m ⋅ z ⋅ p ⋅ z
@@ -6396,7 +6396,7 @@ This definition retrieves a representative carrier set from a magma (which is ac
 exports[`render hlm library: 2.3.3 Algebra/Magmas/operation 1`] = `
 "Definition 2.3.3.  Let 𝐌 be a magma, a, b ∈ 𝐌. We define:
 
-  a • b := a ∗ b if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)
+  a • b := a ∗ b if 𝐌 = [M, ∗] (M is a set, ∗ : M × M → M is an operation on M)
 
 Remarks.
 
@@ -6434,7 +6434,7 @@ References.
 exports[`render hlm library: 2.3.6.1 Algebra/Magmas/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.3.6.1.  Let 𝐌, 𝐍 be magmas. We define:
 
-  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -6449,7 +6449,7 @@ exports[`render hlm library: 2.3.6.2 Algebra/Magmas/Homomorphisms/Isomorphisms 1
 "Definition 2.3.6.2.  Let 𝐌, 𝐍 be magmas. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
+   = {f : (𝐌) ↔ (𝐍) : ∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -6522,7 +6522,7 @@ No proof."
 exports[`render hlm library: 2.3.7.1 Algebra/Magmas/Submagmas/submagma%20set 1`] = `
 "Definition 2.3.7.1.  Let 𝐌 be a magma, S ⊆ (𝐌). We define:
 
-  S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S
+  S is a submagma of 𝐌  :⇔  ∀ a, b ∈ S : a • b ∈ S
 
 References.
 
@@ -6749,7 +6749,7 @@ This definition retrieves a representative carrier set from a monoid (which is a
 exports[`render hlm library: 2.5.5 Algebra/Monoids/operation 1`] = `
 "Definition 2.5.5.  Let 𝐌 be a monoid, a, b ∈ 𝐌. We define:
 
-  a • b := a ∗ b if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
+  a • b := a ∗ b if 𝐌 = [M, ∗, e] (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
 
 Remarks.
 
@@ -6792,7 +6792,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.5.9.1 Algebra/Monoids/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.5.9.1.  Let 𝐌, 𝐍 be monoids. We define:
 
-  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
+  Hom(𝐌, 𝐍) := {f : (𝐌) → (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
 We write “let φ : 𝐌 → 𝐍 be a homomorphism” for “let φ ∈ Hom(𝐌, 𝐍).”
 
@@ -6808,7 +6808,7 @@ exports[`render hlm library: 2.5.9.2 Algebra/Monoids/Homomorphisms/Isomorphisms 
 "Definition 2.5.9.2.  Let 𝐌, 𝐍 be monoids. We define:
 
   Iso(𝐌, 𝐍) := {homomorphisms φ : 𝐌 → 𝐍 : φ is bijective}
-   = {f : (𝐌) ↔ (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
+   = {f : (𝐌) ↔ (𝐍) : [∀ a, b ∈ 𝐌 : f(a • b) = f(a) • f(b)] and f(e_𝐌) = e_𝐍}
 
 We write “let φ : 𝐌 ↔ 𝐍 be an isomorphism” for “let φ ∈ Iso(𝐌, 𝐍).”
 
@@ -6879,7 +6879,7 @@ No proof."
 exports[`render hlm library: 2.5.10.1 Algebra/Monoids/Submonoids/submonoid%20set 1`] = `
 "Definition 2.5.10.1.  Let 𝐌 be a monoid, S ⊆ (𝐌). We define:
 
-  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐌 ∈ S
+  S is a submonoid of 𝐌  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐌 ∈ S
 
 References.
 
@@ -6938,8 +6938,8 @@ References.
 exports[`render hlm library: 2.5.12 Algebra/Monoids/invertible 1`] = `
 "Definition 2.5.12.  Let 𝐌 be a monoid, a ∈ 𝐌. We define:
 
-  a is invertible  :⇔  ∃ b ∈ 𝐌 : a • b = b • a = e_𝐌
-    ⇔  ∃! b ∈ 𝐌 : a • b = b • a = e_𝐌
+  a is invertible  :⇔  ∃ b ∈ 𝐌 : a • b = b • a = e_𝐌
+    ⇔  ∃! b ∈ 𝐌 : a • b = b • a = e_𝐌
 
 Equivalence.  No proof.
 
@@ -6954,7 +6954,7 @@ References.
 exports[`render hlm library: 2.5.13 Algebra/Monoids/inverse 1`] = `
 "Definition 2.5.13.  Let 𝐌 be a monoid, a ∈ 𝐌 such that a is invertible. For b ∈ 𝐌, we define:
 
-  a^-1 = b  :⇔  a • b = e_𝐌
+  a^-1 = b  :⇔  a • b = e_𝐌
 
 Well-definedness.  No proof.
 
@@ -6972,7 +6972,7 @@ exports[`render hlm library: 2.5.14 Algebra/Monoids/power%20to%20natural%20numbe
 by:
 
   a^0 := e_𝐌
-  a^(x+1) := a^x • a  (x ∈ ℕ)
+  a^(x+1) := a^x • a  (x ∈ ℕ)
 
 References.
 
@@ -7063,7 +7063,7 @@ This definition retrieves a representative carrier set from a group (which is ac
 exports[`render hlm library: 2.6.5 Algebra/Groups/operation 1`] = `
 "Definition 2.6.5.  Let 𝐆 be a group, a, b ∈ 𝐆. We define:
 
-  a • b := a ∗ b if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
+  a • b := a ∗ b if 𝐆 = [G, ∗, e, i] (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
 
 Remarks.
 
@@ -7129,7 +7129,7 @@ exports[`render hlm library: 2.6.10 Algebra/Groups/power%20to%20natural%20number
 by:
 
   a^0 := e_𝐆
-  a^(x+1) := a^x • a  (x ∈ ℕ)
+  a^(x+1) := a^x • a  (x ∈ ℕ)
 
 References.
 
@@ -7151,8 +7151,8 @@ References.
 exports[`render hlm library: 2.6.12.1 Algebra/Groups/Homomorphisms/Homomorphisms 1`] = `
 "Definition 2.6.12.1.  Let 𝐆, 𝐇 be groups. We define:
 
-  Hom(𝐆, 𝐇) := {f : (𝐆) → (𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(e_𝐆) = e_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
-   = {f : (𝐆) → (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
+  Hom(𝐆, 𝐇) := {f : (𝐆) → (𝐇) : [∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)] and f(e_𝐆) = e_𝐇 and ∀ c ∈ 𝐆 : f(c^-1) = (f(c))^-1}
+   = {f : (𝐆) → (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐆 → 𝐇 be a homomorphism” for “let φ ∈ Hom(𝐆, 𝐇).”
 
@@ -7171,7 +7171,7 @@ exports[`render hlm library: 2.6.12.2 Algebra/Groups/Homomorphisms/Isomorphisms 
 "Definition 2.6.12.2.  Let 𝐆, 𝐇 be groups. We define:
 
   Iso(𝐆, 𝐇) := {homomorphisms φ : 𝐆 → 𝐇 : φ is bijective}
-   = {f : (𝐆) ↔ (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
+   = {f : (𝐆) ↔ (𝐇) : ∀ a, b ∈ 𝐆 : f(a • b) = f(a) • f(b)}
 
 We write “let φ : 𝐆 ↔ 𝐇 be an isomorphism” for “let φ ∈ Iso(𝐆, 𝐇).”
 
@@ -7256,7 +7256,7 @@ No proof."
 exports[`render hlm library: 2.6.13.1 Algebra/Groups/Subgroups/subgroup%20set 1`] = `
 "Definition 2.6.13.1.  Let 𝐆 be a group, S ⊆ (𝐆). We define:
 
-  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S
+  S is a subgroup of 𝐆  :⇔  [∀ a, b ∈ S : a • b ∈ S] and e_𝐆 ∈ S and ∀ c ∈ S : c^-1 ∈ S
 
 References.
 
@@ -7293,8 +7293,8 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.6.13.4 Algebra/Groups/Subgroups/normal%20subgroup%20set 1`] = `
 "Definition 2.6.13.4.  Let 𝐆 be a group, S ⊆ (𝐆). We define:
 
-  S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : g • s • g^-1 ∈ S
-    ⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, h ∈ 𝐆 : h^-1 • s • h ∈ S
+  S is a normal subgroup of 𝐆  :⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, g ∈ 𝐆 : g • s • g^-1 ∈ S
+    ⇔  S is a subgroup of 𝐆 and ∀ s ∈ S, h ∈ 𝐆 : h^-1 • s • h ∈ S
     ⇔  ∃ group 𝐇, homomorphism φ : 𝐆 → 𝐇 : S = Ker(φ)
 
 Equivalence.  No proof.
@@ -7344,9 +7344,9 @@ References.
 `;
 
 exports[`render hlm library: 2.6.14.1 Algebra/Groups/Quotients/quotient%20group 1`] = `
-"Definition 2.6.14.1.  Let 𝐆 be a group, S ⊆ (𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ (𝐆)), Q := (𝐆)∕∼. We define:
+"Definition 2.6.14.1.  Let 𝐆 be a group, S ⊆ (𝐆) such that S is a normal subgroup of 𝐆, ∼ := [∃ s ∈ S : g • s = h]_(g,h ∈ (𝐆)), Q := (𝐆)∕∼. We define:
 
-  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)] is a group
+  𝐆∕S := [Q, (Q × Q → Q, ([g]_∼, [h]_∼) ↦ [g • h]_∼), [e_𝐆]_∼, (Q → Q, [g]_∼ ↦ [g^-1]_∼)] is a group
 
 References.
 

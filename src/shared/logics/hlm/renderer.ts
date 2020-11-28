@@ -56,6 +56,12 @@ interface ParameterListState {
   inExistsUnique: boolean;
   associatedParameterList?: Fmt.ParameterList;
   associatedDefinition?: Fmt.Definition;
+  extractedConstraints?: Fmt.Parameter[];
+  outputPromise?: CachedPromise<void>;
+}
+
+interface ConstraintExtractionContainer {
+  resultPromise?: CachedPromise<Fmt.Parameter[]>;
 }
 
 interface ProofOutputImplication {
@@ -224,22 +230,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (claim) {
         if (definition.parameters.length) {
-          let extractedConstraints: Fmt.Parameter[] = [];
-          let reducedParameters = this.renderUtils.extractConstraints(definition.parameters, extractedConstraints);
-          let parameters = this.readOnlyRenderer.renderParameters(reducedParameters, false, false, false);
+          let extractedConstraints: ConstraintExtractionContainer = {};
+          let parameters = this.readOnlyRenderer.renderParameterList(definition.parameters, false, false, false, undefined, undefined, extractedConstraints);
           let addendum = new Notation.RowExpression([new Notation.TextExpression('if '), parameters]);
           addendum.styleClasses = ['addendum'];
-          if (extractedConstraints.length) {
-            let constraints = this.renderParameters(extractedConstraints, false, true, false);
-            claim.optionalParenStyle = '[]';
-            claim = this.renderTemplate('ImplicationRelation', {
-                                          'operands': [constraints, claim]
-                                        });
-          }
+          let extendedClaimPromise = extractedConstraints.resultPromise!.then((constraintParams: Fmt.Parameter[]) => {
+            if (constraintParams.length) {
+              let constraints = this.renderParameters(constraintParams, false, true, false);
+              claim!.optionalParenStyle = '[]';
+              return this.renderTemplate('ImplicationRelation', {
+                                           'operands': [constraints, claim]
+                                         });
+            } else {
+              return claim!;
+            }
+          });
+          let extendedClaim = new Notation.PromiseExpression(extendedClaimPromise);
           if (multiLine) {
-            return new Notation.ParagraphExpression([claim, addendum]);
+            return new Notation.ParagraphExpression([extendedClaim, addendum]);
           } else {
-            return new Notation.RowExpression([claim, new Notation.TextExpression('  '), addendum]);
+            return new Notation.RowExpression([extendedClaim, new Notation.TextExpression('  '), addendum]);
           }
         } else {
           return claim;
@@ -348,7 +358,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return new Notation.TextExpression(hasParameters ? 'Then the following are equivalent' : 'The following are equivalent');
   }
 
-  renderParameterList(parameters: Fmt.ParameterList, sentence: boolean, abbreviate: boolean, forcePlural: boolean, associatedDefinition?: Fmt.Definition, elementParameterOverrides?: ElementParameterOverrides): Notation.RenderedExpression {
+  renderParameterList(parameters: Fmt.ParameterList, sentence: boolean, abbreviate: boolean, forcePlural: boolean, associatedDefinition?: Fmt.Definition, elementParameterOverrides?: ElementParameterOverrides, extractedConstraints?: ConstraintExtractionContainer): Notation.RenderedExpression {
     let initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
@@ -367,10 +377,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       associatedParameterList: parameters,
       associatedDefinition: associatedDefinition
     };
-    return this.renderParametersWithInitialState(parameters, initialState, undefined);
+    return this.renderParametersWithInitialState(parameters, initialState, undefined, extractedConstraints);
   }
 
-  renderParameters(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, elementParameterOverrides?: ElementParameterOverrides): Notation.RenderedExpression {
+  renderParameters(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, elementParameterOverrides?: ElementParameterOverrides, extractedConstraints?: ConstraintExtractionContainer): Notation.RenderedExpression {
     let initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
@@ -387,7 +397,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       inForEach: false,
       inExistsUnique: false
     };
-    return this.renderParametersWithInitialState(parameters, initialState, undefined);
+    return this.renderParametersWithInitialState(parameters, initialState, undefined, extractedConstraints);
   }
 
   renderParameter(parameter: Fmt.Parameter, sentence: boolean, forcePlural: boolean, markAsDummy: boolean, elementParameterOverrides?: ElementParameterOverrides): Notation.RenderedExpression {
@@ -410,7 +420,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     return this.renderParametersWithInitialState([parameter], initialState);
   }
 
-  private renderParametersWithInitialState(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Notation.RenderedExpression[]): Notation.RenderedExpression {
+  private renderParametersWithInitialState(parameters: Fmt.Parameter[], initialState: ParameterListState, indices?: Notation.RenderedExpression[], extractedConstraints?: ConstraintExtractionContainer): Notation.RenderedExpression {
     let renderer: HLMRenderer = this;
     if (indices) {
       renderer = Object.create(this);
@@ -421,9 +431,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
 
     let state: ParameterListState = {...initialState};
+    if (extractedConstraints) {
+      state.extractedConstraints = [];
+    }
     let resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]> = CachedPromise.resolve([]);
     resolveDefinitions = renderer.extractParameterDefinitions(parameters, resolveDefinitions);
     let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => renderer.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
+    if (extractedConstraints) {
+      extractedConstraints.resultPromise = render.then(() => state.extractedConstraints!);
+    }
     return new Notation.PromiseExpression(render);
   }
 
@@ -532,12 +548,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[], remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
-    let type = parameters[0].type;
+    let param = parameters[0];
+    let type = param.type;
 
     if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       this.addBinder(type, state, indices, row);
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-      this.addConstraint(type, remainingParameters, remainingDefinitions, state, row);
+      if (state.extractedConstraints && (state.associatedParameterList || state.extractedConstraints.length || remainingParameters.length)) {
+        state.extractedConstraints.push(param);
+      } else {
+        this.addConstraint(type, remainingParameters, remainingDefinitions, state, row);
+      }
     } else {
       this.addRegularParameterGroup(parameters, type, definition, remainingParameters, remainingDefinitions, state, indices, row);
     }
@@ -565,7 +586,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       forcePlural: false,
       started: false,
       inForEach: true,
-      associatedParameterList: type.sourceParameters
+      associatedParameterList: type.sourceParameters,
+      extractedConstraints: undefined
     };
     row.push(this.renderParametersWithInitialState(type.sourceParameters, sourceState));
 
@@ -1262,18 +1284,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addCaseParameters(parameters: Fmt.Parameter[], elementParameterOverrides: ElementParameterOverrides | undefined, row: Notation.RenderedExpression[]): void {
     if (parameters.length) {
-      let extractedConstraints: Fmt.Parameter[] = [];
-      let extractedParameters = this.renderUtils.extractConstraints(parameters, extractedConstraints);
-      if (extractedConstraints.length <= 1 || !extractedParameters.length) {
-        extractedConstraints = [];
-        extractedParameters = parameters;
-      }
-      let parameterList = this.readOnlyRenderer.renderParameters(extractedParameters, false, false, false, elementParameterOverrides);
-      if (extractedConstraints.length) {
-        let caseRow = [parameterList, new Notation.TextExpression(' with suitable conditions')];
-        parameterList = new Notation.RowExpression(caseRow);
-      }
-      let caseParameters = new Notation.ParenExpression(parameterList, '()');
+      let extractedConstraints: ConstraintExtractionContainer = {};
+      let parameterList = this.readOnlyRenderer.renderParameters(parameters, false, false, false, elementParameterOverrides, extractedConstraints);
+      let extendedParameterListPromise = extractedConstraints.resultPromise!.then((constraintParams: Fmt.Parameter[]) => {
+        if (constraintParams.length) {
+          return new Notation.RowExpression([parameterList, new Notation.TextExpression(' with suitable conditions')]);
+        } else {
+          return parameterList;
+        }
+      });
+      let extendedParameterList = new Notation.PromiseExpression(extendedParameterListPromise);
+      let caseParameters = new Notation.ParenExpression(extendedParameterList, '()');
       caseParameters.styleClasses = ['case-parameters'];
       row.push(caseParameters);
     }

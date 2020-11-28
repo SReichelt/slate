@@ -316,17 +316,16 @@ $SubtractionOperator(symbol: %Expr = '−', operands: %Expr[], space: %String = 
 
 /**
  * An operator that can be thought of as a multiplication. 
- * The operator symbol is set to "•" by default, but can be altered. For example, "×" and "∘" are common candidates. 
- * In contrast to `$MultiplicationOperator`, the default spacing is the same as for other operators.
+ * The operator symbol is set to "•" by default, but can be altered. 
+ * By default, spacing is reduced compared to other operators, to indicate that multiplication binds more strongly, and to avoid clutter due to explicitly written multiplication symbols where one would normally omit them.
  *
  * @param symbol The operator symbol.
  * @param operands The list of operands. If more than two operands are given, the operator symbol is displayed between each pair of operands.
- * @param space The space to use between the operator symbol and its operands.
+ * @param space The space to use between the operator symbol and its operands. The default value is a particularly thin space.
  *
  * @example `$MultiplicationLikeOperator(operands = [a, b])`
- * @example `$MultiplicationLikeOperator(symbol = '×', operands = [a, b])`
  */
-$MultiplicationLikeOperator(symbol: %Expr = '•', operands: %Expr[], space: %String = ' '): %Template {
+$MultiplicationLikeOperator(symbol: %Expr = '•', operands: %Expr[], space: %String = ' '): %Template {
   notation = $Operator(
     symbol = symbol,
     operands = operands,
@@ -348,6 +347,43 @@ $MultiplicationLikeOperator(symbol: %Expr = '•', operands: %Expr[], space: %St
  * @example `$MultiplicationOperator(operands = [a, b])`
  */
 $MultiplicationOperator(symbol: %Expr = '⋅', operands: %Expr[], space: %String = ' '): %Template {
+  notation = $MultiplicationLikeOperator(
+    symbol = symbol,
+    operands = operands,
+    space = space
+  )
+}
+
+/**
+ * An operator representing a special kind of multiplication, e.g. a Cartesian product. 
+ * The operator symbol is set to "×" by default, but can be altered. 
+ *
+ * @param symbol The operator symbol.
+ * @param operands The list of operands. If more than two operands are given, the operator symbol is displayed between each pair of operands.
+ * @param space The space to use between the operator symbol and its operands.
+ *
+ * @example `$CrossOperator(operands = [a, b])`
+ */
+$CrossOperator(symbol: %Expr = '×', operands: %Expr[], space: %String = ' '): %Template {
+  notation = $MultiplicationLikeOperator(
+    symbol = symbol,
+    operands = operands,
+    space = space
+  )
+}
+
+/**
+ * An operator representing composition of two or more functions or morphisms. 
+ * The operator symbol is set to "∘" by default, but can be altered. 
+ *
+ * @param symbol The operator symbol.
+ * @param operands The list of operands. If more than two operands are given, the operator symbol is displayed between each pair of operands.
+ * @param space The space to use between the operator symbol and its operands.
+ *
+ * @example `$CompositionOperator(operands = [a, b])`
+ * @example `$CompositionOperator(symbol = '∙', operands = [a, b])`
+ */
+$CompositionOperator(symbol: %Expr = '∘', operands: %Expr[], space: %String = ' '): %Template {
   notation = $MultiplicationLikeOperator(
     symbol = symbol,
     operands = operands,
@@ -2139,7 +2175,12 @@ $ProofEquality(source?: %Expr, formula?: %Expr): %Template {
     source,
     $OverUnder(
       body = '=',
-      over = source,
+      over = $OuterParens(
+        body = $Style(
+          body = source,
+          styleClass = 'miniature'
+        )
+      ),
       style = 'shallow'
     ),
     '='

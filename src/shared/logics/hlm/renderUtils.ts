@@ -42,18 +42,6 @@ export class HLMRenderUtils extends GenericRenderUtils {
     return [constraint, negationCount];
   }
 
-  extractConstraints(parameters: Fmt.Parameter[], extractedConstraints: Fmt.Parameter[]): Fmt.Parameter[] {
-    let result: Fmt.Parameter[] = [];
-    for (let param of parameters) {
-      if (param.type instanceof FmtHLM.MetaRefExpression_Constraint) {
-        extractedConstraints.push(param);
-      } else {
-        result.push(param);
-      }
-    }
-    return result;
-  }
-
   extractStructuralCases(definitions: Fmt.Expression[]): ExtractedStructuralCase[] {
     return this.doExtractStructuralCases(this.definition.parameters, definitions, true);
   }

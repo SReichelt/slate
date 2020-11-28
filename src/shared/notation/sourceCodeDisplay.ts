@@ -6,6 +6,7 @@ import * as Logic from '../logics/logic';
 
 interface StackItem {
   range?: Notation.RowExpression;
+  object?: Object;
   isMathematical: boolean;
 }
 
@@ -26,6 +27,9 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
   private addExpression(expression: Notation.RenderedExpression): void {
     let back = this.stack[this.stack.length - 1];
     if (back.range) {
+      if (back.object instanceof Fmt.Argument && !expression.styleClasses) {
+        expression.styleClasses = ['arg'];
+      }
       back.range.items.push(expression);
     }
   }
@@ -96,6 +100,7 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
         back.range.items.push(range);
         this.stack.push({
           range: range,
+          object: object,
           isMathematical: isMathematical
         });
       }
