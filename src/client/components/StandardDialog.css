@@ -1,7 +1,14 @@
+.dialog-root {
+  z-index: 20;
+}
+
+.dialog-overlay {
+  background-color: var(--dialog-overlay-color);
+}
+
 .dialog {
   padding: 0;
   border-radius: 2pt;
-  margin: auto auto;
   color: var(--dialog-foreground-color);
   background-color: var(--dialog-background-color);
 }
@@ -96,11 +103,6 @@
   border-top: solid 1px var(--dialog-button-row-border-color);
   background-color: var(--dialog-button-row-background-color);
   text-align: right;
-}
-
-*.dialog-overlay {
-  z-index: 20;
-  background-color: var(--dialog-overlay-color);
 }
 
 .dialog-optional-label {

@@ -18,8 +18,9 @@ interface StandardDialogProps {
 }
 
 const modalClassNames = {
-  modal: 'dialog',
-  overlay: 'dialog-overlay'
+  root: 'dialog-root',
+  overlay: 'dialog-overlay',
+  modal: 'dialog'
 };
 
 function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): React.ReactElement {
@@ -53,7 +54,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
     ];
   }
   return (
-    <Modal open={true} onClose={props.onCancel} showCloseIcon={false} classNames={modalClassNames} animationDuration={0} key="dialog">
+    <Modal open={true} onClose={props.onCancel} showCloseIcon={false} center={true} classNames={modalClassNames} animationDuration={0} key="dialog">
       <form onSubmit={onOK} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
         {props.children}
         <div className={'dialog-button-row'} key="buttons">
