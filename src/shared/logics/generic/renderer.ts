@@ -351,7 +351,7 @@ export abstract class GenericRenderer {
     return 'a/an';
   }
 
-  protected addExtractedProperties(properties: PropertyInfo[], singular: Notation.RenderedExpression[], plural: Notation.RenderedExpression[]) {
+  protected addExtractedProperties(properties: PropertyInfo[], singular: Notation.RenderedExpression[], plural: Notation.RenderedExpression[]): void {
     for (let property of properties) {
       let space = new Notation.TextExpression(' ');
       if (property.property) {

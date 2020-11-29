@@ -80,7 +80,7 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     if (ExpressionToolTip.showTimerOwner === this) {
       clearTimeout(ExpressionToolTip.showTimer);
       ExpressionToolTip.showTimer = undefined;
@@ -144,7 +144,7 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     this.stopTimer();
   }
 

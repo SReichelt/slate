@@ -22,7 +22,7 @@ class SourceCodeView extends LibraryItemBase {
     return <Expression expression={stream.result} interactionHandler={this.props.interactionHandler} toolTipPosition="top"/>;
   }
 
-  protected onExpressionChanged = () => {
+  protected onExpressionChanged = (): void => {
     if (this.timer) {
       clearTimeout(this.timer);
     }

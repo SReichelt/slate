@@ -2012,7 +2012,7 @@ export class HLMUtils extends GenericUtils {
         return result;
       });
     }
-  };
+  }
 
   private isDeclaredElementOf(element: Fmt.Expression, set: Fmt.Expression): CachedPromise<boolean> {
     return this.getDeclaredSet(element).then((declaredSet: Fmt.Expression) =>

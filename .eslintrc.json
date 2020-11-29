@@ -11,71 +11,32 @@
     "plugins": [
         "@typescript-eslint"
     ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "rules": {
         "@typescript-eslint/indent": [
-            "off",  // currently a little too strict
+            "off",  // not flexible enough
             2
         ],
-        "@typescript-eslint/member-delimiter-style": [
-            "warn",
+        "@typescript-eslint/ban-types": "off",  // TODO we may want this
+        "@typescript-eslint/explicit-module-boundary-types": [
+            "error",
             {
-                "multiline": {
-                    "delimiter": "semi",
-                    "requireLast": true
-                },
-                "singleline": {
-                    "delimiter": "comma",
-                    "requireLast": false
-                }
+                "allowArgumentsExplicitlyTypedAsAny": true
             }
         ],
         "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-redeclare": "warn",
-        "@typescript-eslint/no-shadow": "warn",
-        "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/quotes": [
-            "warn",
-            "single",
-            {
-                "allowTemplateLiterals": true
-            }
-        ],
-        "@typescript-eslint/semi": [
-            "warn",
-            "always"
-        ],
-        "@typescript-eslint/type-annotation-spacing": "warn",
-        "camelcase": "off",
-        "comma-dangle": "warn",
-        "curly": "warn",
-        "default-case": "off",
-        "dot-notation": "off",
-        "eol-last": "warn",
-        "eqeqeq": [
-            "warn",
-            "smart"
-        ],
-        "guard-for-in": "warn",
-        "id-blacklist": [
-            "warn",
-            "any",
-            "number",
-            "string",
-            "boolean"
-        ],
-        "id-match": "warn",
-        "no-bitwise": "warn",
-        "no-caller": "warn",
-        "no-debugger": "warn",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-this-alias": "off",
+        "@typescript-eslint/no-unused-vars": "off",  // covered by syntax highlighting
+        "@typescript-eslint/no-var-requires": "off",
         "no-empty": "off",
-        "no-eval": "warn",
-        "no-fallthrough": "warn",
-        "no-new-wrappers": "warn",
-        "no-trailing-spaces": "warn",
-        "no-underscore-dangle": "off",
-        "no-unused-expressions": "off",  // currently conflicts with new TypeScript operators
-        "no-unused-labels": "warn",
-        "radix": "warn"
+        "prefer-const": "off"
     }
 }

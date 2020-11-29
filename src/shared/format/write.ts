@@ -693,7 +693,6 @@ export class Writer {
             if (c === '\r') {
               // ignore
             } else if (c === '\n') {
-              textLine = textLine;
               if (textLine.startsWith('@')) {
                 textLine = textLine.substring(1);
               }
@@ -713,7 +712,6 @@ export class Writer {
               textLine += c;
             }
           }
-          textLine = textLine;
           if (textLine) {
             if (indentLength > this.lineLength) {
               this.write(' '.repeat(indentLength - this.lineLength));

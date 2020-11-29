@@ -87,7 +87,7 @@ function renderTheoremExample(names: string[], props: StartPageProps): React.Rea
   return wrapExample(result, examplePath, props);
 }
 
-function StartPage(props: StartPageProps) {
+function StartPage(props: StartPageProps): React.ReactElement {
   if (props.isLoggedIn) {
     // Once we display high scores, latest additions, etc., we will still want to display those here.
     return <div className="start-page"/>;

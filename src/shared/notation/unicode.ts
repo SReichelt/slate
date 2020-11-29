@@ -50,95 +50,97 @@ export function convertUnicode(text: string, renderer: UnicodeConverter, options
       curText += c;
       break;
     default:
-      let cp = c.codePointAt(0)!;
-      if (options.convertStandardCharacters) {
-        let standardCharacter = getStandardCharacter(cp);
-        if (standardCharacter) {
-          setStyle(standardCharacter[1]);
-          curText += standardCharacter[0];
-          break;
+      {
+        let cp = c.codePointAt(0)!;
+        if (options.convertStandardCharacters) {
+          let standardCharacter = getStandardCharacter(cp);
+          if (standardCharacter) {
+            setStyle(standardCharacter[1]);
+            curText += standardCharacter[0];
+            break;
+          }
         }
-      }
-      if (cp >= 0x1d400 && cp < 0x1d434) {
-        setStyle('bold');
-        curText += convertLatinMathToRegular(cp - 0x1d400);
-      } else if ((cp >= 0x1d6a8 && cp < 0x1d6e2) || (cp >= 0x1d7ca && cp < 0x1d7cc)) {
-        setStyle('bold');
-        curText += convertGreekMathToRegular(cp - 0x1d6a8);
-      } else if (cp >= 0x1d7ce && cp < 0x1d7d8) {
-        setStyle('bold');
-        curText += convertDigitMathToRegular(cp - 0x1d7ce);
-      } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
-        setStyle('italic');
-        switch (cp) {
-        case 0x210e:
-          curText += 'h';
-          break;
-        default:
-          curText += convertLatinMathToRegular(cp - 0x1d434);
+        if (cp >= 0x1d400 && cp < 0x1d434) {
+          setStyle('bold');
+          curText += convertLatinMathToRegular(cp - 0x1d400);
+        } else if ((cp >= 0x1d6a8 && cp < 0x1d6e2) || (cp >= 0x1d7ca && cp < 0x1d7cc)) {
+          setStyle('bold');
+          curText += convertGreekMathToRegular(cp - 0x1d6a8);
+        } else if (cp >= 0x1d7ce && cp < 0x1d7d8) {
+          setStyle('bold');
+          curText += convertDigitMathToRegular(cp - 0x1d7ce);
+        } else if ((cp >= 0x1d434 && cp < 0x1d468) || cp === 0x210e) {
+          setStyle('italic');
+          switch (cp) {
+          case 0x210e:
+            curText += 'h';
+            break;
+          default:
+            curText += convertLatinMathToRegular(cp - 0x1d434);
+          }
+        } else if (cp >= 0x1d6e2 && cp < 0x1d71c) {
+          setStyle('italic');
+          curText += convertGreekMathToRegular(cp - 0x1d6e2);
+        } else if (cp >= 0x1d468 && cp < 0x1d49c) {
+          setStyle('bold italic');
+          curText += convertLatinMathToRegular(cp - 0x1d468);
+        } else if (cp >= 0x1d71c && cp < 0x1d756) {
+          setStyle('bold italic');
+          curText += convertGreekMathToRegular(cp - 0x1d71c);
+        } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
+          setStyle('sans');
+          curText += convertLatinMathToRegular(cp - 0x1d5a0);
+        } else if (cp >= 0x1d7e2 && cp < 0x1d7ec) {
+          setStyle('sans');
+          curText += convertDigitMathToRegular(cp - 0x1d7e2);
+        } else if (cp >= 0x1d5d4 && cp < 0x1d608) {
+          setStyle('sans bold');
+          curText += convertLatinMathToRegular(cp - 0x1d5d4);
+        } else if (cp >= 0x1d756 && cp < 0x1d790) {
+          setStyle('sans bold');
+          curText += convertGreekMathToRegular(cp - 0x1d756);
+        } else if (cp >= 0x1d7ec && cp < 0x1d7f6) {
+          setStyle('sans bold');
+          curText += convertDigitMathToRegular(cp - 0x1d7ec);
+        } else if (cp >= 0x1d608 && cp < 0x1d63c) {
+          setStyle('sans italic');
+          curText += convertLatinMathToRegular(cp - 0x1d608);
+        } else if (cp >= 0x1d63c && cp < 0x1d670) {
+          setStyle('sans bold italic');
+          curText += convertLatinMathToRegular(cp - 0x1d63c);
+        } else if (cp >= 0x1d790 && cp < 0x1d7ca) {
+          setStyle('sans bold italic');
+          curText += convertGreekMathToRegular(cp - 0x1d790);
+        } else if (cp >= 0x1d49c && cp < 0x1d504) {
+          setStyle('calligraphic');
+          curText += convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
+        } else if (cp >= 0x1d504 && cp < 0x1d538) {
+          setStyle('fraktur');
+          curText += convertLatinMathToRegular(cp - 0x1d504);
+        } else if (cp >= 0x1d538 && cp < 0x1d56c) {
+          setStyle('double-struck');
+          curText += convertLatinMathToRegular(cp - 0x1d538);
+        } else if (cp >= 0x1d56c && cp < 0x1d5a0) {
+          setStyle('fraktur bold');
+          curText += convertLatinMathToRegular(cp - 0x1d56c);
+        } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
+          setStyle('double-struck');
+          curText += convertDigitMathToRegular(cp - 0x1d7d8);
+        } else if (cp >= 0x1d670 && cp < 0x1d6a4) {
+          setStyle('monospace');
+          curText += convertLatinMathToRegular(cp - 0x1d670);
+        } else if (cp >= 0x1d7f6 && cp < 0x1d800) {
+          setStyle('monospace');
+          curText += convertDigitMathToRegular(cp - 0x1d7f6);
+        } else {
+          if (curStyle) {
+            flush();
+          }
+          if (options.shrinkMathSpaces) {
+            c = shrinkMathSpace(c);
+          }
+          curText += c;
         }
-      } else if (cp >= 0x1d6e2 && cp < 0x1d71c) {
-        setStyle('italic');
-        curText += convertGreekMathToRegular(cp - 0x1d6e2);
-      } else if (cp >= 0x1d468 && cp < 0x1d49c) {
-        setStyle('bold italic');
-        curText += convertLatinMathToRegular(cp - 0x1d468);
-      } else if (cp >= 0x1d71c && cp < 0x1d756) {
-        setStyle('bold italic');
-        curText += convertGreekMathToRegular(cp - 0x1d71c);
-      } else if (cp >= 0x1d5a0 && cp < 0x1d5d4) {
-        setStyle('sans');
-        curText += convertLatinMathToRegular(cp - 0x1d5a0);
-      } else if (cp >= 0x1d7e2 && cp < 0x1d7ec) {
-        setStyle('sans');
-        curText += convertDigitMathToRegular(cp - 0x1d7e2);
-      } else if (cp >= 0x1d5d4 && cp < 0x1d608) {
-        setStyle('sans bold');
-        curText += convertLatinMathToRegular(cp - 0x1d5d4);
-      } else if (cp >= 0x1d756 && cp < 0x1d790) {
-        setStyle('sans bold');
-        curText += convertGreekMathToRegular(cp - 0x1d756);
-      } else if (cp >= 0x1d7ec && cp < 0x1d7f6) {
-        setStyle('sans bold');
-        curText += convertDigitMathToRegular(cp - 0x1d7ec);
-      } else if (cp >= 0x1d608 && cp < 0x1d63c) {
-        setStyle('sans italic');
-        curText += convertLatinMathToRegular(cp - 0x1d608);
-      } else if (cp >= 0x1d63c && cp < 0x1d670) {
-        setStyle('sans bold italic');
-        curText += convertLatinMathToRegular(cp - 0x1d63c);
-      } else if (cp >= 0x1d790 && cp < 0x1d7ca) {
-        setStyle('sans bold italic');
-        curText += convertGreekMathToRegular(cp - 0x1d790);
-      } else if (cp >= 0x1d49c && cp < 0x1d504) {
-        setStyle('calligraphic');
-        curText += convertLatinMathToRegular(cp < 0x1d4d0 ? cp - 0x1d49c : cp - 0x1d4d0);
-      } else if (cp >= 0x1d504 && cp < 0x1d538) {
-        setStyle('fraktur');
-        curText += convertLatinMathToRegular(cp - 0x1d504);
-      } else if (cp >= 0x1d538 && cp < 0x1d56c) {
-        setStyle('double-struck');
-        curText += convertLatinMathToRegular(cp - 0x1d538);
-      } else if (cp >= 0x1d56c && cp < 0x1d5a0) {
-        setStyle('fraktur bold');
-        curText += convertLatinMathToRegular(cp - 0x1d56c);
-      } else if (cp >= 0x1d7d8 && cp < 0x1d7e2) {
-        setStyle('double-struck');
-        curText += convertDigitMathToRegular(cp - 0x1d7d8);
-      } else if (cp >= 0x1d670 && cp < 0x1d6a4) {
-        setStyle('monospace');
-        curText += convertLatinMathToRegular(cp - 0x1d670);
-      } else if (cp >= 0x1d7f6 && cp < 0x1d800) {
-        setStyle('monospace');
-        curText += convertDigitMathToRegular(cp - 0x1d7f6);
-      } else {
-        if (curStyle) {
-          flush();
-        }
-        if (options.shrinkMathSpaces) {
-          c = shrinkMathSpace(c);
-        }
-        curText += c;
       }
     }
   }

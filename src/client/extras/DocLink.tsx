@@ -10,7 +10,7 @@ interface DocLinkProps {
   onDocLinkClicked: OnDocLinkClicked;
 }
 
-function DocLink(props: React.PropsWithChildren<DocLinkProps>) {
+function DocLink(props: React.PropsWithChildren<DocLinkProps>): React.ReactElement {
   let onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (event.button < 1) {
       eventHandled(event);

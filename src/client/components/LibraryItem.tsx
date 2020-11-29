@@ -99,7 +99,7 @@ class LibraryItem extends LibraryItemBase {
     return null;
   }
 
-  protected onExpressionChanged = (editorUpdateRequired: boolean) => {
+  protected onExpressionChanged = (editorUpdateRequired: boolean): void => {
     if (editorUpdateRequired) {
       let onAutoFilled = () => {
         if (this.props.interactionHandler) {

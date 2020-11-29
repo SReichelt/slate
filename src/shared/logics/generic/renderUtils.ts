@@ -72,7 +72,7 @@ export abstract class GenericRenderUtils {
               }
             }
             templateArgs.set(templateParam, templateArg);
-          };
+          }
         }
         return this.getSelections(template.contents.notation, templateArgs);
       }

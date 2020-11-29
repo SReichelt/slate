@@ -7,7 +7,6 @@ import { HLMUtils } from '../utils';
 import * as HLMMacro from '../macro';
 import * as Macro from '../../macro';
 import CachedPromise from '../../../data/cachedPromise';
-import { HLMExpressionType } from '../hlm';
 
 export class MatrixMacro implements HLMMacro.HLMMacro {
   name = 'matrix';

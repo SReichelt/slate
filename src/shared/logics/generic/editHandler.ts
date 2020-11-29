@@ -867,7 +867,7 @@ export abstract class GenericEditHandler {
     return undefined;
   }
 
-  addVariableNameEditor(text: Notation.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.ParameterList) {
+  addVariableNameEditor(text: Notation.TextExpression, param: Fmt.Parameter, parameterList?: Fmt.ParameterList): void {
     text.onTextChanged = (newText: string) => {
       if (!newText) {
         return false;

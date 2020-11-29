@@ -13,7 +13,7 @@ interface MessageState {
 }
 
 const AlertTemplate = require('react-alert-template-basic').default;
-export function getAlertTemplate(ref: any) {
+export function getAlertTemplate(ref: any): React.ReactNode {
   ref.style['textTransform'] = 'initial';
   return AlertTemplate(ref);
 }

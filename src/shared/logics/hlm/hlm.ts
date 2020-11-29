@@ -9,32 +9,32 @@ const hlmDefinitionTypes: Logic.LogicDefinitionTypeDescription[] = [
   {
     definitionType: Logic.LogicDefinitionType.Operator,
     name: 'Operator',
-    createTypeExpression: () => new FmtHLM.MetaRefExpression_ExplicitOperator,
-    createObjectContents: () => new FmtHLM.ObjectContents_ExplicitOperator(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)])
+    createTypeExpression: (): Fmt.Expression => new FmtHLM.MetaRefExpression_ExplicitOperator,
+    createObjectContents: (): Fmt.ObjectContents => new FmtHLM.ObjectContents_ExplicitOperator(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm)])
   },
   {
     definitionType: Logic.LogicDefinitionType.SetOperator,
     name: 'Set Operator',
-    createTypeExpression: () => new FmtHLM.MetaRefExpression_SetOperator,
-    createObjectContents: () => new FmtHLM.ObjectContents_SetOperator(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm)])
+    createTypeExpression: (): Fmt.Expression => new FmtHLM.MetaRefExpression_SetOperator,
+    createObjectContents: (): Fmt.ObjectContents => new FmtHLM.ObjectContents_SetOperator(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm)])
   },
   {
     definitionType: Logic.LogicDefinitionType.Construction,
     name: 'Construction',
-    createTypeExpression: () => new FmtHLM.MetaRefExpression_Construction,
-    createObjectContents: () => new FmtHLM.ObjectContents_Construction
+    createTypeExpression: (): Fmt.Expression => new FmtHLM.MetaRefExpression_Construction,
+    createObjectContents: (): Fmt.ObjectContents => new FmtHLM.ObjectContents_Construction
   },
   {
     definitionType: Logic.LogicDefinitionType.Predicate,
     name: 'Predicate',
-    createTypeExpression: () => new FmtHLM.MetaRefExpression_Predicate,
-    createObjectContents: () => new FmtHLM.ObjectContents_Predicate(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)])
+    createTypeExpression: (): Fmt.Expression => new FmtHLM.MetaRefExpression_Predicate,
+    createObjectContents: (): Fmt.ObjectContents => new FmtHLM.ObjectContents_Predicate(undefined, undefined, undefined, undefined, [new Fmt.PlaceholderExpression(HLMExpressionType.Formula)])
   },
   {
     definitionType: Logic.LogicDefinitionType.Theorem,
     name: 'Theorem',
-    createTypeExpression: () => new FmtHLM.MetaRefExpression_StandardTheorem,
-    createObjectContents: () => new FmtHLM.ObjectContents_StandardTheorem(new Fmt.PlaceholderExpression(HLMExpressionType.Formula))
+    createTypeExpression: (): Fmt.Expression => new FmtHLM.MetaRefExpression_StandardTheorem,
+    createObjectContents: (): Fmt.ObjectContents => new FmtHLM.ObjectContents_StandardTheorem(new Fmt.PlaceholderExpression(HLMExpressionType.Formula))
   }
 ];
 

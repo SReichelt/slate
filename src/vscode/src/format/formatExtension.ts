@@ -142,20 +142,20 @@ function configureLanguage(context: vscode.ExtensionContext): void {
         vscode.languages.setLanguageConfiguration(languageId, {
             onEnterRules: [
                 {
-                    beforeText: /^\s*\/\*\*([^\*]|\*(?!\/))*$/,
+                    beforeText: /^\s*\/\*\*([^*]|\*(?!\/))*$/,
                     afterText: /^\s*\*\/$/,
                     action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: ' * ' }
                 },
                 {
-                    beforeText: /^\s*\/\*\*([^\*]|\*(?!\/))*$/,
+                    beforeText: /^\s*\/\*\*([^*]|\*(?!\/))*$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: ' * ' }
                 },
                 {
-                    beforeText: /^(\ \ )*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
+                    beforeText: /^({2})* \*( ([^*]|\*(?!\/))*)?$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: '* ' }
                 },
                 {
-                    beforeText: /^(\ \ )*\ \*\/\s*$/,
+                    beforeText: /^({2})* \*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 }
                 }
             ]
