@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AlertType } from 'react-alert';
+import { AlertType, AlertComponentPropsWithStyle } from 'react-alert';
 
 import './Message.css';
 
@@ -13,9 +13,9 @@ interface MessageState {
 }
 
 const AlertTemplate = require('react-alert-template-basic').default;
-export function getAlertTemplate(ref: any): React.ReactNode {
-  ref.style['textTransform'] = 'initial';
-  return AlertTemplate(ref);
+export function getAlertTemplate(props: AlertComponentPropsWithStyle): React.ReactElement {
+  props.style['textTransform'] = 'initial';
+  return AlertTemplate(props);
 }
 
 class Message extends React.Component<MessageProps, MessageState> {
@@ -27,7 +27,8 @@ class Message extends React.Component<MessageProps, MessageState> {
 
   render(): React.ReactNode {
     if (this.state.visible) {
-      let ref = {
+      let props: AlertComponentPropsWithStyle = {
+        id: 'message',
         message: this.props.children,
         options: {
           type: this.props.type
@@ -40,7 +41,7 @@ class Message extends React.Component<MessageProps, MessageState> {
         },
         close: () => this.setState({visible: false})
       };
-      return <div className={'message'}>{getAlertTemplate(ref)}</div>;
+      return <div className={'message'}>{getAlertTemplate(props)}</div>;
     } else {
       return null;
     }
