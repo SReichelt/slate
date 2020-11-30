@@ -1898,7 +1898,7 @@ exports[`render hlm library: 1.5.28 Essentials/Functions/Inverse%20of%20inverse%
 
   (f^-1)^-1 = f
 
-Proof.  f^-1 ∘ f = id_X by 1.5.25."
+Proof.  f^-1 ∘ f = id_X by definition of f^-1."
 `;
 
 exports[`render hlm library: 1.5.29 Essentials/Functions/Identity%20is%20its%20own%20inverse 1`] = `

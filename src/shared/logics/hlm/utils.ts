@@ -672,6 +672,7 @@ export class HLMUtils extends GenericUtils {
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef
                || type instanceof FmtHLM.MetaRefExpression_Unfold
                || type instanceof FmtHLM.MetaRefExpression_UseTheorem
+               || type instanceof FmtHLM.MetaRefExpression_UseImplicitOperator
                || type instanceof FmtHLM.MetaRefExpression_Substitute) {
       return this.getImplicationResult(type.result, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseExists
@@ -2738,5 +2739,12 @@ export class HLMUtils extends GenericUtils {
     } else {
       return undefined;
     }
+  }
+
+  getImplicitOperatorDefinitionResults(definitionRef: Fmt.DefinitionRefExpression, definition: Fmt.Definition, contents: FmtHLM.ObjectContents_ImplicitOperator): Fmt.Expression[] {
+    return contents.definition.map((item: Fmt.Expression) => {
+      let substitutedItem = this.substitutePath(item, definitionRef.path, [definition]);
+      return FmtUtils.substituteVariable(substitutedItem, contents.parameter, definitionRef);
+    });
   }
 }

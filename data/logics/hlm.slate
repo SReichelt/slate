@@ -9,12 +9,12 @@ $hlm: %MetaModel {
   expressionTypes = [$Bool, $Nat,
                      $Prop, $Set, $Subset, $Element, $Constraint, $Binder,
                      $SetDef, $Def,
-                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $Unfold, $UseTheorem, $ProveDef, $ProveByContradiction, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction, $ProveBySubstitution],
+                     $Consider, $State, $UseDef, $UseCases, $UseForAll, $UseExists, $Substitute, $Unfold, $UseTheorem, $UseImplicitOperator, $ProveDef, $ProveByContradiction, $ProveForAll, $ProveExists, $ProveEquivalence, $ProveCases, $ProveByInduction, $ProveBySubstitution],
   functions = [$true, $false,
                $enumeration, $subset, $extendedSubset, $setStructuralCases, $setAssociative,
                $cases, $structuralCases, $asElementOf, $associative,
                $not, $and, $or, $equiv, $forall, $exists, $existsUnique, $in, $sub, $setEquals, $equals, $structural,
-               $State, $UseTheorem,
+               $State, $UseTheorem, $UseImplicitOperator,
                %Any],
   lookup = %Any
 }
@@ -298,6 +298,9 @@ $Unfold(result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $UseTheorem(theorem: $Theorem, input?: $IntermediateProofStep, result?: $Formula): %ParameterType($Formula) {
+  superType = $IntermediateProofStep
+}
+$UseImplicitOperator(operator: $ImplicitOperator, result?: $Formula): %ParameterType($Formula) {
   superType = $IntermediateProofStep
 }
 $ProveDef(side?: %Int, proof?: $Proof): %ParameterType {

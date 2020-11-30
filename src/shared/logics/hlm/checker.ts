@@ -1717,6 +1717,7 @@ export class HLMDefinitionChecker {
               this.checkFormula(type.result, context);
             }
             let implicationResult = this.utils.getImplicationResult(type.result, context);
+            // TODO check restrictions on rewriting (see equality.md)
             if (!this.utils.substitutesTo(context.previousResult, implicationResult, sourceExpression, targetExpressions)) {
               this.error(type, `Substitution from ${context.previousResult} to ${implicationResult} is invalid`);
             }
@@ -1767,8 +1768,25 @@ export class HLMDefinitionChecker {
               this.checkDeclaredResult(type, useTheorem.result, [claim], context);
             }
           } else {
-            // TODO also support definitions (and render as "by definition")
             this.error(type, 'Referenced definition must be a theorem');
+          }
+          return CachedPromise.resolve();
+        });
+        this.addPendingCheck(type, checkDefinitionRef);
+      } else {
+        this.error(type, 'Definition reference required');
+      }
+    } else if (type instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) {
+      let useImplicitOperator = type;
+      if (useImplicitOperator.operator instanceof Fmt.DefinitionRefExpression) {
+        let operator = useImplicitOperator.operator;
+        let checkDefinitionRef = this.utils.getOuterDefinition(operator).then((definition: Fmt.Definition) => {
+          if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
+            this.checkDefinitionRefExpression(operator, [definition], context);
+            let conditions = this.utils.getImplicitOperatorDefinitionResults(operator, definition, definition.contents);
+            this.checkDeclaredResult(type, useImplicitOperator.result, conditions, context);
+          } else {
+            this.error(type, 'Referenced definition must be an implicitly defined operator');
           }
           return CachedPromise.resolve();
         });
@@ -1916,6 +1934,7 @@ export class HLMDefinitionChecker {
             let sourceExpression = expressions[sourceIndex];
             let targetExpressions = expressions.slice();
             targetExpressions.splice(sourceIndex, 1);
+            // TODO check restrictions on rewriting (see equality.md)
             if (this.utils.substitutesTo(context.goal, type.goal, sourceExpression, targetExpressions)) {
               this.checkProof(type, type.proof, undefined, type.goal, context);
             } else {
