@@ -151,11 +151,11 @@ function configureLanguage(context: vscode.ExtensionContext): void {
                     action: { indentAction: vscode.IndentAction.None, appendText: ' * ' }
                 },
                 {
-                    beforeText: /^({2})* \*( ([^*]|\*(?!\/))*)?$/,
+                    beforeText: /^( {2})* \*( ([^*]|\*(?!\/))*)?$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: '* ' }
                 },
                 {
-                    beforeText: /^({2})* \*\/\s*$/,
+                    beforeText: /^( {2})* \*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 }
                 }
             ]
