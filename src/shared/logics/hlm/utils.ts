@@ -160,6 +160,16 @@ export interface HLMEquivalenceListInfo {
   wrapAround: boolean;
 }
 
+export interface HLMSubstitutionSourceInfo {
+  source: Fmt.Expression;
+  targets: Fmt.Expression[];
+}
+
+export interface HLMSubstitutionResult {
+  sourceIndex: number;
+  result: Fmt.Expression;
+}
+
 type CreatePlaceholderFn = (placeholderType: HLMExpressionType) => Fmt.PlaceholderExpression;
 
 function createStandardPlaceholder(placeholderType: HLMExpressionType) {
@@ -860,8 +870,19 @@ export class HLMUtils extends GenericUtils {
       } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
         let elementResult = this.getNextElementTerms(formula.element, unfoldParameters).then((nextElements: Fmt.Expression[] | undefined) =>
           nextElements?.map((nextElement: Fmt.Expression) => new FmtHLM.MetaRefExpression_in(nextElement, formula._set)));
-        return this.concatResults(elementResult, () => this.getNextSetTerms(formula._set, unfoldParameters).then((nextSets: Fmt.Expression[] | undefined) =>
-          nextSets?.map((nextSet: Fmt.Expression) => new FmtHLM.MetaRefExpression_in(formula.element, nextSet))));
+        return this.concatResults(elementResult, () => this.getNextSetTerms(formula._set, unfoldParameters).then((nextSets: Fmt.Expression[] | undefined) => {
+          if (nextSets) {
+            let result: Fmt.Expression[] = [];
+            for (let nextSet of nextSets) {
+              if (!(nextSet instanceof FmtHLM.MetaRefExpression_subset || nextSet instanceof FmtHLM.MetaRefExpression_extendedSubset)) {
+                result.push(new FmtHLM.MetaRefExpression_in(formula.element, nextSet));
+              }
+            }
+            return result;
+          } else {
+            return undefined;
+          }
+        }));
       } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
         let subsetResult = this.getNextSetTerms(formula.subset, unfoldParameters).then((nextSubsets: Fmt.Expression[] | undefined) =>
           nextSubsets?.map((nextSubset: Fmt.Expression) => new FmtHLM.MetaRefExpression_sub(nextSubset, formula.superset)));
@@ -1159,7 +1180,8 @@ export class HLMUtils extends GenericUtils {
               if (!substituted) {
                 substituted = this.substitutePath(item, expression.path, definitions);
               }
-              return currentResult ? currentResult.concat(substituted) : [substituted];
+              let simplified = this.fixSubstitutionArtifacts(substituted);
+              return currentResult ? currentResult.concat(simplified) : [simplified];
             } else {
               return currentResult;
             }
@@ -1292,6 +1314,33 @@ export class HLMUtils extends GenericUtils {
         arg.value = newValue;
       }
     }
+  }
+
+  private fixSubstitutionArtifacts(expression: Fmt.Expression): Fmt.Expression {
+    if (expression instanceof FmtHLM.MetaRefExpression_subset
+        && expression.formula instanceof FmtHLM.MetaRefExpression_and
+        && expression.formula.formulas
+        && expression.parameter.type instanceof FmtHLM.MetaRefExpression_Element) {
+      let newItems: Fmt.Expression[] | undefined = undefined;
+      let index = 0;
+      for (let item of expression.formula.formulas) {
+        if (item instanceof FmtHLM.MetaRefExpression_in
+            && item.element instanceof Fmt.VariableRefExpression
+            && item.element.variable === expression.parameter
+            && item._set.isEquivalentTo(expression.parameter.type._set)) {
+          if (!newItems) {
+            newItems = expression.formula.formulas.slice(0, index);
+          }
+        } else if (newItems) {
+          newItems.push(item);
+        }
+        index++;
+      }
+      if (newItems) {
+        return new FmtHLM.MetaRefExpression_subset(expression.parameter, this.createConjunction(newItems));
+      }
+    }
+    return expression;
   }
 
   private unfoldStructuralCases(expression: FmtHLM.MetaRefExpression_structural | FmtHLM.MetaRefExpression_setStructuralCases | FmtHLM.MetaRefExpression_structuralCases, expressionType: HLMExpressionType, unfoldParameters: HLMUnfoldParameters): CachedPromise<Fmt.Expression[] | undefined> {
@@ -1825,17 +1874,74 @@ export class HLMUtils extends GenericUtils {
     return false;
   }
 
-  substitutesTo(input: Fmt.Expression, output: Fmt.Expression, source: Fmt.Expression, targets: Fmt.Expression[]): boolean {
-    let unificationFn = (left: Fmt.Expression, right: Fmt.Expression) => {
-      if (this.areExpressionsSyntacticallyEquivalent(left, source)) {
-        for (let target of targets) {
-          if (this.areExpressionsSyntacticallyEquivalent(right, target)) {
-            return true;
+  getSubstitutionSourceInfo(source: Fmt.Expression, sourceIndex: number): HLMSubstitutionSourceInfo | undefined {
+    let equivalenceListInfo = this.getEquivalenceListInfo(source);
+    if (equivalenceListInfo && sourceIndex >= 0 && sourceIndex < equivalenceListInfo.items.length) {
+      return this.createSubstitutionSourceInfo(equivalenceListInfo, sourceIndex);
+    } else {
+      return undefined;
+    }
+  }
+
+  private createSubstitutionSourceInfo(equivalenceListInfo: HLMEquivalenceListInfo, sourceIndex: number): HLMSubstitutionSourceInfo {
+    return {
+      source: equivalenceListInfo.items[sourceIndex],
+      targets: equivalenceListInfo.items.slice(0, sourceIndex).concat(equivalenceListInfo.items.slice(sourceIndex + 1))
+    };
+  }
+
+  getAllSubstitutionResults(expression: Fmt.Expression, sourceInfo: HLMSubstitutionSourceInfo, substituteIndividualSubExpressions: boolean): Fmt.Expression[] {
+    let result: Fmt.Expression[] = [];
+    for (let target of sourceInfo.targets) {
+      let substitutedExpression = expression.substitute((subExpression: Fmt.Expression) => {
+        if (this.areExpressionsSyntacticallyEquivalent(subExpression, sourceInfo.source)) {
+          return target;
+        } else {
+          return subExpression;
+        }
+      });
+      if (substitutedExpression !== expression) {
+        result.push(substitutedExpression);
+        if (substituteIndividualSubExpressions) {
+          for (let substitutionIndex = 0; substitutedExpression !== expression; substitutionIndex++) {
+            let currentIndex = 0;
+            substitutedExpression = expression.substitute((subExpression: Fmt.Expression) => {
+              if (this.areExpressionsSyntacticallyEquivalent(subExpression, sourceInfo.source) && currentIndex++ === substitutionIndex) {
+                return target;
+              } else {
+                return subExpression;
+              }
+            });
           }
         }
       }
-      return false;
-    };
+    }
+    return result;
+  }
+
+  getAllSubstitutions(expression: Fmt.Expression, source: Fmt.Expression, substituteIndividualSubExpressions: boolean): HLMSubstitutionResult[] | undefined {
+    let equivalenceListInfo = this.getEquivalenceListInfo(source);
+    if (equivalenceListInfo) {
+      let result: HLMSubstitutionResult[] = [];
+      for (let sourceIndex = 0; sourceIndex < equivalenceListInfo.items.length; sourceIndex++) {
+        let sourceInfo = this.createSubstitutionSourceInfo(equivalenceListInfo, sourceIndex);
+        for (let substitutionResult of this.getAllSubstitutionResults(expression, sourceInfo, substituteIndividualSubExpressions)) {
+          result.push({
+            result: substitutionResult,
+            sourceIndex: sourceIndex
+          });
+        }
+      }
+      return result;
+    } else {
+      return undefined;
+    }
+  }
+
+  substitutesTo(input: Fmt.Expression, output: Fmt.Expression, sourceInfo: HLMSubstitutionSourceInfo): boolean {
+    let unificationFn = (left: Fmt.Expression, right: Fmt.Expression) =>
+      (this.areExpressionsSyntacticallyEquivalent(left, sourceInfo.source)
+       && sourceInfo.targets.some((target: Fmt.Expression) => this.areExpressionsSyntacticallyEquivalent(right, target)));
     return input.isEquivalentTo(output, unificationFn);
   }
 
@@ -2277,8 +2383,11 @@ export class HLMUtils extends GenericUtils {
     } else if (set instanceof FmtHLM.MetaRefExpression_subset && side === undefined) {
       let paramType = set.parameter.type as FmtHLM.MetaRefExpression_Element;
       let elementConstraint = new FmtHLM.MetaRefExpression_in(element, paramType._set);
-      let subsetFormula = FmtUtils.substituteVariable(set.formula, set.parameter, element);
-      let result = new FmtHLM.MetaRefExpression_and(elementConstraint, subsetFormula);
+      let result = FmtUtils.substituteVariable(set.formula, set.parameter, element);
+      if (!(result instanceof FmtHLM.MetaRefExpression_and
+            && result.formulas?.some((item: Fmt.Expression) => elementConstraint.isEquivalentTo(item)))) {
+        result = this.createConjunction([elementConstraint, result]);
+      }
       return CachedPromise.resolve([{
         formula: result
       }]);

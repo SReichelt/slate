@@ -13,9 +13,9 @@ import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProv
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
-import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll, HLMSubstitutionContext, HLMEquivalenceListInfo } from './utils';
+import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll, HLMSubstitutionContext, HLMEquivalenceListInfo, HLMSubstitutionResult } from './utils';
 import { HLMRenderUtils } from './renderUtils';
-import { HLMDefinitionChecker, HLMCheckResult, HLMCheckerProofStepContext, HLMCheckerStructuralCaseRef } from './checker';
+import { HLMDefinitionChecker, HLMCheckResult, HLMCheckerProofStepContext, HLMCheckerStructuralCaseRef, HLMCheckerConstraint } from './checker';
 import CachedPromise from '../../data/cachedPromise';
 
 export type InsertProofFn = (proof: FmtHLM.ObjectContents_Proof) => void;
@@ -1194,7 +1194,7 @@ export class HLMEditHandler extends GenericEditHandler {
         }
         rows.push(
           this.getUnfoldRow(context.previousResult, previousStep, context, onInsertProofStep, onRenderProofStep),
-          this.getSubstituteRow(),
+          this.getSubstituteRow(context.previousResult, context, onInsertProofStep, onRenderProofStep),
           new Menu.ExpressionMenuSeparator
         );
       }
@@ -1235,7 +1235,7 @@ export class HLMEditHandler extends GenericEditHandler {
             }
           }
           rows.push(
-            this.getProveBySubstitutionRow(),
+            this.getProveBySubstitutionRow(context.goal, context, onInsertProofStep, onRenderProofStep),
             new Menu.ExpressionMenuSeparator
           );
         }
@@ -1444,11 +1444,15 @@ export class HLMEditHandler extends GenericEditHandler {
           resultPromise = resultPromise.then((currentSteps: ProofStepInfo[]) =>
             this.simplifyResult(definition.formula, context).then((simplifiedResult: Fmt.Expression) => {
               let declaredResult = context.goal?.isEquivalentTo(simplifiedResult) ? undefined : simplifiedResult;
-              let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseDef(this.utils.internalToExternalIndex(definition.side), declaredResult), '_');
-              return currentSteps.concat({
-                step: step,
-                linkedObject: definition.definitionRef
-              });
+              if (declaredResult && this.utils.isTrivialTautology(declaredResult, false).getImmediateResult()) {
+                return currentSteps;
+              } else {
+                let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseDef(this.utils.internalToExternalIndex(definition.side), declaredResult), '_');
+                return currentSteps.concat({
+                  step: step,
+                  linkedObject: definition.definitionRef
+                });
+              }
             }));
         }
         return resultPromise;
@@ -1493,10 +1497,19 @@ export class HLMEditHandler extends GenericEditHandler {
     return resultPromise;
   }
 
-  private getSubstituteRow(): Menu.ExpressionMenuRow {
+  private getSubstituteRow(previousResult: Fmt.Expression, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
     let substituteRow = new Menu.StandardExpressionMenuRow('Substitute');
-    // TODO
+    let onCreateProofStep = (source: Fmt.Expression, substitution: HLMSubstitutionResult) => {
+      if (this.utils.isTrivialTautology(substitution.result, false).getImmediateResult()) {
+        return undefined;
+      } else {
+        return CachedPromise.resolve(this.utils.createParameter(new FmtHLM.MetaRefExpression_Substitute(source, this.utils.internalToExternalIndex(substitution.sourceIndex)!, substitution.result), '_'));
+      }
+    };
+    // TODO substitution dialog
     substituteRow.titleAction = this.getNotImplementedAction();
+    let stepsPromise = this.createContextSubstitutionSteps(previousResult, context, onCreateProofStep);
+    substituteRow.subMenu = this.getProofStepSubMenu(stepsPromise, context, onInsertProofStep, onRenderProofStep);
     return substituteRow;
   }
 
@@ -1627,7 +1640,7 @@ export class HLMEditHandler extends GenericEditHandler {
       let to = list.items[toIndex];
       let subParameters: Fmt.ParameterList | undefined = new Fmt.ParameterList;
       let subGoal: Fmt.Expression | undefined = list.getEquivalenceGoal(from, to, subParameters);
-      if (!subParameters.length) {
+      if (list.wrapAround && !subParameters.length) {
         subParameters = undefined;
         subGoal = undefined;
       }
@@ -1799,16 +1812,7 @@ export class HLMEditHandler extends GenericEditHandler {
         });
       }
     }
-    let onInsertConstraintStep = (step: Fmt.Parameter) => {
-      if (step.type instanceof FmtHLM.MetaRefExpression_Consider && step.type.variable instanceof Fmt.VariableRefExpression) {
-        let variable = step.type.variable.variable;
-        if (variable.name === '_') {
-          variable.name = this.utils.getUnusedDefaultName('_1', this.getUsedParameterNames());
-        }
-      }
-      onInsertProofStep(step);
-    };
-    considerRow.subMenu = this.getProofStepSubMenu(CachedPromise.resolve(steps), context, onInsertConstraintStep, onRenderProofStep);
+    considerRow.subMenu = this.getProofStepSubMenu(CachedPromise.resolve(steps), context, onInsertProofStep, onRenderProofStep);
     return considerRow;
   }
 
@@ -1819,11 +1823,59 @@ export class HLMEditHandler extends GenericEditHandler {
     return stateFormulaRow;
   }
 
-  private getProveBySubstitutionRow(): Menu.ExpressionMenuRow {
+  private getProveBySubstitutionRow(goal: Fmt.Expression, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
     let proveBySubstitutionRow = new Menu.StandardExpressionMenuRow('Substitute in goal');
-    // TODO
+    let onCreateProofStep = (source: Fmt.Expression, substitution: HLMSubstitutionResult) => {
+      if (this.utils.isTrivialContradiction(substitution.result, false).getImmediateResult()) {
+        return undefined;
+      } else {
+        let subProofPromise = this.createSubProof(undefined, substitution.result, true, context);
+        return subProofPromise.then((subProof: FmtHLM.ObjectContents_Proof) =>
+          this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveBySubstitution(source, this.utils.internalToExternalIndex(substitution.sourceIndex)!, substitution.result, subProof), '_'));
+      }
+    };
+    // TODO substitution dialog
     proveBySubstitutionRow.titleAction = this.getNotImplementedAction();
+    let stepsPromise = this.createContextSubstitutionSteps(goal, context, onCreateProofStep);
+    proveBySubstitutionRow.subMenu = this.getProofStepSubMenu(stepsPromise, context, onInsertProofStep, onRenderProofStep);
     return proveBySubstitutionRow;
+  }
+
+  private createContextSubstitutionSteps(expression: Fmt.Expression, context: HLMCheckerProofStepContext, onCreateProofStep: (source: Fmt.Expression, substitution: HLMSubstitutionResult) => CachedPromise<Fmt.Parameter> | undefined): CachedPromise<ProofStepInfo[]> {
+    let resultPromise: CachedPromise<ProofStepInfo[]> = CachedPromise.resolve([]);
+    for (let constraint of this.checker.getAvailableConstraints(context, true)) {
+      if (constraint.constraint !== expression) {
+        let substitutions = this.utils.getAllSubstitutions(expression, constraint.constraint, false);
+        if (substitutions) {
+          for (let substitution of substitutions) {
+            let stepPromise = this.createSubstitutionStep(constraint, substitution, onCreateProofStep);
+            if (stepPromise) {
+              resultPromise = resultPromise.then((currentResult: ProofStepInfo[]) =>
+                stepPromise!.then((step: ProofStepInfo) => currentResult.concat(step)));
+            }
+          }
+        }
+      }
+    }
+    return resultPromise;
+  }
+
+  private createSubstitutionStep(constraint: HLMCheckerConstraint, substitution: HLMSubstitutionResult, onCreateProofStep: (source: Fmt.Expression, substitution: HLMSubstitutionResult) => CachedPromise<Fmt.Parameter> | undefined): CachedPromise<ProofStepInfo> | undefined {
+    let source: Fmt.Expression;
+    if (constraint.parameter) {
+      source = new Fmt.VariableRefExpression(constraint.parameter);
+    } else {
+      source = new FmtHLM.MetaRefExpression_State(constraint.constraint);
+    }
+    let stepPromise = onCreateProofStep(source, substitution);
+    if (stepPromise) {
+      return stepPromise.then((step: Fmt.Parameter) => ({
+        step: step,
+        linkedObject: constraint.parameter && this.utils.isValueParamType(constraint.parameter.type) ? constraint.parameter : constraint.constraint
+      }));
+    } else {
+      return undefined;
+    }
   }
 
   private getDefineVariableRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuRow {
@@ -1919,6 +1971,7 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getProofStepMenuItem(step: ProofStepInfo, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn): Menu.ExpressionMenuItem {
     let clonedStep = step.preventCloning ? step.step : this.cloneAndAdaptParameterNames(step.step);
+    this.adaptNamesOfReferencedSteps(clonedStep);
     let action = new Menu.ImmediateExpressionMenuAction(() => this.insertProofStep(clonedStep, context, onInsertProofStep));
     let renderedStep = onRenderProofStep(clonedStep);
     if (step.linkedObject) {
@@ -1930,6 +1983,16 @@ export class HLMEditHandler extends GenericEditHandler {
       }
     }
     return new Menu.ExpressionMenuItem(renderedStep, action);
+  }
+
+  private adaptNamesOfReferencedSteps(step: Fmt.Parameter): void {
+    step.traverse((subExpression: Fmt.Expression) => {
+      if (subExpression instanceof Fmt.VariableRefExpression) {
+        if (subExpression.variable.name === '_') {
+          subExpression.variable.name = this.utils.getUnusedDefaultName('_1', this.getUsedParameterNames());
+        }
+      }
+    });
   }
 
   private insertProofStep(step: Fmt.Parameter, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn): void {

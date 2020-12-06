@@ -54,16 +54,18 @@ When developing Slate, you will probably want to install the locally built versi
 
 ## Deploying to Netlify or Heroku
 
-Creating a new public installation of Slate is very simple, and should work out of the box on Netlify or Heroku. There is a provider-specific part and some provider-independent configuration.
+Creating a new public installation of Slate is very simple, and should work out of the box on Netlify. There is a provider-specific part and some provider-independent configuration.
 
 ### Netlify
 
-Netlify is recommended because its serverless architecture reduces costs and is potentially faster. However, this means that the site runs differently than what you can reproduce locally.
+Netlify is recommended because its serverless architecture reduces costs and is potentially faster. However, this means that the site runs differently from what you can reproduce locally.
 
 1. Log in with your GitHub account at https://www.netlify.com/.
 2. Follow the steps to create a new site based on the GitHub repository. Leave all settings empty because they are already configured in `netlify.toml`.
 
 ### Heroku
+
+_Unfortunately, the Heroku build stopped working after including a custom-built patched npm package. It can probably be fixed with a little bit of effort._
 
 1. Create an account at https://www.heroku.com/.
 2. Create a new Node.js app.

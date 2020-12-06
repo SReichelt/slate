@@ -2420,6 +2420,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (proof) {
       this.addProofInternal(proof, heading, context, showExternalGoal, isListItem, indentSteps, state);
     } else if (!this.utils.containsPlaceholders()) {
+      let displayedGoal = showExternalGoal ? this.getDisplayedGoal(context.goal) : undefined;
+      if (displayedGoal) {
+        if (state.startRow) {
+          this.outputStartRowSpacing(state);
+        } else {
+          state.startRow = [];
+        }
+        let renderedGoal = this.readOnlyRenderer.renderFormula(displayedGoal, fullFormulaSelection);
+        state.startRow.push(
+          renderedGoal,
+          new Notation.TextExpression(':')
+        );
+        state.startRowSpacing = ' ';
+      }
       this.addNoProofPlaceholder(heading, onInsertProof, state);
     }
   }
@@ -2462,7 +2476,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         ...context,
         goal: proof.goal
       };
-      displayedGoal = this.getDisplayedGoal(proof.goal, displayedGoal);
+      displayedGoal = state.isPreview ? proof.goal : this.getDisplayedGoal(proof.goal, displayedGoal);
     }
     if (displayedGoal && steps.length) {
       let firstStepType = steps[0].type;
@@ -2582,16 +2596,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (!state.isPreview) {
       this.outputStartRowSpacing(state);
       if (this.editHandler) {
-        let onRenderTrivialProof = () => this.getTrivialProofPlaceholder();
         let renderContext: HLMProofStepRenderContext = {
           ...context,
           originalParameters: [],
           substitutedParameters: [],
           isLastStep: true
         };
-        let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, renderContext);
-        let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
-        state.startRow.push(this.editHandler.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula));
+        state.startRow.push(this.getConditionalProofStepInsertButton(proof, renderContext, true, state));
       } else {
         state.startRow.push(this.getTrivialProofPlaceholder());
       }
@@ -2664,8 +2675,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
     this.commitImplications(state, false);
-    if (proof) {
-      let showExternalGoal = !(proof.steps.length && this.isDependentProofStepType(proof.steps[0].type));
+    if (proof || this.editHandler) {
+      let showExternalGoal = !(proof?.steps.length && this.isDependentProofStepType(proof.steps[0].type));
+      // TODO set onInsertProof
       this.addOptionalProofInternal(proof, undefined, context, showExternalGoal, false, indentSteps, undefined, state);
     } else if (context.goal) {
       if (!state.startRow) {
@@ -2673,8 +2685,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       this.outputStartRowSpacing(state);
       state.startRow.push(this.readOnlyRenderer.renderFormula(context.goal, fullFormulaSelection));
-      // TODO add conditional proof step insertion button
-      state.startRow.push(new Notation.TextExpression('.'));
+      if (!state.isPreview) {
+        state.startRow.push(new Notation.TextExpression('.'));
+      }
       this.commitStartRow(state);
     } else if (state.startRow) {
       this.addNoProofPlaceholder(undefined, undefined, state);
@@ -2701,12 +2714,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
-    // TODO add conditional proof step insertion button
     let indentedState: ProofOutputState = {
       paragraphs: [],
       isPreview: state.isPreview,
       onApply: state.onApply
     };
+    // TODO set onInsertProof
     this.addOptionalProofInternal(proof, heading, context, false, false, false, undefined, indentedState);
     let indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
     indentedProof.styleClasses = ['indented'];
@@ -3206,65 +3219,70 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       ...sourceContext,
       goal: type.goal
     };
-    if (((goal instanceof FmtHLM.MetaRefExpression_setEquals && type.goal instanceof FmtHLM.MetaRefExpression_setEquals)
-         || (goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
-        && goal.terms.length >= 2
-        && type.goal.terms.length === 2
-        && goal.terms[1].isEquivalentTo(type.goal.terms[1])
-        && (originalLeftTerm || !type.goal.terms[0].isEquivalentTo(type.goal.terms[1]))) {
-      let leftTerm = originalLeftTerm ?? goal.terms[0];
-      let rightTerm = type.goal.terms[0];
-      let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
-      let source: Notation.RenderedExpression | undefined = undefined;
-      let sourceType = type.source;
-      if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
-        source = this.renderItemNumber(sourceType.theorem);
+    if (!state.isPreview) {
+      if (((goal instanceof FmtHLM.MetaRefExpression_setEquals && type.goal instanceof FmtHLM.MetaRefExpression_setEquals)
+           || (goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
+          && goal.terms.length >= 2
+          && type.goal.terms.length === 2) {
+        let targetTerm = type.goal.terms[1];
+        if (goal.terms[1].isEquivalentTo(targetTerm)
+            && (originalLeftTerm || !type.goal.terms[0].isEquivalentTo(targetTerm))) {
+          let leftTerm = originalLeftTerm ?? goal.terms[0];
+          let rightTerm = type.goal.terms[0];
+          let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+          let source: Notation.RenderedExpression | undefined = undefined;
+          let sourceType = type.source;
+          if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
+            source = this.renderItemNumber(sourceType.theorem);
+          }
+          addImplication({
+            dependsOnPrevious: originalLeftTerm !== undefined,
+            result: equality,
+            resultIsEditable: false,
+            source: source,
+            sourceFormula: this.getSourceFormula(type.source, context)
+          });
+          let finished = !type.proof || this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
+          for (let additionalRightTermIndex = finished ? 2 : 1; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
+            let additionalRightTerm = goal.terms[additionalRightTermIndex];
+            let additionalEquality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, additionalRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, additionalRightTerm);
+            let punctuation = additionalRightTermIndex === goal.terms.length - 1 && !finished ? [new Notation.TextExpression(':')] : undefined;
+            addImplication({
+              dependsOnPrevious: true,
+              result: additionalEquality,
+              resultIsEditable: false,
+              resultPunctuation: punctuation
+            });
+          }
+          if (finished) {
+            return;
+          }
+        } else if (goal.terms.length > 2
+                   && goal.terms.slice(2).some((term: Fmt.Expression) => term.isEquivalentTo(targetTerm))) {
+          let leftTerm = originalLeftTerm ?? goal.terms[0];
+          let rightTerm = goal.terms[1];
+          let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+          addImplication({
+            dependsOnPrevious: originalLeftTerm !== undefined,
+            result: equality,
+            resultIsEditable: false
+          });
+          let newGoal = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(...goal.terms.slice(1)) : new FmtHLM.MetaRefExpression_equals(...goal.terms.slice(1));
+          let newContext = {
+            ...context,
+            goal: newGoal
+          };
+          this.renderProofBySubstitution(proof, type, newContext, leftTerm, state, addImplication);
+          return;
+        }
       }
-      addImplication({
-        dependsOnPrevious: originalLeftTerm !== undefined,
-        result: equality,
-        resultIsEditable: false,
-        source: source,
-        sourceFormula: this.getSourceFormula(type.source, context)
-      });
-      let finished = !type.proof || this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
-      for (let additionalRightTermIndex = finished ? 2 : 1; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
-        let additionalRightTerm = goal.terms[additionalRightTermIndex];
-        let additionalEquality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, additionalRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, additionalRightTerm);
-        let punctuation = additionalRightTermIndex === goal.terms.length - 1 && !finished ? [new Notation.TextExpression(':')] : undefined;
-        addImplication({
-          dependsOnPrevious: true,
-          result: additionalEquality,
-          resultIsEditable: false,
-          resultPunctuation: punctuation
-        });
-      }
-      if (finished) {
-        return;
-      }
-    } else if ((goal instanceof FmtHLM.MetaRefExpression_setEquals || goal instanceof FmtHLM.MetaRefExpression_equals) && goal.terms.length > 2) {
-      let leftTerm = originalLeftTerm ?? goal.terms[0];
-      let rightTerm = goal.terms[1];
-      let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
-      addImplication({
-        dependsOnPrevious: originalLeftTerm !== undefined,
-        result: equality,
-        resultIsEditable: false
-      });
-      let newGoal = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(...goal.terms.slice(1)) : new FmtHLM.MetaRefExpression_equals(...goal.terms.slice(1));
-      let newContext = {
-        ...context,
-        goal: newGoal
-      };
-      this.renderProofBySubstitution(proof, type, newContext, leftTerm, state, addImplication);
-      return;
     }
     if (!(type.source instanceof Fmt.VariableRefExpression || type.source instanceof Fmt.IndexedExpression || type.source instanceof FmtHLM.MetaRefExpression_Consider)) {
       let step = new Fmt.Parameter('_', type.source);
       this.addProofStep(proof, step, sourceContext, state);
     }
     this.addSubProof(type.proof, subProofContext, false, state);
-    if (goal && !type.proof) {
+    if (goal && !type.proof && !state.isPreview) {
       addImplication({
         dependsOnPrevious: true,
         result: goal,
@@ -3328,13 +3346,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
+  private getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): Notation.RenderedExpression {
+    let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
+    let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
+    let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
+    return this.editHandler!.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
+  }
+
   private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {
     if (this.editHandler) {
       if (!this.utils.containsPlaceholders()) {
-        let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
-        let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
-        let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
-        state.additionalRow = this.editHandler.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
+        state.additionalRow = this.getConditionalProofStepInsertButton(proof, context, displayContradiction, state);
       }
       return true;
     } else {
@@ -3426,8 +3448,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       if (commitAdditionalRow && state.additionalRow) {
         let row: Notation.RenderedExpression[] = [];
-        if (gridState.implicationSymbolColumn) {
-          while (row.length < gridState.implicationSymbolColumn) {
+        if (gridState.implicationSymbolColumn !== undefined) {
+          while (!row.length || row.length < gridState.implicationSymbolColumn) {
             row.push(new Notation.EmptyExpression);
           }
         }

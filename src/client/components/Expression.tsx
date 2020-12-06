@@ -278,11 +278,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         dialog = <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
       }
     }
-    let result: React.ReactNode = null;
+    let result: React.ReactNode;
     let innerClassName = '';
     let isInputControl = false;
     if (expression instanceof Notation.EmptyExpression) {
-      result = '\u200b';
+      if (semanticLinks) {
+        result = '\u200b';
+      } else {
+        return null;
+      }
     } else if (expression instanceof Notation.TextExpression) {
       if (this.props.interactionHandler && expression.onTextChanged) {
         let onChange = (newText: string) => {

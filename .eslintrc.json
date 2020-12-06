@@ -13,7 +13,6 @@
     ],
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
@@ -32,11 +31,60 @@
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-invalid-this": "error",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-this-alias": "off",
-        "@typescript-eslint/no-unused-vars": "off",  // covered by syntax highlighting
+        "@typescript-eslint/no-unused-expressions": "warn",
+        "@typescript-eslint/no-unused-vars": "off",  // covered adequately by syntax highlighting
         "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-redeclare": "warn",
+        "@typescript-eslint/no-shadow": "warn",
+        "@typescript-eslint/quotes": [
+            "warn",
+            "single",
+            {
+                "allowTemplateLiterals": true
+            }
+        ],
+        "@typescript-eslint/semi": [
+            "warn",
+            "always"
+        ],
+        "@typescript-eslint/space-before-function-paren": [
+            "warn",
+            {
+                "anonymous": "always",
+                "named": "never",
+                "asyncArrow": "always"
+            }
+        ],
+        "@typescript-eslint/space-infix-ops": "warn",
+        "comma-dangle": "warn",
+        "curly": "warn",
+        "eol-last": "warn",
+        "eqeqeq": [
+            "warn",
+            "smart"
+        ],
+        "guard-for-in": "warn",
+        "id-denylist": [
+            "warn",
+            "any",
+            "number",
+            "string",
+            "boolean"
+        ],
+        "id-match": "warn",
+        "no-bitwise": "warn",
+        "no-caller": "warn",
+        "no-constructor-return": "warn",
+        "no-debugger": "warn",
         "no-empty": "off",
+        "no-eval": "warn",
+        "no-fallthrough": "warn",
+        "no-new-wrappers": "warn",
+        "no-trailing-spaces": "warn",
+        "no-unused-labels": "warn",
         "prefer-const": "off"
     }
 }

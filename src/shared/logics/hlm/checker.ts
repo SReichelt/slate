@@ -5,7 +5,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
-import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMBaseContext, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo } from './utils';
+import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMBaseContext, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo, HLMSubstitutionSourceInfo } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -1701,32 +1701,11 @@ export class HLMDefinitionChecker {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Substitute) {
       if (context.previousResult) {
-        let sourceContext: HLMCheckerProofStepContext = {
-          ...context,
-          goal: undefined,
-          previousResult: undefined
-        };
-        let expressions = this.checkEqualitySource(type.source, sourceContext);
-        if (expressions) {
-          let sourceIndex = this.utils.externalToInternalIndex(type.sourceSide);
-          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < expressions.length) {
-            let sourceExpression = expressions[sourceIndex];
-            let targetExpressions = expressions.slice();
-            targetExpressions.splice(sourceIndex, 1);
-            if (type.result) {
-              this.checkFormula(type.result, context);
-            }
-            let implicationResult = this.utils.getImplicationResult(type.result, context);
-            // TODO check restrictions on rewriting (see equality.md)
-            if (!this.utils.substitutesTo(context.previousResult, implicationResult, sourceExpression, targetExpressions)) {
-              this.error(type, `Substitution from ${context.previousResult} to ${implicationResult} is invalid`);
-            }
-          } else {
-            this.error(type, 'Source side is invalid');
-          }
-        } else {
-          this.error(type.source, 'Source proof step does not result in an equality');
+        if (type.result) {
+          this.checkFormula(type.result, context);
         }
+        let implicationResult = this.utils.getImplicationResult(type.result, context);
+        this.checkSubstitution(type, type.source, type.sourceSide, context.previousResult, implicationResult, context);
       } else {
         this.error(type, 'Previous result not set');
       }
@@ -1922,29 +1901,8 @@ export class HLMDefinitionChecker {
       return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
       if (context.goal) {
-        let sourceContext: HLMCheckerProofStepContext = {
-          ...context,
-          goal: undefined,
-          previousResult: undefined
-        };
-        let expressions = this.checkEqualitySource(type.source, sourceContext);
-        if (expressions) {
-          let sourceIndex = this.utils.externalToInternalIndex(type.sourceSide);
-          if (sourceIndex !== undefined && sourceIndex >= 0 && sourceIndex < expressions.length) {
-            let sourceExpression = expressions[sourceIndex];
-            let targetExpressions = expressions.slice();
-            targetExpressions.splice(sourceIndex, 1);
-            // TODO check restrictions on rewriting (see equality.md)
-            if (this.utils.substitutesTo(context.goal, type.goal, sourceExpression, targetExpressions)) {
-              this.checkProof(type, type.proof, undefined, type.goal, context);
-            } else {
-              this.error(type, `Substitution from ${context.goal} to ${type.goal} is invalid`);
-            }
-          } else {
-            this.error(type, 'Source side is invalid');
-          }
-        } else {
-          this.error(type.source, 'Source proof step does not result in an equality');
+        if (this.checkSubstitution(type, type.source, type.sourceSide, context.goal, type.goal, context)) {
+          this.checkProof(type, type.proof, undefined, type.goal, context);
         }
       } else {
         this.error(type, 'Goal not set');
@@ -2123,14 +2081,34 @@ export class HLMDefinitionChecker {
     this.addPendingCheck(object, check);
   }
 
-  private checkEqualitySource(source: Fmt.Expression, context: HLMCheckerProofStepContext): Fmt.Expression[] | undefined {
-    let result = this.checkProofStepType(source, context);
-    if (result instanceof FmtHLM.MetaRefExpression_setEquals || result instanceof FmtHLM.MetaRefExpression_equals) {
-      return result.terms;
-    } else if (result instanceof FmtHLM.MetaRefExpression_equiv) {
-      return result.formulas;
+  private checkSubstitutionSource(source: Fmt.Expression, sourceSide: Fmt.BN, context: HLMCheckerProofStepContext): HLMSubstitutionSourceInfo | undefined {
+    let equivalence = this.checkProofStepType(source, context);
+    let sourceIndex = this.utils.externalToInternalIndex(sourceSide);
+    if (equivalence && sourceIndex !== undefined) {
+      return this.utils.getSubstitutionSourceInfo(equivalence, sourceIndex);
+    } else {
+      return undefined;
     }
-    return undefined;
+  }
+
+  private checkSubstitution(object: Object, source: Fmt.Expression, sourceSide: Fmt.BN, input: Fmt.Expression, output: Fmt.Expression, context: HLMCheckerProofStepContext): boolean {
+    let sourceContext: HLMCheckerProofStepContext = {
+      ...context,
+      goal: undefined,
+      previousResult: undefined
+    };
+    let sourceInfo = this.checkSubstitutionSource(source, sourceSide, sourceContext);
+    if (sourceInfo) {
+      // TODO check restrictions on rewriting (see equality.md)
+      if (this.utils.substitutesTo(input, output, sourceInfo)) {
+        return true;
+      } else {
+        this.error(object, `Invalid substitution from ${input} to ${output}`);
+      }
+    } else {
+      this.error(source, 'Invalid substitution source');
+    }
+    return false;
   }
 
   private checkBoolConstant(expression: Fmt.Expression | undefined): void {
