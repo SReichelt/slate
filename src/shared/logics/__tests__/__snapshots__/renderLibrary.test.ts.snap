@@ -1882,7 +1882,10 @@ exports[`render hlm library: 1.5.26 Essentials/Functions/Application%20of%20func
 
   f^-1(f(x)) = x
 
-No proof."
+Proof.
+
+f^-1 ∘ f = id_X by definition of f^-1 ⇒^(def) ∀ z ∈ X : f^-1(f(z)) = z
+ ⇒^(x ∈ X) f^-1(f(x)) = x"
 `;
 
 exports[`render hlm library: 1.5.27 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
@@ -1890,7 +1893,10 @@ exports[`render hlm library: 1.5.27 Essentials/Functions/Application%20of%20func
 
   f(f^-1(y)) = y
 
-No proof."
+Proof.
+
+f ∘ f^-1 = id_Y by definition of f^-1 ⇒^(def) ∀ z ∈ Y : f(f^-1(z)) = z
+ ⇒^(y ∈ Y) f(f^-1(y)) = y"
 `;
 
 exports[`render hlm library: 1.5.28 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
