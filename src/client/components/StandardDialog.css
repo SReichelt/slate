@@ -11,6 +11,7 @@
   border-radius: 2pt;
   color: var(--dialog-foreground-color);
   background-color: var(--dialog-background-color);
+  overflow: visible;
 }
 
 .dialog, .dialog-cell, .dialog input {
