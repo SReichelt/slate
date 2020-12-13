@@ -377,9 +377,9 @@ div.display-math {
   white-space: nowrap;
 }
 
-.table.inline, .table.single-case {
-  vertical-align: initial;
+.table.inline {
   white-space: initial;
+  vertical-align: initial;
 }
 
 .table.matrix, .table.binom {
@@ -412,20 +412,21 @@ div.display-math {
   padding-top: 2pt;
 }
 
+.table.single-case {
+  vertical-align: initial;
+}
+
 .table.cases>.table-row>.table-cell:not(:first-child), .table.single-case>.table-row>.table-cell:not(:first-child) {
   padding-left: 1ex;
 }
 
-.table.cases>.table-row>.table-cell::last-child, .table.single-case>.table-row>.table-cell:last-child {
+.table.cases>.table-row>.table-cell:last-child, .table.single-case>.table-row>.table-cell:last-child, .table.definitions>.table-row>.table-cell:last-child {
   white-space: initial;
+  min-width: 15em;
 }
 
 .table.definitions>.table-row>.table-cell:nth-child(3) {
   padding-left: 1em;
-}
-
-.table.definitions>.table-row>.table-cell:last-child {
-  white-space: initial;
 }
 
 .table.construction>.table-row>.table-cell {

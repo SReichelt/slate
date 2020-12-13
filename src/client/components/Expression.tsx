@@ -752,14 +752,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       result = renderPromise(render, undefined, renderWithLineHeight);
     } else if (expression instanceof Notation.OverUnderExpression) {
       innerClassName += ' overunder';
-      let bodyWithParens = new Notation.InnerParenExpression(expression.body);
       let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let rows: React.ReactNode[] = [
         (
           <span className={'overunder-body-row'} key="body">
             <span className={'overunder-body'}>
-              <Expression expression={bodyWithParens} parent={this} interactionHandler={this.props.interactionHandler}/>
+              <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>
             </span>
           </span>
         ),
