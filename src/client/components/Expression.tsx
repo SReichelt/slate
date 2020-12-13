@@ -932,8 +932,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.PromiseExpression) {
       let render = expression.promise.then((innerExpression: Notation.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
       return <PromiseHelper promise={render}/>;
-    } else if (expression instanceof Notation.DecoratedExpression) {
+    } else if (expression instanceof Notation.AssociativeExpression) {
       return this.renderExpression(expression.body, className, semanticLinks);
+    } else if (expression instanceof Notation.AbstractDecoratedExpression) {
+      return this.renderExpression(expression.body, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Notation.PlaceholderExpression) {
       className += ' placeholder';
       if (expression instanceof Notation.InsertPlaceholderExpression) {

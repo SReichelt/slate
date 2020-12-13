@@ -138,7 +138,7 @@ export abstract class GenericRenderer {
     let result: Notation.RenderedExpression = text;
     if (suffixes) {
       let subExpression = new Notation.SubSupExpression(result);
-      subExpression.sub = this.renderTemplate('Group', {'items': suffixes, 'separator': ','});
+      subExpression.sub = this.renderGroup(suffixes, ',');
       subExpression.fallback = new Notation.RowExpression([result, new Notation.TextExpression('_'), subExpression.sub]);
       subExpression.styleClasses = ['var'];
       result = subExpression;
@@ -150,7 +150,7 @@ export abstract class GenericRenderer {
     if (indices) {
       result = this.renderTemplate('SubSup', {
                                      'body': result,
-                                     'sub': this.renderTemplate('Group', {'items': indices})
+                                     'sub': this.renderGroup(indices)
                                    });
     }
     return result;

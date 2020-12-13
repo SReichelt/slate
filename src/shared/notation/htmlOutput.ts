@@ -208,10 +208,12 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     }
   } else if (expression instanceof Notation.PromiseExpression) {
     resultPromise = expression.promise.then((innerExpression: Notation.RenderedExpression) => renderAsHTML(innerExpression, renderer, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
-  } else if (expression instanceof Notation.DecoratedExpression) {
+  } else if (expression instanceof Notation.AssociativeExpression) {
     resultPromise = renderAsHTML(expression.body, renderer, options);
   } else if (expression.fallback) {
     resultPromise = renderAsHTML(expression.fallback, renderer, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+  } else if (expression instanceof Notation.AbstractDecoratedExpression) {
+    resultPromise = renderAsHTML(expression.body, renderer, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
   } else if (expression instanceof Notation.PlaceholderExpression) {
     return CachedPromise.resolve(renderer.renderText('?'));
   } else {

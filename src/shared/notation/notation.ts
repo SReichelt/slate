@@ -189,7 +189,9 @@ export abstract class AbstractDecoratedExpression extends RenderedExpression {
   }
 }
 
-export class DecoratedExpression extends AbstractDecoratedExpression {}
+export class StyleExpression extends AbstractDecoratedExpression {}
+
+export class AssociativeExpression extends AbstractDecoratedExpression {}
 
 export class ParenExpression extends AbstractDecoratedExpression {
   constructor(body: RenderedExpression, public style: string) {
@@ -680,7 +682,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     case 'Style':
       {
         let body = this.getExpressionArg('body');
-        expression = new DecoratedExpression(body);
+        expression = new StyleExpression(body);
         expression.styleClasses = [this.getArg('styleClass')];
       }
       break;

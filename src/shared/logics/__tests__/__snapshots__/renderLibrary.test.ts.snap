@@ -26,7 +26,7 @@ exports[`render hlm library: 1.1.2 Essentials/Sets/Empty%20set%20is%20subset%20o
 
 Proof.  Let x ∈ ∅.
 
-⇒^(def) ↯
+⇒^def ↯
 
 References.
 
@@ -50,7 +50,7 @@ Equivalence.
 1⇒3. Assume S = ∅. Then ∄ x ∈ S:
      Let x ∈ S.
      ⇒^(S = ∅) x ∈ ∅
-     ⇒^(def) ↯
+     ⇒^def ↯
 3⇒2. Assume ∄ x ∈ S. Then S ⊆ ∅:
      Let a ∈ S. Then a ∈ ∅:
      We have ∃ x ∈ S: ↯
@@ -65,14 +65,14 @@ Equivalence.
 4⇒5. Assume |S| = 0. Then |S| ≤ 0:
      We show that 0 ≤ 0:
      1.8.2.10 ⇒ ≤ is a partial order
-      ⇒^(def) ≤ is reflexive
-      ⇒^(def) ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
+      ⇒^def ≤ is reflexive
+      ⇒^def ∀ κ ∈ 𝓒𝓻𝓭 : κ ≤ κ
       ⇒^(0 ∈ 𝓒𝓻𝓭) 0 ≤ 0
 5⇒3. Assume |S| ≤ 0. Then ∄ x ∈ S:
-     |S| ≤ 0 ⇒^(def) ∃ φ : |S| → 0 : φ is injective
+     |S| ≤ 0 ⇒^def ∃ φ : |S| → 0 : φ is injective
      Let x ∈ S.
-     We have φ(x) ∈ ℕ_(<0) ⇒^(def) φ(x) < 0
-      ⇒^(def) ↯.
+     We have φ(x) ∈ ℕ_(<0) ⇒^def φ(x) < 0
+      ⇒^def ↯.
 
 Remarks.
 
@@ -97,8 +97,8 @@ exports[`render hlm library: 1.1.4 Essentials/Sets/finite 1`] = `
 Equivalence.
 
 1⇒2. Assume |S| is finite. Then ∃ k ∈ ℕ, f : S ↔ ℕ_(<k):
-     |S| is finite ⇒^(def) ∃ n ∈ ℕ : |S| = n
-      ⇒^(def) ∃ r : S ↔ ℕ_(<n)
+     |S| is finite ⇒^def ∃ n ∈ ℕ : |S| = n
+      ⇒^def ∃ r : S ↔ ℕ_(<n)
      Take k := n, f := r.
 2⇒3. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ l ∈ ℕ, g : ℕ_(<l) ↔ S:
      Take l := k, g := f^-1.
@@ -109,8 +109,8 @@ Equivalence.
        Take s := g.
      l ∈ ℕ ⇒^(l = |S|) |S| ∈ ℕ
 2⇒4. Let k ∈ ℕ, f : S ↔ ℕ_(<k) be a bijection. Then ∃ m ∈ ℕ, h : S → ℕ_(<m) : h is injective:
-     f ∈ (S ↔ ℕ_(<k)) ⇒^(def) f is bijective
-      ⇒^(def) f is injective
+     f ∈ (S ↔ ℕ_(<k)) ⇒^def f is bijective
+      ⇒^def f is injective
      Take m := k, h := f.
 4⇒1. Let n ∈ ℕ, i : S → ℕ_(<n) be an injective function. Then |S| is finite:
      We show that ∃ y ∈ ℕ : |S| ≤ y:
@@ -143,7 +143,7 @@ exports[`render hlm library: 1.1.5 Essentials/Sets/Subsets%20of%20finite%20sets%
 
 Proof 1.  We show that ∃ m ∈ ℕ, f : T → ℕ_(<m) : f is injective:
 
-S is finite ⇒^(def) ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
+S is finite ⇒^def ∃ n ∈ ℕ, g : S → ℕ_(<n) : g is injective
 
 Take m := n, f := g∣_T. g∣_T is injective by 1.5.20.
 
@@ -151,8 +151,8 @@ Proof 2.  We show that |T| is finite:
 
 1.8.2.7 ⇒ |T| ≤ |S|
 
-S is finite ⇒^(def) |S| is finite
- ⇒^(1.8.2.18) |T| is finite
+S is finite ⇒^def |S| is finite
+ ⇒^1.8.2.18 |T| is finite
 
 References.
 
@@ -224,13 +224,13 @@ Proof.
 
 ⊆. Let x ∈ (R ∩ S) ∩ T. Then x ∈ R ∩ (S ∩ T):
    We show that x ∈ R and x ∈ S ∩ T:
-   x ∈ (R ∩ S) ∩ T ⇒^(def) x ∈ R ∩ S and x ∈ T
-   x ∈ R ∩ S ⇒^(def) x ∈ R and x ∈ S
+   x ∈ (R ∩ S) ∩ T ⇒^def x ∈ R ∩ S and x ∈ T
+   x ∈ R ∩ S ⇒^def x ∈ R and x ∈ S
    We have x ∈ S ∩ T by definition.
 ⊇. Let x ∈ R ∩ (S ∩ T). Then x ∈ (R ∩ S) ∩ T:
    We show that x ∈ R ∩ S and x ∈ T:
-   x ∈ R ∩ (S ∩ T) ⇒^(def) x ∈ R and x ∈ S ∩ T
-   x ∈ S ∩ T ⇒^(def) x ∈ S and x ∈ T
+   x ∈ R ∩ (S ∩ T) ⇒^def x ∈ R and x ∈ S ∩ T
+   x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
    We have x ∈ R ∩ S by definition.
 
 References.
@@ -249,10 +249,10 @@ Proof.
 
 ⊆. Let x ∈ S ∩ T. Then x ∈ T ∩ S:
    We show that x ∈ T and x ∈ S:
-   x ∈ S ∩ T ⇒^(def) x ∈ S and x ∈ T
+   x ∈ S ∩ T ⇒^def x ∈ S and x ∈ T
 ⊇. Let x ∈ T ∩ S. Then x ∈ S ∩ T:
    We show that x ∈ S and x ∈ T:
-   x ∈ T ∩ S ⇒^(def) x ∈ T and x ∈ S
+   x ∈ T ∩ S ⇒^def x ∈ T and x ∈ S
 
 References.
 
@@ -285,7 +285,7 @@ exports[`render hlm library: 1.1.12 Essentials/Sets/Intersection%20is%20subset%2
 
 Proof.  Let x ∈ S ∩ T.
 
-⇒^(def) x ∈ S
+⇒^def x ∈ S
 
 References.
 
@@ -301,7 +301,7 @@ exports[`render hlm library: 1.1.13 Essentials/Sets/Intersection%20is%20subset%2
 
 Proof.  Let x ∈ S ∩ T.
 
-⇒^(def) x ∈ T
+⇒^def x ∈ T
 
 References.
 
@@ -369,20 +369,20 @@ exports[`render hlm library: 1.1.17 Essentials/Sets/Union%20is%20associative 1`]
 Proof.
 
 ⊆. Let x ∈ (R ∪ S) ∪ T. Then x ∈ R ∪ (S ∪ T):
-   x ∈ (R ∪ S) ∪ T ⇒^(def) x ∈ R ∪ S or x ∈ T
+   x ∈ (R ∪ S) ∪ T ⇒^def x ∈ R ∪ S or x ∈ T
    * Assume x ∈ R ∪ S. Then x ∈ R ∪ (S ∪ T):
-     x ∈ R ∪ S ⇒^(def) x ∈ R or x ∈ S
+     x ∈ R ∪ S ⇒^def x ∈ R or x ∈ S
      * Assume x ∈ R. Then x ∈ R ∪ (S ∪ T) by definition.
      * Assume x ∈ S. Then x ∈ R ∪ (S ∪ T):
        We have x ∈ S ∪ T by definition.
    * Assume x ∈ T. Then x ∈ R ∪ (S ∪ T):
      We have x ∈ S ∪ T by definition.
 ⊇. Let x ∈ R ∪ (S ∪ T). Then x ∈ (R ∪ S) ∪ T:
-   x ∈ R ∪ (S ∪ T) ⇒^(def) x ∈ R or x ∈ S ∪ T
+   x ∈ R ∪ (S ∪ T) ⇒^def x ∈ R or x ∈ S ∪ T
    * Assume x ∈ R. Then x ∈ (R ∪ S) ∪ T:
      We have x ∈ R ∪ S by definition.
    * Assume x ∈ S ∪ T. Then x ∈ (R ∪ S) ∪ T:
-     x ∈ S ∪ T ⇒^(def) x ∈ S or x ∈ T
+     x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
      * Assume x ∈ S. Then x ∈ (R ∪ S) ∪ T:
        We have x ∈ R ∪ S by definition.
      * Assume x ∈ T. Then x ∈ (R ∪ S) ∪ T by definition.
@@ -403,10 +403,10 @@ Proof.
 
 ⊆. Let x ∈ S ∪ T. Then x ∈ T ∪ S:
    We show that x ∈ T or x ∈ S:
-   x ∈ S ∪ T ⇒^(def) x ∈ S or x ∈ T
+   x ∈ S ∪ T ⇒^def x ∈ S or x ∈ T
 ⊇. Let x ∈ T ∪ S. Then x ∈ S ∪ T:
    We show that x ∈ S or x ∈ T:
-   x ∈ T ∪ S ⇒^(def) x ∈ T or x ∈ S
+   x ∈ T ∪ S ⇒^def x ∈ T or x ∈ S
 
 References.
 
@@ -673,7 +673,7 @@ References.
 exports[`render hlm library: 1.1.30.1 Essentials/Sets/Choice/Choice%20functions 1`] = `
 "Definition 1.1.30.1.  Let S be a set. We define:
 
-  𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f(T) ∈ T}
+  𝓒𝓱𝓸𝓲𝓬𝓮(S) := {f : (𝒫(S) ∖ {(∅)}) → S : ∀ T ⊆ S s.t. T is nonempty : f((T)) ∈ T}
 
 We write “let f be a choice function on S” for “let f ∈ 𝓒𝓱𝓸𝓲𝓬𝓮(S).”
 
@@ -857,11 +857,11 @@ Equivalence.
 2⇒3. Assume b = ⊤. Then b ≠ ⊥:
      Assume b = ⊥.
      ⇒^(b = ⊤) ⊤ = ⊥
-     ⇒^(def) [true  ⇔  false] ↯
+     ⇒^def [true  ⇔  false] ↯
 3⇒1. Assume b ≠ ⊥.
      Let q be a proposition such that b = [q]. Then q:
      b ≠ ⊥ ⇒^(b = [q]) [q] ≠ ⊥
-      ⇒^(def) q
+      ⇒^def q
 
 References.
 
@@ -1019,7 +1019,7 @@ Proof.
 2⇒1. Assume ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)]. Then s = t:
      Let q := [x = t]_(x ∈ S).
      ∀ p ∈ 𝓟𝓻𝓹(S) : [p(s)  ⇔  p(t)] ⇒^(q ∈ 𝓟𝓻𝓹(S)) [q(s)  ⇔  q(t)]
-      ⇒^(def) [s = t  ⇔  t = t]
+      ⇒^def [s = t  ⇔  t = t]
      t = t.
      ⇒^(s = t ⇔ t = t) s = t"
 `;
@@ -1027,12 +1027,12 @@ Proof.
 exports[`render hlm library: 1.4.1 Essentials/Relations/Relations 1`] = `
 "Definition 1.4.1.  Let S, T be sets. We define:
 
-  𝓡𝓮𝓵(S, T) :=: {[p_s,t]_s ∈ S,t ∈ T | p_s,t is a proposition for each s ∈ S and t ∈ T}
+  𝓡𝓮𝓵(S, T) :=: {[p_(s,t)]_(s ∈ S,t ∈ T) | p_(s,t) is a proposition for each s ∈ S and t ∈ T}
 
-  [p_s,t]_s ∈ S,t ∈ T = [q_s,t]_s ∈ S,t ∈ T  :⇔  ∀ s ∈ S, t ∈ T : [p_s,t  ⇔  q_s,t]  (p_s,t is a proposition for each s ∈ S and t ∈ T, q_s,t is a proposition for each s ∈ S and t ∈ T)
+  [p_(s,t)]_(s ∈ S,t ∈ T) = [q_(s,t)]_(s ∈ S,t ∈ T)  :⇔  ∀ s ∈ S, t ∈ T : [p_(s,t)  ⇔  q_(s,t)]  (p_(s,t) is a proposition for each s ∈ S and t ∈ T, q_(s,t) is a proposition for each s ∈ S and t ∈ T)
 
 𝓟𝓻𝓹(S × T) =: 𝓡𝓮𝓵(S, T) via
-r = [r(s, t)]_s ∈ S,t ∈ T
+r = [r((s, t))]_(s ∈ S,t ∈ T)
 
   Well-definedness.  No proof.
 
@@ -1058,13 +1058,13 @@ exports[`render hlm library: 1.4.2 Essentials/Relations/related 1`] = `
 
 by:
 
-  s [p_u,v]_u ∈ S,v ∈ T t  :⇔  p_s,t  (p_u,v is a proposition for each u ∈ S and v ∈ T)"
+  s [p_(u,v)]_(u ∈ S,v ∈ T) t  :⇔  p_(s,t)  (p_(u,v) is a proposition for each u ∈ S and v ∈ T)"
 `;
 
 exports[`render hlm library: 1.4.3 Essentials/Relations/converse 1`] = `
 "Definition 1.4.3.  Let S, T be sets, ≺ be a relation from S to T. We define:
 
-  ≺^T := [s ≺ t]_t ∈ T,s ∈ S
+  ≺^T := [s ≺ t]_(t ∈ T,s ∈ S)
 
 References.
 
@@ -1104,9 +1104,9 @@ References.
 exports[`render hlm library: 1.4.6 Essentials/Relations/Endorelations 1`] = `
 "Definition 1.4.6 (Endorelations).  Let S be a set. We define:
 
-  𝓡𝓮𝓵(S) :=: {[p_s,t]_(s,t ∈ S) | p_s,t is a proposition for each s, t ∈ S}
+  𝓡𝓮𝓵(S) :=: {[p_(s,t)]_(s,t ∈ S) | p_(s,t) is a proposition for each s, t ∈ S}
 
-  [p_s,t]_(s,t ∈ S) = [q_s,t]_(s,t ∈ S)  :⇔  ∀ s, t ∈ S : [p_s,t  ⇔  q_s,t]  (p_s,t is a proposition for each s, t ∈ S, q_s,t is a proposition for each s, t ∈ S)
+  [p_(s,t)]_(s,t ∈ S) = [q_(s,t)]_(s,t ∈ S)  :⇔  ∀ s, t ∈ S : [p_(s,t)  ⇔  q_(s,t)]  (p_(s,t) is a proposition for each s, t ∈ S, q_(s,t) is a proposition for each s, t ∈ S)
 
 𝓡𝓮𝓵(S, S) =: 𝓡𝓮𝓵(S) via
 ≺ = [s ≺ t]_(s,t ∈ S)
@@ -1496,9 +1496,9 @@ References.
 exports[`render hlm library: 1.4.27.1 Essentials/Relations/Heterogenous%20equality/Heterogenous%20equality 1`] = `
 "Definition 1.4.27.1.  Let I be a set, let S_i be a set for each i ∈ I. We define:
 
-  𝓗𝓔𝓺((S_i)_(i∈I)) :=: {(≡_a,b)_(a = b)^((S_i)_(i∈I)) | ≡_a,b is a relation from S_a to S_b for each a, b ∈ I s.t. a = b, [∀ i ∈ I : ≡_i,i = (=_(S_i))]}
+  𝓗𝓔𝓺((S_i)_(i∈I)) :=: {(≡_(a,b))_(a = b)^((S_i)_(i∈I)) | ≡_(a,b) is a relation from S_a to S_b for each a, b ∈ I s.t. a = b, [∀ i ∈ I : ≡_(i,i) = (=_(S_i))]}
 
-  (≡_a,b)_(a = b)^((S_i)_(i∈I)) = (≡'_a,b)_(a = b)^((S_i)_(i∈I))  :⇔  ∀ a, b ∈ I : ≡_a,b = ≡'_a,b  (≡_a,b is a relation from S_a to S_b for each a, b ∈ I s.t. a = b, ≡'_a,b is a relation from S_a to S_b for each a, b ∈ I s.t. a = b with suitable conditions)
+  (≡_(a,b))_(a = b)^((S_i)_(i∈I)) = (≡'_(a,b))_(a = b)^((S_i)_(i∈I))  :⇔  ∀ a, b ∈ I : ≡_(a,b) = ≡'_(a,b)  (≡_(a,b) is a relation from S_a to S_b for each a, b ∈ I s.t. a = b, ≡'_(a,b) is a relation from S_a to S_b for each a, b ∈ I s.t. a = b with suitable conditions)
 
 We write “let ≃ be a heterogenous equality on S_i (i ∈ I)” for “let ≃ ∈ 𝓗𝓔𝓺((S_i)_(i∈I)).”
 
@@ -1520,7 +1520,7 @@ exports[`render hlm library: 1.4.27.2 Essentials/Relations/Heterogenous%20equali
 
 by:
 
-  s (≡_j,k)_(j = k)^((S_i)_(i∈I)) t  :⇔  s ≡_a,b t  (≡_j,k is a relation from S_j to S_k for each j, k ∈ I s.t. j = k, [∀ i ∈ I : ≡_i,i = (=_(S_i))])"
+  s (≡_(j,k))_(j = k)^((S_i)_(i∈I)) t  :⇔  s ≡_(a,b) t  (≡_(j,k) is a relation from S_j to S_k for each j, k ∈ I s.t. j = k, [∀ i ∈ I : ≡_(i,i) = (=_(S_i))])"
 `;
 
 exports[`render hlm library: 1.5.1 Essentials/Functions/Functions 1`] = `
@@ -1789,9 +1789,9 @@ exports[`render hlm library: 1.5.19 Essentials/Functions/Generalized%20restricti
 
 Proof.  Let a, b ∈ A such that f∣_A^B(a) = f∣_A^B(b). Then a = b:
 
-f∣_A^B(a) = f∣_A^B(b) ⇒^(def) f(a) = f(b)
+f∣_A^B(a) = f∣_A^B(b) ⇒^def f(a) = f(b)
 
-f is injective ⇒^(def) ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
+f is injective ⇒^def ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
  ⇒^(a,b ∈ X, f(a) = f(b)) a = b"
 `;
 
@@ -1812,9 +1812,9 @@ exports[`render hlm library: 1.5.21 Essentials/Functions/Generalized%20extension
 
 Proof.  Let y ∈ Y. Then ∃ x ∈ X : f(x) = y:
 
-f∣_A^B is surjective ⇒^(def) ∀ b ∈ B : ∃ a ∈ A : f∣_A^B(a) = b
+f∣_A^B is surjective ⇒^def ∀ b ∈ B : ∃ a ∈ A : f∣_A^B(a) = b
  ⇒^(y ∈ B) ∃ a ∈ A : f∣_A^B(a) = y
- ⇒^(def) f(a) = y
+ ⇒^def f(a) = y
 
 Take x := a."
 `;
@@ -1834,7 +1834,7 @@ exports[`render hlm library: 1.5.23 Essentials/Functions/Surjectivity%20by%20cod
 
 Proof.  Let y ∈ f(A). Then ∃ x ∈ A : f∣_A^(f(A))(x) = y:
 
-y ∈ f(A) ⇒^(def) ∃ a ∈ A : y = f(a)
+y ∈ f(A) ⇒^def ∃ a ∈ A : y = f(a)
 
 Take x := a. f∣_A^(f(A))(a) = f(a) = y."
 `;
@@ -1884,7 +1884,7 @@ exports[`render hlm library: 1.5.26 Essentials/Functions/Application%20of%20func
 
 Proof.
 
-f^-1 ∘ f = id_X by definition of f^-1 ⇒^(def) ∀ z ∈ X : f^-1(f(z)) = z
+f^-1 ∘ f = id_X by definition of f^-1 ⇒^def ∀ z ∈ X : f^-1(f(z)) = z
  ⇒^(x ∈ X) f^-1(f(x)) = x"
 `;
 
@@ -1895,7 +1895,7 @@ exports[`render hlm library: 1.5.27 Essentials/Functions/Application%20of%20func
 
 Proof.
 
-f ∘ f^-1 = id_Y by definition of f^-1 ⇒^(def) ∀ z ∈ Y : f(f^-1(z)) = z
+f ∘ f^-1 = id_Y by definition of f^-1 ⇒^def ∀ z ∈ Y : f(f^-1(z)) = z
  ⇒^(y ∈ Y) f(f^-1(y)) = y"
 `;
 
@@ -1952,7 +1952,7 @@ Proof.  By induction on n.
 * Let x ∈ ℕ such that (id_X)^x = id_X. Then:
   (id_X)^(x+1) = id_X ∘ (id_X)^x
    = id_X ∘ id_X
-   =^(1.5.13) id_X"
+   =^1.5.13 id_X"
 `;
 
 exports[`render hlm library: 1.5.33 Essentials/Functions/Power%20of%20identity%20to%20integer%20is%20identity 1`] = `
@@ -1964,25 +1964,25 @@ Proof.
 
 * Assume a ≥ 0. Then (id_X)^a = id_X by 1.5.32.
 * Assume a < 0. Then:
-  ((id_X)^-1)^(−a) =^(1.5.29) (id_X)^(−a)
-   =^(1.5.32) id_X"
+  ((id_X)^-1)^(−a) =^1.5.29 (id_X)^(−a)
+   =^1.5.32 id_X"
 `;
 
 exports[`render hlm library: 1.6.1 Essentials/Operations/Operations 1`] = `
 "Definition 1.6.1.  Let X, Y, Z be sets. We define:
 
-  𝓞𝓹(X, Y, Z) :=: {(X × Y → Z, (x, y) ↦ z_x,y) | z_x,y ∈ Z for each x ∈ X and y ∈ Y}
+  𝓞𝓹(X, Y, Z) :=: {(X × Y → Z, (x, y) ↦ z_(x,y)) | z_(x,y) ∈ Z for each x ∈ X and y ∈ Y}
 
-  (X × Y → Z, (x, y) ↦ z_x,y) = (X × Y → Z, (x, y) ↦ z'_x,y)  :⇔  ∀ x ∈ X, y ∈ Y : z_x,y = z'_x,y  (z_x,y ∈ Z for each x ∈ X and y ∈ Y, z'_x,y ∈ Z for each x ∈ X and y ∈ Y)
+  (X × Y → Z, (x, y) ↦ z_(x,y)) = (X × Y → Z, (x, y) ↦ z'_(x,y))  :⇔  ∀ x ∈ X, y ∈ Y : z_(x,y) = z'_(x,y)  (z_(x,y) ∈ Z for each x ∈ X and y ∈ Y, z'_(x,y) ∈ Z for each x ∈ X and y ∈ Y)
 
 X × Y → Z =: 𝓞𝓹(X, Y, Z) via
-f = (X × Y → Z, (x, y) ↦ f(x, y))
+f = (X × Y → Z, (x, y) ↦ f((x, y)))
 
   Well-definedness.  No proof.
 
 We write “let ∗ : X × Y → Z be an operation” for “let ∗ ∈ 𝓞𝓹(X, Y, Z).”
 
-We write “∗ :  X × Y → Z, (x, y) ↦ z_x,y” for “∗ := (X × Y → Z, (x, y) ↦ z_x,y).”
+We write “∗ :  X × Y → Z, (x, y) ↦ z_(x,y)” for “∗ := (X × Y → Z, (x, y) ↦ z_(x,y)).”
 
 References.
 
@@ -1996,8 +1996,8 @@ exports[`render hlm library: 1.6.2 Essentials/Operations/value 1`] = `
 
 by:
 
-  x (X × Y → Z, (a, b) ↦ c_a,b) y := c_x,y  (c_a,b ∈ Z for each a ∈ X and b ∈ Y)
-   = ∗(x, y)
+  x (X × Y → Z, (a, b) ↦ c_(a,b)) y := c_(x,y)  (c_(a,b) ∈ Z for each a ∈ X and b ∈ Y)
+   = ∗((x, y))
 
 Equality.  No proof."
 `;
@@ -2181,9 +2181,9 @@ References.
 exports[`render hlm library: 1.6.18.1 Essentials/Operations/Iterated%20operations/Iterated%20operations 1`] = `
 "Definition 1.6.18.1.  Let X be a set. We define:
 
-  𝓑𝓲𝓰𝓞𝓹(X) :=: {[e ∗ ⋅⋅⋅] | ∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid}
+  𝓑𝓲𝓰𝓞𝓹(X) :=: {bigop(e ∗ ⋅⋅⋅) | ∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid}
 
-  [e ∗ ⋅⋅⋅] = [f ⋆ ⋅⋅⋅]  :⇔  ∗ = ⋆ and e = f  (∗ : X × X → X is an operation on X, e ∈ X, ⋆ : X × X → X is an operation on X, f ∈ X with suitable conditions)
+  bigop(e ∗ ⋅⋅⋅) = bigop(f ⋆ ⋅⋅⋅)  :⇔  ∗ = ⋆ and e = f  (∗ : X × X → X is an operation on X, e ∈ X, ⋆ : X × X → X is an operation on X, f ∈ X with suitable conditions)
 
 We write “let ⨂ be an iterated operation on X” for “let ⨂ ∈ 𝓑𝓲𝓰𝓞𝓹(X).”
 
@@ -2200,13 +2200,13 @@ exports[`render hlm library: 1.6.18.2 Essentials/Operations/Iterated%20operation
 
 by:
 
-  e_[e∗⋅⋅⋅] := e  (∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid)"
+  e_(bigop(e∗⋅⋅⋅)) := e  (∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid)"
 `;
 
 exports[`render hlm library: 1.6.18.3 Essentials/Operations/Iterated%20operations/operation 1`] = `
 "Definition 1.6.18.3.  Let X be a set, ⨂ be an iterated operation on X, x, y ∈ X. We define:
 
-  x ⨂ y := x ∗ y if ⨂ = [e ∗ ⋅⋅⋅] (∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid)"
+  x ⨂ y := x ∗ y if ⨂ = bigop(e ∗ ⋅⋅⋅) (∗ : X × X → X is an operation on X, e ∈ X such that (X, ∗, e) forms a commutative monoid)"
 `;
 
 exports[`render hlm library: 1.6.18.4 Essentials/Operations/Iterated%20operations/indexed%20by%20natural%20number 1`] = `
@@ -2669,7 +2669,7 @@ Proof.  By induction on n.
 * Let x ∈ ℕ such that m + x = x + m. Then:
   m + (x+1) = ((m + x)+1)
    = ((x + m)+1)
-   =^(1.8.1.5) (x+1) + m"
+   =^1.8.1.5 (x+1) + m"
 `;
 
 exports[`render hlm library: 1.8.1.10 Essentials/Numbers/Natural/Sum%20is%20commutative 1`] = `
@@ -2698,10 +2698,10 @@ We have n = 0:
   * Assume n = 0. Then n = 0.
   * Let x ∈ ℕ such that n = x + 1. Then n = 0:
     m + n = 0 ⇒^(n = x+1) m + (x + 1) = 0
-     ⇒^(def) ↯
+     ⇒^def ↯
 
 m + n = 0 ⇒^(n = 0) m + 0 = 0
- ⇒^(def) m = 0"
+ ⇒^def m = 0"
 `;
 
 exports[`render hlm library: 1.8.1.12 Essentials/Numbers/Natural/Addition%20of%20a%20fixed%20number%20is%20injective 1`] = `
@@ -2715,8 +2715,8 @@ Proof.  By induction on c.
   a + c = b + c ⇒^(c = 0) a + 0 = b + 0
 * Let x ∈ ℕ such that c = x + 1. Then a = b:
   a + c = b + c ⇒^(c = x+1) a + (x + 1) = b + (x + 1)
-   ⇒^(def) a + x = b + x
-   ⇒^(1.8.1.12) a = b
+   ⇒^def a + x = b + x
+   ⇒^1.8.1.12 a = b
 
 References.
 
@@ -2730,7 +2730,7 @@ exports[`render hlm library: 1.8.1.13 Essentials/Numbers/Natural/Zero%20is%20the
 
 Proof.
 
-We have n + m = 0 + m ⇒^(1.8.1.12) n = 0."
+We have n + m = 0 + m ⇒^1.8.1.12 n = 0."
 `;
 
 exports[`render hlm library: 1.8.1.14 Essentials/Numbers/Natural/less%20or%20equal 1`] = `
@@ -2783,17 +2783,17 @@ Proof.
   Assume m > n. Then n ≤ m.
 * ≤ is antisymmetric:
   Let m, n ∈ ℕ such that m ≤ n and n ≤ m. Then m = n:
-  m ≤ n ⇒^(def) ∃ x ∈ ℕ : m + x = n
-  n ≤ m ⇒^(def) ∃ y ∈ ℕ : n + y = m
+  m ≤ n ⇒^def ∃ x ∈ ℕ : m + x = n
+  n ≤ m ⇒^def ∃ y ∈ ℕ : n + y = m
    ⇒^(m+x = n) m + x + y = m
-   ⇒^(1.8.1.13) x + y = 0
-   ⇒^(1.8.1.11) x = y = 0
+   ⇒^1.8.1.13 x + y = 0
+   ⇒^1.8.1.11 x = y = 0
   m + x = n ⇒^(x = y = 0) m + 0 = n
 * ≤ is transitive:
   Let l, m, n ∈ ℕ such that l ≤ m and m ≤ n. Then l ≤ n:
   We show that ∃ x ∈ ℕ : l + x = n:
-  l ≤ m ⇒^(def) ∃ y ∈ ℕ : l + y = m
-  m ≤ n ⇒^(def) ∃ z ∈ ℕ : m + z = n
+  l ≤ m ⇒^def ∃ y ∈ ℕ : l + y = m
+  m ≤ n ⇒^def ∃ z ∈ ℕ : m + z = n
   Take x := y + z.
 
 References.
@@ -2809,9 +2809,9 @@ exports[`render hlm library: 1.8.1.17 Essentials/Numbers/Natural/Less%20and%20le
 
 Proof.  We show that ∃ x ∈ ℕ_+ : a + x = c:
 
-a < b ⇒^(def) ∃ y ∈ ℕ_+ : a + y = b
+a < b ⇒^def ∃ y ∈ ℕ_+ : a + y = b
 
-b ≤ c ⇒^(def) ∃ z ∈ ℕ : b + z = c
+b ≤ c ⇒^def ∃ z ∈ ℕ : b + z = c
 
 Take x := y + z.
 
@@ -2827,9 +2827,9 @@ exports[`render hlm library: 1.8.1.18 Essentials/Numbers/Natural/Less%20or%20equ
 
 Proof.  We show that ∃ x ∈ ℕ_+ : a + x = c:
 
-a ≤ b ⇒^(def) ∃ y ∈ ℕ : a + y = b
+a ≤ b ⇒^def ∃ y ∈ ℕ : a + y = b
 
-b < c ⇒^(def) ∃ z ∈ ℕ_+ : b + z = c
+b < c ⇒^def ∃ z ∈ ℕ_+ : b + z = c
 
 Take x := y + z."
 `;
@@ -2853,7 +2853,7 @@ exports[`render hlm library: 1.8.1.20 Essentials/Numbers/Natural/Zero%20is%20the
 
 Proof.
 
-n ≤ 0 ⇒^(def) n = 0"
+n ≤ 0 ⇒^def n = 0"
 `;
 
 exports[`render hlm library: 1.8.1.21 Essentials/Numbers/Natural/Successor%20is%20always%20greater 1`] = `
@@ -2980,7 +2980,7 @@ Proof.  By induction on k.
   Take m := f(0).
 * Let x ∈ ℕ such that k = x + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
   Let N := f(ℕ_(≤x)).
-  ⇒^(1.8.1.23) ∃ n ∈ N : n is a ≤-greatest element of N
+  ⇒^1.8.1.23 ∃ n ∈ N : n is a ≤-greatest element of N
   Take m := {f(k) if f(k) > n, n if f(k) ≤ n.
 
 Remarks.
@@ -3000,16 +3000,16 @@ exports[`render hlm library: 1.8.1.24 Essentials/Numbers/Natural/Finiteness%20cr
 Proof.
 
 1⇒2. Assume M is finite. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M:
-     M is finite ⇒^(def) |M| is finite
-      ⇒^(def) |M| ∈ ℕ
+     M is finite ⇒^def |M| is finite
+      ⇒^def |M| ∈ ℕ
      * Assume |M| = 0. Then M is empty by definition.
      * Let k ∈ ℕ such that |M| = k + 1. Then ∃ m ∈ M : m is a ≤-greatest element of M:
-       We have |M| = k + 1 ⇒^(def) ∃ f : M ↔ ℕ_(<(k+1)).
+       We have |M| = k + 1 ⇒^def ∃ f : M ↔ ℕ_(<(k+1)).
        1.8.1.23 ⇒ ∃ m ∈ M : m is a ≤-greatest element of M
 3⇒2. Assume M is empty or ∃! m ∈ M : m is a ≤-greatest element of M. Then M is empty or ∃ m ∈ M : m is a ≤-greatest element of M.
 2⇒4. Assume M is empty or ∃ m ∈ M : m is a ≤-greatest element of M. Then ∃ a ∈ ℕ : M ⊆ ℕ_(≤a):
      * Assume M is empty.
-       ⇒^(def) M = ∅
+       ⇒^def M = ∅
        Take a := 0. We show that M ⊆ ℕ_(≤0):
          1.1.2 ⇒ ∅ ⊆ ℕ_(≤0)
           ⇒^(M = ∅) M ⊆ ℕ_(≤0)
@@ -3019,7 +3019,7 @@ Proof.
      Take b := a + 1.
 5⇒1. Let b ∈ ℕ such that M ⊆ ℕ_(<b). Then M is finite:
      1.8.1.22.7 ⇒ ℕ_(<b) is finite
-      ⇒^(1.1.5) M is finite"
+      ⇒^1.1.5 M is finite"
 `;
 
 exports[`render hlm library: 1.8.1.25 Essentials/Numbers/Natural/difference 1`] = `
@@ -3257,8 +3257,8 @@ Proof.
      ⊆. Trivial.
      ⊇. Let n ∈ ℕ. Then n ∈ M:
         Let p := [m ∈ M]_(m ∈ ℕ).
-        ⇒^(1.8.1.39) p(n)
-        ⇒^(def) n ∈ M
+        ⇒^1.8.1.39 p(n)
+        ⇒^def n ∈ M
 3⇒1. Assume M = ℕ. Then 0 ∈ M and ∀ m ∈ M : m + 1 ∈ M:
      0 ∈ ℕ and ∀ m ∈ ℕ : m + 1 ∈ ℕ.
      ⇒^(M = ℕ) 0 ∈ M and ∀ m ∈ M : m + 1 ∈ M
@@ -3480,7 +3480,7 @@ References.
 exports[`render hlm library: 1.8.1.51.1 Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.8.1.51.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℕ
+  ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on ℕ
 
 Example.
 
@@ -3528,7 +3528,7 @@ No proof."
 exports[`render hlm library: 1.8.1.51.6 Essentials/Numbers/Natural/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.8.1.51.6.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℕ
+  ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on ℕ
 
 Example.
 
@@ -3672,20 +3672,20 @@ Let a := ∏_(p ∈ ℙ) p.
 ⇒ a ≥ 1:
 
   1.8.1.51.8 ⇒ ∏_(x ∈ ∅) x ≤ ∏_(p ∈ ℙ) p
-   ⇒^(1.6.18.8) 1 ≤ ∏_(p ∈ ℙ) p
+   ⇒^1.6.18.8 1 ≤ ∏_(p ∈ ℙ) p
 
-⇒^(1.8.1.18) a + 1 > 1
-⇒^(1.8.1.52.5) ∃ prime q : q ∣ (a + 1)
+⇒^1.8.1.18 a + 1 > 1
+⇒^1.8.1.52.5 ∃ prime q : q ∣ (a + 1)
 
 We have q ∣ a:
 
   1.8.1.51.9 ⇒ q ∣ (∏_(p ∈ ℙ) p)
 
-⇒^(1.8.1.35) q ∣ 1
-⇒^(1.8.1.34) q ≤ 1
+⇒^1.8.1.35 q ∣ 1
+⇒^1.8.1.34 q ≤ 1
 
-q ∈ ℙ ⇒^(def) q ∈ ℕ_(>1)
- ⇒^(def) q > 1 ↯
+q ∈ ℙ ⇒^def q ∈ ℕ_(>1)
+ ⇒^def q > 1 ↯
 
 References.
 
@@ -3840,7 +3840,7 @@ n = |ℕ_(<n)|
 
   Well-definedness.  Let m, n ∈ ℕ such that |ℕ_(<m)| = |ℕ_(<n)|. Then m = n:
 
-  |ℕ_(<m)| = |ℕ_(<n)| ⇒^(def) ∃ f : ℕ_(<m) ↔ ℕ_(<n)
+  |ℕ_(<m)| = |ℕ_(<n)| ⇒^def ∃ f : ℕ_(<m) ↔ ℕ_(<n)
 
   1.8.2.1 ⇒ m = n
 
@@ -4279,7 +4279,7 @@ References.
 exports[`render hlm library: 1.8.2.25.1 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.8.2.25.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅] is an iterated operation on 𝓒𝓻𝓭
+  ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on 𝓒𝓻𝓭
 
 Example.
 
@@ -4305,7 +4305,7 @@ In contrast to the previous definition, this definition works for arbitrary inde
 exports[`render hlm library: 1.8.2.25.3 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.8.2.25.3.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on 𝓒𝓻𝓭
+  ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on 𝓒𝓻𝓭
 
 Example.
 
@@ -4639,8 +4639,8 @@ x = (x-0)
 
   Well-definedness.  Let x, y ∈ ℕ such that (x-0) = (y-0). Then x = y:
 
-  (x-0) = (y-0) ⇒^(def) x + 0 = y + 0
-   ⇒^(def) x = y
+  (x-0) = (y-0) ⇒^def x + 0 = y + 0
+   ⇒^def x = y
 
 Remarks.
 
@@ -5034,7 +5034,7 @@ No proof."
 exports[`render hlm library: 1.8.4.22.1 Essentials/Numbers/Integer/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.8.4.22.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℤ
+  ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on ℤ
 
 Example.
 
@@ -5050,7 +5050,7 @@ References.
 exports[`render hlm library: 1.8.4.22.2 Essentials/Numbers/Integer/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.8.4.22.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℤ
+  ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on ℤ
 
 Example.
 
@@ -5407,7 +5407,7 @@ References.
 exports[`render hlm library: 1.8.5.14.1 Essentials/Numbers/Rational/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.8.5.14.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℚ
+  ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on ℚ
 
 Example.
 
@@ -5423,7 +5423,7 @@ References.
 exports[`render hlm library: 1.8.5.14.2 Essentials/Numbers/Rational/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.8.5.14.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℚ
+  ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on ℚ
 
 Example.
 
@@ -5836,7 +5836,7 @@ References.
 exports[`render hlm library: 1.8.6.17.1 Essentials/Numbers/Real/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.8.6.17.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℝ
+  ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on ℝ
 
 Example.
 
@@ -5852,7 +5852,7 @@ References.
 exports[`render hlm library: 1.8.6.17.2 Essentials/Numbers/Real/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.8.6.17.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℝ
+  ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on ℝ
 
 Example.
 
@@ -5872,32 +5872,32 @@ exports[`render hlm library: 1.8.6.18 Essentials/Numbers/Real/Roots%20of%20prime
 
 Proof.  Assume n√p is rational.
 
-⇒^(def) ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
+⇒^def ∃! a ∈ ℤ_+, b ∈ ℤ s.t. a and b are coprime : n√p = b∕a
 
-⇒^(def) p = (b∕a)^n
- =^(1.8.6.13) b^n∕a^n
+⇒^def p = (b∕a)^n
+ =^1.8.6.13 b^n∕a^n
 
-⇒^(def) p ⋅ a^n = b^n
+⇒^def p ⋅ a^n = b^n
 ⇒ p ∣ b^n by definition
-⇒^(1.8.4.23.1) p ∣ b
+⇒^1.8.4.23.1 p ∣ b
 ⇒ p ∣ a^n:
 
   We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
 
-  p ∣ b ⇒^(def) ∃ z ∈ ℤ : p ⋅ z = b
+  p ∣ b ⇒^def ∃ z ∈ ℤ : p ⋅ z = b
 
-  n ∈ ℕ_(>1) ⇒^(def) ∃ m ∈ ℕ : 2 + m = n
+  n ∈ ℕ_(>1) ⇒^def ∃ m ∈ ℕ : 2 + m = n
 
   Take y := b^m ⋅ z ⋅ z. We show that p ⋅ (b^m ⋅ z ⋅ z) = a^n:
 
     p ⋅ a^n = b^n
      = b^(2+m)
-     =^(def) b^m ⋅ b ⋅ b
+     =^def b^m ⋅ b ⋅ b
      = b^m ⋅ p ⋅ z ⋅ p ⋅ z
 
-    ⇒^(1.8.4.20) a^n = b^m ⋅ z ⋅ p ⋅ z
+    ⇒^1.8.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
-⇒^(1.8.4.23.1) p ∣ a
+⇒^1.8.4.23.1 p ∣ a
 
 p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
 
@@ -6085,7 +6085,7 @@ Well-definedness.  No proof."
 exports[`render hlm library: 1.8.7.14.1 Essentials/Numbers/Complex/Iterated%20operators/iterated%20sum 1`] = `
 "Definition 1.8.7.14.1.  We define:
 
-  ∑ := [0 + ⋅⋅⋅] is an iterated operation on ℂ
+  ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on ℂ
 
 Example.
 
@@ -6101,7 +6101,7 @@ References.
 exports[`render hlm library: 1.8.7.14.2 Essentials/Numbers/Complex/Iterated%20operators/iterated%20product 1`] = `
 "Definition 1.8.7.14.2.  We define:
 
-  ∏ := [1 ⋅ ⋅⋅⋅] is an iterated operation on ℂ
+  ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on ℂ
 
 Example.
 
@@ -6145,7 +6145,7 @@ exports[`render hlm library: 2.1.1.3 Algebra/Generic/Isomorphisms/inner%20operat
 
 by:
 
-  (X × X → X, (x_1, x_2) ↦ a_x_1,x_2) ≃^φ (Y × Y → Y, (y_1, y_2) ↦ b_y_1,y_2)  :⇔  ∀ x_1, x_2 ∈ X : φ(a_x_1,x_2) = b_φ(x_1),φ(x_2)  (a_x_1,x_2 ∈ X for each x_1 ∈ X and x_2 ∈ X, b_y_1,y_2 ∈ Y for each y_1 ∈ Y and y_2 ∈ Y)
+  (X × X → X, (x_1, x_2) ↦ a_(x_1,x_2)) ≃^φ (Y × Y → Y, (y_1, y_2) ↦ b_(y_1,y_2))  :⇔  ∀ x_1, x_2 ∈ X : φ(a_(x_1,x_2)) = b_(φ(x_1),φ(x_2))  (a_(x_1,x_2) ∈ X for each x_1 ∈ X and x_2 ∈ X, b_(y_1,y_2) ∈ Y for each y_1 ∈ Y and y_2 ∈ Y)
     ⇔  ∀ x_1, x_2 ∈ X : φ(x_1 ∗ x_2) = φ(x_1) ⋆ φ(x_2)
     ⇔  φ ∘ ∗ = ⋆ ∘ (φ × φ)
 
@@ -6159,7 +6159,7 @@ exports[`render hlm library: 2.1.1.4 Algebra/Generic/Isomorphisms/left%20operati
 
 by:
 
-  (S × X → X, (s, x) ↦ a_s,x) ≃^φ (S × Y → Y, (s, y) ↦ b_s,y)  :⇔  ∀ s ∈ S, x ∈ X : φ(a_s,x) = b_s,φ(x)  (a_s,x ∈ X for each s ∈ S and x ∈ X, b_s,y ∈ Y for each s ∈ S and y ∈ Y)
+  (S × X → X, (s, x) ↦ a_(s,x)) ≃^φ (S × Y → Y, (s, y) ↦ b_(s,y))  :⇔  ∀ s ∈ S, x ∈ X : φ(a_(s,x)) = b_(s,φ(x))  (a_(s,x) ∈ X for each s ∈ S and x ∈ X, b_(s,y) ∈ Y for each s ∈ S and y ∈ Y)
     ⇔  ∀ s ∈ S, x ∈ X : φ(s ∗ x) = s ⋆ φ(x)
     ⇔  φ ∘ ∗ = ⋆ ∘ (id_S × φ)
 
@@ -6173,7 +6173,7 @@ exports[`render hlm library: 2.1.1.5 Algebra/Generic/Isomorphisms/right%20operat
 
 by:
 
-  (X × S → X, (x, s) ↦ a_x,s) ≃^φ (Y × S → Y, (y, s) ↦ b_y,s)  :⇔  ∀ x ∈ X, s ∈ S : φ(a_x,s) = b_φ(x),s  (a_x,s ∈ X for each x ∈ X and s ∈ S, b_y,s ∈ Y for each y ∈ Y and s ∈ S)
+  (X × S → X, (x, s) ↦ a_(x,s)) ≃^φ (Y × S → Y, (y, s) ↦ b_(y,s))  :⇔  ∀ x ∈ X, s ∈ S : φ(a_(x,s)) = b_(φ(x),s)  (a_(x,s) ∈ X for each x ∈ X and s ∈ S, b_(y,s) ∈ Y for each y ∈ Y and s ∈ S)
     ⇔  ∀ x ∈ X, s ∈ S : φ(x ∗ s) = φ(x) ⋆ s
     ⇔  φ ∘ ∗ = ⋆ ∘ (φ × id_S)
 
@@ -6187,7 +6187,7 @@ exports[`render hlm library: 2.1.1.6 Algebra/Generic/Isomorphisms/relation%20con
 
 by:
 
-  [p_x_1,x_2]_(x_1,x_2 ∈ X) ≃^φ [q_y_1,y_2]_(y_1,y_2 ∈ Y)  :⇔  ∀ x_1, x_2 ∈ X : [p_x_1,x_2  ⇔  q_φ(x_1),φ(x_2)]  (q_y_1,y_2 is a proposition for each y_1, y_2 ∈ Y, p_x_1,x_2 is a proposition for each x_1, x_2 ∈ X)
+  [p_(x_1,x_2)]_(x_1,x_2 ∈ X) ≃^φ [q_(y_1,y_2)]_(y_1,y_2 ∈ Y)  :⇔  ∀ x_1, x_2 ∈ X : [p_(x_1,x_2)  ⇔  q_(φ(x_1),φ(x_2))]  (q_(y_1,y_2) is a proposition for each y_1, y_2 ∈ Y, p_(x_1,x_2) is a proposition for each x_1, x_2 ∈ X)
     ⇔  ∀ x_1, x_2 ∈ X : [x_1 ≺ x_2  ⇔  φ(x_1) ⊂ φ(x_2)]
 
 Equivalence.  No proof."
@@ -6196,11 +6196,11 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.1.1.7 Algebra/Generic/Isomorphisms/morphism%20condition 1`] = `
 "Definition 2.1.1.7.  Let X_1, X_2, X_3, Y_1, Y_2, Y_3 be sets, φ_1 : X_1 ↔ Y_1, φ_2 : X_2 ↔ Y_2, φ_3 : X_3 ↔ Y_3 be bijections, ∗ : X_1 × X_2 → X_3, ⋆ : Y_1 × Y_2 → Y_3 be operations. We define
 
-  ∗ ≃^φ_1,φ_2,φ_3 ⋆
+  ∗ ≃^(φ_1,φ_2,φ_3) ⋆
 
 by:
 
-  (X_1 × X_2 → X_3, (x_1, x_2) ↦ a_x_1,x_2) ≃^φ_1,φ_2,φ_3 (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ b_y_1,y_2)  :⇔  ∀ x_1 ∈ X_1, x_2 ∈ X_2 : φ_3(a_x_1,x_2) = b_φ_1(x_1),φ_2(x_2)  (a_x_1,x_2 ∈ X_3 for each x_1 ∈ X_1 and x_2 ∈ X_2, b_y_1,y_2 ∈ Y_3 for each y_1 ∈ Y_1 and y_2 ∈ Y_2)
+  (X_1 × X_2 → X_3, (x_1, x_2) ↦ a_(x_1,x_2)) ≃^(φ_1,φ_2,φ_3) (Y_1 × Y_2 → Y_3, (y_1, y_2) ↦ b_(y_1,y_2))  :⇔  ∀ x_1 ∈ X_1, x_2 ∈ X_2 : φ_3(a_(x_1,x_2)) = b_(φ_1(x_1),φ_2(x_2))  (a_(x_1,x_2) ∈ X_3 for each x_1 ∈ X_1 and x_2 ∈ X_2, b_(y_1,y_2) ∈ Y_3 for each y_1 ∈ Y_1 and y_2 ∈ Y_2)
     ⇔  ∀ x_1 ∈ X_1, x_2 ∈ X_2 : φ_3(x_1 ∗ x_2) = φ_1(x_1) ⋆ φ_2(x_2)
     ⇔  φ_3 ∘ ∗ = ⋆ ∘ (φ_1 × φ_2)
 
@@ -6999,7 +6999,7 @@ exports[`render hlm library: 2.5.16 Algebra/Monoids/iterated%20operation 1`] = `
 
 by:
 
-  ∏_[M,∗,e] := [e ∗ ⋅⋅⋅] is an iterated operation on M  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
+  ∏_[M,∗,e] := bigop(e ∗ ⋅⋅⋅) is an iterated operation on M  (M is a set, ∗ : M × M → M is an operation on M, e ∈ M such that (M, ∗, e) forms a monoid)
 
 Example.
 
@@ -7323,7 +7323,7 @@ exports[`render hlm library: 2.6.13.5 Algebra/Groups/Subgroups/normal%20subgroup
 exports[`render hlm library: 2.6.13.6 Algebra/Groups/Subgroups/Span 1`] = `
 "Definition 2.6.13.6.  Let 𝐆 be a group, X ⊆ (𝐆). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(𝐆) : S is a subgroup of 𝐆 and X ⊆ S}
+  〈X〉 := ⋂{(S) ∈ 𝒫((𝐆)) : S is a subgroup of 𝐆 and X ⊆ S}
 
 References.
 
@@ -7419,7 +7419,7 @@ exports[`render hlm library: 2.6.16 Algebra/Groups/iterated%20operation 1`] = `
 
 by:
 
-  ∏_[G,∗,e,i] := [e ∗ ⋅⋅⋅] is an iterated operation on G  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
+  ∏_[G,∗,e,i] := bigop(e ∗ ⋅⋅⋅) is an iterated operation on G  (G is a set, ∗ : G × G → G is an operation on G, e ∈ G, i : G → G is a function such that (G, ∗, e, i) forms a group)
 
 Example.
 
@@ -7925,7 +7925,7 @@ References.
 exports[`render hlm library: 2.7.16.1 Algebra/Semirings/Formulas/Binomial%20theorem 1`] = `
 "Theorem 2.7.16.1 (Binomial theorem).  Let 𝐑 be a semiring, a, b ∈ 𝐑, n ∈ ℕ. Then:
 
-  (a + b)^n = ∑_𝐑_(k = 0)^n (n, k) ⋅ a^(n−k) ⋅ b^k
+  (a + b)^n = (∑_𝐑)_(k = 0)^n (n, k) ⋅ a^(n−k) ⋅ b^k
 
 No proof.
 
@@ -8577,7 +8577,7 @@ exports[`render hlm library: 2.8.26.13 Algebra/Rings/Polynomials/dimension 1`] =
 by:
 
   dim((0)_(𝐑[X])) := 0
-  dim(qX+a) := dim(q) + 1  (q ∈ 𝐑[X], a ∈ 𝐑 such that [q ≠ (0)_(𝐑[X]) or a ≠ 0_𝐑])
+  dim((qX+a)) := dim(q) + 1  (q ∈ 𝐑[X], a ∈ 𝐑 such that [q ≠ (0)_(𝐑[X]) or a ≠ 0_𝐑])
 
 Remarks.
 
@@ -8602,7 +8602,7 @@ References.
 exports[`render hlm library: 2.8.27 Algebra/Rings/kronecker%20delta 1`] = `
 "Definition 2.8.27 (Kronecker delta).  Let 𝐑 be a ring, S be a set, i, j ∈ S. We define:
 
-  δ_𝐑,i,j := {1_𝐑 if i = j, 0_𝐑 if i ≠ j
+  δ_(𝐑,i,j) := {1_𝐑 if i = j, 0_𝐑 if i ≠ j
 
 References.
 
@@ -8615,9 +8615,9 @@ References.
 exports[`render hlm library: 2.8.28.1 Algebra/Rings/Matrices/Matrices 1`] = `
 "Definition 2.8.28.1.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
-  𝐑^(m×n) :=: {[a_i,j]_i < m,j < n | a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
+  𝐑^(m×n) :=: {[a_(i,j)]_(i < m,j < n) | a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n)}
 
-  [a_i,j]_i < m,j < n = [b_i,j]_i < m,j < n  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_i,j = b_i,j  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))
+  [a_(i,j)]_(i < m,j < n) = [b_(i,j)]_(i < m,j < n)  :⇔  ∀ i ∈ ℕ_(<m), j ∈ ℕ_(<n) : a_(i,j) = b_(i,j)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))
 
 References.
 
@@ -8655,13 +8655,13 @@ exports[`render hlm library: 2.8.28.4 Algebra/Rings/Matrices/sum 1`] = `
 
 by:
 
-  [a_i,j]_i < m,j < n + [b_i,j]_i < m,j < n := [a_i,j + b_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  [a_(i,j)]_(i < m,j < n) + [b_(i,j)]_(i < m,j < n) := [a_(i,j) + b_(i,j)]_(i < m,j < n)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.5 Algebra/Rings/Matrices/zero 1`] = `
 "Definition 2.8.28.5.  Let 𝐑 be a ring, m, n ∈ ℕ. We define:
 
-  0_(𝐑^(m×n)) := [0_𝐑]_i < m,j < n"
+  0_(𝐑^(m×n)) := [0_𝐑]_(i < m,j < n)"
 `;
 
 exports[`render hlm library: 2.8.28.6 Algebra/Rings/Matrices/additive%20inverse 1`] = `
@@ -8671,7 +8671,7 @@ exports[`render hlm library: 2.8.28.6 Algebra/Rings/Matrices/additive%20inverse 
 
 by:
 
-  −[a_i,j]_i < m,j < n := [−a_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  −[a_(i,j)]_(i < m,j < n) := [−a_(i,j)]_(i < m,j < n)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.7 Algebra/Rings/Matrices/difference 1`] = `
@@ -8681,7 +8681,7 @@ exports[`render hlm library: 2.8.28.7 Algebra/Rings/Matrices/difference 1`] = `
 
 by:
 
-  [a_i,j]_i < m,j < n − [b_i,j]_i < m,j < n := [a_i,j − b_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  [a_(i,j)]_(i < m,j < n) − [b_(i,j)]_(i < m,j < n) := [a_(i,j) − b_(i,j)]_(i < m,j < n)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n), b_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.8 Algebra/Rings/Matrices/product 1`] = `
@@ -8691,7 +8691,7 @@ exports[`render hlm library: 2.8.28.8 Algebra/Rings/Matrices/product 1`] = `
 
 by:
 
-  [a_i,j]_i < l,j < m ⋅ [b_j,k]_j < m,k < n := [∑_𝐑_(j < m) a_i,j ⋅ b_j,k]_i < l,k < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_j,k ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))
+  [a_(i,j)]_(i < l,j < m) ⋅ [b_(j,k)]_(j < m,k < n) := [(∑_𝐑)_(j < m) a_(i,j) ⋅ b_(j,k)]_(i < l,k < n)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<l) and j ∈ ℕ_(<m), b_(j,k) ∈ 𝐑 for each j ∈ ℕ_(<m) and k ∈ ℕ_(<n))
 
 References.
 
@@ -8709,7 +8709,7 @@ exports[`render hlm library: 2.8.28.9 Algebra/Rings/Matrices/product%20with%20le
 
 by:
 
-  r ⋅ [a_i,j]_i < m,j < n := [r ⋅ a_i,j]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  r ⋅ [a_(i,j)]_(i < m,j < n) := [r ⋅ a_(i,j)]_(i < m,j < n)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.10 Algebra/Rings/Matrices/product%20with%20right%20scalar 1`] = `
@@ -8719,13 +8719,13 @@ exports[`render hlm library: 2.8.28.10 Algebra/Rings/Matrices/product%20with%20r
 
 by:
 
-  [a_i,j]_i < m,j < n ⋅ r := [a_i,j ⋅ r]_i < m,j < n  (a_i,j ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
+  [a_(i,j)]_(i < m,j < n) ⋅ r := [a_(i,j) ⋅ r]_(i < m,j < n)  (a_(i,j) ∈ 𝐑 for each i ∈ ℕ_(<m) and j ∈ ℕ_(<n))"
 `;
 
 exports[`render hlm library: 2.8.28.11 Algebra/Rings/Matrices/identity 1`] = `
 "Definition 2.8.28.11.  Let 𝐑 be a ring, n ∈ ℕ. We define:
 
-  I_(𝐑^(n×n)) := [δ_𝐑,i,j]_i < n,j < n
+  I_(𝐑^(n×n)) := [δ_(𝐑,i,j)]_(i < n,j < n)
 
 References.
 
@@ -9031,7 +9031,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.8.29.1.12.4 Algebra/Rings/Modules/Left%20modules/Submodules/Span 1`] = `
 "Definition 2.8.29.1.12.4.  Let 𝐑 be a ring, 𝐌 be a left 𝐑-module, X ⊆ (𝐌). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(𝐌) : S is a submodule of 𝐌 and X ⊆ S}
+  〈X〉 := ⋂{(S) ∈ 𝒫((𝐌)) : S is a submodule of 𝐌 and X ⊆ S}
 
 Remarks.
 
@@ -9085,7 +9085,7 @@ exports[`render hlm library: 2.8.29.1.13.3 Algebra/Rings/Modules/Left%20modules/
 
 by:
 
-  (a_k)_(k < |((x_k)_(k < α))_((𝐌)^α)|) ⋅ ((x_k)_(k < α))_((𝐌)^α) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
+  (a_k)_(k < |((x_k)_(k < α))_((𝐌)^α)|) ⋅ ((x_k)_(k < α))_((𝐌)^α) := (∑_𝐌)_(k ∈ 𝓞𝓻𝓭_(<α)) a_k ⋅ x_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
 
 References.
 
@@ -9468,7 +9468,7 @@ Equivalence.  No proof."
 exports[`render hlm library: 2.8.29.2.12.4 Algebra/Rings/Modules/Right%20modules/Submodules/Span 1`] = `
 "Definition 2.8.29.2.12.4.  Let 𝐑 be a ring, 𝐌 be a right 𝐑-module, X ⊆ (𝐌). We define:
 
-  〈X〉 := ⋂{(S) ∈ 𝒫(𝐌) : S is a submodule of 𝐌 and X ⊆ S}
+  〈X〉 := ⋂{(S) ∈ 𝒫((𝐌)) : S is a submodule of 𝐌 and X ⊆ S}
 
 Remarks.
 
@@ -9522,7 +9522,7 @@ exports[`render hlm library: 2.8.29.2.13.3 Algebra/Rings/Modules/Right%20modules
 
 by:
 
-  ((x_k)_(k < α))_((𝐌)^α) ⋅ (a_k)_(k < |((x_k)_(k < α))_((𝐌)^α)|) := ∑_𝐌_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
+  ((x_k)_(k < α))_((𝐌)^α) ⋅ (a_k)_(k < |((x_k)_(k < α))_((𝐌)^α)|) := (∑_𝐌)_(k ∈ 𝓞𝓻𝓭_(<α)) x_k ⋅ a_k  (α is an ordinal number, (x_k)_(k < α) is a/an α-tuple on (𝐌), a_k ∈ 𝐑 for each k ∈ 𝓞𝓻𝓭_(<|𝒙|))
 
 References.
 
@@ -9820,9 +9820,9 @@ References.
 exports[`render hlm library: 4.1 Category%20theory/Categories 1`] = `
 "Definition 4.1.  Let u ∈ ℕ. We define:
 
-  𝓒𝓪𝓽_u :=: {[O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u | O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, [∀ 𝐖, 𝐗, 𝐘, 𝐙 ∈ O, f ∈ M_𝐖,𝐗, g ∈ M_𝐗,𝐘, h ∈ M_𝐘,𝐙 : (h ∘_𝐗,𝐘,𝐙 g) ∘_𝐖,𝐗,𝐙 f = h ∘_𝐖,𝐘,𝐙 (g ∘_𝐖,𝐗,𝐘 f)], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_𝐗,𝐘 : i_𝐘 ∘_𝐗,𝐘,𝐘 f = f ∘_𝐗,𝐗,𝐘 i_𝐗 = f], [∀ 𝐗, 𝐘 ∈ O s.t. [∃ f ∈ M_𝐗,𝐘, g ∈ M_𝐘,𝐗 : [f ∘_𝐘,𝐗,𝐘 g = i_𝐘 and g ∘_𝐗,𝐘,𝐗 f = i_𝐗]] : 𝐗 = 𝐘]}
+  𝓒𝓪𝓽_u :=: {[O, (M_(𝐀,𝐁))_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ O)]_u | O is a set, M_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_(𝐂,𝐂) for each 𝐂 ∈ O, ∘_(𝐃,𝐄,𝐅) : M_(𝐄,𝐅) × M_(𝐃,𝐄) → M_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, [∀ 𝐖, 𝐗, 𝐘, 𝐙 ∈ O, f ∈ M_(𝐖,𝐗), g ∈ M_(𝐗,𝐘), h ∈ M_(𝐘,𝐙) : (h ∘_(𝐗,𝐘,𝐙) g) ∘_(𝐖,𝐗,𝐙) f = h ∘_(𝐖,𝐘,𝐙) (g ∘_(𝐖,𝐗,𝐘) f)], [∀ 𝐗, 𝐘 ∈ O, f ∈ M_(𝐗,𝐘) : i_𝐘 ∘_(𝐗,𝐘,𝐘) f = f ∘_(𝐗,𝐗,𝐘) i_𝐗 = f], [∀ 𝐗, 𝐘 ∈ O s.t. [∃ f ∈ M_(𝐗,𝐘), g ∈ M_(𝐘,𝐗) : [f ∘_(𝐘,𝐗,𝐘) g = i_𝐘 and g ∘_(𝐗,𝐘,𝐗) f = i_𝐗]] : 𝐗 = 𝐘]}
 
-  [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u = [P, (N_𝐀,𝐁)_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ P)]_u  :⇔  ∃ φ : O ↔ P, ψ_𝐀,𝐁 : M_𝐀,𝐁 ↔ N_φ(𝐀),φ(𝐁) f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : i_𝐂 ≃^(ψ_𝐂,𝐂) j_(φ(𝐂))] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : ∘_𝐃,𝐄,𝐅 ≃^ψ_𝐄,𝐅,ψ_𝐃,𝐄,ψ_𝐃,𝐅 ∙_φ(𝐃),φ(𝐄),φ(𝐅)]  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_𝐂,𝐂 for each 𝐂 ∈ P, ∙_𝐃,𝐄,𝐅 : N_𝐄,𝐅 × N_𝐃,𝐄 → N_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
+  [O, (M_(𝐀,𝐁))_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ O)]_u = [P, (N_(𝐀,𝐁))_(𝐀,𝐁 ∈ P), (j_𝐂)_(𝐂 ∈ P), (∙_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ P)]_u  :⇔  ∃ φ : O ↔ P, ψ_(𝐀,𝐁) : M_(𝐀,𝐁) ↔ N_(φ(𝐀),φ(𝐁)) f.e. 𝐀, 𝐁 ∈ O : [[∀ 𝐂 ∈ O : i_𝐂 ≃^(ψ_(𝐂,𝐂)) j_(φ(𝐂))] and ∀ 𝐃, 𝐄, 𝐅 ∈ O : ∘_(𝐃,𝐄,𝐅) ≃^(ψ_(𝐄,𝐅),ψ_(𝐃,𝐄),ψ_(𝐃,𝐅)) ∙_(φ(𝐃),φ(𝐄),φ(𝐅))]  (O is a set, M_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_(𝐂,𝐂) for each 𝐂 ∈ O, ∘_(𝐃,𝐄,𝐅) : M_(𝐄,𝐅) × M_(𝐃,𝐄) → M_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ O, P is a set, N_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ P, j_𝐂 ∈ N_(𝐂,𝐂) for each 𝐂 ∈ P, ∙_(𝐃,𝐄,𝐅) : N_(𝐄,𝐅) × N_(𝐃,𝐄) → N_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ P with suitable conditions)
 
 We write “let 𝓒 be a/an u-small category” for “let 𝓒 ∈ 𝓒𝓪𝓽_u.”
 
@@ -9850,7 +9850,7 @@ exports[`render hlm library: 4.2 Category%20theory/Objects 1`] = `
 
 by:
 
-  Ob([O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u) := O  (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  Ob([O, (M_(𝐀,𝐁))_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ O)]_u) := O  (O is a set, M_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_(𝐂,𝐂) for each 𝐂 ∈ O, ∘_(𝐃,𝐄,𝐅) : M_(𝐄,𝐅) × M_(𝐃,𝐄) → M_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 We write “let 𝐗 ∈ 𝓒” for “let 𝐗 ∈ Ob(𝓒).”
 
@@ -9862,7 +9862,7 @@ This definition retrieves a representative set of objects from a category (which
 exports[`render hlm library: 4.3 Category%20theory/Morphisms 1`] = `
 "Definition 4.3.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐗, 𝐘 ∈ 𝓒. We define:
 
-  Hom(𝐗, 𝐘) := M_𝐗,𝐘 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  Hom(𝐗, 𝐘) := M_(𝐗,𝐘) if 𝓒 = [O, (M_(𝐀,𝐁))_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_(𝐂,𝐂) for each 𝐂 ∈ O, ∘_(𝐃,𝐄,𝐅) : M_(𝐄,𝐅) × M_(𝐃,𝐄) → M_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 We write “let F : 𝐗 → 𝐘 be a morphism” for “let F ∈ Hom(𝐗, 𝐘).”
 
@@ -9877,7 +9877,7 @@ References.
 exports[`render hlm library: 4.4 Category%20theory/identity 1`] = `
 "Definition 4.4.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐗 ∈ 𝓒. We define:
 
-  id_𝐗 := i_𝐗 if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  id_𝐗 := i_𝐗 if 𝓒 = [O, (M_(𝐀,𝐁))_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_(𝐂,𝐂) for each 𝐂 ∈ O, ∘_(𝐃,𝐄,𝐅) : M_(𝐄,𝐅) × M_(𝐃,𝐄) → M_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 References.
 
@@ -9887,7 +9887,7 @@ References.
 exports[`render hlm library: 4.5 Category%20theory/composition 1`] = `
 "Definition 4.5.  Let u ∈ ℕ, 𝓒 be a/an u-small category, 𝐗, 𝐘, 𝐙 ∈ 𝓒, f : 𝐗 → 𝐘, g : 𝐘 → 𝐙 be morphisms. We define:
 
-  g ∘ f := g ∘_𝐗,𝐘,𝐙 f if 𝓒 = [O, (M_𝐀,𝐁)_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_𝐃,𝐄,𝐅)_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_𝐀,𝐁 is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_𝐂,𝐂 for each 𝐂 ∈ O, ∘_𝐃,𝐄,𝐅 : M_𝐄,𝐅 × M_𝐃,𝐄 → M_𝐃,𝐅 is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
+  g ∘ f := g ∘_(𝐗,𝐘,𝐙) f if 𝓒 = [O, (M_(𝐀,𝐁))_(𝐀,𝐁 ∈ O), (i_𝐂)_(𝐂 ∈ O), (∘_(𝐃,𝐄,𝐅))_(𝐃,𝐄,𝐅 ∈ O)]_u (O is a set, M_(𝐀,𝐁) is a set for each 𝐀, 𝐁 ∈ O, i_𝐂 ∈ M_(𝐂,𝐂) for each 𝐂 ∈ O, ∘_(𝐃,𝐄,𝐅) : M_(𝐄,𝐅) × M_(𝐃,𝐄) → M_(𝐃,𝐅) is an operation for each 𝐃, 𝐄, 𝐅 ∈ O with suitable conditions)
 
 References.
 
@@ -9915,13 +9915,13 @@ References.
 exports[`render hlm library: 4.7.1 Category%20theory/Functors/Functors 1`] = `
 "Definition 4.7.1.  Let u, v ∈ ℕ, 𝓒 be a/an u-small category, 𝓓 be a/an v-small category. We define:
 
-  Fun(𝓒, 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f) | 𝐘_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, g_𝐀,𝐁,f : 𝐘_𝐀 → 𝐘_𝐁 is a morphism for each 𝐀, 𝐁 ∈ 𝓒 and f : 𝐀 → 𝐁, [∀ 𝐀 ∈ 𝓒 : g_𝐀,𝐀,id_𝐀 = id_(𝐘_𝐀)], [∀ 𝐀, 𝐁, 𝐂 ∈ 𝓒, d : 𝐀 → 𝐁, e : 𝐁 → 𝐂 : g_𝐀,𝐂,e∘d = g_𝐁,𝐂,e ∘ g_𝐀,𝐁,d]}
+  Fun(𝓒, 𝓓) :=: {(𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_(𝐀,𝐁,f)) | 𝐘_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, g_(𝐀,𝐁,f) : 𝐘_𝐀 → 𝐘_𝐁 is a morphism for each 𝐀, 𝐁 ∈ 𝓒 and f : 𝐀 → 𝐁, [∀ 𝐀 ∈ 𝓒 : g_(𝐀,𝐀,id_𝐀) = id_(𝐘_𝐀)], [∀ 𝐀, 𝐁, 𝐂 ∈ 𝓒, d : 𝐀 → 𝐁, e : 𝐁 → 𝐂 : g_(𝐀,𝐂,e∘d) = g_(𝐁,𝐂,e) ∘ g_(𝐀,𝐁,d)]}
 
-  (𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f) = (𝓒 → 𝓓, 𝐗 ↦ 𝐘'_𝐗, (f : 𝐀 → 𝐁) ↦ g'_𝐀,𝐁,f)  :⇔  ∃ i_𝐗 : 𝐘_𝐗 ↔ 𝐘'_𝐗 f.e. 𝐗 ∈ 𝓒 : ∀ 𝐀, 𝐁 ∈ 𝓒, f : 𝐀 → 𝐁 : i_𝐁 ∘ g_𝐀,𝐁,f = g'_𝐀,𝐁,f ∘ i_𝐀  (𝐘_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, g_𝐀,𝐁,f : 𝐘_𝐀 → 𝐘_𝐁 is a morphism for each 𝐀, 𝐁 ∈ 𝓒 and f : 𝐀 → 𝐁, 𝐘'_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, g'_𝐀,𝐁,f : 𝐘'_𝐀 → 𝐘'_𝐁 is a morphism for each 𝐀, 𝐁 ∈ 𝓒 and f : 𝐀 → 𝐁 with suitable conditions)
+  (𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_(𝐀,𝐁,f)) = (𝓒 → 𝓓, 𝐗 ↦ 𝐘'_𝐗, (f : 𝐀 → 𝐁) ↦ g'_(𝐀,𝐁,f))  :⇔  ∃ i_𝐗 : 𝐘_𝐗 ↔ 𝐘'_𝐗 f.e. 𝐗 ∈ 𝓒 : ∀ 𝐀, 𝐁 ∈ 𝓒, f : 𝐀 → 𝐁 : i_𝐁 ∘ g_(𝐀,𝐁,f) = g'_(𝐀,𝐁,f) ∘ i_𝐀  (𝐘_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, g_(𝐀,𝐁,f) : 𝐘_𝐀 → 𝐘_𝐁 is a morphism for each 𝐀, 𝐁 ∈ 𝓒 and f : 𝐀 → 𝐁, 𝐘'_𝐗 ∈ 𝓓 for each 𝐗 ∈ 𝓒, g'_(𝐀,𝐁,f) : 𝐘'_𝐀 → 𝐘'_𝐁 is a morphism for each 𝐀, 𝐁 ∈ 𝓒 and f : 𝐀 → 𝐁 with suitable conditions)
 
 We write “let F : 𝓒 → 𝓓 be a functor” for “let F ∈ Fun(𝓒, 𝓓).”
 
-We write “F :  𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f” for “F := (𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_𝐀,𝐁,f).”
+We write “F :  𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_(𝐀,𝐁,f)” for “F := (𝓒 → 𝓓, 𝐗 ↦ 𝐘_𝐗, (f : 𝐀 → 𝐁) ↦ g_(𝐀,𝐁,f)).”
 
 References.
 
@@ -9939,7 +9939,7 @@ exports[`render hlm library: 4.7.2 Category%20theory/Functors/object%20value 1`]
 
 by:
 
-  (𝓒 → 𝓓, 𝐀 ↦ 𝐘_𝐀, (f : 𝐁 → 𝐂) ↦ g_𝐁,𝐂,f)(𝐗) := 𝐘_𝐗  (𝐘_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, g_𝐁,𝐂,f : 𝐘_𝐁 → 𝐘_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and f : 𝐁 → 𝐂 with suitable conditions)"
+  (𝓒 → 𝓓, 𝐀 ↦ 𝐘_𝐀, (f : 𝐁 → 𝐂) ↦ g_(𝐁,𝐂,f))(𝐗) := 𝐘_𝐗  (𝐘_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, g_(𝐁,𝐂,f) : 𝐘_𝐁 → 𝐘_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and f : 𝐁 → 𝐂 with suitable conditions)"
 `;
 
 exports[`render hlm library: 4.7.3 Category%20theory/Functors/morphism%20value 1`] = `
@@ -9949,7 +9949,7 @@ exports[`render hlm library: 4.7.3 Category%20theory/Functors/morphism%20value 1
 
 by:
 
-  (𝓒 → 𝓓, 𝐀 ↦ 𝐃_𝐀, (g : 𝐁 → 𝐂) ↦ h_𝐁,𝐂,g)(f) := h_𝐗,𝐘,f  (𝐃_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, h_𝐁,𝐂,g : 𝐃_𝐁 → 𝐃_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and g : 𝐁 → 𝐂 with suitable conditions)"
+  (𝓒 → 𝓓, 𝐀 ↦ 𝐃_𝐀, (g : 𝐁 → 𝐂) ↦ h_(𝐁,𝐂,g))(f) := h_(𝐗,𝐘,f)  (𝐃_𝐀 ∈ 𝓓 for each 𝐀 ∈ 𝓒, h_(𝐁,𝐂,g) : 𝐃_𝐁 → 𝐃_𝐂 is a morphism for each 𝐁, 𝐂 ∈ 𝓒 and g : 𝐁 → 𝐂 with suitable conditions)"
 `;
 
 exports[`render hlm library: 4.7.4 Category%20theory/Functors/identity 1`] = `

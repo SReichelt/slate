@@ -146,10 +146,12 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
     }
   } else if (expression instanceof Notation.PromiseExpression) {
     return expression.promise.then((innerExpression: Notation.RenderedExpression) => renderAsText(innerExpression, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
-  } else if (expression instanceof Notation.DecoratedExpression) {
+  } else if (expression instanceof Notation.AssociativeExpression) {
     return renderAsText(expression.body, options);
   } else if (expression.fallback) {
     return renderAsText(expression.fallback, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
+  } else if (expression instanceof Notation.AbstractDecoratedExpression) {
+    return renderAsText(expression.body, options, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
   } else if (expression instanceof Notation.PlaceholderExpression) {
     return CachedPromise.resolve('?');
   } else {

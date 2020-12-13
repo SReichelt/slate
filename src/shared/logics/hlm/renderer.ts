@@ -958,7 +958,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (term instanceof FmtHLM.MetaRefExpression_setAssociative) {
       let result = this.renderSetTermInternal(term.term, markParametersAsDummy);
       if (result) {
-        result = new Notation.DecoratedExpression(result);
+        result = new Notation.AssociativeExpression(result);
         this.addSemanticLink(result, term.term);
       }
       return result;
@@ -1012,7 +1012,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (term instanceof FmtHLM.MetaRefExpression_associative) {
       let result = this.renderElementTermInternal(term.term);
       if (result) {
-        result = new Notation.DecoratedExpression(result);
+        result = new Notation.AssociativeExpression(result);
         this.addSemanticLink(result, term.term);
       }
       return result;
@@ -1737,17 +1737,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           return this.renderFormula(arg, formulaSelection);
         } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
           if (replaceAssociativeArg && arg instanceof FmtHLM.MetaRefExpression_setAssociative) {
-            return new Notation.DecoratedExpression(replaceAssociativeArg);
+            return new Notation.AssociativeExpression(replaceAssociativeArg);
           }
           return this.renderSetTerm(arg, fullSetTermSelection);
         } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
           if (replaceAssociativeArg && arg instanceof FmtHLM.MetaRefExpression_setAssociative) {
-            return new Notation.DecoratedExpression(replaceAssociativeArg);
+            return new Notation.AssociativeExpression(replaceAssociativeArg);
           }
           return this.renderSetTerm(arg, fullSetTermSelection);
         } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
           if (replaceAssociativeArg && arg instanceof FmtHLM.MetaRefExpression_associative) {
-            return new Notation.DecoratedExpression(replaceAssociativeArg);
+            return new Notation.AssociativeExpression(replaceAssociativeArg);
           }
           return this.renderElementTerm(arg, fullElementTermSelection);
         }

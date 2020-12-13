@@ -102,11 +102,14 @@ $DefinitionColon: %Template {
  * @example `$Group(items = [a, b, c])`
  */
 $Group(items: %Expr[], separator: %String = ', '): %Template {
-  notation = %for(
-    param = items,
-    dimension = 0,
-    item = items,
-    separator = separator
+  notation = $OuterParens(
+    body = %for(
+      param = items,
+      dimension = 0,
+      item = items,
+      separator = separator
+    ),
+    minLevel = 0
   ),
   context = {
     argument = %true
@@ -2139,11 +2142,9 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
     source,
     $OverUnder(
       body = '⇒',
-      over = $OuterParens(
-        body = $Style(
-          body = source,
-          styleClass = 'miniature'
-        )
+      over = $Style(
+        body = source,
+        styleClass = 'miniature'
       ),
       style = 'shallow'
     ),
@@ -2151,11 +2152,9 @@ $ProofImplication(source?: %Expr, formula?: %Expr): %Template {
       formula,
       $OverUnder(
         body = '⇒',
-        over = $OuterParens(
-          body = $Style(
-            body = formula,
-            styleClass = 'miniature'
-          )
+        over = $Style(
+          body = formula,
+          styleClass = 'miniature'
         ),
         style = 'shallow'
       ),
@@ -2175,11 +2174,9 @@ $ProofEquality(source?: %Expr, formula?: %Expr): %Template {
     source,
     $OverUnder(
       body = '=',
-      over = $OuterParens(
-        body = $Style(
-          body = source,
-          styleClass = 'miniature'
-        )
+      over = $Style(
+        body = source,
+        styleClass = 'miniature'
       ),
       style = 'shallow'
     ),
