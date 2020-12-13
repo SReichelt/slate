@@ -1,4 +1,4 @@
-:root {
+body {
   --font-family: sans-serif;
   --font-weight: normal;
   --font-size: initial;
@@ -72,7 +72,7 @@
   --dialog-group-border-color: var(--dialog-separator-color);
   --dialog-button-row-background-color: var(--toolbar-background-color);
   --dialog-button-row-border-color: var(--dialog-separator-color);
-  --dialog-overlay-color: #00000080;
+  --dialog-overlay-color: #00000060;
   --tooltip-foreground-color: black;
   --tooltip-background-color: #fff4d0;
   --permanent-tooltip-foreground-color: black;
