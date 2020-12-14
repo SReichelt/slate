@@ -2616,13 +2616,11 @@ exports[`render hlm library: 1.8.1.6 Essentials/Numbers/Natural/Addition%20of%20
 
   (n+1) = n + 1
 
-Proof.  (n+1) = (n+1).
+Proof.  Trivial.
 
 Remarks.
 
 This proposition justifies the notation for the successor constructor.
-
-The proof works by unfolding the definitions of \`$sum\` and 1.
 
 References.
 

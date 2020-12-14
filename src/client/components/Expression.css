@@ -412,6 +412,10 @@ div.display-math {
   padding-top: 2pt;
 }
 
+.table.definitions>.table-row>.table-cell:last-child {
+  white-space: initial;
+}
+
 .table.single-case {
   vertical-align: initial;
 }
@@ -420,7 +424,7 @@ div.display-math {
   padding-left: 1ex;
 }
 
-.table.cases>.table-row>.table-cell:last-child, .table.single-case>.table-row>.table-cell:last-child, .table.definitions>.table-row>.table-cell:last-child {
+.table-cell>.table.cases>.table-row>.table-cell:last-child, .table-cell>.table.single-case>.table-row>.table-cell:last-child {
   white-space: initial;
   min-width: 15em;
 }

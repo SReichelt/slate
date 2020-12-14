@@ -1765,7 +1765,7 @@ export class HLMEditHandler extends GenericEditHandler {
                     return currentNextResult;
                   } else {
                     let adaptedFormula = this.cloneAndAdaptParameterNames(simplifiedFormula);
-                    return this.utils.unfoldsTo(originalSource, adaptedFormula).then((unfoldResult: boolean) => {
+                    return this.utils.formulaUnfoldsTo(originalSource, adaptedFormula).then((unfoldResult: boolean) => {
                       if (unfoldResult) {
                         // TODO if adaptedFormula is trivially provable (during "unfold goal") or proves the goal (during "unfold"), sort it to the front and don't unfold it further (see currentResultFormulas.length below)
                         return currentNextResult ? currentNextResult.concat(adaptedFormula) : [adaptedFormula];

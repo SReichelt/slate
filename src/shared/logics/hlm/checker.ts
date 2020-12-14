@@ -2035,7 +2035,7 @@ export class HLMDefinitionChecker {
       }
       return resultPromise;
     } else {
-      return this.utils.unfoldsTo(source, target);
+      return this.utils.formulaUnfoldsTo(source, target);
     }
   }
 
