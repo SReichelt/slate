@@ -709,9 +709,6 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
-    if (!editedLibraryDefinition.fileReference) {
-      return CachedPromise.reject(new Error('Internal error: trying to submit definition without file reference'));
-    }
     let name = editedLibraryDefinition.definition.name;
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
       return CachedPromise.reject(new Error('Internal error: trying to submit definition that is not being edited'));
@@ -774,19 +771,19 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private unPrePublishLocalDefinition(editedLibraryDefinition: LibraryDefinition): void {
-    if (editedLibraryDefinition.fileReference && editedLibraryDefinition.fileReference.unPrePublish) {
+    if (editedLibraryDefinition.fileReference?.unPrePublish) {
       editedLibraryDefinition.fileReference.unPrePublish()
         .catch(() => {});
     }
   }
 
   private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
-    if (!editedLibraryDefinition.fileReference) {
+    if (!editedLibraryDefinition.fileReference?.write) {
       return CachedPromise.reject(new Error('Internal error: trying to submit definition without file reference'));
     }
     try {
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);
-      return editedLibraryDefinition.fileReference.write!(contents, isPartOfGroup)
+      return editedLibraryDefinition.fileReference.write(contents, isPartOfGroup)
         .then((result: WriteFileResult) => {
           this.replaceLocalDefinition(name, editedLibraryDefinition);
           return result;
@@ -796,9 +793,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     }
   }
 
-  replaceLocalItem(newLibraryDefinition: LibraryDefinition): void {
+  submitLocalTutorialItem(newLibraryDefinition: LibraryDefinition, notify: boolean): void {
     let name = newLibraryDefinition.definition.name;
     this.replaceLocalDefinition(name, newLibraryDefinition);
+    if (notify && newLibraryDefinition.fileReference?.write) {
+      let contents = FmtWriter.writeString(newLibraryDefinition.file);
+      contents = '/* Tutorial mode */\n\n' + contents;
+      newLibraryDefinition.fileReference.write(contents, false)
+        .catch(() => {});
+    }
   }
 
   private replaceLocalDefinition(name: string, newLibraryDefinition: LibraryDefinition): void {

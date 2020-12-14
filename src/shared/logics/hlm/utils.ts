@@ -2317,10 +2317,14 @@ export class HLMUtils extends GenericUtils {
     return resultPromise;
   }
 
-  // TODO when checking expressions for equality, ignore certain aspects:
+  // TODO when checking expressions for equivalence, ignore certain aspects:
   // * existence of constraint arguments
   // * proofs in arguments
-  // * different variants of associative expressions
+  // * different variants of associative and commutative expressions
+  // * rewritten constructor terms
+  // * expressions that have been proven to be compatible with other expressions.
+  // However, we somehow need to make sure to avoid circularly depending on such properties while proving them.
+  // Maybe these properties could be inner definitions that are explicitly referenced.
   areExpressionsSyntacticallyEquivalent(left: Fmt.Expression, right: Fmt.Expression): boolean {
     let fn = (leftPart: Fmt.Expression, rightPart: Fmt.Expression) => {
       if ((leftPart instanceof FmtHLM.MetaRefExpression_setAssociative || leftPart instanceof FmtHLM.MetaRefExpression_associative || leftPart instanceof FmtHLM.MetaRefExpression_asElementOf)

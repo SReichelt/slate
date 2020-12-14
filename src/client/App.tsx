@@ -960,8 +960,9 @@ class App extends React.Component<AppProps, AppState> {
           this.props.alert.error('References must be adapted before submitting.');
           return;
         }
-        if (this.state.tutorialState && (config.runningLocally || this.state.gitHubUserInfo)) {
-          libraryDataProvider.replaceLocalItem(definition);
+        if (this.state.tutorialState) {
+          let notify = !config.runningLocally && !this.state.gitHubUserInfo;
+          libraryDataProvider.submitLocalTutorialItem(definition, notify);
           this.submitted(definition, absolutePath);
         } else {
           libraryDataProvider.submitLocalItem(definition)
@@ -979,13 +980,8 @@ class App extends React.Component<AppProps, AppState> {
               }
             })
             .catch((error) => {
-              if (this.state.tutorialState) {
-                libraryDataProvider!.replaceLocalItem(definition!);
-                this.submitted(definition!, absolutePath);
-              } else {
-                this.props.alert.error('Error submitting changes: ' + error.message);
-                this.forceUpdate();
-              }
+              this.props.alert.error('Error submitting changes: ' + error.message);
+              this.forceUpdate();
             });
         }
         this.forceUpdate();
