@@ -2252,7 +2252,7 @@ class TutorialStates {
                                                   position: 'left',
                                                   index: 0
                                                 },
-                                                elementAction: this.automateClick(),
+                                                elementAction: this.automateClick()
                                               }
                                             ],
                                             manipulateProps: (props: ExpressionMenuRowProps) => ({
