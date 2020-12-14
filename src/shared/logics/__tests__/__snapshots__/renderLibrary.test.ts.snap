@@ -2662,8 +2662,7 @@ exports[`render hlm library: 1.8.1.9 Essentials/Numbers/Natural/Sum%20is%20commu
 
 Proof.  By induction on n.
 
-* We show that m + (0) = m = (0) + m:
-  1.8.1.4 ⇒ (0) + m = m
+* m + (0) = m = (0) + m by 1.8.1.4.
 * Let x ∈ ℕ such that m + x = x + m. Then:
   m + (x+1) = ((m + x)+1)
    = ((x + m)+1)

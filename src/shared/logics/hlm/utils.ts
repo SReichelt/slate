@@ -1862,7 +1862,7 @@ export class HLMUtils extends GenericUtils {
     return this.unfoldsTo(source, target, HLMExpressionType.Formula);
   }
 
-  private unfoldsTo(source: Fmt.Expression, target: Fmt.Expression, expressionType: HLMExpressionType): CachedPromise<boolean> {
+  private unfoldsTo(source: Fmt.Expression, target: Fmt.Expression, expressionType: HLMExpressionType, checkForSyntacticEquivalence: boolean = true): CachedPromise<boolean> {
     let knownDifferences: Fmt.Expression[] = [];
     let newUnfoldLocations: Fmt.Expression[] = [];
     let unfoldLocationsToCheck: Fmt.Expression[] = [];
@@ -1892,7 +1892,8 @@ export class HLMUtils extends GenericUtils {
       newUnfoldLocations.length = 0;
     }
 
-    if (!unfoldLocationsToCheck.length) {
+    if (!unfoldLocationsToCheck.length
+        || (checkForSyntacticEquivalence && this.areExpressionsSyntacticallyEquivalent(source, target))) {
       return CachedPromise.resolve(true);
     }
 
@@ -1909,7 +1910,7 @@ export class HLMUtils extends GenericUtils {
             let result = CachedPromise.resolve(false);
             if (nextSources) {
               for (let nextSource of nextSources) {
-                result = result.or(() => this.unfoldsTo(nextSource, target, expressionType));
+                result = result.or(() => this.unfoldsTo(nextSource, target, expressionType, false));
               }
             }
             return result;
@@ -2441,9 +2442,13 @@ export class HLMUtils extends GenericUtils {
           equalities.push(equality);
         }
       }
+      if (formula.formula) {
+        let substitutedFormula = formula.formula.clone(replacedParameters);
+        parameters.push(this.createConstraintParameter(substitutedFormula, '_1'));
+      }
       let equalityFormula = this.createConjunction(equalities);
       let uniquenessFormula = new FmtHLM.MetaRefExpression_forall(parameters, equalityFormula);
-      let resultFormula = formula.formula ? new FmtHLM.MetaRefExpression_and(formula.formula, uniquenessFormula) : uniquenessFormula;
+      let resultFormula = formula.formula ? this.createConjunction([formula.formula, uniquenessFormula]) : uniquenessFormula;
       let result = new FmtHLM.MetaRefExpression_exists(formula.parameters, resultFormula);
       return CachedPromise.resolve([{
         formula: result

@@ -3284,7 +3284,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addProofStep(proof, step, sourceContext, state);
     }
     this.addSubProof(type.proof, subProofContext, false, state);
-    if (goal && !type.proof && !state.isPreview) {
+    if (goal && !type.proof && !this.editHandler && !state.isPreview) {
       addImplication({
         dependsOnPrevious: true,
         result: goal,

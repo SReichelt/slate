@@ -136,7 +136,7 @@ function StartPage(props: StartPageProps): React.ReactElement {
       </p>
       <h2>Current Status</h2>
       <p>
-        Graphical input of simple definitions and theorem statements is mostly implemented. Proof input will follow soon.
+        Graphical input of simple definitions and theorem statements is mostly implemented. Proof input is not fully functional yet, but can be experimented with.
       </p>
       <p>
         The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
