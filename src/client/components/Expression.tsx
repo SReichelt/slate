@@ -755,20 +755,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let rows: React.ReactNode[] = [
-        (
-          <span className={'overunder-body-row'} key="body">
-            <span className={'overunder-body'}>
-              <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>
-            </span>
+        <span className={'overunder-body-row'} key="body">
+          <span className={'overunder-body'}>
+            <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>
           </span>
-        ),
-        (
-          <span className={'overunder-under-row'} key="under">
-            <span className={'overunder-under'}>
-              {under}
-            </span>
+        </span>,
+        <span className={'overunder-under-row'} key="under">
+          <span className={'overunder-under'}>
+            {under}
           </span>
-        )
+        </span>
       ];
       if (over) {
         rows.unshift(
@@ -788,20 +784,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.FractionExpression) {
       innerClassName += ' fraction';
       result = [
-        (
-          <span className={'fraction-numerator-row'} key="numerator">
-            <span className={'fraction-numerator'}>
-              <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>
-            </span>
+        <span className={'fraction-numerator-row'} key="numerator">
+          <span className={'fraction-numerator'}>
+            <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>
           </span>
-        ),
-        (
-          <span className={'fraction-denominator-row'} key="denominator">
-            <span className={'fraction-denominator'}>
-              <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>
-            </span>
+        </span>,
+        <span className={'fraction-denominator-row'} key="denominator">
+          <span className={'fraction-denominator'}>
+            <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>
           </span>
-        )
+        </span>
       ];
     } else if (expression instanceof Notation.RadicalExpression) {
       innerClassName += ' radical';
@@ -911,12 +903,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       };
       let rows = [
-        (
-          <div className={'paragraph foldable-heading'} onClick={onClick} key={'heading'}>
-            <span className={'foldable-icon'}>{getSectionIcon(unfolded)}</span>
-            <Expression expression={expression.heading} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </div>
-        )
+        <div className={'paragraph foldable-heading'} onClick={onClick} key={'heading'}>
+          <span className={'foldable-icon'}>{getSectionIcon(unfolded)}</span>
+          <Expression expression={expression.heading} parent={this} interactionHandler={this.props.interactionHandler}/>
+        </div>
       ];
       if (unfolded) {
         rows.push(

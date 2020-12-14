@@ -54,6 +54,8 @@ const dataURIPrefix = 'data/';
 const preloadURIPrefix = 'preload/';
 const librariesURIPrefix = 'libraries/';
 
+const sourceCodeURLPrefix = 'https://github.com/SReichelt/slate/tree/master/';
+
 const appName = 'Slate';
 const selectedLibraryName = 'hlm';
 
@@ -621,12 +623,20 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.selectedDocURI) {
       let rightButtons: React.ReactNode[] = [];
-      if (!config.embedded && config.runningLocally) {
-        rightButtons.push(
-          <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openDocPageLocally} key="open-locally">
-            {getButtonIcon(ButtonType.OpenInVSCode)}
-          </Button>
-        );
+      if (!config.embedded) {
+        if (config.runningLocally) {
+          rightButtons.push(
+            <Button toolTipText={'Open in Visual Studio Code'} onClick={this.openDocPageLocally} key="open-locally">
+              {getButtonIcon(ButtonType.OpenInVSCode)}
+            </Button>
+          );
+        } else {
+          rightButtons.push(
+            <Button toolTipText={'View on GitHub'} onClick={this.openDocPageRemotely} key="view-on-github">
+              {getButtonIcon(ButtonType.ViewOnGitHub)}
+            </Button>
+          );
+        }
       }
       rightButtonsPromise = CachedPromise.resolve(rightButtons);
     } else if (this.state.selectedItemDefinition) {
@@ -647,9 +657,7 @@ class App extends React.Component<AppProps, AppState> {
             rightButtons.push(
               <Button toolTipText={willSubmit ? 'Submit' : 'Save'} onClick={this.submit} key="submit">
                 {getButtonIcon(willSubmit ? ButtonType.Submit : ButtonType.Save)}
-              </Button>
-            );
-            rightButtons.push(
+              </Button>,
               <Button toolTipText={'Cancel'} onClick={this.cancelEditing} key="cancel">
                 {getButtonIcon(ButtonType.Cancel)}
               </Button>
@@ -1052,6 +1060,13 @@ class App extends React.Component<AppProps, AppState> {
         .catch((error) => {
           this.props.alert.error('Error opening file: ' + error.message);
         });
+    }
+  };
+
+  private openDocPageRemotely = (): void  => {
+    if (this.state.selectedDocURI) {
+      let uri = this.state.selectedDocURI + markdownSuffix;
+      window.open(sourceCodeURLPrefix + uri, '_blank');
     }
   };
 
