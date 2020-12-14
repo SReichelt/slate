@@ -479,6 +479,7 @@ export interface ExpressionMenuTextInputProps {
 export interface ExpressionMenuTextInputState {
   hovered: boolean;
   editing: boolean;
+  edited: boolean;
   text: string;
 }
 
@@ -489,13 +490,24 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
     this.state = {
       hovered: false,
       editing: false,
+      edited: false,
       text: props.item.text
     };
   }
 
   componentDidUpdate(prevProps: ExpressionMenuTextInputProps): void {
     if (this.props.item !== prevProps.item) {
-      this.setState({text: this.props.item.text});
+      this.setState({
+        edited: false,
+        text: this.props.item.text
+      });
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (this.state.edited) {
+      this.props.item.text = this.state.text;
+      this.props.onItemClicked(this.props.item.action);
     }
   }
 
@@ -507,11 +519,18 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
     if (this.props.item.selected) {
       className += ' selected';
     }
-    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => this.setState({text: event.target.value});
-    let onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-      this.props.item.text = this.state.text;
-      this.props.onItemClicked(this.props.item.action);
-      eventHandled(event);
+    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      this.setState({
+        edited: true,
+        text: event.target.value
+      });
+    };
+    let onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter' || event.key === 'NumpadEnter') {
+        this.props.item.text = this.state.text;
+        this.props.onItemClicked(this.props.item.action);
+        eventHandled(event);
+      }
     };
     let onMouseEnter = () => {
       this.setState({hovered: true});
@@ -526,13 +545,19 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
       }
     };
     let onFocus = () => {
-      this.setState({editing: true});
+      this.setState({
+        editing: true,
+        edited: false
+      });
       if (this.props.onEnter) {
         this.props.onEnter();
       }
     };
     let onBlur = () => {
-      this.setState({editing: false});
+      this.setState({
+        editing: false,
+        edited: false
+      });
       if (this.props.onLeave && !this.state.hovered) {
         this.props.onLeave();
       }
@@ -545,9 +570,7 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
     };
     return (
       <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>
-        <form onSubmit={onSubmit}>
-          <input type={'text'} value={this.state.text} size={this.props.item.expectedTextLength} onChange={onChange} onFocus={onFocus} onBlur={onBlur} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
-        </form>
+        <input type={'text'} value={this.state.text} size={this.props.item.expectedTextLength} onChange={onChange} onFocus={onFocus} onBlur={onBlur} onKeyPress={onKeyPress} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
       </td>
     );
   }

@@ -11,7 +11,7 @@ import StandardDialog from '../components/StandardDialog';
 import InsertDialog, { InsertDialogProps } from '../components/InsertDialog';
 import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
-import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput } from '../components/ExpressionMenu';
+import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput, ExpressionMenuTextInputProps } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 import { PromiseHelper } from '../components/PromiseHelper';
@@ -56,7 +56,7 @@ function createContentAction(action: (definition: Fmt.Definition) => void): (com
   return createLibraryDefinitionAction((libraryDefinition: LibraryDefinition) => (libraryDefinition.state === LibraryDefinitionState.EditingNew && action(libraryDefinition.definition)));
 }
 
-function createDummyEvent(target: HTMLElement) {
+function createDummyEvent(target: HTMLElement): any {
   return {
     type: 'dummy',
     target: target,
@@ -2252,9 +2252,17 @@ class TutorialStates {
                                                   position: 'left',
                                                   index: 0
                                                 },
-                                                elementAction: this.automateClick()
+                                                elementAction: this.automateClick(),
                                               }
-                                            ]
+                                            ],
+                                            manipulateProps: (props: ExpressionMenuRowProps) => ({
+                                              ...props,
+                                              onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
+                                                if (action instanceof Menu.ImmediateExpressionMenuAction) {
+                                                  this.changeState(this.fillOperatorDefinition_composition_arg2_arg2);
+                                                }
+                                              })
+                                            })
                                           }
                                         ]
                                       },
@@ -2995,20 +3003,14 @@ class TutorialStates {
                                                                 children: [
                                                                   {
                                                                     type: ExpressionMenuTextInput,
+                                                                    manipulateProps: (props: ExpressionMenuTextInputProps) => ({
+                                                                      ...props,
+                                                                      onItemClicked: inject(props.onItemClicked, () => this.changeState(this.selectOperatorNotation_dialog_ok))
+                                                                    }),
                                                                     children: [
                                                                       {
-                                                                        type: 'form',
-                                                                        manipulateProps: (props) => ({
-                                                                          ...props,
-                                                                          onSubmit: inject(props.onSubmit, () => this.changeState(this.selectOperatorNotation_dialog_ok))
-                                                                        }),
-                                                                        elementAction: this.automateFormSubmission(2 * defaultDelay),
-                                                                        children: [
-                                                                          {
-                                                                            type: 'input',
-                                                                            elementAction: this.automateTextInput('my')
-                                                                          }
-                                                                        ]
+                                                                        type: 'input',
+                                                                        elementAction: this.automateTextInput('my', true)
                                                                       }
                                                                     ]
                                                                   }
@@ -5193,29 +5195,23 @@ class TutorialStates {
     };
   }
 
-  private automateTextInput(text: string, delay: number = defaultDelay) {
+  private automateTextInput(text: string, pressEnter: boolean = false, delay: number = defaultDelay) {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done && htmlElement instanceof HTMLInputElement) {
         done = true;
         let simulateTextInput = () => {
           htmlElement.value = text;
-          reactElement.props.onChange(createDummyEvent(htmlElement));
+          if (reactElement.props.onChange) {
+            reactElement.props.onChange(createDummyEvent(htmlElement));
+          }
+          if (pressEnter && reactElement.props.onKeyPress) {
+            let enterKeyEvent = createDummyEvent(htmlElement);
+            enterKeyEvent.key = 'Enter';
+            reactElement.props.onKeyPress(enterKeyEvent);
+          }
         };
         setTimeout(simulateTextInput, delay);
-      }
-    };
-  }
-
-  private automateFormSubmission(delay: number = defaultDelay) {
-    let done = false;
-    return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
-      if (this.runAutomatically && !done) {
-        done = true;
-        let simulateFormSubmission = () => {
-          reactElement.props.onSubmit(createDummyEvent(htmlElement));
-        };
-        setTimeout(simulateFormSubmission, delay);
       }
     };
   }
