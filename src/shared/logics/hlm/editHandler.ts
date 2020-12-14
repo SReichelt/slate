@@ -1619,7 +1619,7 @@ export class HLMEditHandler extends GenericEditHandler {
           return firstStepPromise.then((firstStep: ProofStepInfo) => [firstStep]);
         } else {
           return firstStepPromise.then((firstStep: ProofStepInfo) =>
-            this.createProveEquivalenceStep(list!, proofCount, list!.items.length - 1, context).then((secondStep: ProofStepInfo) =>[
+            this.createProveEquivalenceStep(list!, proofCount, 0, context).then((secondStep: ProofStepInfo) =>[
               firstStep,
               secondStep
             ]));
@@ -1629,10 +1629,11 @@ export class HLMEditHandler extends GenericEditHandler {
     return undefined;
   }
 
-  private createProveEquivalenceStep(list: HLMEquivalenceListInfo, proofCount: number, fixedToIndex: number | undefined, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo> {
+  private createProveEquivalenceStep(list: HLMEquivalenceListInfo, proofCount: number, fixedFromIndex: number | undefined, context: HLMCheckerProofStepContext): CachedPromise<ProofStepInfo> {
     let subProofsPromise: CachedPromise<FmtHLM.ObjectContents_Proof[]> = CachedPromise.resolve([]);
-    for (let fromIndex = 0; fromIndex < proofCount; fromIndex++) {
-      let toIndex = fixedToIndex ?? fromIndex + 1;
+    for (let baseIndex = 0; baseIndex < proofCount; baseIndex++) {
+      let fromIndex = fixedFromIndex ?? baseIndex;
+      let toIndex = baseIndex + 1;
       if (toIndex >= list.items.length) {
         toIndex = 0;
       }
@@ -1640,8 +1641,10 @@ export class HLMEditHandler extends GenericEditHandler {
       let to = list.items[toIndex];
       let subParameters: Fmt.ParameterList | undefined = new Fmt.ParameterList;
       let subGoal: Fmt.Expression | undefined = list.getEquivalenceGoal(from, to, subParameters);
-      if (list.wrapAround && !subParameters.length) {
+      if (!subParameters.length) {
         subParameters = undefined;
+      }
+      if (list.wrapAround && !subParameters) {
         subGoal = undefined;
       }
       subProofsPromise = subProofsPromise.then((currentSubProofs: FmtHLM.ObjectContents_Proof[]) =>
@@ -1918,6 +1921,9 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createSubProof(parameters: Fmt.ParameterList | undefined, goal: Fmt.Expression | undefined, mayOmitGoal: boolean, context: HLMCheckerProofStepContext, fromIndex?: number, toIndex?: number): CachedPromise<FmtHLM.ObjectContents_Proof> {
+    if (parameters && !parameters.length) {
+      parameters = undefined;
+    }
     let subContext = parameters ? this.checker.getParameterListContext(parameters, context) : context;
     return this.simplifyGoal(goal, subContext).then((simplifiedGoal: Fmt.Expression | undefined) => {
       let from = this.utils.internalToExternalIndex(fromIndex);

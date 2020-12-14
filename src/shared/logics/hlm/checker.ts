@@ -5,7 +5,7 @@ import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
 import { HLMExpressionType } from './hlm';
-import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMBaseContext, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo, HLMSubstitutionSourceInfo } from './utils';
+import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMBaseContext, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo, HLMSubstitutionSourceInfo, followSupersetsAndEmbeddings, findConstruction } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import CachedPromise from '../../data/cachedPromise';
 
@@ -542,19 +542,7 @@ export class HLMDefinitionChecker {
   }
 
   private checkEmbeddability(subset: Fmt.Expression): void {
-    let typeSearchParameters: HLMTypeSearchParameters = {
-      unfoldVariableDefinitions: true,
-      followDefinitions: true,
-      followSupersets: true,
-      followEmbeddings: true,
-      followAllAlternatives: false,
-      unfoldMacros: false,
-      allowStructuralCaseResults: true,
-      unfoldArguments: false,
-      substituteStructuralCases: false,
-      extractStructuralCases: false
-    };
-    let checkSubset = this.utils.getFinalSuperset(subset, typeSearchParameters).then((superset: Fmt.Expression) => {
+    let checkSubset = this.utils.getFinalSuperset(subset, followSupersetsAndEmbeddings).then((superset: Fmt.Expression) => {
       if (this.utils.isWildcardFinalSet(superset)) {
         this.error(subset!, 'The given set cannot be embedded');
       }
@@ -1345,19 +1333,7 @@ export class HLMDefinitionChecker {
     context = this.setCurrentRecheckFn(term, recheckFn, autoFillFn, context);
     this.checkElementTerm(term, context);
     this.checkSetTerm(construction, this.getAutoFillContext(context));
-    let typeSearchParameters: HLMTypeSearchParameters = {
-      unfoldVariableDefinitions: true,
-      followDefinitions: true,
-      followSupersets: true,
-      followEmbeddings: false,
-      followAllAlternatives: false,
-      unfoldMacros: false,
-      allowStructuralCaseResults: true,
-      unfoldArguments: false,
-      substituteStructuralCases: true,
-      extractStructuralCases: false
-    };
-    let checkConstructionRef = this.utils.getFinalSet(term, typeSearchParameters).then((finalSet: Fmt.Expression) => {
+    let checkConstructionRef = this.utils.getFinalSet(term, findConstruction).then((finalSet: Fmt.Expression) => {
       if (!((finalSet instanceof Fmt.DefinitionRefExpression || finalSet instanceof Fmt.PlaceholderExpression)
             && this.checkEquivalenceOfTemporarySetTerms(construction, finalSet, context))) {
         this.error(term, 'Term must be an element of the specified construction');
@@ -1779,8 +1755,12 @@ export class HLMDefinitionChecker {
         let goalDefinitionsPromise = this.utils.getFormulaDefinitions(context.goal, this.utils.externalToInternalIndex(proveDef.side));
         if (goalDefinitionsPromise) {
           let checkDefinition = goalDefinitionsPromise.then((goalDefinitions: HLMFormulaDefinition[]) => {
-            let goals = goalDefinitions.map((goalDefinition: HLMFormulaDefinition) => goalDefinition.formula);
-            this.checkMultiGoalProof(type, proveDef.proof, undefined, goals, context);
+            if (goalDefinitions.length) {
+              let goals = goalDefinitions.map((goalDefinition: HLMFormulaDefinition) => goalDefinition.formula);
+              this.checkMultiGoalProof(type, proveDef.proof, undefined, goals, context);
+            } else {
+              this.error(type, `${context.goal} cannot be proved by definition`);
+            }
           });
           this.addPendingCheck(type, checkDefinition);
         } else {
@@ -2228,6 +2208,7 @@ export class HLMDefinitionChecker {
           allowStructuralCaseResults: true,
           unfoldArguments: nextStatus.followedEmbeddings,
           substituteStructuralCases: true,
+          allowConstructorResultsFromStructuralDefinitionSubstitution: true,
           extractStructuralCases: nextStatus.followedEmbeddings
         };
         if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {

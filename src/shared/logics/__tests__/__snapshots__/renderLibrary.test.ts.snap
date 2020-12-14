@@ -212,7 +212,7 @@ References.
 * https://ncatlab.org/nlab/show/intersection
 * http://metamath.tirix.org/df-in.html
 * http://metamath.tirix.org/dfin5.html
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.inter"
+* https://leanprover-community.github.io/mathlib_docs/init/data/set.html#set.inter"
 `;
 
 exports[`render hlm library: 1.1.9 Essentials/Sets/Intersection%20is%20associative 1`] = `
@@ -358,7 +358,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Union
 * https://ncatlab.org/nlab/show/union
 * http://metamath.tirix.org/df-un.html
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.union"
+* https://leanprover-community.github.io/mathlib_docs/init/data/set.html#set.union"
 `;
 
 exports[`render hlm library: 1.1.17 Essentials/Sets/Union%20is%20associative 1`] = `
@@ -507,7 +507,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Set_Difference
 * http://metamath.tirix.org/df-dif.html
 * http://metamath.tirix.org/dfdif2.html
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.diff"
+* https://leanprover-community.github.io/mathlib_docs/init/data/set.html#set.diff"
 `;
 
 exports[`render hlm library: 1.1.25 Essentials/Sets/Disjoint%20union 1`] = `
@@ -535,7 +535,7 @@ References.
 * https://mathworld.wolfram.com/DisjointUnion.html
 * https://proofwiki.org/wiki/Definition:Disjoint_Union_(Set_Theory)
 * https://ncatlab.org/nlab/show/disjoint+union#special_cases
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sum"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#sum"
 `;
 
 exports[`render hlm library: 1.1.26 Essentials/Sets/Cartesian%20product 1`] = `
@@ -557,7 +557,7 @@ References.
 * https://mathworld.wolfram.com/CartesianProduct.html
 * https://proofwiki.org/wiki/Definition:Cartesian_Product
 * https://ncatlab.org/nlab/show/cartesian+product
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#prod"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#prod"
 `;
 
 exports[`render hlm library: 1.1.27 Essentials/Sets/Power%20set 1`] = `
@@ -580,7 +580,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Power_Set
 * https://ncatlab.org/nlab/show/power+set
 * https://coq.inria.fr/library/Coq.Sets.Powerset.html
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.powerset"
+* https://leanprover-community.github.io/mathlib_docs/init/data/set.html#set.powerset"
 `;
 
 exports[`render hlm library: 1.1.28 Essentials/Sets/maximal%20subset 1`] = `
@@ -649,7 +649,7 @@ In HLM, the disjoint union additionally needs to be equipped with a \\"heterogen
 References.
 
 * https://en.wikipedia.org/wiki/Disjoint_union#Set_theory_definition
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#sigma"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#sigma"
 `;
 
 exports[`render hlm library: 1.1.29.6 Essentials/Sets/Generalized%20operators/Generalized%20cartesian%20product 1`] = `
@@ -718,7 +718,7 @@ References.
 * https://mathworld.wolfram.com/AxiomofChoice.html
 * https://proofwiki.org/wiki/Axiom:Axiom_of_Choice
 * https://ncatlab.org/nlab/show/axiom+of+choice
-* https://leanprover-community.github.io/mathlib_docs/core/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
+* https://leanprover-community.github.io/mathlib_docs/init/classical.html#classical.choice (actually a choice operator, which is stronger)"
 `;
 
 exports[`render hlm library: 1.1.31.1 Essentials/Sets/Multisets/Multisets 1`] = `
@@ -818,7 +818,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Truth_Value
 * https://ncatlab.org/nlab/show/truth+value
 * https://coq.inria.fr/library/Coq.Bool.Bool.html
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#bool"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#bool"
 `;
 
 exports[`render hlm library: 1.2.2 Essentials/Boolean%20values/true 1`] = `
@@ -866,7 +866,7 @@ Equivalence.
 References.
 
 * https://coq.inria.fr/library/Coq.Bool.Bool.html#Is_true
-* https://leanprover-community.github.io/mathlib_docs/core/init/coe.html#coe_bool_to_Prop"
+* https://leanprover-community.github.io/mathlib_docs/init/coe.html#coe_bool_to_Prop"
 `;
 
 exports[`render hlm library: 1.2.5 Essentials/Boolean%20values/Set%20of%20boolean%20values%20only%20contains%20true%20and%20false 1`] = `
@@ -950,7 +950,7 @@ This definition is the equivalent of ⊆.
 References.
 
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#contains (for endorelations only)
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#subrelation (ditto)"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#subrelation (ditto)"
 `;
 
 exports[`render hlm library: 1.3.4 Essentials/Properties/negation 1`] = `
@@ -1142,7 +1142,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Binary_relation#Particular_binary_relations: identity relation
 * https://proofwiki.org/wiki/Definition:Diagonal_Relation
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#eq"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#eq"
 `;
 
 exports[`render hlm library: 1.4.9 Essentials/Relations/reflexive 1`] = `
@@ -1157,7 +1157,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Reflexive_Relation
 * https://ncatlab.org/nlab/show/reflexive+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Reflexive
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#reflexive"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#reflexive"
 `;
 
 exports[`render hlm library: 1.4.10 Essentials/Relations/connex 1`] = `
@@ -1170,7 +1170,7 @@ References.
 * https://en.wikipedia.org/wiki/Connex_relation
 * https://proofwiki.org/wiki/Definition:Total_Relation
 * https://ncatlab.org/nlab/show/total+relation
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#total"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#total"
 `;
 
 exports[`render hlm library: 1.4.11 Essentials/Relations/symmetric 1`] = `
@@ -1188,7 +1188,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Symmetric_Relation
 * https://ncatlab.org/nlab/show/symmetric+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Symmetric
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#symmetric"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#symmetric"
 `;
 
 exports[`render hlm library: 1.4.12 Essentials/Relations/antisymmetric 1`] = `
@@ -1203,7 +1203,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Antisymmetric_Relation
 * https://ncatlab.org/nlab/show/antisymmetric+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Antisymmetric
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#anti_symmetric"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#anti_symmetric"
 `;
 
 exports[`render hlm library: 1.4.13 Essentials/Relations/transitive 1`] = `
@@ -1218,7 +1218,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Transitive_Relation
 * https://ncatlab.org/nlab/show/transitive+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Transitive
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#transitive"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#transitive"
 `;
 
 exports[`render hlm library: 1.4.14 Essentials/Relations/preorder 1`] = `
@@ -1233,7 +1233,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Preordering
 * https://ncatlab.org/nlab/show/preorder
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Preorder
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#preorder"
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/order.html#preorder"
 `;
 
 exports[`render hlm library: 1.4.15 Essentials/Relations/partial%20order 1`] = `
@@ -1250,7 +1250,7 @@ References.
 * https://mathworld.wolfram.com/PartialOrder.html
 * https://proofwiki.org/wiki/Definition:Ordering
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Order
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#partial_order"
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/order.html#partial_order"
 `;
 
 exports[`render hlm library: 1.4.16 Essentials/Relations/total%20order 1`] = `
@@ -1266,7 +1266,7 @@ References.
 * https://en.wikipedia.org/wiki/Total_order
 * https://mathworld.wolfram.com/TotallyOrderedSet.html
 * https://proofwiki.org/wiki/Definition:Total_Ordering
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/order.html#linear_order"
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/order.html#linear_order"
 `;
 
 exports[`render hlm library: 1.4.17 Essentials/Relations/lower%20bound 1`] = `
@@ -1332,7 +1332,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Equivalence_Relation
 * https://ncatlab.org/nlab/show/equivalence+relation
 * https://coq.inria.fr/library/Coq.Sets.Relations_1.html#Equivalence
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#equivalence"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#equivalence"
 `;
 
 exports[`render hlm library: 1.4.23 Essentials/Relations/Equivalence%20classes 1`] = `
@@ -1362,7 +1362,7 @@ References.
 * https://mathworld.wolfram.com/EquivalenceClass.html
 * https://proofwiki.org/wiki/Definition:Equivalence_Class
 * https://ncatlab.org/nlab/show/equivalence+class
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/quot.html#quotient"
+* https://leanprover-community.github.io/mathlib_docs/init/data/quot.html#quotient"
 `;
 
 exports[`render hlm library: 1.4.24 Essentials/Relations/succession 1`] = `
@@ -1395,7 +1395,7 @@ References.
 * https://mathworld.wolfram.com/LexicographicOrder.html
 * https://proofwiki.org/wiki/Definition:Lexicographic_Order
 * https://ncatlab.org/nlab/show/lexicographic+order
-* https://leanprover-community.github.io/mathlib_docs/core/init/wf.html#prod.lex"
+* https://leanprover-community.github.io/mathlib_docs/init/wf.html#prod.lex"
 `;
 
 exports[`render hlm library: 1.4.26.1 Essentials/Relations/Closures/closure 1`] = `
@@ -1569,7 +1569,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Function_(mathematics)#Functional_notation
 * https://coq.inria.fr/library/Coq.Program.Basics.html#apply
-* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.app"
+* https://leanprover-community.github.io/mathlib_docs/init/function.html#function.app"
 `;
 
 exports[`render hlm library: 1.5.3 Essentials/Functions/Image 1`] = `
@@ -1581,7 +1581,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Image_(mathematics)
 * https://proofwiki.org/wiki/Definition:Image_(Set_Theory)/Mapping/Subset
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/set.html#set.image"
+* https://leanprover-community.github.io/mathlib_docs/init/data/set.html#set.image"
 `;
 
 exports[`render hlm library: 1.5.4 Essentials/Functions/Preimage 1`] = `
@@ -1625,7 +1625,7 @@ References.
 * https://en.wikipedia.org/wiki/Identity_function
 * https://proofwiki.org/wiki/Definition:Identity_Mapping
 * https://coq.inria.fr/library/Coq.Init.Datatypes.html#id
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#id"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#id"
 `;
 
 exports[`render hlm library: 1.5.8 Essentials/Functions/generalized%20restriction 1`] = `
@@ -1679,7 +1679,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Composition_of_Mappings
 * https://ncatlab.org/nlab/show/composition
 * https://coq.inria.fr/library/Coq.Program.Basics.html#compose
-* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp"
+* https://leanprover-community.github.io/mathlib_docs/init/function.html#function.comp"
 `;
 
 exports[`render hlm library: 1.5.12 Essentials/Functions/Composition%20is%20associative 1`] = `
@@ -1695,7 +1695,7 @@ References.
 * https://mathworld.wolfram.com/Composition.html
 * https://proofwiki.org/wiki/Composition_of_Mappings_is_Associative
 * https://coq.inria.fr/library/Coq.Program.Combinators.html#compose_assoc
-* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.comp.assoc"
+* https://leanprover-community.github.io/mathlib_docs/init/function.html#function.comp.assoc"
 `;
 
 exports[`render hlm library: 1.5.13 Essentials/Functions/Left%20composition%20with%20identity%20is%20neutral 1`] = `
@@ -1740,7 +1740,7 @@ References.
 * https://mathworld.wolfram.com/Injection.html
 * https://proofwiki.org/wiki/Definition:Injection
 * https://ncatlab.org/nlab/show/injection
-* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.injective"
+* https://leanprover-community.github.io/mathlib_docs/init/function.html#function.injective"
 `;
 
 exports[`render hlm library: 1.5.17 Essentials/Functions/surjective 1`] = `
@@ -1758,7 +1758,7 @@ References.
 * https://mathworld.wolfram.com/Surjection.html
 * https://proofwiki.org/wiki/Definition:Surjection
 * https://ncatlab.org/nlab/show/surjection
-* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.surjective"
+* https://leanprover-community.github.io/mathlib_docs/init/function.html#function.surjective"
 `;
 
 exports[`render hlm library: 1.5.18 Essentials/Functions/bijective 1`] = `
@@ -1778,7 +1778,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Bijection
 * https://proofwiki.org/wiki/Bijection_iff_Left_and_Right_Inverse
 * https://ncatlab.org/nlab/show/bijection
-* https://leanprover-community.github.io/mathlib_docs/core/init/function.html#function.bijective
+* https://leanprover-community.github.io/mathlib_docs/init/function.html#function.bijective
 * https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.bijective_iff_has_inverse"
 `;
 
@@ -2026,7 +2026,7 @@ References.
 * https://en.wikipedia.org/wiki/Associative_property
 * https://mathworld.wolfram.com/Associative.html
 * https://proofwiki.org/wiki/Definition:Associative_Operation
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#associative"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#associative"
 `;
 
 exports[`render hlm library: 1.6.5 Essentials/Operations/commutative 1`] = `
@@ -2039,7 +2039,7 @@ References.
 * https://en.wikipedia.org/wiki/Commutative_property
 * https://mathworld.wolfram.com/Commutative.html
 * https://proofwiki.org/wiki/Definition:Commutative/Operation
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#commutative"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#commutative"
 `;
 
 exports[`render hlm library: 1.6.6 Essentials/Operations/left%20identity%20element 1`] = `
@@ -2127,7 +2127,7 @@ References.
 * https://en.wikipedia.org/wiki/Distributive_property
 * https://mathworld.wolfram.com/Distributive.html
 * https://proofwiki.org/wiki/Definition:Distributive_Operation/Left
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#left_distributive"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#left_distributive"
 `;
 
 exports[`render hlm library: 1.6.13 Essentials/Operations/right-distributive 1`] = `
@@ -2140,7 +2140,7 @@ References.
 * https://en.wikipedia.org/wiki/Distributive_property
 * https://mathworld.wolfram.com/Distributive.html
 * https://proofwiki.org/wiki/Definition:Distributive_Operation/Right
-* https://leanprover-community.github.io/mathlib_docs/core/init/logic.html#right_distributive"
+* https://leanprover-community.github.io/mathlib_docs/init/logic.html#right_distributive"
 `;
 
 exports[`render hlm library: 1.6.14 Essentials/Operations/distributive 1`] = `
@@ -2309,7 +2309,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Ordered_Tuple/On_Set
 * https://ncatlab.org/nlab/show/tuple
 * https://coq.inria.fr/library/Coq.Vectors.VectorDef.html
-* https://leanprover-community.github.io/mathlib_docs/core/data/vector.html#vector (finite) or https://leanprover-community.github.io/mathlib_docs/data/seq/seq.html#seq (infinite)"
+* https://leanprover-community.github.io/mathlib_docs/data/vector.html#vector (finite) or https://leanprover-community.github.io/mathlib_docs/data/seq/seq.html#seq (infinite)"
 `;
 
 exports[`render hlm library: 1.7.2 Essentials/Sequences/tuple 1`] = `
@@ -2350,7 +2350,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Finite_Sequence
 * https://ncatlab.org/nlab/show/free+monoid
 * https://coq.inria.fr/library/Coq.Init.Datatypes.html#list
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#list"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#list"
 `;
 
 exports[`render hlm library: 1.7.5 Essentials/Sequences/finite%20sequence%20length 1`] = `
@@ -2365,7 +2365,7 @@ by:
 References.
 
 * https://coq.inria.fr/library/Coq.Init.Datatypes.html#length
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/list/basic.html#list.length"
+* https://leanprover-community.github.io/mathlib_docs/init/data/list/basic.html#list.length"
 `;
 
 exports[`render hlm library: 1.7.6 Essentials/Sequences/Infinite%20sequences 1`] = `
@@ -2397,7 +2397,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Sequence/Infinite_Sequence
 * https://ncatlab.org/nlab/show/sequence
 * https://coq.inria.fr/library/Coq.Lists.Streams.html#Stream
-* https://leanprover-community.github.io/mathlib_docs/core/data/stream.html#stream"
+* https://leanprover-community.github.io/mathlib_docs/data/stream.html#stream"
 `;
 
 exports[`render hlm library: 1.7.7 Essentials/Sequences/sequence%20from%20function 1`] = `
@@ -2522,7 +2522,7 @@ References.
 * https://ncatlab.org/nlab/show/natural+number
 * https://coq.inria.fr/library/Coq.Init.Nat.html
 * https://coq.inria.fr/library/Coq.NArith.BinNat.html
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#nat
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#nat
 * http://oeis.org/A001477"
 `;
 
@@ -2566,7 +2566,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Addition/Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#add
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.add
-* https://leanprover-community.github.io/mathlib_docs/core/init/core.html#nat.add"
+* https://leanprover-community.github.io/mathlib_docs/init/core.html#nat.add"
 `;
 
 exports[`render hlm library: 1.8.1.4 Essentials/Numbers/Natural/Left-addition%20of%20zero%20is%20neutral 1`] = `
@@ -2588,7 +2588,7 @@ References.
 * https://proofwiki.org/wiki/Natural_Number_Addition_Commutes_with_Zero
 * https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_0_l
 * https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_0_l
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.zero_add"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.zero_add"
 `;
 
 exports[`render hlm library: 1.8.1.5 Essentials/Numbers/Natural/Successor%20can%20be%20pulled%20over%20addition 1`] = `
@@ -2608,7 +2608,7 @@ References.
 
 * https://coq.inria.fr/library/Coq.Arith.PeanoNat.html#Nat.add_succ_l
 * https://coq.inria.fr/library/Coq.NArith.BinNat.html#N.add_succ_l
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.succ_add"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.succ_add"
 `;
 
 exports[`render hlm library: 1.8.1.6 Essentials/Numbers/Natural/Addition%20of%20one%20yields%20successor 1`] = `
@@ -2626,7 +2626,7 @@ The proof works by unfolding the definitions of \`$sum\` and 1.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.add_one"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.add_one"
 `;
 
 exports[`render hlm library: 1.8.1.7 Essentials/Numbers/Natural/Sum%20is%20associative%20lemma 1`] = `
@@ -2654,7 +2654,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_associativity
 * https://proofwiki.org/wiki/Natural_Number_Addition_is_Associative
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_assoc"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.add_assoc"
 `;
 
 exports[`render hlm library: 1.8.1.9 Essentials/Numbers/Natural/Sum%20is%20commutative%20lemma 1`] = `
@@ -2683,7 +2683,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Proofs_involving_the_addition_of_natural_numbers#Proof_of_commutativity
 * https://proofwiki.org/wiki/Natural_Number_Addition_is_Commutative
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_comm"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.add_comm"
 `;
 
 exports[`render hlm library: 1.8.1.11 Essentials/Numbers/Natural/Both%20summands%20are%20zero%20if%20sum%20is%20zero 1`] = `
@@ -2720,7 +2720,7 @@ Proof.  By induction on c.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_right_cancel"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.add_right_cancel"
 `;
 
 exports[`render hlm library: 1.8.1.13 Essentials/Numbers/Natural/Zero%20is%20the%20unique%20neutral%20element%20of%20addition 1`] = `
@@ -2748,7 +2748,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Ordering_on_Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#leb
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.leb
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.le"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.le"
 `;
 
 exports[`render hlm library: 1.8.1.15 Essentials/Numbers/Natural/less 1`] = `
@@ -2767,8 +2767,8 @@ References.
 
 * https://coq.inria.fr/library/Coq.Init.Nat.html#ltb
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.ltb
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.lt
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.lt_of_le_and_ne"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.lt
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.lt_of_le_and_ne"
 `;
 
 exports[`render hlm library: 1.8.1.16 Essentials/Numbers/Natural/Less%20or%20equal%20is%20a%20total%20order 1`] = `
@@ -2799,7 +2799,7 @@ Proof.
 References.
 
 * https://en.wikipedia.org/wiki/Natural_number#Order
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.linear_order"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.linear_order"
 `;
 
 exports[`render hlm library: 1.8.1.17 Essentials/Numbers/Natural/Less%20and%20less%20or%20equal%20combine%20to%20less 1`] = `
@@ -2817,7 +2817,7 @@ Take x := y + z.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.lt_of_lt_of_le"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.lt_of_lt_of_le"
 `;
 
 exports[`render hlm library: 1.8.1.18 Essentials/Numbers/Natural/Less%20or%20equal%20and%20less%20combine%20to%20less 1`] = `
@@ -2843,7 +2843,7 @@ Proof.  By definition.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.zero_le"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.zero_le"
 `;
 
 exports[`render hlm library: 1.8.1.20 Essentials/Numbers/Natural/Zero%20is%20the%20only%20number%20less%20than%20or%20equal%20to%20zero 1`] = `
@@ -2867,7 +2867,7 @@ Take x := 1.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.lt_succ_self"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.lt_succ_self"
 `;
 
 exports[`render hlm library: 1.8.1.22.1 Essentials/Numbers/Natural/Subsets/Segment%20(less) 1`] = `
@@ -2879,7 +2879,7 @@ References.
 
 * https://mathworld.wolfram.com/InitialSegment.html
 * https://proofwiki.org/wiki/Definition:Initial_Segment_of_Natural_Numbers/Zero-Based
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/fin/basic.html#fin"
+* https://leanprover-community.github.io/mathlib_docs/init/data/fin/basic.html#fin"
 `;
 
 exports[`render hlm library: 1.8.1.22.2 Essentials/Numbers/Natural/Subsets/Segment%20(less%20or%20equal) 1`] = `
@@ -3034,8 +3034,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Subtraction/Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#sub (truncated subtraction, thus incompatible with integer subtraction)
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.sub (ditto)
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.sub (ditto)
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.sub_le"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.sub (ditto)
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.sub_le"
 `;
 
 exports[`render hlm library: 1.8.1.26 Essentials/Numbers/Natural/product 1`] = `
@@ -3054,7 +3054,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Multiplication/Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#mul
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.mul
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.mul"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.mul"
 `;
 
 exports[`render hlm library: 1.8.1.27 Essentials/Numbers/Natural/Multiplication%20by%20one%20is%20neutral 1`] = `
@@ -3066,7 +3066,7 @@ Proof.  (0) + n = n by 1.8.1.4.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.mul_one"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.mul_one"
 `;
 
 exports[`render hlm library: 1.8.1.28 Essentials/Numbers/Natural/Product%20is%20associative 1`] = `
@@ -3078,7 +3078,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.mul_assoc"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.mul_assoc"
 `;
 
 exports[`render hlm library: 1.8.1.29 Essentials/Numbers/Natural/Product%20is%20commutative 1`] = `
@@ -3090,7 +3090,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.mul_comm"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.mul_comm"
 `;
 
 exports[`render hlm library: 1.8.1.30 Essentials/Numbers/Natural/Product%20is%20distributive%20over%20sum 1`] = `
@@ -3102,7 +3102,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.distrib"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.distrib"
 `;
 
 exports[`render hlm library: 1.8.1.31 Essentials/Numbers/Natural/Multiplication%20by%20a%20positive%20number%20is%20injective 1`] = `
@@ -3130,7 +3130,7 @@ References.
 * https://en.wikipedia.org/wiki/Divisor
 * https://mathworld.wolfram.com/Divisor.html
 * https://proofwiki.org/wiki/Definition:Divisor_(Algebra)/Natural_Numbers
-* (https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.comm_semiring)"
+* (https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.comm_semiring)"
 `;
 
 exports[`render hlm library: 1.8.1.33 Essentials/Numbers/Natural/Divisors 1`] = `
@@ -3156,7 +3156,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.le_of_dvd"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.le_of_dvd"
 `;
 
 exports[`render hlm library: 1.8.1.35 Essentials/Numbers/Natural/Divisibility%20criterion 1`] = `
@@ -3200,7 +3200,7 @@ References.
 * https://en.wikipedia.org/wiki/Quotient
 * https://coq.inria.fr/library/Coq.Init.Nat.html#div (truncated division, thus incompatible with division of rational numbers)
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.div (ditto)
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/div.html#nat.div (ditto)"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/div.html#nat.div (ditto)"
 `;
 
 exports[`render hlm library: 1.8.1.38 Essentials/Numbers/Natural/power 1`] = `
@@ -3219,7 +3219,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Power_(Algebra)#Natural_Numbers
 * https://coq.inria.fr/library/Coq.Init.Nat.html#pow
 * https://coq.inria.fr/library/Coq.NArith.BinNatDef.html#N.pow
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/basic.html#nat.pow"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/basic.html#nat.pow"
 `;
 
 exports[`render hlm library: 1.8.1.39 Essentials/Numbers/Natural/Induction%20principle%20of%20property 1`] = `
@@ -3317,7 +3317,7 @@ References.
 
 * https://proofwiki.org/wiki/Definition:Min_Operation
 * https://coq.inria.fr/library/Coq.Init.Nat.html#min
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/functions.html#min"
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/functions.html#min"
 `;
 
 exports[`render hlm library: 1.8.1.44 Essentials/Numbers/Natural/maximum 1`] = `
@@ -3351,7 +3351,7 @@ References.
 
 * https://proofwiki.org/wiki/Definition:Max_Operation
 * https://coq.inria.fr/library/Coq.Init.Nat.html#max
-* https://leanprover-community.github.io/mathlib_docs/core/init/algebra/functions.html#max"
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/functions.html#max"
 `;
 
 exports[`render hlm library: 1.8.1.46.1 Essentials/Numbers/Natural/Sequences/indexed%20element 1`] = `
@@ -3805,7 +3805,7 @@ References.
 * https://mathworld.wolfram.com/RelativelyPrime.html
 * https://proofwiki.org/wiki/Definition:Coprime/Integers
 * https://coq.inria.fr/library/Coq.ZArith.Znumtheory.html#rel_prime (for integers)
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/gcd.html#nat.coprime"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/gcd.html#nat.coprime"
 `;
 
 exports[`render hlm library: 1.8.1.54 Essentials/Numbers/Natural/Coprime%20test 1`] = `
@@ -4657,7 +4657,7 @@ References.
 * https://proofwiki.org/wiki/Definition:Integer
 * https://ncatlab.org/nlab/show/integer
 * https://coq.inria.fr/library/Coq.ZArith.BinInt.html (but uses a different encoding as an inductive data type with three constructors)
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int (but uses a different encoding as an inductive data type with two constructors)"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int (but uses a different encoding as an inductive data type with two constructors)"
 `;
 
 exports[`render hlm library: 1.8.4.2 Essentials/Numbers/Integer/sum 1`] = `
@@ -4680,7 +4680,7 @@ References.
 * https://en.wikipedia.org/wiki/Integer#Construction
 * https://proofwiki.org/wiki/Definition:Addition/Integers
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.add
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.add"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.add"
 `;
 
 exports[`render hlm library: 1.8.4.3 Essentials/Numbers/Integer/Sum%20is%20associative 1`] = `
@@ -4692,7 +4692,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.add_assoc"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.add_assoc"
 `;
 
 exports[`render hlm library: 1.8.4.4 Essentials/Numbers/Integer/Sum%20is%20commutative 1`] = `
@@ -4704,7 +4704,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.add_comm"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.add_comm"
 `;
 
 exports[`render hlm library: 1.8.4.5 Essentials/Numbers/Integer/inverse 1`] = `
@@ -4721,7 +4721,7 @@ Well-definedness.  No proof.
 References.
 
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.opp
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.neg"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.neg"
 `;
 
 exports[`render hlm library: 1.8.4.6 Essentials/Numbers/Integer/difference 1`] = `
@@ -4741,7 +4741,7 @@ Well-definedness.  No proof.
 References.
 
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.sub
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.has_sub"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.has_sub"
 `;
 
 exports[`render hlm library: 1.8.4.7 Essentials/Numbers/Integer/Actual%20difference%20equals%20formal%20difference 1`] = `
@@ -4895,13 +4895,16 @@ Equality.  No proof."
 exports[`render hlm library: 1.8.4.10.11 Essentials/Numbers/Integer/Subsets/Interval 1`] = `
 "Definition 1.8.4.10.11.  Let a, b ∈ ℤ. We define:
 
-  {a, ..., b} := {c ∈ ℤ : a ≤ c ≤ b}"
+  {a, ..., b} := {z ∈ ℤ : a ≤ z ≤ b}"
 `;
 
 exports[`render hlm library: 1.8.4.10.12 Essentials/Numbers/Integer/Subsets/Multiples 1`] = `
 "Definition 1.8.4.10.12.  Let n ∈ ℕ. We define:
 
-  nℤ := {n ⋅ z : z ∈ ℤ}"
+  nℤ := {n ⋅ z : z ∈ ℤ}
+   = {a ∈ ℤ : n ∣ a}
+
+Equality.  No proof."
 `;
 
 exports[`render hlm library: 1.8.4.11 Essentials/Numbers/Integer/absolute 1`] = `
@@ -4915,7 +4918,7 @@ References.
 * https://mathworld.wolfram.com/AbsoluteValue.html
 * https://proofwiki.org/wiki/Definition:Absolute_Value
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.abs
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.nat_abs"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.nat_abs"
 `;
 
 exports[`render hlm library: 1.8.4.12 Essentials/Numbers/Integer/product 1`] = `
@@ -4936,7 +4939,7 @@ Note that the sums and products on the right are operations on natural numbers.
 References.
 
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.mul
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.mul"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.mul"
 `;
 
 exports[`render hlm library: 1.8.4.13 Essentials/Numbers/Integer/Product%20is%20associative 1`] = `
@@ -4948,7 +4951,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.mul_assoc"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.mul_assoc"
 `;
 
 exports[`render hlm library: 1.8.4.14 Essentials/Numbers/Integer/Product%20is%20commutative 1`] = `
@@ -4960,7 +4963,7 @@ No proof.
 
 References.
 
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.mul_comm"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.mul_comm"
 `;
 
 exports[`render hlm library: 1.8.4.15 Essentials/Numbers/Integer/divisible 1`] = `
@@ -4988,7 +4991,7 @@ Well-definedness.  No proof.
 References.
 
 * https://coq.inria.fr/library/Coq.ZArith.BinIntDef.html#Z.div (truncated division, thus incompatible with division of rational numbers)
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.div (ditto)"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.div (ditto)"
 `;
 
 exports[`render hlm library: 1.8.4.18 Essentials/Numbers/Integer/power 1`] = `
@@ -5904,7 +5907,6 @@ p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
 References.
 
 * https://proofwiki.org/wiki/Square_Root_of_Prime_is_Irrational (for \`n\` = 2)
-* https://isabelle.in.tum.de/website-Isabelle2012/dist/library/HOL/ex/Sqrt.html (for \`n\` = 2)
 * https://leanprover-community.github.io/mathlib_docs/data/real/irrational.html#nat.prime.irrational_sqrt (for \`n\` = 2)
 * https://isabelle.in.tum.de/dist/library/HOL/HOL-ex/Sqrt.html (for \`n\` = 2)
 * http://www.mizar.org/version/current/html/irrat_1.html#T1 (for \`n\` = 2)"
@@ -6927,7 +6929,7 @@ exports[`render hlm library: 2.5.11.1 Algebra/Monoids/Examples/natural%20numbers
 References.
 
 * https://en.wikipedia.org/wiki/Monoid#Examples
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.add_monoid"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.add_monoid"
 `;
 
 exports[`render hlm library: 2.5.11.2 Algebra/Monoids/Examples/natural%20numbers%20with%20multiplication 1`] = `
@@ -6938,7 +6940,7 @@ exports[`render hlm library: 2.5.11.2 Algebra/Monoids/Examples/natural%20numbers
 References.
 
 * https://en.wikipedia.org/wiki/Monoid#Examples
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.monoid"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.monoid"
 `;
 
 exports[`render hlm library: 2.5.12 Algebra/Monoids/invertible 1`] = `
@@ -7887,7 +7889,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Semiring#Examples
 * https://ncatlab.org/nlab/show/rig#examples
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/nat/lemmas.html#nat.semiring"
+* https://leanprover-community.github.io/mathlib_docs/init/data/nat/lemmas.html#nat.semiring"
 `;
 
 exports[`render hlm library: 2.7.15.1 Algebra/Semirings/Iterated%20operations/iterated%20sum 1`] = `
@@ -8368,7 +8370,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Ring_(mathematics)#Basic_examples
 * https://ncatlab.org/nlab/show/ring#Examples
-* https://leanprover-community.github.io/mathlib_docs/core/init/data/int/basic.html#int.comm_ring"
+* https://leanprover-community.github.io/mathlib_docs/init/data/int/basic.html#int.comm_ring"
 `;
 
 exports[`render hlm library: 2.8.24.2 Algebra/Rings/Examples/Multiples%20are%20an%20ideal%20of%20integers 1`] = `

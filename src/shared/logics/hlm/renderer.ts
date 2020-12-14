@@ -2500,7 +2500,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let hasSingleSource = ((singleStepType instanceof FmtHLM.MetaRefExpression_ProveDef && (!singleStepType.proof || (singleStepType.proof.goal && this.utils.isTrueFormula(singleStepType.proof.goal))))
                            || ((singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem || singleStepType instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) && !(singleStep && singleStepType.result)));
     if (displayedGoal) {
-      if (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution
+      if (!this.editHandler
+          && singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution
           && (displayedGoal instanceof FmtHLM.MetaRefExpression_setEquals || displayedGoal instanceof FmtHLM.MetaRefExpression_equals)) {
         if (hasContents) {
           this.outputStartRowSpacing(state);
@@ -2602,7 +2603,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           substitutedParameters: [],
           isLastStep: true
         };
-        state.startRow.push(this.getConditionalProofStepInsertButton(proof, renderContext, true, state));
+        state.startRow.push(this.getConditionalProofStepInsertButton(proof, renderContext, false, state));
       } else {
         state.startRow.push(this.getTrivialProofPlaceholder());
       }
@@ -3219,7 +3220,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       ...sourceContext,
       goal: type.goal
     };
-    if (!state.isPreview) {
+    if (!this.editHandler && !state.isPreview) {
       if (((goal instanceof FmtHLM.MetaRefExpression_setEquals && type.goal instanceof FmtHLM.MetaRefExpression_setEquals)
            || (goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
           && goal.terms.length >= 2
@@ -3242,11 +3243,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             source: source,
             sourceFormula: this.getSourceFormula(type.source, context)
           });
-          let finished = !type.proof || this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
-          for (let additionalRightTermIndex = finished ? 2 : 1; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
+          let targetReached = this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
+          let addProof = type.proof?.steps.length && !targetReached;
+          for (let additionalRightTermIndex = targetReached || rightTerm.isEquivalentTo(targetTerm) ? 2 : 1; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
             let additionalRightTerm = goal.terms[additionalRightTermIndex];
             let additionalEquality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, additionalRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, additionalRightTerm);
-            let punctuation = additionalRightTermIndex === goal.terms.length - 1 && !finished ? [new Notation.TextExpression(':')] : undefined;
+            let punctuation = additionalRightTermIndex === goal.terms.length - 1 && addProof ? [new Notation.TextExpression(':')] : undefined;
             addImplication({
               dependsOnPrevious: true,
               result: additionalEquality,
@@ -3254,7 +3256,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               resultPunctuation: punctuation
             });
           }
-          if (finished) {
+          if (!addProof) {
             return;
           }
         } else if (goal.terms.length > 2
@@ -3292,8 +3294,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
   }
 
-  private continueCalculation(subProof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): boolean {
-    if (subProof.steps.length === 1) {
+  private continueCalculation(subProof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepRenderContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): boolean {
+    if (subProof?.steps.length === 1) {
       let firstStep = subProof.steps[0];
       let type = firstStep.type;
       if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
@@ -3347,7 +3349,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): Notation.RenderedExpression {
-    let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
+    let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : this.getTrivialProofPlaceholder());
     let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
     let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
     return this.editHandler!.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
