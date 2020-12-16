@@ -2140,9 +2140,8 @@ export class HLMDefinitionChecker {
     }
   }
 
+  // In addition to checking for term compatibility, returns whether the term is trivially a subset of the given set.
   private checkSubset(subset: Fmt.Expression, superset: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
-    // I think setting checkSubset to true on the first try improves the way placeholders are filled,
-    // but I'm not sure.
     return this.checkSetCompatibilityInternal(subset, [subset, superset], true, context, initialCompatibilityStatusWithoutElements)
       .then((subsetResult: Fmt.Expression | undefined) => {
         if (subsetResult) {
@@ -2160,9 +2159,8 @@ export class HLMDefinitionChecker {
       });
   }
 
+  // In addition to checking for term compatibility, returns whether the term is trivially an element of the given set.
   private checkElement(element: Fmt.Expression, set: Fmt.Expression, context: HLMCheckerContext): CachedPromise<boolean> {
-    // I think setting checkSubset to true on the first try improves the way placeholders are filled,
-    // but I'm not sure.
     return this.utils.getDeclaredSet(element).then((declaredSet: Fmt.Expression) =>
       this.checkSetCompatibilityInternal(element, [declaredSet, set], true, context, initialCompatibilityStatus)
         .then((elementResult: Fmt.Expression | undefined) => {
@@ -2209,8 +2207,8 @@ export class HLMDefinitionChecker {
         let typeSearchParameters: HLMTypeSearchParameters = {
           unfoldVariableDefinitions: true,
           followDefinitions: true,
-          followSupersets: true,
-          followEmbeddings: nextStatus.followedEmbeddings && !checkSubset,
+          followSupersets: !checkSubset,
+          followEmbeddings: nextStatus.followedEmbeddings,
           followAllAlternatives: false,
           unfoldMacros: false,
           allowStructuralCaseResults: true,
@@ -2227,13 +2225,6 @@ export class HLMDefinitionChecker {
             }
             setTerms[index] = term;
           }
-        }
-        if (checkSubset) {
-          typeSearchParameters = {
-            ...typeSearchParameters,
-            followSupersets: false,
-            followEmbeddings: nextStatus.followedEmbeddings
-          };
         }
         let firstTerm = setTerms[0];
         for (let index = 1; index < setTerms.length; index++) {
@@ -2252,6 +2243,13 @@ export class HLMDefinitionChecker {
               })
             );
           }
+        }
+        if (checkSubset) {
+          typeSearchParameters = {
+            ...typeSearchParameters,
+            followSupersets: nextStatus.followedEmbeddings,
+            followEmbeddings: false
+          };
         }
         nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) => {
           if (nextSetTerms.length) {
