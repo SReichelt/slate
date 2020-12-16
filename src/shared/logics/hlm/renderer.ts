@@ -2478,24 +2478,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       };
       displayedGoal = state.isPreview ? proof.goal : this.getDisplayedGoal(proof.goal, displayedGoal);
     }
-    if (displayedGoal && steps.length) {
-      let firstStepType = steps[0].type;
-      if ((firstStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && displayedGoal instanceof FmtHLM.MetaRefExpression_forall)
-          || firstStepType instanceof FmtHLM.MetaRefExpression_ProveCases) {
-        displayedGoal = undefined;
-      }
-    }
     let singleStep: Fmt.Parameter | undefined = undefined;
     let singleStepType: Fmt.Expression | undefined = undefined;
     if (steps.length === 1) {
       singleStep = steps[0];
       singleStepType = singleStep.type;
-    }
-    while (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution
-           && (singleStepType.source instanceof FmtHLM.MetaRefExpression_UseTheorem || singleStepType.source instanceof FmtHLM.MetaRefExpression_UseImplicitOperator)
-           && !singleStepType.proof) {
-      singleStepType = singleStepType.source;
-      singleStep = undefined;
+      if ((singleStepType instanceof FmtHLM.MetaRefExpression_ProveForAll && displayedGoal instanceof FmtHLM.MetaRefExpression_forall)
+          || singleStepType instanceof FmtHLM.MetaRefExpression_ProveCases) {
+        displayedGoal = undefined;
+      }
+      while (singleStepType instanceof FmtHLM.MetaRefExpression_ProveBySubstitution
+             && (singleStepType.source instanceof FmtHLM.MetaRefExpression_UseTheorem || singleStepType.source instanceof FmtHLM.MetaRefExpression_UseImplicitOperator)
+             && !singleStepType.proof) {
+        singleStepType = singleStepType.source;
+        singleStep = undefined;
+      }
     }
     let hasSingleSource = ((singleStepType instanceof FmtHLM.MetaRefExpression_ProveDef && (!singleStepType.proof || (singleStepType.proof.goal && this.utils.isTrueFormula(singleStepType.proof.goal))))
                            || ((singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem || singleStepType instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) && !(singleStep && singleStepType.result)));

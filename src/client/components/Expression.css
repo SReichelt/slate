@@ -751,6 +751,7 @@ div.display-math {
   border-radius: 2px;
   border-collapse: initial;
   border-spacing: 0;
+  overflow: hidden;
 }
 
 .menu.hidden {

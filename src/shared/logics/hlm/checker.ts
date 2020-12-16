@@ -1630,20 +1630,24 @@ export class HLMDefinitionChecker {
           let previousResultCasesPromise = this.utils.getFormulaCases(context.previousResult, this.utils.externalToInternalIndex(type.side), false);
           if (previousResultCasesPromise) {
             let caseProofs = type.caseProofs;
-            let checkCases = previousResultCasesPromise.then((previousResultCases: HLMFormulaCase[]) => {
-              let index = 0;
-              for (let previousResultCase of previousResultCases) {
-                if (index < caseProofs.length) {
-                  let caseProof = caseProofs[index];
-                  let parameters = this.utils.getUseCasesProofParameters(previousResultCase);
-                  this.checkProof(caseProof, caseProof, parameters, goal, context);
-                } else {
-                  this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+            let checkCases = previousResultCasesPromise.then((previousResultCases: HLMFormulaCase[] | undefined) => {
+              if (previousResultCases) {
+                let index = 0;
+                for (let previousResultCase of previousResultCases) {
+                  if (index < caseProofs.length) {
+                    let caseProof = caseProofs[index];
+                    let parameters = this.utils.getUseCasesProofParameters(previousResultCase);
+                    this.checkProof(caseProof, caseProof, parameters, goal, context);
+                  } else {
+                    this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+                  }
+                  index++;
                 }
-                index++;
-              }
-              if (index < caseProofs.length) {
-                this.error(caseProofs[index], 'Superfluous case proof');
+                if (index < caseProofs.length) {
+                  this.error(caseProofs[index], 'Superfluous case proof');
+                }
+              } else {
+                this.error(type, 'Invalid cases');
               }
             });
             this.addPendingCheck(type, checkCases);
@@ -1822,19 +1826,23 @@ export class HLMDefinitionChecker {
         let goalCasesPromise = this.utils.getFormulaCases(context.goal, this.utils.externalToInternalIndex(type.side), true);
         if (goalCasesPromise) {
           let caseProofs = type.caseProofs;
-          let checkCases = goalCasesPromise.then((goalCases: HLMFormulaCase[]) => {
-            let index = 0;
-            for (let goalCase of goalCases) {
-              if (index < caseProofs.length) {
-                let caseProof = caseProofs[index];
-                this.checkProof(caseProof, caseProof, goalCase.parameters, goalCase.formula, context);
-              } else {
-                this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+          let checkCases = goalCasesPromise.then((goalCases: HLMFormulaCase[] | undefined) => {
+            if (goalCases) {
+              let index = 0;
+              for (let goalCase of goalCases) {
+                if (index < caseProofs.length) {
+                  let caseProof = caseProofs[index];
+                  this.checkProof(caseProof, caseProof, goalCase.parameters, goalCase.formula, context);
+                } else {
+                  this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
+                }
+                index++;
               }
-              index++;
-            }
-            if (index < caseProofs.length) {
-              this.error(caseProofs[index], 'Superfluous case proof');
+              if (index < caseProofs.length) {
+                this.error(caseProofs[index], 'Superfluous case proof');
+              }
+            } else {
+              this.error(type, 'Invalid cases');
             }
           });
           this.addPendingCheck(type, checkCases);
