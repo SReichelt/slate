@@ -1,4 +1,5 @@
 import * as Fmt from '../../format/format';
+import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
 import * as FmtNotation from '../../notation/meta';
 import * as Logic from '../logic';
@@ -2182,7 +2183,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       this.addSubsetEmbeddings(paragraphs);
     } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
       let notation = definition.contents.notation;
-      if (notation && this.utils.containsSubExpression(notation, (subExpression: Fmt.Expression) => (subExpression instanceof FmtNotation.MetaRefExpression_neg && subExpression.items.length > 1))) {
+      if (notation && FmtUtils.containsSubExpression(notation, (subExpression: Fmt.Expression) => (subExpression instanceof FmtNotation.MetaRefExpression_neg && subExpression.items.length > 1))) {
         let args = this.getRenderedTemplateArguments([definition]);
         let extraContents = this.renderTemplate('EquivalenceDefinition', {
                                                   'operands': [

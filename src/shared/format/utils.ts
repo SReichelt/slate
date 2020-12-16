@@ -71,6 +71,16 @@ export function substituteVariable<T extends Fmt.ExpressionObject<T>>(value: T, 
   });
 }
 
+export function containsSubExpression<T extends Fmt.Traversable>(value: T, fn: (subExpression: Fmt.Expression) => boolean): boolean {
+  let result = false;
+  value.traverse((subExpression: Fmt.Expression) => {
+    if (!result && fn(subExpression)) {
+      result = true;
+    }
+  });
+  return result;
+}
+
 export function renameParameter(parameter: Fmt.Parameter, newName: string, parameterList: Fmt.ParameterList | undefined, scope: Fmt.Traversable | undefined): void {
   let oldName = parameter.name;
   if (newName !== oldName) {

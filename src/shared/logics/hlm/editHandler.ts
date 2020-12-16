@@ -1263,6 +1263,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getProveByCasesRow(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn, proveByCasesInfo: ProofStepMenuItemInfo): Menu.ExpressionMenuRow | undefined {
+    // TODO merge induction-based cases with proof by induction where appropriate
     let stepsPromises: CachedPromise<ProofStepInfo[]>[] = [];
     if (context.previousResult) {
       let useCasesStepsPromise = this.createUseCasesSteps(context.previousResult, context);
@@ -1309,10 +1310,12 @@ export class HLMEditHandler extends GenericEditHandler {
           && this.definition.contents.proofs
           && this.definition.contents.proofs.indexOf(proof) >= 0
           && context.goal
-          && this.utils.containsSubExpression(context.goal, (subExpression: Fmt.Expression) => subExpression.isEquivalentTo(variableRefExpression))) {
+          && FmtUtils.containsSubExpression(context.goal, (subExpression: Fmt.Expression) => subExpression.isEquivalentTo(variableRefExpression))) {
         for (let structuralCase of structuralExpression.cases) {
           let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
-          subProof.parameters = undefined;
+          if (!this.utils.referencesParameter(this.definition.parameters, variableRefExpression.variable)) {
+            subProof.parameters = undefined;
+          }
           if (structuralCase.parameters) {
             for (let param of structuralCase.parameters) {
               if (param.type.isEquivalentTo(variableRefExpression.variable.type)) {

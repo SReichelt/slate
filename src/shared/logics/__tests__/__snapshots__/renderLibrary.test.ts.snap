@@ -2231,7 +2231,7 @@ No proof."
 exports[`render hlm library: 1.6.18.6 Essentials/Operations/Iterated%20operations/indexed%20by%20integer 1`] = `
 "Definition 1.6.18.6.  Let X be a set, ⨂ be an iterated operation on X, j, k ∈ ℤ, let a_i ∈ X for each i ∈ {j, ..., k}. We define:
 
-  ⨂_(i = j)^k a_i := ⨂_(i < k−j+1) a_(i+j)"
+  ⨂_(i = j)^k a_i := ⨂_(i < max(k−j+1,0)) a_(i+j)"
 `;
 
 exports[`render hlm library: 1.6.18.7 Essentials/Operations/Iterated%20operations/indexed%20by%20finite%20set 1`] = `
@@ -3421,7 +3421,7 @@ References.
 * https://mathworld.wolfram.com/Factorial.html
 * https://proofwiki.org/wiki/Definition:Factorial
 * https://coq.inria.fr/library/Coq.Arith.Factorial.html#fact
-* https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.fact
+* https://leanprover-community.github.io/mathlib_docs/data/nat/factorial.html#nat.factorial
 * http://oeis.org/A000142"
 `;
 
@@ -3455,7 +3455,7 @@ We use this definition of the binomial coefficient because it does not need any 
 References.
 
 * https://en.wikipedia.org/wiki/Pascal%27s_rule
-* https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose"
+* https://leanprover-community.github.io/mathlib_docs/data/nat/choose/basic.html#nat.choose"
 `;
 
 exports[`render hlm library: 1.8.1.50 Essentials/Numbers/Natural/Binomial%20coefficient%20equality 1`] = `
@@ -3471,7 +3471,7 @@ References.
 * https://mathworld.wolfram.com/BinomialCoefficient.html
 * https://proofwiki.org/wiki/Definition:Binomial_Coefficient
 * https://coq.inria.fr/library/Coq.Reals.Binomial.html#C
-* https://leanprover-community.github.io/mathlib_docs/data/nat/basic.html#nat.choose_eq_fact_div_fact"
+* https://leanprover-community.github.io/mathlib_docs/data/nat/choose/basic.html#nat.choose_eq_factorial_div_factorial"
 `;
 
 exports[`render hlm library: 1.8.1.51.1 Essentials/Numbers/Natural/Iterated%20operators/iterated%20sum 1`] = `
@@ -5031,8 +5031,73 @@ exports[`render hlm library: 1.8.4.21 Essentials/Numbers/Integer/Power%20base%20
 No proof."
 `;
 
-exports[`render hlm library: 1.8.4.22.1 Essentials/Numbers/Integer/Iterated%20operators/iterated%20sum 1`] = `
-"Definition 1.8.4.22.1.  We define:
+exports[`render hlm library: 1.8.4.22 Essentials/Numbers/Integer/minimum 1`] = `
+"Definition 1.8.4.22.  Let S ⊆ ℤ such that S is finite and S is nonempty. For m ∈ S, we define:
+
+  min(S) = m  :⇔  ∀ a ∈ S : m ≤ a
+    ⇔  ∀ b ∈ S s.t. b ≤ m : b = m
+    ⇔  ∄ c ∈ S : c < m
+
+Equivalence.  No proof.
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
+* https://mathworld.wolfram.com/Minimum.html
+* https://proofwiki.org/wiki/Definition:Minimal/Ordered_Set"
+`;
+
+exports[`render hlm library: 1.8.4.23 Essentials/Numbers/Integer/minimum%20of%20two%20numbers 1`] = `
+"Definition 1.8.4.23.  Let a, b ∈ ℤ. We define:
+
+  min(a, b) := max({a, b})
+   = {a if a ≤ b, b if a > b
+
+Equality.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Min_Operation
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/functions.html#min"
+`;
+
+exports[`render hlm library: 1.8.4.24 Essentials/Numbers/Integer/maximum 1`] = `
+"Definition 1.8.4.24.  Let S ⊆ ℤ such that S is finite and S is nonempty. For m ∈ S, we define:
+
+  max(S) = m  :⇔  ∀ a ∈ S : m ≥ a
+    ⇔  ∀ b ∈ S s.t. b ≥ m : b = m
+    ⇔  ∄ c ∈ S : c > m
+
+Equivalence.  No proof.
+
+Well-definedness.  No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
+* https://mathworld.wolfram.com/Maximum.html
+* https://proofwiki.org/wiki/Definition:Maximal/Ordered_Set"
+`;
+
+exports[`render hlm library: 1.8.4.25 Essentials/Numbers/Integer/maximum%20of%20two%20numbers 1`] = `
+"Definition 1.8.4.25.  Let a, b ∈ ℤ. We define:
+
+  max(a, b) := max({a, b})
+   = {a if a ≥ b, b if a < b
+
+Equality.  No proof.
+
+References.
+
+* https://proofwiki.org/wiki/Definition:Max_Operation
+* https://coq.inria.fr/library/Coq.Init.Nat.html#max
+* https://leanprover-community.github.io/mathlib_docs/init/algebra/functions.html#max"
+`;
+
+exports[`render hlm library: 1.8.4.26.1 Essentials/Numbers/Integer/Iterated%20operators/iterated%20sum 1`] = `
+"Definition 1.8.4.26.1.  We define:
 
   ∑ := bigop(0 + ⋅⋅⋅) is an iterated operation on ℤ
 
@@ -5047,8 +5112,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Summation"
 `;
 
-exports[`render hlm library: 1.8.4.22.2 Essentials/Numbers/Integer/Iterated%20operators/iterated%20product 1`] = `
-"Definition 1.8.4.22.2.  We define:
+exports[`render hlm library: 1.8.4.26.2 Essentials/Numbers/Integer/Iterated%20operators/iterated%20product 1`] = `
+"Definition 1.8.4.26.2.  We define:
 
   ∏ := bigop(1 ⋅ ⋅⋅⋅) is an iterated operation on ℤ
 
@@ -5063,8 +5128,8 @@ References.
 * https://proofwiki.org/wiki/Definition:Product_Notation_(Algebra)"
 `;
 
-exports[`render hlm library: 1.8.4.23.1 Essentials/Numbers/Integer/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
-"Proposition 1.8.4.23.1.  Let p be a prime, a ∈ ℤ, n ∈ ℕ_+. Then the following are equivalent:
+exports[`render hlm library: 1.8.4.27.1 Essentials/Numbers/Integer/Prime/Prime%20and%20power%20divisibility%20criterion 1`] = `
+"Proposition 1.8.4.27.1.  Let p be a prime, a ∈ ℤ, n ∈ ℕ_+. Then the following are equivalent:
 
   1. p ∣ a
   2. p ∣ a^n
@@ -5073,8 +5138,8 @@ exports[`render hlm library: 1.8.4.23.1 Essentials/Numbers/Integer/Prime/Prime%2
 No proof."
 `;
 
-exports[`render hlm library: 1.8.4.24 Essentials/Numbers/Integer/coprime 1`] = `
-"Definition 1.8.4.24.  Let a, b ∈ ℤ. We define:
+exports[`render hlm library: 1.8.4.28 Essentials/Numbers/Integer/coprime 1`] = `
+"Definition 1.8.4.28.  Let a, b ∈ ℤ. We define:
 
   a and b are coprime  :⇔  ∀ c ∈ ℤ_+ s.t. c ∣ a and c ∣ b : c = 1
     ⇔  ∄ d ∈ ℤ_(>1) : [d ∣ a and d ∣ b]
@@ -5879,7 +5944,7 @@ Proof.  Assume n√p is rational.
 
 ⇒^def p ⋅ a^n = b^n
 ⇒ p ∣ b^n by definition
-⇒^1.8.4.23.1 p ∣ b
+⇒^1.8.4.27.1 p ∣ b
 ⇒ p ∣ a^n:
 
   We show that ∃ y ∈ ℤ : p ⋅ y = a^n:
@@ -5897,7 +5962,7 @@ Proof.  Assume n√p is rational.
 
     ⇒^1.8.4.20 a^n = b^m ⋅ z ⋅ p ⋅ z
 
-⇒^1.8.4.23.1 p ∣ a
+⇒^1.8.4.27.1 p ∣ a
 
 p ∣ a and p ∣ b ⇒ a and b are not coprime by definition ↯
 

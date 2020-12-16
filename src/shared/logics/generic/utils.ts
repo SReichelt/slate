@@ -146,16 +146,6 @@ export class GenericUtils {
     return new Fmt.Parameter(name, type);
   }
 
-  containsSubExpression(expression: Fmt.Expression, fn: (subExpression: Fmt.Expression) => boolean): boolean {
-    let result = false;
-    expression.traverse((subExpression: Fmt.Expression) => {
-      if (!result && fn(subExpression)) {
-        result = true;
-      }
-    });
-    return result;
-  }
-
   isSelfReference(expression: Fmt.Expression): boolean {
     return (expression instanceof Fmt.DefinitionRefExpression && this.isSelfReferencePath(expression.path));
   }
@@ -164,13 +154,13 @@ export class GenericUtils {
     return (expression instanceof Fmt.DefinitionRefExpression && this.isSelfOrChildReferencePath(expression.path));
   }
 
-  referencesSelf(expression: Fmt.Expression): boolean {
-    return this.containsSubExpression(expression, (subExpression: Fmt.Expression) =>
+  referencesSelf<T extends Fmt.Traversable>(value: T): boolean {
+    return FmtUtils.containsSubExpression(value, (subExpression: Fmt.Expression) =>
       this.isSelfOrChildReference(subExpression));
   }
 
-  referencesParameter(expression: Fmt.Expression, param: Fmt.Parameter): boolean {
-    return this.containsSubExpression(expression, (subExpression: Fmt.Expression) =>
+  referencesParameter<T extends Fmt.Traversable>(value: T, param: Fmt.Parameter): boolean {
+    return FmtUtils.containsSubExpression(value, (subExpression: Fmt.Expression) =>
       (subExpression instanceof Fmt.VariableRefExpression && subExpression.variable === param));
   }
 
