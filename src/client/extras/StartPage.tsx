@@ -8,6 +8,7 @@ import Expression from '../components/Expression';
 import { OnLinkClicked } from '../components/InteractionHandler';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 
+import config from '../utils/config';
 import { eventHandled } from '../utils/event';
 
 import * as Fmt from '../../shared/format/format';
@@ -142,6 +143,10 @@ function StartPage(props: StartPageProps): React.ReactElement {
         The entire web GUI is also integrated into an <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">extension for Microsoft Visual Studio Code</a> which supports more complex workflows.
         In particular, it provides side-by-side textual and graphical editing, combining the best of both worlds.
       </p>
+      <h2>Feedback/Discussion</h2>
+      <p>
+        Feel free to join the <a href={`${config.projectRepositoryURL}/discussions`} target="_blank">discussion forum</a> over at GitHub. Any feedback is welcome.
+      </p>
       <h2>Foundations</h2>
       <p>
         Slate, as an application, is built to support different logics. However, the rendering and editing concepts of Slate works particularly well for a logic that is close to mathematical practice. Therefore, only one logic (called "HLM") is currently implemented.
@@ -159,14 +164,10 @@ function StartPage(props: StartPageProps): React.ReactElement {
       </p>
       <h2>Development</h2>
       <p>
-        All relevant code and documentation is contained in the <a href="https://github.com/SReichelt/slate" target="_blank">GitHub repository</a>.
+        All relevant code and documentation is contained in the <a href={config.projectRepositoryURL} target="_blank">GitHub repository</a>.
       </p>
       <p>
         For a list of third-party software used in Slate, see <DocLink href="docs/dependencies" onDocLinkClicked={props.onDocLinkClicked}>here</DocLink>.
-      </p>
-      <h2>Contact</h2>
-      <p>
-        Please send feedback via <a href="mailto:SebastianR@gmx.de">email</a>.
       </p>
     </div>
   );

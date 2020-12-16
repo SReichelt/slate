@@ -54,7 +54,7 @@ const dataURIPrefix = 'data/';
 const preloadURIPrefix = 'preload/';
 const librariesURIPrefix = 'libraries/';
 
-const sourceCodeURLPrefix = 'https://github.com/SReichelt/slate/tree/master/';
+const sourceCodeURLPrefix = `${config.projectRepositoryURL}/tree/master/`;
 
 const appName = 'Slate';
 const selectedLibraryName = 'hlm';
