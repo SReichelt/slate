@@ -1957,7 +1957,50 @@ export class MetaRefExpression_Predicate extends Fmt.MetaRefExpression {
   }
 }
 
-export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
+export class ObjectContents_Theorem extends Fmt.ObjectContents {
+  static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Theorem {
+    let result: ObjectContents_Theorem = Object.create(ObjectContents_Theorem.prototype);
+    result.fromArgumentList(argumentList, reportFn);
+    return result;
+  }
+
+  fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+  }
+
+  toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
+    let argumentList = new Fmt.ArgumentList;
+    return argumentList;
+  }
+
+  static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Theorem {
+    let result: ObjectContents_Theorem = Object.create(ObjectContents_Theorem.prototype);
+    result.fromExpression(expression, reportFn);
+    return result;
+  }
+
+  clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Theorem {
+    let result: ObjectContents_Theorem = Object.create(ObjectContents_Theorem.prototype);
+    this.substitute(undefined, result, replacedParameters);
+    return result;
+  }
+
+  traverse(fn: Fmt.ExpressionTraversalFn): void {
+  }
+
+  substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Theorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    let changed = false;
+    return changed;
+  }
+
+  isEquivalentTo(objectContents: ObjectContents_Theorem, fn?: Fmt.ExpressionUnificationFn, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
+    if (this === objectContents && !replacedParameters.length) {
+      return true;
+    }
+    return true;
+  }
+}
+
+export class ObjectContents_StandardTheorem extends ObjectContents_Theorem {
   constructor(public claim: Fmt.Expression, public proofs?: ObjectContents_Proof[]) {
     super();
   }
@@ -1969,6 +2012,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    super.fromArgumentList(argumentList, reportFn);
     this.claim = argumentList.getValue('claim', 0);
     let proofsRaw = argumentList.getOptionalValue('proofs', 1);
     if (proofsRaw !== undefined) {
@@ -1986,7 +2030,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    let argumentList = super.toArgumentList(outputAllNames, reportFn);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'claim' : undefined, this.claim, false));
     if (this.proofs !== undefined) {
       let proofsExprItems: Fmt.Expression[] = [];
@@ -2025,7 +2069,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_StandardTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.claim) {
       result.claim = this.claim.substitute(fn, replacedParameters);
       if (result.claim !== this.claim) {
@@ -2064,7 +2108,7 @@ export class ObjectContents_StandardTheorem extends Fmt.ObjectContents {
         }
       }
     }
-    return true;
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
 }
 
@@ -2101,7 +2145,7 @@ export class MetaRefExpression_StandardTheorem extends Fmt.MetaRefExpression {
   }
 }
 
-export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
+export class ObjectContents_EquivalenceTheorem extends ObjectContents_Theorem {
   constructor(public conditions: Fmt.Expression[], public equivalenceProofs?: ObjectContents_Proof[]) {
     super();
   }
@@ -2113,6 +2157,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
+    super.fromArgumentList(argumentList, reportFn);
     let conditionsRaw = argumentList.getValue('conditions', 0);
     if (conditionsRaw instanceof Fmt.ArrayExpression) {
       this.conditions = conditionsRaw.items;
@@ -2135,7 +2180,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    let argumentList = super.toArgumentList(outputAllNames, reportFn);
     let conditionsExprItems: Fmt.Expression[] = [];
     for (let item of this.conditions) {
       conditionsExprItems.push(item);
@@ -2181,7 +2226,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_EquivalenceTheorem, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = false;
+    let changed = super.substitute(fn, result, replacedParameters);
     if (this.conditions) {
       result.conditions = [];
       for (let item of this.conditions) {
@@ -2233,7 +2278,7 @@ export class ObjectContents_EquivalenceTheorem extends Fmt.ObjectContents {
         }
       }
     }
-    return true;
+    return super.isEquivalentTo(objectContents, fn, replacedParameters);
   }
 }
 

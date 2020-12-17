@@ -1027,13 +1027,12 @@ export class HLMUtils extends GenericUtils {
                 return [structuralCase.value];
               }
               if (term.term instanceof Fmt.PlaceholderExpression && structuralCase.parameters) {
-                let args = new Fmt.ArgumentList;
                 let createPlaceholder = (placeholderType: HLMExpressionType) => {
                   let result = new Fmt.PlaceholderExpression(placeholderType);
                   result.specialRole = Fmt.SpecialPlaceholderRole.Temporary;
                   return result;
                 };
-                this.fillPlaceholderArguments(structuralCase.parameters, args, undefined, createPlaceholder);
+                let args = this.getPlaceholderArguments(structuralCase.parameters, undefined, createPlaceholder);
                 return [this.substituteArguments(structuralCase.value, structuralCase.parameters, args)];
               }
               return this.getNextElementTerms(term.term, typeSearchParameters).then((nextTerms: Fmt.Expression[] | undefined) => {
@@ -2833,17 +2832,19 @@ export class HLMUtils extends GenericUtils {
     return internalIndex === undefined ? undefined : new Fmt.BN(internalIndex + 1);
   }
 
-  fillPlaceholderArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, substitutionContext?: HLMSubstitutionContext, createPlaceholder: CreatePlaceholderFn = createStandardPlaceholder): void {
+  getPlaceholderArguments(params: Fmt.ParameterList, substitutionContext?: HLMSubstitutionContext, createPlaceholder: CreatePlaceholderFn = createStandardPlaceholder): Fmt.ArgumentList {
+    let result = new Fmt.ArgumentList;
     let previousParams: Fmt.Parameter[] = [];
     for (let param of params) {
       let argumentSubstitutionContext = new HLMSubstitutionContext(substitutionContext);
-      this.addArgumentListSubstitution(previousParams, args, undefined, argumentSubstitutionContext);
+      this.addArgumentListSubstitution(previousParams, result, undefined, argumentSubstitutionContext);
       let argValue = this.createArgumentValue(param, argumentSubstitutionContext, createPlaceholder);
       if (argValue) {
-        args.push(new Fmt.Argument(param.name, argValue));
+        result.push(new Fmt.Argument(param.name, argValue));
       }
       previousParams.push(param);
     }
+    return result;
   }
 
   createArgumentValue(param: Fmt.Parameter, substitutionContext?: HLMSubstitutionContext, createPlaceholder: CreatePlaceholderFn = createStandardPlaceholder): Fmt.Expression | undefined {
@@ -2865,8 +2866,7 @@ export class HLMUtils extends GenericUtils {
       let substitutedSourceParameters = this.applySubstitutionContextToParameterList(paramType.sourceParameters, substitutionContext);
       let substitutedTargetParameters = this.applySubstitutionContextToParameterList(paramType.targetParameters, substitutionContext);
       let sourceParameters = substitutedSourceParameters.clone();
-      let targetArguments = new Fmt.ArgumentList;
-      this.fillPlaceholderArguments(substitutedTargetParameters, targetArguments, substitutionContext, createPlaceholder);
+      let targetArguments = this.getPlaceholderArguments(substitutedTargetParameters, substitutionContext, createPlaceholder);
       let binderArg = new FmtHLM.ObjectContents_BinderArg(sourceParameters, targetArguments);
       return binderArg.toExpression(false);
     } else if (paramType instanceof FmtHLM.MetaRefExpression_Nat) {

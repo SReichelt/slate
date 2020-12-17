@@ -1356,18 +1356,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     };
     searchTextExpression.requestTextInput = true;
     searchTextExpression.inputLength = 20;
-    let searchTextItem = new Dialog.ExpressionDialogParameterItem;
-    searchTextItem.title = 'Search default references for';
-    searchTextItem.onGetValue = () => searchTextExpression;
-    let dialog = new Dialog.ExpressionDialog;
-    dialog.items = [searchTextItem];
-    dialog.items.push(new Dialog.ExpressionDialogSeparatorItem);
+    let items = [
+      new Dialog.ExpressionDialogParameterItem('Search default references for', () => searchTextExpression),
+      new Dialog.ExpressionDialogSeparatorItem
+    ];
     for (let searchUrl of searchURLs) {
-      let linkItem = new Dialog.ExpressionDialogLinkItem;
-      linkItem.title = searchUrl.title;
-      linkItem.getURL = () => (searchUrl.searchUrlPrefix + encodeURI(searchText));
-      dialog.items.push(linkItem);
+      items.push(new Dialog.ExpressionDialogLinkItem(searchUrl.title, () => (searchUrl.searchUrlPrefix + encodeURI(searchText))));
     }
+    let dialog = new Dialog.ExpressionDialog(items);
     if (!config.embedded) {
       dialog.onOK = () => {
         for (let searchUrl of searchURLs) {

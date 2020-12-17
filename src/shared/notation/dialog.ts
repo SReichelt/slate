@@ -7,10 +7,8 @@ import CachedPromise from '../data/cachedPromise';
 export interface DialogResultBase {
 }
 
-// TODO define proper constructors for these classes
-
 export class DialogBase {
-  onOK?: (result: DialogResultBase) => void;
+  constructor(public onOK?: (result: DialogResultBase) => void) {}
 }
 
 export interface InsertDialogResult extends DialogResultBase {
@@ -20,19 +18,22 @@ export interface InsertDialogResult extends DialogResultBase {
 }
 
 export class InsertDialog extends DialogBase {
-  libraryDataProvider: LibraryDataProvider;
   section?: LibraryDefinition;
   sectionItemNumber?: LibraryItemNumber;
-  definitionType: Logic.LogicDefinitionTypeDescription | undefined;
-  onCheckNameInUse: (name: string) => boolean;
-  templates?: Fmt.File;
+
+  constructor(public libraryDataProvider: LibraryDataProvider, public definitionType: Logic.LogicDefinitionTypeDescription | undefined, public onCheckNameInUse: (name: string) => boolean, public templates: Fmt.File | undefined, onOK?: (result: InsertDialogResult) => void) {
+    super(onOK);
+  }
 }
 
 export class ExpressionDialog extends DialogBase {
   styleClasses?: string[];
-  items: ExpressionDialogItem[];
   onCheckOKEnabled?: () => boolean;
   onCheckUpdateNeeded?: () => boolean;
+
+  constructor(public items: ExpressionDialogItem[], onOK?: () => void) {
+    super(onOK);
+  }
 }
 
 type ChangeListener = () => void;
@@ -59,27 +60,35 @@ export abstract class ExpressionDialogItem {
   }
 }
 
-export class ExpressionDialogInfoItem extends ExpressionDialogItem {
-  info: Notation.RenderedExpression;
+export class ExpressionDialogExpressionItem extends ExpressionDialogItem {
+  constructor(public expression: Notation.RenderedExpression) {
+    super();
+  }
 }
 
+export class ExpressionDialogInfoItem extends ExpressionDialogExpressionItem {}
+
 export class ExpressionDialogLinkItem extends ExpressionDialogItem {
-  title: string;
-  getURL: () => string;
+  constructor(public title: string, public onGetURL: () => string) {
+    super();
+  }
 }
 
 export class ExpressionDialogSeparatorItem extends ExpressionDialogItem {
 }
 
 export class ExpressionDialogParameterItem extends ExpressionDialogItem {
-  title: string | Notation.RenderedExpression;
-  info?: Notation.RenderedExpression;
-  onGetValue: () => Notation.RenderedExpression;
+  onGetInfo?: () => Notation.RenderedExpression | undefined;
+
+  constructor(public title: string | Notation.RenderedExpression, public onGetValue: () => Notation.RenderedExpression) {
+    super();
+  }
 }
 
 export class ExpressionDialogListItem<T> extends ExpressionDialogItem {
-  items: T[];
-  onRenderItem: (item: T) => Notation.RenderedExpression;
+  constructor(public items: T[], public onRenderItem: (item: T) => Notation.RenderedExpression) {
+    super();
+  }
 }
 
 export class ExpressionDialogSelectionItem<T> extends ExpressionDialogListItem<T> {
@@ -87,9 +96,11 @@ export class ExpressionDialogSelectionItem<T> extends ExpressionDialogListItem<T
 }
 
 export class ExpressionDialogTreeItem extends ExpressionDialogItem {
-  libraryDataProvider: LibraryDataProvider;
-  templates?: Fmt.File;
   onFilter?: (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => CachedPromise<boolean>;
   selectedItemPath?: Fmt.Path;
   onItemClicked?: (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise?: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => void;
+
+  constructor(public libraryDataProvider: LibraryDataProvider, public templates: Fmt.File | undefined) {
+    super();
+  }
 }

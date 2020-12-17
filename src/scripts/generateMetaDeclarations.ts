@@ -38,14 +38,16 @@ class MetaDeclarationGenerator {
   }
 
   private hasObjectContents(definition: Fmt.Definition): boolean {
-    if (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members) {
+    if (definition.contents instanceof FmtMeta.ObjectContents_DefinitionType
+        || (definition.contents instanceof FmtMeta.ObjectContents_DefinedType && definition.contents.members)) {
       return true;
-    }
-    let superDefinition = this.getSuperDefinition(definition);
-    if (superDefinition) {
-      return this.hasObjectContents(superDefinition);
     } else {
-      return false;
+      let superDefinition = this.getSuperDefinition(definition);
+      if (superDefinition) {
+        return this.hasObjectContents(superDefinition);
+      } else {
+        return false;
+      }
     }
   }
 

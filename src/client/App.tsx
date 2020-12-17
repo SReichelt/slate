@@ -836,13 +836,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, sectionItemNumber: LibraryItemNumber, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
-    let dialog = new Dialog.InsertDialog;
-    dialog.libraryDataProvider = libraryDataProvider;
+    let dialog = new Dialog.InsertDialog(libraryDataProvider, definitionType, this.checkNameInUse, this.state.templates);
     dialog.section = section;
     dialog.sectionItemNumber = sectionItemNumber;
-    dialog.definitionType = definitionType;
-    dialog.onCheckNameInUse = this.checkNameInUse;
-    dialog.templates = this.state.templates;
     this.setState({
       insertDialog: dialog
     });

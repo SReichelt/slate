@@ -8,8 +8,8 @@ import * as HLMMacro from './macro';
 import * as Notation from '../../notation/notation';
 import * as Menu from '../../notation/menu';
 import * as Dialog from '../../notation/dialog';
-import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn, SetExpressionFn, RenderExpressionsFn, GetExpressionsFn } from '../generic/editHandler';
-import { LibraryDataProvider, LibraryItemInfo } from '../../data/libraryDataProvider';
+import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn, SetExpressionFn, RenderExpressionsFn, RenderArgumentsFn, GetExpressionsFn } from '../generic/editHandler';
+import { LibraryDataProvider, LibraryItemInfo, LibraryDefinition } from '../../data/libraryDataProvider';
 import { MRUList } from '../../data/mostRecentlyUsedList';
 import { HLMExpressionType } from './hlm';
 import { HLMEditAnalysis } from './edit';
@@ -168,7 +168,7 @@ export class HLMEditHandler extends GenericEditHandler {
     semanticLink.onMenuOpened = () => {
       let rows = [this.getTypeRow(undefined, onRenderType, info)];
       let contents = this.definition.contents;
-      if (contents instanceof FmtHLM.ObjectContents_StandardTheorem || contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+      if (contents instanceof FmtHLM.ObjectContents_Theorem) {
         rows.push(
           this.getTypeRow('lemma', onRenderType, info),
           this.getTypeRow('theorem', onRenderType, info),
@@ -300,10 +300,10 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getSetTermDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+    let onGetExpressions = (getPath: () => Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
       let type = definition.type;
       if (type instanceof FmtHLM.MetaRefExpression_SetOperator || type instanceof FmtHLM.MetaRefExpression_Construction) {
-        return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.SetTerm);
+        return this.getDefinitionRefExpressions(expressionEditInfo, getPath(), outerDefinition, definition, true, HLMExpressionType.SetTerm);
       } else {
         return undefined;
       }
@@ -354,13 +354,13 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getElementTermDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderTerm: RenderExpressionFn, allowConstructors: boolean): Menu.ExpressionMenuRow {
-    let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
+    let onGetExpressions = (getPath: () => Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => {
       let type = definition.type;
       if (type instanceof FmtHLM.MetaRefExpression_ExplicitOperator
           || type instanceof FmtHLM.MetaRefExpression_ImplicitOperator
           || type instanceof FmtHLM.MetaRefExpression_MacroOperator
           || (allowConstructors && type instanceof FmtHLM.MetaRefExpression_Constructor && !(fromMRUList && definition.contents instanceof FmtHLM.ObjectContents_Constructor && definition.contents.rewrite))) {
-        return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, true, HLMExpressionType.ElementTerm);
+        return this.getDefinitionRefExpressions(expressionEditInfo, getPath(), outerDefinition, definition, true, HLMExpressionType.ElementTerm);
       } else {
         return undefined;
       }
@@ -418,10 +418,10 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private getFormulaDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, onRenderFormula: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+    let onGetExpressions = (getPath: () => Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
       let type = definition.type;
       if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
-        return this.getDefinitionRefExpressions(expressionEditInfo, path, outerDefinition, definition, false, HLMExpressionType.Formula)
+        return this.getDefinitionRefExpressions(expressionEditInfo, getPath(), outerDefinition, definition, false, HLMExpressionType.Formula)
           .then(addNegations);
       } else {
         return undefined;
@@ -617,9 +617,8 @@ export class HLMEditHandler extends GenericEditHandler {
       for (let indexParameterList of variableInfo.indexParameterLists) {
         let index: Fmt.Index = {
           parameters: indexParameterList,
-          arguments: new Fmt.ArgumentList
+          arguments: this.utils.getPlaceholderArguments(indexParameterList)
         };
-        this.utils.fillPlaceholderArguments(indexParameterList, index.arguments!);
         expression = new Fmt.IndexedExpression(expression, index);
       }
     }
@@ -702,12 +701,11 @@ export class HLMEditHandler extends GenericEditHandler {
         } else {
           this.utils.addTargetPathSubstitution(parentPath, substitutionContext);
         }
-        let resultPath = new Fmt.Path(path.name);
-        this.utils.fillPlaceholderArguments(definition.parameters, resultPath.arguments, substitutionContext);
-        resultPath.parentPath = parentPath;
+        let args = this.utils.getPlaceholderArguments(definition.parameters, substitutionContext);
         if (notationAlternative) {
-          this.utils.reorderArguments(resultPath.arguments, notationAlternative);
+          this.utils.reorderArguments(args, notationAlternative);
         }
+        let resultPath = new Fmt.Path(path.name, args, parentPath);
         let pathWithArgumentsResult = this.getPathWithArgumentsResult(resultPath, checkResultPath, definition, preFillExpression, preFillExpressionType, requirePreFilling);
         if (pathWithArgumentsResult) {
           result.push(pathWithArgumentsResult);
@@ -851,21 +849,15 @@ export class HLMEditHandler extends GenericEditHandler {
 
   getConstructorInsertButton(definitions: Fmt.DefinitionList): Notation.RenderedExpression {
     let action = new Menu.DialogExpressionMenuAction(() => {
-      let dialog = new Dialog.InsertDialog;
-      dialog.libraryDataProvider = this.libraryDataProvider;
       let definitionType: Logic.LogicDefinitionTypeDescription = {
         definitionType: Logic.LogicDefinitionType.Constructor,
         name: 'Constructor',
         createTypeExpression: () => new FmtHLM.MetaRefExpression_Constructor,
         createObjectContents: () => new FmtHLM.ObjectContents_Constructor
       };
-      dialog.definitionType = definitionType;
-      dialog.onCheckNameInUse = (name: string) => definitions.some((definition: Fmt.Definition) => (definition.name === name));
-      dialog.onOK = (result: Dialog.DialogResultBase) => {
-        let insertResult = result as Dialog.InsertDialogResult;
-        definitions.push(Logic.createDefinition(definitionType, insertResult.name));
-      };
-      return dialog;
+      let onCheckNameInUse = (name: string) => definitions.some((definition: Fmt.Definition) => (definition.name === name));
+      let onOK = (result: Dialog.InsertDialogResult) => definitions.push(Logic.createDefinition(definitionType, result.name));
+      return new Dialog.InsertDialog(this.libraryDataProvider, definitionType, onCheckNameInUse, undefined, onOK);
     });
     return this.getActionInsertButton(action);
   }
@@ -1002,10 +994,10 @@ export class HLMEditHandler extends GenericEditHandler {
             .catch(() => undefined);
         });
       };
-      let onGetExpressions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
+      let onGetExpressions = (getPath: () => Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition) => {
         let type = definition.type;
         if (type instanceof FmtHLM.MetaRefExpression_Predicate) {
-          return this.getValidDefinitionRefExpressions(path, outerDefinition, definition, context!, checkResultPath, firstObjectExpression, objectExpressionType, true)
+          return this.getValidDefinitionRefExpressions(getPath(), outerDefinition, definition, context!, checkResultPath, firstObjectExpression, objectExpressionType, true)
             .then(addNegations);
         } else {
           return undefined;
@@ -1139,18 +1131,18 @@ export class HLMEditHandler extends GenericEditHandler {
     return this.getImmediateInsertButton(onInsert);
   }
 
-  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onApply: () => void, onRenderTrivialProof: Logic.RenderFn, onRenderProofStep: RenderParameterFn, onRenderFormula: RenderExpressionFn): Notation.RenderedExpression {
+  getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, onApply: () => void, onRenderTrivialProof: Logic.RenderFn, onRenderProofStep: RenderParameterFn, onRenderFormula: RenderExpressionFn, onRenderArgumentList: RenderArgumentsFn): Notation.RenderedExpression {
     return this.createConditionalElement((checkResult: HLMCheckResult) => {
       let context = checkResult.incompleteProofs.get(proof.steps);
       if (context) {
-        return this.getProofStepInsertButton(proof, context, onApply, onRenderProofStep, onRenderFormula);
+        return this.getProofStepInsertButton(proof, context, onApply, onRenderProofStep, onRenderFormula, onRenderArgumentList);
       } else {
         return onRenderTrivialProof();
       }
     });
   }
 
-  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext, onApply: () => void, onRenderProofStep: RenderParameterFn, onRenderFormula: RenderExpressionFn): Notation.RenderedExpression {
+  getProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext, onApply: () => void, onRenderProofStep: RenderParameterFn, onRenderFormula: RenderExpressionFn, onRenderArgumentList: RenderArgumentsFn): Notation.RenderedExpression {
     let autoOpen = (proof === HLMEditHandler.lastInsertedProof);
     return this.getMenuInsertButton(() => {
       let rows: Menu.ExpressionMenuRow[] = [];
@@ -1256,7 +1248,7 @@ export class HLMEditHandler extends GenericEditHandler {
         );
       }
 
-      rows.push(this.getUseTheoremRow());
+      rows.push(this.getUseTheoremRow(context, onInsertProofStep, onRenderProofStep, onRenderArgumentList));
 
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     }, true, autoOpen);
@@ -1308,6 +1300,7 @@ export class HLMEditHandler extends GenericEditHandler {
           && this.definition.parameters.indexOf(variableRefExpression.variable) >= 0
           && this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem
           && this.definition.contents.proofs
+          // TODO allow nested induction
           && this.definition.contents.proofs.indexOf(proof) >= 0
           && context.goal
           && FmtUtils.containsSubExpression(context.goal, (subExpression: Fmt.Expression) => subExpression.isEquivalentTo(variableRefExpression))) {
@@ -1409,8 +1402,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createUseForAllStep(previousResult: FmtHLM.MetaRefExpression_forall, context: HLMCheckerProofStepContext): ProofStepInfo {
-    let args = new Fmt.ArgumentList;
-    this.utils.fillPlaceholderArguments(previousResult.parameters, args);
+    let args = this.utils.getPlaceholderArguments(previousResult.parameters);
     let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_UseForAll(args), '_');
     return {step: step};
   }
@@ -1588,8 +1580,7 @@ export class HLMEditHandler extends GenericEditHandler {
   }
 
   private createProveExistsStep(goal: FmtHLM.MetaRefExpression_exists, context: HLMCheckerProofStepContext): ProofStepInfo {
-    let args = new Fmt.ArgumentList;
-    this.utils.fillPlaceholderArguments(goal.parameters, args);
+    let args = this.utils.getPlaceholderArguments(goal.parameters);
     let step = this.utils.createParameter(new FmtHLM.MetaRefExpression_ProveExists(args), '_');
     return {step: step};
   }
@@ -1896,11 +1887,57 @@ export class HLMEditHandler extends GenericEditHandler {
     return defineVariableRow;
   }
 
-  private getUseTheoremRow(): Menu.ExpressionMenuRow {
+  private getUseTheoremRow(context: HLMCheckerProofStepContext, onInsertProofStep: InsertParameterFn, onRenderProofStep: RenderParameterFn, onRenderArgumentList: RenderArgumentsFn): Menu.ExpressionMenuRow {
     let useTheoremRow = new Menu.StandardExpressionMenuRow('Use theorem');
+    useTheoremRow.titleAction = new Menu.DialogExpressionMenuAction(() => {
+      let treeItem = new Dialog.ExpressionDialogTreeItem(this.libraryDataProvider.getRootProvider(), this.templates);
+      treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) =>
+        CachedPromise.resolve(libraryDefinition.definition.contents instanceof FmtHLM.ObjectContents_Theorem);
+      let currentPath: Fmt.Path | undefined = undefined;
+      let argumentsItem = new Dialog.ExpressionDialogExpressionItem(new Notation.EmptyExpression);
+      /*let resultSelectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>();
+      resultSelectionItem.items = [];
+      resultSelectionItem.onRenderItem = onRenderExpression;*/
+      treeItem.onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise?: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => {
+        let absolutePath = libraryDataProvider.getAbsolutePath(path);
+        treeItem.selectedItemPath = absolutePath;
+        treeItem.changed();
+        if (!libraryDefinitionPromise) {
+          libraryDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path), false);
+        }
+        libraryDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
+          let definition = libraryDefinition.definition;
+          currentPath = this.libraryDataProvider.getRelativePath(absolutePath);
+          currentPath.arguments = this.utils.getPlaceholderArguments(definition.parameters);
+          argumentsItem.expression = onRenderArgumentList(definition.parameters, currentPath.arguments);
+          argumentsItem.changed();
+          /*let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition, false);
+          if (expressionsPromise) {
+            expressionsPromise.then((expressions: Fmt.Expression[]) => {
+              selectionItem.items = expressions;
+              selectionItem.selectedItem = expressions.length ? expressions[0] : undefined;
+              selectionItem.changed();
+            });
+          }*/
+        });
+      };
+      let dummyPath = new Fmt.Path('');
+      treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
+      let items = [
+        treeItem,
+        argumentsItem
+        //resultSelectionItem
+      ];
+      let onOK = () => {
+/*        if (selectionItem.selectedItem) {
+          this.setValueAndAddToMRU(selectionItem.selectedItem, expressionEditInfo);
+        }*/
+      };
+      let dialog = new Dialog.ExpressionDialog(items, onOK);
+      //dialog.onCheckOKEnabled = () => (resultSelectionItem.selectedItem !== undefined);
+      return dialog;
+    });
     useTheoremRow.iconType = Logic.LogicDefinitionType.Theorem;
-    // TODO
-    useTheoremRow.titleAction = this.getNotImplementedAction();
     return useTheoremRow;
   }
 
@@ -1958,11 +1995,8 @@ export class HLMEditHandler extends GenericEditHandler {
 
   private getNotImplementedAction(): Menu.ExpressionMenuAction {
     return new Menu.DialogExpressionMenuAction(() => {
-      let infoItem = new Dialog.ExpressionDialogInfoItem;
-      infoItem.info = new Notation.TextExpression('Not implemented yet');
-      let dialog = new Dialog.ExpressionDialog;
-      dialog.items = [infoItem];
-      return dialog;
+      let infoItem = new Dialog.ExpressionDialogInfoItem(new Notation.TextExpression('Not implemented yet'));
+      return new Dialog.ExpressionDialog([infoItem]);
     });
   }
 

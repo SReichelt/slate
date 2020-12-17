@@ -139,7 +139,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         space = ' ';
       }
       let introText: Notation.RenderedExpression | undefined = undefined;
-      if (contents instanceof FmtHLM.ObjectContents_StandardTheorem || contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+      if (contents instanceof FmtHLM.ObjectContents_Theorem) {
         if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
           introText = this.renderEquivalenceTheoremIntro(hasParameters);
         } else {
@@ -209,7 +209,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   renderDefinitionSummary(innerDefinition?: Fmt.Definition, multiLine: boolean = false): Notation.RenderedExpression | undefined {
     let definition = innerDefinition || this.definition;
     let contents = definition.contents;
-    if (contents instanceof FmtHLM.ObjectContents_StandardTheorem || contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
+    if (contents instanceof FmtHLM.ObjectContents_Theorem) {
       let claim: Notation.RenderedExpression | undefined = undefined;
       if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
         let formulaSelection: FormulaSelection = {
@@ -307,7 +307,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let row: Notation.RenderedExpression[] = [new Notation.TextExpression(text + ' '), title, new Notation.TextExpression('.')];
         if (this.editHandler) {
           let typeLabel = new Notation.TextExpression(typeLabelText);
-          if (this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
+          if (this.definition.contents instanceof FmtHLM.ObjectContents_Theorem || this.definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
             let semanticLink = new Notation.SemanticLink(typeLabel, false, false);
             let onRenderType = (type: string | undefined) => {
               let renderedType = new Notation.TextExpression(this.getDefinitionTypeLabel(type));
@@ -334,7 +334,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (type) {
       return type.charAt(0).toUpperCase() + type.slice(1);
     } else {
-      return this.definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || this.definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem ? 'Proposition' : 'Definition';
+      return this.definition.contents instanceof FmtHLM.ObjectContents_Theorem ? 'Proposition' : 'Definition';
     }
   }
 
@@ -3347,10 +3347,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): Notation.RenderedExpression {
-    let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : this.getTrivialProofPlaceholder());
+    let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
     let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
     let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
-    return this.editHandler!.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula);
+    let onRenderArgumentList = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList) => this.renderArgumentList(parameterList, argumentList, undefined, ArgumentListStyle.Definitions);
+    return this.editHandler!.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula, onRenderArgumentList);
   }
 
   private addConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): boolean {

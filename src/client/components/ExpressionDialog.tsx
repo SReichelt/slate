@@ -132,6 +132,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
 
   render(): React.ReactNode {
     let className = 'dialog-row';
+    let cellClassName = 'dialog-cell';
     if (this.props.separated) {
       className += ' separated';
     }
@@ -144,23 +145,31 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
     if (!this.props.item.visible) {
       return (
         <tr className={className}>
-          <td className={'dialog-cell'} colSpan={2}/>
+          <td className={cellClassName} colSpan={2}/>
         </tr>
       );
     }
-    if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
+    if (this.props.item instanceof Dialog.ExpressionDialogExpressionItem) {
+      let groupClassName: string | undefined = undefined;
+      if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
+        cellClassName += ' dialog-info-cell';
+      } else {
+        groupClassName = 'dialog-group';
+      }
       return (
         <tr className={className}>
-          <td className={'dialog-cell dialog-info-cell'} colSpan={2}>
-            <Expression expression={this.props.item.info}/>
+          <td className={cellClassName} colSpan={2}>
+            <div className={groupClassName}>
+              <Expression expression={this.props.item.expression} interactionHandler={this.props.interactionHandler}/>
+            </div>
           </td>
         </tr>
       );
     } else if (this.props.item instanceof Dialog.ExpressionDialogLinkItem) {
       return (
         <tr className={className}>
-          <td className={'dialog-cell'} colSpan={2}>
-            <a href={this.props.item.getURL()} target={'_blank'}>{this.props.item.title}</a>
+          <td className={cellClassName} colSpan={2}>
+            <a href={this.props.item.onGetURL()} target={'_blank'}>{this.props.item.title}</a>
           </td>
         </tr>
       );
@@ -170,17 +179,24 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
         title = <Expression expression={title} key="title"/>;
       }
       title = [title, ':'];
-      if (this.props.item.info && this.titleNode) {
-        let info = this.props.item.info;
-        let getToolTipContents = () => <Expression expression={info}/>;
+      if (this.props.item.onGetInfo && this.titleNode) {
+        let onGetInfo = this.props.item.onGetInfo;
+        let getToolTipContents = () => {
+          let info = onGetInfo();
+          if (info) {
+            return <Expression expression={info}/>;
+          } else {
+            return null;
+          }
+        };
         title = [title, <ExpressionToolTip active={this.state.titleHovered} position="top" parent={this.titleNode} getContents={getToolTipContents} delay={100} key="tooltip"/>];
       }
       return (
         <tr className={className}>
-          <th className={'dialog-cell dialog-param-title-cell'} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
+          <th className={cellClassName + ' dialog-param-title-cell'} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
             {title}
           </th>
-          <td className={'dialog-cell'} key="value">
+          <td className={cellClassName} key="value">
             <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>
           </td>
         </tr>
@@ -245,7 +261,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
       }
       return (
         <tr className={className}>
-          <td className={'dialog-cell'} colSpan={2}>
+          <td className={cellClassName} colSpan={2}>
             {contents}
           </td>
         </tr>
@@ -253,7 +269,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
     } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
       return (
         <tr className={className}>
-          <td className={'dialog-cell'} colSpan={2}>
+          <td className={cellClassName} colSpan={2}>
             <div className={'dialog-group'}>
               <LibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked} autoFocusSearchInput={true}/>
             </div>

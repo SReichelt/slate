@@ -28,7 +28,9 @@ export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
 export type RenderExpressionsFn = (expressions: Fmt.Expression[]) => Notation.RenderedExpression;
 
-export type GetExpressionsFn = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => CachedPromise<Fmt.Expression[]> | undefined;
+export type RenderArgumentsFn = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList) => Notation.RenderedExpression;
+
+export type GetExpressionsFn = (getPath: () => Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
   static lastInsertedParameter?: Fmt.Parameter;
@@ -351,14 +353,11 @@ export abstract class GenericEditHandler {
       this.addDocumentation(template.documentation, undefined, paragraphs);
       title = new Notation.ParagraphExpression(paragraphs);
     }
-    let titleItem = new Dialog.ExpressionDialogInfoItem;
-    titleItem.info = title;
-    let dialog = new Dialog.ExpressionDialog;
-    dialog.styleClasses = ['wide'];
-    dialog.items = [
-      titleItem,
+    let dialog = new Dialog.ExpressionDialog([
+      new Dialog.ExpressionDialogInfoItem(title),
       new Dialog.ExpressionDialogSeparatorItem
-    ];
+    ]);
+    dialog.styleClasses = ['wide'];
     let newNotation: Fmt.DefinitionRefExpression;
     if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath && notation.path.name === template.name) {
       newNotation = notation.clone() as Fmt.DefinitionRefExpression;
@@ -372,9 +371,8 @@ export abstract class GenericEditHandler {
     let previewItem = this.createTemplateDialogPreviewItem(newNotation, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
     let messageItem: Dialog.ExpressionDialogInfoItem | undefined = undefined;
     if (isTopLevel) {
-      messageItem = new Dialog.ExpressionDialogInfoItem;
+      messageItem = new Dialog.ExpressionDialogInfoItem(new Notation.EmptyExpression);
       messageItem.visible = false;
-      messageItem.info = new Notation.EmptyExpression;
     }
     let requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
     previewItem.visible = requiredArgumentsFilled;
@@ -385,11 +383,10 @@ export abstract class GenericEditHandler {
     let paramIndex = 0;
     let previousParamNames: string[] = [];
     for (let param of template.parameters) {
-      let paramItem = new Dialog.ExpressionDialogParameterItem;
-      paramItem.title = new Notation.TextExpression(param.name);
-      paramItem.title.styleClasses = ['source-code'];
+      let paramTitle = new Notation.TextExpression(param.name);
+      paramTitle.styleClasses = ['source-code'];
       let localPreviousParamNames = previousParamNames.slice();
-      paramItem.onGetValue = () => {
+      let onGetValue = () => {
         let value = newNotation.path.arguments.getOptionalValue(param.name, paramIndex);
         let onUpdateParamNotation = () => {
           requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
@@ -407,7 +404,8 @@ export abstract class GenericEditHandler {
         let canRemove = param.optional && value !== undefined;
         return this.renderArgumentValue(value, param.type, param.defaultValue, onSetParamNotation, onUpdateParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
       };
-      paramItem.info = this.getDocumentation(template, param);
+      let paramItem = new Dialog.ExpressionDialogParameterItem(paramTitle, onGetValue);
+      paramItem.onGetInfo = () => this.getDocumentation(template, param);
       dialog.items.push(paramItem);
       previousParamNames.push(param.name);
       paramIndex++;
@@ -554,10 +552,9 @@ export abstract class GenericEditHandler {
 
   private createTemplateDialogPreviewItem(notation: Fmt.Expression, includeNegation: boolean, renderedTemplateArguments: RenderedTemplateArguments, renderer: GenericRenderer): Dialog.ExpressionDialogListItem<number | undefined> {
     // TODO add preview in different contexts, to validate parentheses
-    let listItem = new Dialog.ExpressionDialogListItem<number | undefined>();
-    listItem.items = includeNegation ? [0, 1] : [undefined];
-    listItem.onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notation, renderedTemplateArguments, 0, negationCount);
-    return listItem;
+    let items = includeNegation ? [0, 1] : [undefined];
+    let onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notation, renderedTemplateArguments, 0, negationCount);
+    return new Dialog.ExpressionDialogListItem<number | undefined>(items, onRenderItem);
   }
 
   private checkReferencedParameters(notation: Fmt.Expression, variables: RenderedVariable[], messageItem: Dialog.ExpressionDialogInfoItem): boolean {
@@ -579,7 +576,7 @@ export abstract class GenericEditHandler {
     } else if (autoVariables.length) {
       this.setMessageItem(autoVariables, 'will be inferred automatically if possible', messageItem);
     } else {
-      messageItem.info = new Notation.EmptyExpression;
+      messageItem.expression = new Notation.EmptyExpression;
       messageItem.visible = false;
     }
     return true;
@@ -604,7 +601,7 @@ export abstract class GenericEditHandler {
         variable.notation
       );
     }
-    messageItem.info = new Notation.RowExpression(row);
+    messageItem.expression = new Notation.RowExpression(row);
     messageItem.visible = true;
   }
 
@@ -643,8 +640,7 @@ export abstract class GenericEditHandler {
 
   private getNegationDialog(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
     let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
-    let dialog = new Dialog.ExpressionDialog;
-    dialog.items = [];
+    let items: Dialog.ExpressionDialogItem[] = [];
     let newNotation: FmtNotation.MetaRefExpression_neg;
     if (notation instanceof FmtNotation.MetaRefExpression_neg) {
       newNotation = notation.clone() as FmtNotation.MetaRefExpression_neg;
@@ -656,8 +652,7 @@ export abstract class GenericEditHandler {
       }
     }
     for (let index = 0; index <= 1; index++) {
-      let paramItem = new Dialog.ExpressionDialogParameterItem;
-      paramItem.title = index ? 'Negated' : 'Regular';
+      let paramTitle = index ? 'Negated' : 'Regular';
       let onSetItem = (newItem: Fmt.Expression | undefined) => {
         if (newItem) {
           if (newNotation.items.length <= index) {
@@ -669,14 +664,14 @@ export abstract class GenericEditHandler {
           }
         }
       };
-      paramItem.onGetValue = () => {
+      let onGetValue = () => {
         let regular = newNotation.items.length > index ? newNotation.items[index] : undefined;
         return this.renderArgumentValue(regular, type, undefined, onSetItem, () => {}, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
       };
-      dialog.items.push(paramItem);
+      items.push(new Dialog.ExpressionDialogParameterItem(paramTitle, onGetValue));
     }
-    dialog.onOK = () => onSetNotation(newNotation);
-    return dialog;
+    let onOK = () => onSetNotation(newNotation);
+    return new Dialog.ExpressionDialog(items, onOK);
   }
 
   private getRenderedTemplateArguments(variables: RenderedVariable[]): RenderedTemplateArguments {
@@ -716,32 +711,28 @@ export abstract class GenericEditHandler {
 
     let definitionRow = new Menu.StandardExpressionMenuRow('Definition');
     definitionRow.titleAction = new Menu.DialogExpressionMenuAction(() => {
-      let treeItem = new Dialog.ExpressionDialogTreeItem;
-      treeItem.libraryDataProvider = this.libraryDataProvider.getRootProvider();
-      treeItem.templates = this.templates;
+      let treeItem = new Dialog.ExpressionDialogTreeItem(this.libraryDataProvider.getRootProvider(), this.templates);
       treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => {
-        let relativePath = this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
-        let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition, false);
+        let getPath = () => this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
+        let expressionsPromise = onGetExpressions(getPath, libraryDefinition.definition, definition, false);
         if (expressionsPromise) {
           return expressionsPromise.then((expressions: Fmt.Expression[]) => expressions.length > 0);
         } else {
           return CachedPromise.resolve(false);
         }
       };
-      let selectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>();
-      selectionItem.items = [];
-      selectionItem.onRenderItem = onRenderExpression;
+      let selectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>([], onRenderExpression);
       treeItem.onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise?: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => {
         let absolutePath = libraryDataProvider.getAbsolutePath(path);
-        let relativePath = this.libraryDataProvider.getRelativePath(absolutePath);
         treeItem.selectedItemPath = absolutePath;
         treeItem.changed();
         if (!libraryDefinitionPromise) {
           libraryDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path), false);
         }
         libraryDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
+          let getPath = () => this.libraryDataProvider.getRelativePath(absolutePath);
           let definition = FmtUtils.getInnerDefinition(libraryDefinition.definition, path);
-          let expressionsPromise = onGetExpressions(relativePath, libraryDefinition.definition, definition, false);
+          let expressionsPromise = onGetExpressions(getPath, libraryDefinition.definition, definition, false);
           if (expressionsPromise) {
             expressionsPromise.then((expressions: Fmt.Expression[]) => {
               selectionItem.items = expressions;
@@ -757,16 +748,16 @@ export abstract class GenericEditHandler {
         let dummyPath = new Fmt.Path('');
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
       }
-      let dialog = new Dialog.ExpressionDialog;
-      dialog.items = [
+      let items = [
         treeItem,
         selectionItem
       ];
-      dialog.onOK = () => {
+      let onOK = () => {
         if (selectionItem.selectedItem) {
           this.setValueAndAddToMRU(selectionItem.selectedItem, expressionEditInfo);
         }
       };
+      let dialog = new Dialog.ExpressionDialog(items, onOK);
       dialog.onCheckOKEnabled = () => (selectionItem.selectedItem !== undefined);
       return dialog;
     });
@@ -783,7 +774,7 @@ export abstract class GenericEditHandler {
   private getMRURows(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): CachedPromise<Menu.ExpressionMenuRow[]> {
     let iterator = this.mruList.iterator(this.libraryDataProvider);
     let addAllDefinitions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, rows: Menu.ExpressionMenuRow[]) => {
-      let result = onGetExpressions(path, outerDefinition, definition, true) || CachedPromise.resolve([]);
+      let result = onGetExpressions(() => path, outerDefinition, definition, true) || CachedPromise.resolve([]);
       return result.then((expressions: Fmt.Expression[]): void | CachedPromise<void> => {
         if (expressions.length) {
           let items = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));

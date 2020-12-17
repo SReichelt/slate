@@ -28,14 +28,14 @@ class NumberMacroInstance implements HLMMacro.HLMMacroInstance {
   }
 
   invoke(utils: HLMUtils, expression: Fmt.DefinitionRefExpression): NumberMacroInvocation {
-    let value = expression.path.arguments.getValue(this.valueParam.name) as Fmt.IntegerExpression;
+    let value = expression.path.arguments.getValue(this.valueParam.name);
     let naturalNumbersRef = utils.substitutePath(this.naturalNumbers, expression.path, [this.definition]) as Fmt.DefinitionRefExpression;
-    return new NumberMacroInvocation(utils, expression, this.valueParam, value.value, naturalNumbersRef);
+    return new NumberMacroInvocation(utils, expression, this.valueParam, value, naturalNumbersRef);
   }
 }
 
 class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
-  constructor(private utils: HLMUtils, public expression: Fmt.DefinitionRefExpression, private valueParam: Fmt.Parameter, private value: Fmt.BN, private naturalNumbersRef: Fmt.DefinitionRefExpression) {}
+  constructor(private utils: HLMUtils, public expression: Fmt.DefinitionRefExpression, private valueParam: Fmt.Parameter, private value: Fmt.Expression, private naturalNumbersRef: Fmt.DefinitionRefExpression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
     let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
@@ -49,15 +49,15 @@ class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
 
   unfold(): CachedPromise<Fmt.Expression[]> {
     return this.utils.getDefinition(this.naturalNumbersRef.path).then((definition: Fmt.Definition) => {
-      if (definition.innerDefinitions.length === 2 && definition.innerDefinitions[0].parameters.length === 0 && definition.innerDefinitions[1].parameters.length === 1) {
+      if (this.value instanceof Fmt.IntegerExpression && definition.innerDefinitions.length === 2 && definition.innerDefinitions[0].parameters.length === 0 && definition.innerDefinitions[1].parameters.length === 1) {
         let name: string;
         let args = new Fmt.ArgumentList;
-        if (this.value.isZero()) {
+        if (this.value.value.isZero()) {
           name = definition.innerDefinitions[0].name;
         } else {
           let predecessor = this.expression.clone() as Fmt.DefinitionRefExpression;
-          let predecessorValue = predecessor.path.arguments.getValue(this.valueParam.name) as Fmt.IntegerExpression;
-          predecessorValue.value = this.value.subn(1);
+          let predecessorValueExpression = predecessor.path.arguments.getValue(this.valueParam.name) as Fmt.IntegerExpression;
+          predecessorValueExpression.value = this.value.value.subn(1);
           name = definition.innerDefinitions[1].name;
           args.push(new Fmt.Argument(definition.innerDefinitions[1].parameters[0].name, predecessor));
         }
