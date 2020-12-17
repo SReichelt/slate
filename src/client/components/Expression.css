@@ -751,7 +751,6 @@ div.display-math {
   border-radius: 2px;
   border-collapse: initial;
   border-spacing: 0;
-  overflow: hidden;
 }
 
 .menu.hidden {
@@ -820,6 +819,10 @@ div.display-math {
 
 .menu.pressed>.menu-row>.menu-placeholder-cell:hover {
   background-color: var(--expression-pressed-background-color);
+}
+
+.expr.definition>.menu {
+  overflow: hidden;
 }
 
 .expr.definition>.menu.hover>.menu-row>.menu-placeholder-cell, .expr.definition>.menu.hover>.menu-row>.menu-dropdown-cell {
