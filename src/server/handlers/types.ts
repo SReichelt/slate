@@ -9,7 +9,7 @@ export interface Request extends Readable {
 }
 
 export interface Query {
-  [param: string]: string;
+  [param: string]: string | undefined;
 }
 
 export interface Response {
