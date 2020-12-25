@@ -7,6 +7,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 const RemarkableReactRenderer = require('remarkable-react').default;
 const Remarkable = require('remarkable').Remarkable;
 const linkify = require('remarkable/linkify').linkify;
+const unicodeit = require('unicodeit');
 
 import './Expression.css';
 
@@ -290,6 +291,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.TextExpression) {
       if (this.props.interactionHandler && expression.onTextChanged) {
         let onChange = (newText: string) => {
+          newText = unicodeit.replace(newText);
           expression.text = newText;
           this.setState({inputError: false});
           this.forceUpdate();
@@ -320,7 +322,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           inputClassName += ' input-error';
         }
         let text = expression.text;
-        if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
+        let latexInput = text.startsWith('\\');
+        if (latexInput) {
+          inputClassName += ' input-latex';
+        } if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
           inputClassName += ' italic';
         }
         let size = expression.inputLength ?? text.length + 1;
@@ -1246,7 +1251,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private isDirectlyHighlighted(): boolean {
-    return (this.state.hovered && this.hoveredChildren.indexOf(this) >= 0) || this.permanentlyHighlighted || this.state.openMenu !== undefined;
+    return false;
+    // return (this.state.hovered && this.hoveredChildren.indexOf(this) >= 0) || this.permanentlyHighlighted || this.state.openMenu !== undefined;
   }
 
   private linkClicked(semanticLink: Notation.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {

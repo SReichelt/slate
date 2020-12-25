@@ -57,6 +57,7 @@
     "remarkable-react": "^1.4.3",
     "scroll-into-view-if-needed": "^2.2.26",
     "tslib": "^2.0.3",
+    "unicodeit": "^0.7.0",
     "utf8": "^3.0.0"
   },
   "devDependencies": {

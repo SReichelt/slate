@@ -875,6 +875,10 @@ div.display-math {
   background-color: var(--input-error-background-color);
 }
 
+.expr-input.input-latex {
+  font-family: var(--source-code-font-family);
+}
+
 .expr-textarea {
   width: 100%;
 	min-height: 4em;
