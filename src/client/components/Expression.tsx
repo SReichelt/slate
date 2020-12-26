@@ -21,6 +21,7 @@ import { PromiseHelper, renderPromise } from './PromiseHelper';
 import config from '../utils/config';
 import { eventHandled } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
+import { getLatexInputSuggestions } from '../utils/latexInput';
 
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
@@ -83,6 +84,7 @@ export interface ExpressionState {
   showToolTip: boolean;
   clicking: boolean;
   inputError: boolean;
+  inputFocused: boolean;
   unfolded?: boolean;
   openMenu?: Menu.ExpressionMenu;
   openDialog?: Dialog.DialogBase;
@@ -108,7 +110,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       hovered: false,
       showToolTip: false,
       clicking: false,
-      inputError: false
+      inputError: false,
+      inputFocused: false
     };
 
     this.updateOptionalProps(props);
@@ -290,6 +293,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
     } else if (expression instanceof Notation.TextExpression) {
       if (this.props.interactionHandler && expression.onTextChanged) {
+        let text = expression.text;
+        let latexInput = text.startsWith('\\');
         let onChange = (newText: string) => {
           newText = unicodeit.replace(newText);
           expression.text = newText;
@@ -321,8 +326,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (this.state.inputError) {
           inputClassName += ' input-error';
         }
-        let text = expression.text;
-        let latexInput = text.startsWith('\\');
         if (latexInput) {
           inputClassName += ' input-latex';
         } if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
@@ -330,7 +333,54 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         let size = expression.inputLength ?? text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
-        result = <input type={'text'} className={inputClassName} value={text} style={style} onChange={(event) => onChange(event.target.value)} onMouseDown={(event) => event.stopPropagation()} onMouseUp={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()} onFocus={() => this.highlightPermanently()} onBlur={() => this.clearPermanentHighlight()} ref={ref} autoFocus={expression.requestTextInput} key="input"/>;
+        let menu: JSX.Element | undefined = undefined;
+        if (latexInput && this.state.inputFocused) {
+          let rows = getLatexInputSuggestions(text).map(suggestion => {
+            let action = new Menu.ImmediateExpressionMenuAction(() => {
+              onChange(suggestion.unicodeCharacters);
+            });
+            let item = new Menu.ExpressionMenuItem(new Notation.TextExpression(suggestion.unicodeCharacters), action);
+            let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
+            row.subMenu = item;
+            return row;
+          });
+          if (rows.length > 0) {
+            let expressionMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
+            menu = <ExpressionMenu menu={expressionMenu} onItemClicked={this.onMenuItemClicked} />;
+          }
+        }
+        let onFocus = () => {
+          this.highlightPermanently();
+          this.setState({ inputFocused: true });
+        };
+        let onBlur = () => {
+          this.clearPermanentHighlight();
+          this.setState({ inputFocused: false });
+        };
+        result = (
+          <span className={'menu-container'} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
+            <span>
+              <input
+                key="input"
+                type={'text'}
+                className={inputClassName}
+                value={text}
+                style={style}
+                onChange={(event) => onChange(event.target.value)}
+                onMouseDown={(event) => event.stopPropagation()}
+                onMouseUp={(event) => event.stopPropagation()}
+                onTouchStart={(event) => event.stopPropagation()}
+                onTouchCancel={(event) => event.stopPropagation()}
+                onTouchEnd={(event) => event.stopPropagation()}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                ref={ref}
+                autoFocus={expression.requestTextInput}
+              />
+            </span>
+            {menu}
+          </span>
+        );
         isInputControl = true;
       } else {
         let text = expression.text;

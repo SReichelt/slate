@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+export function eventHandledNoBlur(event: React.SyntheticEvent<HTMLElement>): void {
+  event.stopPropagation();
+  event.preventDefault();
+}
 
 export function eventHandled(event: React.SyntheticEvent<HTMLElement>): void {
   event.stopPropagation();
