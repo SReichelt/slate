@@ -21,7 +21,7 @@ import { PromiseHelper, renderPromise } from './PromiseHelper';
 import config from '../utils/config';
 import { eventHandled } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
-import { getLatexInputSuggestions } from '../utils/latexInput';
+import { getLatexInputSuggestions, replaceLatexCode, replaceLatexCodeIfUnambigous } from '../utils/latexInput';
 
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
@@ -267,8 +267,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (this.props.interactionHandler && expression.onTextChanged) {
         let text = expression.text;
         let latexInput = text.startsWith('\\');
-        let onChange = (newText: string) => {
-          newText = unicodeit.replace(newText);
+        let setText = (newText: string) => {
           expression.text = newText;
           this.setState({inputError: false});
           this.forceUpdate();
@@ -281,7 +280,30 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               this.setState({inputError: true});
             }
           }
+        };
+        let performLatexReplacement = () => {
+          let textAfterReplacement = replaceLatexCode(text);
+          if (textAfterReplacement !== text) {
+            setText(textAfterReplacement);
+          }
+        };
+        let onFocus = () => {
+          this.highlightPermanently();
+          this.setState({ inputFocused: true });
+        };
+        let onBlur = () => {
+          this.clearPermanentHighlight();
+          this.setState({ inputFocused: false });
+          performLatexReplacement();
+        };
+        let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+          setText(replaceLatexCodeIfUnambigous(event.target.value));
           this.triggerHighlightPermanently();
+        };
+        let onKeyDown = (event: React.KeyboardEvent) => {
+          if (event.key === 'Enter') {
+            performLatexReplacement();
+          }
         };
         let ref = undefined;
         if (expression.requestTextInput) {
@@ -309,7 +331,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         if (latexInput && this.state.inputFocused) {
           let rows = getLatexInputSuggestions(text).map(suggestion => {
             let action = new Menu.ImmediateExpressionMenuAction(() => {
-              onChange(suggestion.unicodeCharacters);
+              setText(suggestion.unicodeCharacters);
             });
             let item = new Menu.ExpressionMenuItem(new Notation.TextExpression(suggestion.unicodeCharacters), action);
             let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
@@ -321,14 +343,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             menu = <ExpressionMenu menu={expressionMenu} onItemClicked={this.onMenuItemClicked} />;
           }
         }
-        let onFocus = () => {
-          this.highlightPermanently();
-          this.setState({ inputFocused: true });
-        };
-        let onBlur = () => {
-          this.clearPermanentHighlight();
-          this.setState({ inputFocused: false });
-        };
         let input = (
           <input
             key="input"
@@ -336,7 +350,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             className={inputClassName}
             value={text}
             style={style}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={onChange}
             onMouseDown={(event) => event.stopPropagation()}
             onMouseUp={(event) => event.stopPropagation()}
             onTouchStart={(event) => event.stopPropagation()}
@@ -344,6 +358,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             onTouchEnd={(event) => event.stopPropagation()}
             onFocus={onFocus}
             onBlur={onBlur}
+            onKeyDown={onKeyDown}
             ref={ref}
             autoFocus={expression.requestTextInput}
           />
