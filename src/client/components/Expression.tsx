@@ -329,31 +329,31 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           this.clearPermanentHighlight();
           this.setState({ inputFocused: false });
         };
-        let menuContainer = (
+        let input = (
+          <input
+            key="input"
+            type={'text'}
+            className={inputClassName}
+            value={text}
+            style={style}
+            onChange={(event) => onChange(event.target.value)}
+            onMouseDown={(event) => event.stopPropagation()}
+            onMouseUp={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
+            onTouchCancel={(event) => event.stopPropagation()}
+            onTouchEnd={(event) => event.stopPropagation()}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            ref={ref}
+            autoFocus={expression.requestTextInput}
+          />
+        );
+        return (
           <span className={'menu-container'} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
-            <span>
-              <input
-                key="input"
-                type={'text'}
-                className={inputClassName}
-                value={text}
-                style={style}
-                onChange={(event) => onChange(event.target.value)}
-                onMouseDown={(event) => event.stopPropagation()}
-                onMouseUp={(event) => event.stopPropagation()}
-                onTouchStart={(event) => event.stopPropagation()}
-                onTouchCancel={(event) => event.stopPropagation()}
-                onTouchEnd={(event) => event.stopPropagation()}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                ref={ref}
-                autoFocus={expression.requestTextInput}
-              />
-            </span>
+            {this.wrapRenderedExpression(input, { className, semanticLinks, isInputControl: true })}
             {menu}
           </span>
         );
-        return this.wrapRenderedExpression(menuContainer, { className, semanticLinks, isInputControl: true });
       } else {
         let text = expression.text;
         if (text) {
