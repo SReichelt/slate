@@ -7,7 +7,6 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 const RemarkableReactRenderer = require('remarkable-react').default;
 const Remarkable = require('remarkable').Remarkable;
 const linkify = require('remarkable/linkify').linkify;
-const unicodeit = require('unicodeit');
 
 import './Expression.css';
 

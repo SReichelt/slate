@@ -23,9 +23,15 @@ export function replaceLatexCode(current: string): string {
 }
 
 export function replaceLatexCodeIfUnambigous(current: string): string {
-  if (allReplacements.some(({ latexCode }) => latexCode.startsWith(current) && latexCode !== current)) {
-    // unfinished and/or unambigous
-    return current;
+  let firstMatch: LatexInputReplacement | undefined = undefined;
+  for (let replacement of allReplacements) {
+    if (replacement.latexCode.startsWith(current)) {
+      if (firstMatch !== undefined) {
+        return current; // ambigous
+      } else {
+        firstMatch = replacement;
+      }
+    }
   }
-  return replaceLatexCode(current);
+  return firstMatch !== undefined ? firstMatch.unicodeCharacters : current;
 }
