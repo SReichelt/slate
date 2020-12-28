@@ -14,7 +14,7 @@
     "postinstall": "npm run build-deps && cd src/vscode && (mkdir ../../node_modules/.for-vscode || echo Will use existing node_modules.) && (ln -s ../../node_modules/.for-vscode node_modules || echo Will use existing or separate node_modules.) && cross-env NODE_ENV= npm install",
     "build-deps": "cd node_modules/react-portal-tooltip && npm install && npm run build",
     "clean": "rimraf build dist src/vscode/webview",
-    "lint": "tslint -c tslint.json 'src/**/*.ts' 'src/**/*.tsx'",
+    "lint": "eslint --no-eslintrc -c .eslintrc.json 'src/!(vscode)/**/*.@(ts|tsx)'",
     "test": "jest && src/scripts/checkLibrary.sh",
     "test-accept": "src/scripts/tidyLibrary.sh && jest --updateSnapshot && src/scripts/checkLibrary.sh",
     "build-server": "tsc -p src/server",
