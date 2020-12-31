@@ -1,4 +1,4 @@
-const { replacements } = require('unicodeit/ts_dist/js/data');
+import { replacements } from 'unicodeit/ts_dist/js/data';
 
 interface LatexInputReplacement {
   latexCode: string;
@@ -22,12 +22,12 @@ export function replaceLatexCode(current: string): string {
   return exactReplacement !== undefined ? exactReplacement.unicodeCharacters : current;
 }
 
-export function replaceLatexCodeIfUnambigous(current: string): string {
+export function replaceLatexCodeIfUnambiguous(current: string): string {
   let firstMatch: LatexInputReplacement | undefined = undefined;
   for (let replacement of allReplacements) {
     if (replacement.latexCode.startsWith(current)) {
       if (firstMatch !== undefined) {
-        return current; // ambigous
+        return current; // ambiguous
       } else {
         firstMatch = replacement;
       }

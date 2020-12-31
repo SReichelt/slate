@@ -4,6 +4,9 @@ import ReactMarkdownEditor from 'react-simplemde-editor';
 import * as EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// These currently lack TypeScript support.
+// TODO we may want to contribute type definitions ourselves
 const RemarkableReactRenderer = require('remarkable-react').default;
 const Remarkable = require('remarkable').Remarkable;
 const linkify = require('remarkable/linkify').linkify;
@@ -20,7 +23,7 @@ import { PromiseHelper, renderPromise } from './PromiseHelper';
 import config from '../utils/config';
 import { eventHandled } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
-import { getLatexInputSuggestions, replaceLatexCode, replaceLatexCodeIfUnambigous } from '../utils/latexInput';
+import { getLatexInputSuggestions, replaceLatexCode, replaceLatexCodeIfUnambiguous } from '../utils/latexInput';
 
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
@@ -296,7 +299,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           performLatexReplacement();
         };
         let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-          setText(replaceLatexCodeIfUnambigous(event.target.value));
+          setText(replaceLatexCodeIfUnambiguous(event.target.value));
           this.triggerHighlightPermanently();
         };
         let onKeyDown = (event: React.KeyboardEvent) => {
@@ -444,7 +447,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             </span>
           );
         });
-        return this.wrapRenderedExpression(<span className={className}>{rows}</span>, { semanticLinks, className });
+        return <span className={className}>{rows}</span>;
       } else {
         let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
           return (
@@ -453,10 +456,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             </li>
           );
         });
-        let listElement = expression.style === '1.'
+        return (expression.style === '1.'
           ? <ol className={className}>{items}</ol>
-          : <ul className={className}>{items}</ul>;
-        return this.wrapRenderedExpression(listElement, { semanticLinks, className });
+          : <ul className={className}>{items}</ul>);
       }
     } else if (expression instanceof Notation.TableExpression) {
       let colCount = 0;
@@ -1112,7 +1114,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (hasMenu || expression !== undefined) {
       return this.wrapRenderedExpressionWithMenuStuff(result, expression, semanticLinks, onMenuOpened, hasMenu, hasVisibleMenu, className, innerClassName);
     } else {
-      className += ' ' + innerClassName;
+      if (innerClassName) {
+        className += ' ' + innerClassName;
+      }
       if (this.state.hovered) {
         className += ' hover';
       }
@@ -1333,8 +1337,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private isDirectlyHighlighted(): boolean {
-    return false;
-    // return (this.state.hovered && this.hoveredChildren.indexOf(this) >= 0) || this.permanentlyHighlighted || this.state.openMenu !== undefined;
+    return (this.state.hovered && this.hoveredChildren.indexOf(this) >= 0) || this.permanentlyHighlighted || this.state.openMenu !== undefined;
   }
 
   private linkClicked(semanticLink: Notation.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {
