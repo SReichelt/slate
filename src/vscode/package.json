@@ -67,7 +67,8 @@
 		"clean": "rimraf out *.vsix",
 		"build": "npm run clean && webpack --mode production",
 		"watch": "tsc --watch -p ./",
-		"package": "vsce package -o slate.vsix"
+		"package": "vsce package -o slate.vsix",
+		"lint": "eslint --no-eslintrc -c .eslintrc.json '**/*.@(ts|tsx)'"
 	},
 	"engines": {
 		"vscode": "^1.52.0"
