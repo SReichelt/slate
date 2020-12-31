@@ -274,7 +274,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           this.setState({inputError: false});
           this.forceUpdate();
           if (expression.onTextChanged) {
-            if (expression.onTextChanged(newText)) {
+            if (!newText.startsWith('\\') && expression.onTextChanged(newText)) {
               if (this.props.interactionHandler) {
                 this.props.interactionHandler.expressionChanged();
               }
