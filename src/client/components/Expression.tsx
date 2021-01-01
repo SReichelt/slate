@@ -237,6 +237,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
+  // TODO use a library like clsx to build class names
   private renderExpression(expression: Notation.RenderedExpression, className: string, semanticLinks: Notation.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): React.ReactNode {
     if (expression.styleClasses) {
       for (let styleClass of expression.styleClasses) {
