@@ -324,7 +324,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         if (latexInput) {
           inputClassName += ' input-latex';
-        } if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
+        } else if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
           inputClassName += ' italic';
         }
         let size = expression.inputLength ?? text.length + 1;
