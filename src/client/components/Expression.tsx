@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import ReactMarkdownEditor from 'react-simplemde-editor';
@@ -237,13 +238,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
   }
 
-  // TODO use a library like clsx to build class names
   private renderExpression(expression: Notation.RenderedExpression, className: string, semanticLinks: Notation.SemanticLink[] | undefined, optionalParenLeft: boolean = false, optionalParenRight: boolean = false, optionalParenMaxLevel?: number, optionalParenStyle?: string): React.ReactNode {
-    if (expression.styleClasses) {
-      for (let styleClass of expression.styleClasses) {
-        className += ' ' + styleClass;
-      }
-    }
+    className = clsx(className, expression.styleClasses);
     if (!optionalParenStyle) {
       optionalParenStyle = expression.optionalParenStyle;
     }
@@ -319,15 +315,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             }
           };
         }
-        let inputClassName = 'expr-input';
-        if (this.state.inputError) {
-          inputClassName += ' input-error';
-        }
-        if (latexInput) {
-          inputClassName += ' input-latex';
-        } else if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
-          inputClassName += ' italic';
-        }
+        let inputClassName = clsx('expr-input', {
+          'input-error': this.state.inputError,
+          'input-latex': latexInput,
+          'italic': !latexInput && expression.hasStyleClass('var') && useItalicsForVariable(text)
+        });
         let size = expression.inputLength ?? text.length + 1;
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
         let menu: JSX.Element | undefined = undefined;
@@ -393,21 +385,16 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           } else {
             let firstChar = text.charAt(0);
             let lastChar = text.charAt(text.length - 1);
-            if (firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a')) {
-              className += ' space-start';
-            }
-            if (expression.hasStyleClass('var') && useItalicsForVariable(text)) {
-              className += ' italic';
-              if (lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z') {
-                className += ' charcorner-tr';
-                if (lastChar === 'T' || lastChar === 'Y') {
-                  className += ' charcorner-large';
-                }
+            className = clsx(
+              className,
+              { 'space-start': firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a') },
+              expression.hasStyleClass('var') && useItalicsForVariable(text) && {
+                'italic': true,
+                'charcorner-tr': lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z',
+                'charcorner-large': lastChar === 'T' || lastChar === 'Y',
+                'charcorner-bl': firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y'
               }
-              if (firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y') {
-                className += ' charcorner-bl';
-              }
-            }
+            );
             return this.wrapRenderedExpression(this.convertText(text), { semanticLinks, className });
           }
         } else {
@@ -435,10 +422,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       if (expression.style instanceof Array) {
         className += ' custom';
         let rows = expression.items.map((item: Notation.RenderedExpression, index: number) => {
-          let itemClassName = 'list-item';
-          if (index) {
-            itemClassName += ' space-above';
-          }
+          let itemClassName = clsx('list-item', index > 0 && 'space-above');
           return (
             <span className={itemClassName} key={index}>
               <span className={'list-item-header'}>
@@ -489,13 +473,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
         let curRowIndex = rowIndex++;
         let renderCurRow = (additionalClassName: string = '') => (
-          <span className={'table-row' + additionalClassName} key={curRowIndex}>
+          <span className={clsx('table-row', additionalClassName)} key={curRowIndex}>
             {columns}
           </span>
         );
         if (row.length) {
           let renderRow = row[0].getLineHeight().then((lineHeight: number) =>
-            renderCurRow(lineHeight ? '' : ' large'));
+            renderCurRow(lineHeight ? '' : 'large'));
           rows.push(renderPromise(renderRow, curRowIndex.toString()));
         } else {
           rows.push(renderCurRow());
@@ -611,10 +595,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
               if (lineHeight) {
                 parenClassName = 'paren-curly-text';
               } else {
-                let bodyClassName = 'paren-curly-body';
-                if (closeParen) {
-                  bodyClassName += ' paren-right-hairline';
-                }
+                let bodyClassName = clsx('paren-curly-body', closeParen && 'paren-right-hairline');
                 parenResult = (
                   <span className={'paren-large paren-curly'}>
                     <span className={'paren-curly-row'}>
@@ -785,7 +766,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         { semanticLinks, className }
       );
     } else if (expression instanceof Notation.OverUnderExpression) {
-      let innerClassName = 'overunder';
       let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
       let rows: React.ReactNode[] = [
@@ -808,12 +788,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             </span>
           </span>
         );
-      } else {
-        innerClassName += ' noover';
       }
-      if (!under) {
-        innerClassName += ' nounder';
-      }
+      let innerClassName = clsx('overunder', {
+        noover: !over,
+        nounder: !under
+      });
       return this.wrapRenderedExpression(rows, { semanticLinks, className, innerClassName });
     } else if (expression instanceof Notation.FractionExpression) {
       let elements = [
@@ -1023,25 +1002,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     let onMouseEnter = interactive ? () => this.addToHoveredChildren() : undefined;
     let onMouseLeave = interactive ? () => { this.setState({clicking: false}); this.removeFromHoveredChildren(); } : undefined;
-    let menuClassName = 'menu';
-    if (this.state.hovered) {
-      menuClassName += ' hover';
-    }
-    if (interactive) {
-      menuClassName += ' interactive';
-      if (hasMenu) {
-        if (!hasVisibleMenu) {
-          menuClassName += ' hidden';
-        }
-      } else {
-        if (this.state.clicking) {
-          menuClassName += ' pressed';
-        }
-      }
-    }
-    if (this.state.openMenu) {
-      menuClassName += ' open';
-    }
+    let menuClassName = clsx('menu', {
+      hover: this.state.hovered,
+      open: this.state.openMenu,
+      interactive: interactive,
+      hidden: interactive && hasMenu && !hasVisibleMenu,
+      pressed: interactive && !hasMenu && this.state.clicking
+    });
     let cells: React.ReactNode;
     let outerClassNameSuffix = '';
     if (innerClassName) {
@@ -1117,12 +1084,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (hasMenu || expression !== undefined) {
       return this.wrapRenderedExpressionWithMenuStuff(result, expression, semanticLinks, onMenuOpened, hasMenu, hasVisibleMenu, className, innerClassName);
     } else {
-      if (innerClassName) {
-        className += ' ' + innerClassName;
-      }
-      if (this.state.hovered) {
-        className += ' hover';
-      }
+      className = clsx(className, innerClassName, this.state.hovered && 'hover');
       if (this.props.interactionHandler && semanticLinks && semanticLinks.length && (isInputControl || !this.isPartOfMenu())) {
         className += ' interactive';
         let uriLink: Notation.SemanticLink | undefined = undefined;
