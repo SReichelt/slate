@@ -332,12 +332,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
         let menu: JSX.Element | undefined = undefined;
         if (latexInput && this.state.inputFocused) {
-          let rows = getLatexInputSuggestions(text).map(suggestion => {
+          let suggestions = getLatexInputSuggestions(text);
+          let rows = suggestions.map(suggestion => {
             let action = new Menu.ImmediateExpressionMenuAction(() => {
               setText(suggestion.unicodeCharacters);
             });
             let item = new Menu.ExpressionMenuItem(new Notation.TextExpression(suggestion.unicodeCharacters), action);
             let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
+            row.selected = suggestion.latexCode === text || suggestions.length === 1;
             row.subMenu = item;
             return row;
           });
