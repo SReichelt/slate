@@ -43,21 +43,31 @@ export function getLatexInputSuggestions(current: string): LatexInputReplacement
     .slice(0, MAX_SUGGESTIONS);
 }
 
+// Replaces the current input by unicode character if the current input either matches a
+// LaTeX replacement OR is the prefix of a unique LaTeX replacement.
 export function replaceLatexCode(current: string): string {
   let exactReplacement = allReplacements.find(({ latexCode }) => latexCode === current);
-  return exactReplacement !== undefined ? exactReplacement.unicodeCharacters : current;
+  let replacement = exactReplacement ?? findUniqueLatexReplacementByPrefix(current);
+  return replacement !== undefined ? replacement.unicodeCharacters : current;
 }
 
+// Replaces the current input by unicode character if the current input either matches a
+// LaTeX replacement AND is the prefix of a unique LaTeX replacement.
 export function replaceLatexCodeIfUnambiguous(current: string): string {
+  let replacement = findUniqueLatexReplacementByPrefix(current);
+  return replacement !== undefined && replacement.latexCode === current ? replacement.unicodeCharacters : current;
+}
+
+function findUniqueLatexReplacementByPrefix(current: string): LatexInputReplacement | undefined {
   let firstMatch: LatexInputReplacement | undefined = undefined;
   for (let replacement of allReplacements) {
     if (replacement.latexCode.startsWith(current)) {
       if (firstMatch !== undefined) {
-        return current; // ambiguous
+        return undefined; // ambiguous
       } else {
         firstMatch = replacement;
       }
     }
   }
-  return firstMatch !== undefined ? firstMatch.unicodeCharacters : current;
+  return firstMatch;
 }
