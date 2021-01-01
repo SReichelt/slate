@@ -9,7 +9,8 @@ const MAX_SUGGESTIONS = 10;
 
 const allReplacements: LatexInputReplacement[] =
   (replacements as [string, string][])
-    .map(([latexCode, unicodeCharacters]) => ({ latexCode, unicodeCharacters }));
+    .map(([latexCode, unicodeCharacters]) => ({ latexCode, unicodeCharacters }))
+    .sort((a, b) => a.latexCode.localeCompare(b.latexCode, 'en'));
 
 export function getLatexInputSuggestions(current: string): LatexInputReplacement[] {
   return allReplacements
