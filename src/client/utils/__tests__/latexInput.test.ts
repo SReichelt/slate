@@ -1,4 +1,4 @@
-import { getLatexInputSuggestions, replaceLatexCode, replaceLatexCodeIfUnambiguous } from '../latexInput';
+import { getLatexInputSuggestions, replaceLatexCodeOrPrefix, replaceExactLatexCodeOnly } from '../latexInput';
 
 describe('getLatexInputSuggestions', () => {
   it('returns replacements which start with current input', () => {
@@ -24,26 +24,34 @@ describe('getLatexInputSuggestions', () => {
   });
 });
 
-describe('replaceLatexCode', () => {
+describe('replaceLatexCodeOrPrefix', () => {
   it('replaces inputs which match a suggestion exactly', () => {
-    expect(replaceLatexCode('\\l')).toEqual('ł');
+    expect(replaceLatexCodeOrPrefix('\\l')).toEqual('ł');
   });
 
   it('replaces inputs for which a unique suggestion with that input as prefix exists', () => {
-    expect(replaceLatexCode('\\alph')).toEqual('α');
+    expect(replaceLatexCodeOrPrefix('\\alph')).toEqual('α');
+  });
+
+  it('replaces inputs with their first suggestion if more than one suggestion exists', () => {
+    expect(replaceLatexCodeOrPrefix('\\al')).toEqual('ℵ');
+  });
+
+  it('replaces backslash with first item of curated list', () => {
+    expect(replaceLatexCodeOrPrefix('\\')).toEqual('ã');
   });
 });
 
-describe('replaceLatexCodeIfUnambiguous', () => {
+describe('replaceExactLatexCodeOnly', () => {
   it('replaces complete inputs for which a unique suggestion with that input as prefix exists', () => {
-    expect(replaceLatexCodeIfUnambiguous('\\alpha')).toEqual('α');
+    expect(replaceExactLatexCodeOnly('\\alpha')).toEqual('α');
   });
 
   it('doesn\'t replace complete inputs for which multiple suggestions with that input as prefix exist', () => {
-    expect(replaceLatexCodeIfUnambiguous('\\l')).toEqual('\\l'); // because '\\l' is also a prefix of '\\lambda' and others
+    expect(replaceExactLatexCodeOnly('\\l')).toEqual('\\l'); // because '\\l' is also a prefix of '\\lambda' and others
   });
 
   it('doesn\'t replace incomplete inputs even if a unique suggestion with that input as prefix exists', () => {
-    expect(replaceLatexCodeIfUnambiguous('\\alph')).toEqual('\\alph');
+    expect(replaceExactLatexCodeOnly('\\alph')).toEqual('\\alph');
   });
 });

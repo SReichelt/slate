@@ -876,6 +876,7 @@ div.display-math {
 }
 
 .expr-input.input-latex {
+  background-color: var(--input-incomplete-background-color);
   font-family: var(--font-family);
 }
 

@@ -12,13 +12,13 @@ const allReplacements: LatexInputReplacement[] =
     .map(([latexCode, unicodeCharacters]) => ({ latexCode, unicodeCharacters }))
     .sort((a, b) => a.latexCode.localeCompare(b.latexCode, 'en'));
 
-const findReplacementByLatexCode = (latexCode: string): LatexInputReplacement => {
+function findReplacementByLatexCode(latexCode: string): LatexInputReplacement {
   const replacement = allReplacements.find(r => r.latexCode === latexCode);
   if (replacement === undefined) {
     throw new Error(`Could not find replacement with LaTeX code ${latexCode}`);
   }
   return replacement;
-};
+}
 
 // A curated list of suggestions to display when the user types a single backslash
 const initialSuggestions: LatexInputReplacement[] = [
@@ -44,30 +44,24 @@ export function getLatexInputSuggestions(current: string): LatexInputReplacement
 }
 
 // Replaces the current input by unicode character if the current input either matches a
-// LaTeX replacement OR is the prefix of a unique LaTeX replacement.
-export function replaceLatexCode(current: string): string {
-  let exactReplacement = allReplacements.find(({ latexCode }) => latexCode === current);
-  let replacement = exactReplacement ?? findUniqueLatexReplacementByPrefix(current);
-  return replacement !== undefined ? replacement.unicodeCharacters : current;
+// LaTeX replacement OR is a prefix of a LaTeX replacement.
+export function replaceLatexCodeOrPrefix(current: string): string {
+  let firstReplacement = findLatexReplacementByPrefix(current, false);
+  return firstReplacement !== undefined ? firstReplacement.unicodeCharacters : current;
 }
 
-// Replaces the current input by unicode character if the current input either matches a
-// LaTeX replacement AND is the prefix of a unique LaTeX replacement.
-export function replaceLatexCodeIfUnambiguous(current: string): string {
-  let replacement = findUniqueLatexReplacementByPrefix(current);
+// Replaces the current input by unicode character if the current input matches a
+// LaTeX replacement AND is not a prefix of another LaTeX replacement.
+export function replaceExactLatexCodeOnly(current: string): string {
+  let replacement = findLatexReplacementByPrefix(current, true);
   return replacement !== undefined && replacement.latexCode === current ? replacement.unicodeCharacters : current;
 }
 
-function findUniqueLatexReplacementByPrefix(current: string): LatexInputReplacement | undefined {
-  let firstMatch: LatexInputReplacement | undefined = undefined;
-  for (let replacement of allReplacements) {
-    if (replacement.latexCode.startsWith(current)) {
-      if (firstMatch !== undefined) {
-        return undefined; // ambiguous
-      } else {
-        firstMatch = replacement;
-      }
-    }
+function findLatexReplacementByPrefix(current: string, uniqueOnly: boolean): LatexInputReplacement | undefined {
+  let matches = getLatexInputSuggestions(current);
+  if (matches.length && (matches.length === 1 || !uniqueOnly)) {
+    return matches[0];
+  } else {
+    return undefined;
   }
-  return firstMatch;
 }

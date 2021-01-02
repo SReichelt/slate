@@ -22,9 +22,9 @@ import Button from './Button';
 import { PromiseHelper, renderPromise } from './PromiseHelper';
 
 import config from '../utils/config';
-import { disableOwnDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
+import { disableDefaultBehavior, disableOwnDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
-import { getLatexInputSuggestions, replaceLatexCode, replaceLatexCodeIfUnambiguous } from '../utils/latexInput';
+import { getLatexInputSuggestions, replaceLatexCodeOrPrefix, replaceExactLatexCodeOnly } from '../utils/latexInput';
 
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
@@ -270,8 +270,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           expression.text = newText;
           this.setState({inputError: false});
           this.forceUpdate();
-          if (expression.onTextChanged) {
-            if (!newText.startsWith('\\') && expression.onTextChanged(newText)) {
+          if (expression.onTextChanged && !newText.startsWith('\\')) {
+            if (expression.onTextChanged(newText)) {
               if (this.props.interactionHandler) {
                 this.props.interactionHandler.expressionChanged();
               }
@@ -281,7 +281,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         };
         let performLatexReplacement = () => {
-          let textAfterReplacement = replaceLatexCode(text);
+          let textAfterReplacement = replaceLatexCodeOrPrefix(text);
           if (textAfterReplacement !== text) {
             setText(textAfterReplacement);
           }
@@ -293,15 +293,22 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         let onBlur = () => {
           this.clearPermanentHighlight();
           this.setState({ inputFocused: false });
-          performLatexReplacement();
+          if (latexInput) {
+            performLatexReplacement();
+          }
         };
         let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-          setText(replaceLatexCodeIfUnambiguous(event.target.value));
+          let newText = event.target.value;
+          if (latexInput) {
+            newText = replaceExactLatexCodeOnly(newText);
+          }
+          setText(newText);
           this.triggerHighlightPermanently();
         };
-        let onKeyDown = (event: React.KeyboardEvent) => {
-          if (event.key === 'Enter') {
+        let onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+          if (latexInput && (event.key === 'Enter' || event.key === ' ')) {
             performLatexReplacement();
+            disableDefaultBehavior(event);
           }
         };
         let ref = undefined;
@@ -325,13 +332,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         let menu: JSX.Element | undefined = undefined;
         if (latexInput && this.state.inputFocused) {
           let suggestions = getLatexInputSuggestions(text);
-          let rows = suggestions.map(suggestion => {
+          let rows = suggestions.map((suggestion, rowIndex) => {
             let action = new Menu.ImmediateExpressionMenuAction(() => {
               setText(suggestion.unicodeCharacters);
             });
             let item = new Menu.ExpressionMenuItem(new Notation.TextExpression(suggestion.unicodeCharacters), action);
+            item.selected = rowIndex === 0;
             let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
-            row.selected = suggestion.latexCode === text || suggestions.length === 1;
             row.subMenu = item;
             return row;
           });
