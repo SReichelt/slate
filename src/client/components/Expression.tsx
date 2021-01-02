@@ -337,7 +337,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             let action = new Menu.ImmediateExpressionMenuAction(() => {
               setText(suggestion.unicodeCharacters);
             });
-            let item = new Menu.ExpressionMenuItem(new Notation.TextExpression(suggestion.unicodeCharacters), action);
+            let preview = new Notation.TextExpression(suggestion.unicodeCharacters);
+            preview.styleClasses = expression.styleClasses;
+            let item = new Menu.ExpressionMenuItem(preview, action);
             item.selected = rowIndex === 0;
             let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
             row.subMenu = item;

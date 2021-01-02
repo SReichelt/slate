@@ -22,3 +22,10 @@
   src: url('lmroman10-bolditalic.woff') format('woff');
   unicode-range: U+0-27, U+30-3B, U+3F-5A, U+5E-7A, U+BC-218F;
 }
+
+@font-face {
+  font-family: 'TeX-Var';
+  font-style: italic;
+  src: url('lmroman10-italic.woff') format('woff');
+  unicode-range: U+BC-392;
+}
