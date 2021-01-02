@@ -1,5 +1,9 @@
 import { replacements } from 'unicodeit/ts_dist/js/data';
 
+export function isLatexInput(current: string): boolean {
+  return current.startsWith('\\');
+}
+
 interface LatexInputReplacement {
   latexCode: string;
   unicodeCharacters: string;

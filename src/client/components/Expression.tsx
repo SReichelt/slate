@@ -24,7 +24,7 @@ import { PromiseHelper, renderPromise } from './PromiseHelper';
 import config from '../utils/config';
 import { disableDefaultBehavior, disableOwnDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
-import { getLatexInputSuggestions, replaceLatexCodeOrPrefix, replaceExactLatexCodeOnly } from '../utils/latexInput';
+import { isLatexInput, getLatexInputSuggestions, replaceLatexCodeOrPrefix, replaceExactLatexCodeOnly } from '../utils/latexInput';
 
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
@@ -265,12 +265,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.TextExpression) {
       if (this.props.interactionHandler && expression.onTextChanged) {
         let text = expression.text;
-        let latexInput = text.startsWith('\\');
+        let latexInput = isLatexInput(text);
         let setText = (newText: string) => {
           expression.text = newText;
           this.setState({inputError: false});
           this.forceUpdate();
-          if (expression.onTextChanged && !newText.startsWith('\\')) {
+          if (expression.onTextChanged && !isLatexInput(newText)) {
             if (expression.onTextChanged(newText)) {
               if (this.props.interactionHandler) {
                 this.props.interactionHandler.expressionChanged();
