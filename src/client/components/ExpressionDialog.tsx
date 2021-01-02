@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 
 import StandardDialog from './StandardDialog';
 import Expression, { ExpressionInteractionHandler } from './Expression';
@@ -32,12 +33,7 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
   }
 
   render(): React.ReactNode {
-    let className = 'dialog-contents';
-    if (this.props.dialog.styleClasses) {
-      for (let styleClass of this.props.dialog.styleClasses) {
-        className += ' ' + styleClass;
-      }
-    }
+    let className = clsx('dialog-contents', this.props.dialog.styleClasses);
     let rows = [];
     let index = 0;
     let separated = false;
@@ -131,17 +127,12 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
   }
 
   render(): React.ReactNode {
-    let className = 'dialog-row';
+    let className = clsx('dialog-row', {
+      'separated': this.props.separated,
+      'separated-above': this.props.separatedAbove,
+      'separated-below': this.props.separatedBelow
+    });
     let cellClassName = 'dialog-cell';
-    if (this.props.separated) {
-      className += ' separated';
-    }
-    if (this.props.separatedAbove) {
-      className += ' separated-above';
-    }
-    if (this.props.separatedBelow) {
-      className += ' separated-below';
-    }
     if (!this.props.item.visible) {
       return (
         <tr className={className}>
@@ -152,7 +143,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
     if (this.props.item instanceof Dialog.ExpressionDialogExpressionItem) {
       let groupClassName: string | undefined = undefined;
       if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
-        cellClassName += ' dialog-info-cell';
+        cellClassName = clsx(cellClassName, 'dialog-info-cell');
       } else {
         groupClassName = 'dialog-group';
       }
@@ -193,7 +184,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
       }
       return (
         <tr className={className}>
-          <th className={cellClassName + ' dialog-param-title-cell'} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
+          <th className={clsx(cellClassName, 'dialog-param-title-cell')} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
             {title}
           </th>
           <td className={cellClassName} key="value">

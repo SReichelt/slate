@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import scrollIntoView from 'scroll-into-view-if-needed';
 const Loading = require('react-loading-animation');
 
@@ -781,10 +782,10 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     if (this.state.filtered) {
       return null;
     }
-    let className = 'tree-item';
-    if (!this.props.positionSelectionMode) {
-      className += ' hoverable';
-    }
+    let className = clsx('tree-item', {
+      'hoverable': !this.props.positionSelectionMode,
+      'selected': this.props.selected
+    });
     let contents: React.ReactNode = null;
     let icon: React.ReactNode = '\u2001';
     let display: React.ReactNode = this.props.itemInfo ? this.props.itemInfo.title : null;
@@ -839,9 +840,6 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
             display = [display, toolTip];
           }
         }
-      }
-      if (this.props.selected) {
-        className += ' selected';
       }
     }
     if (!display) {

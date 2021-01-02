@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import scrollIntoView from 'scroll-into-view-if-needed';
 const Loading = require('react-loading-animation');
 
@@ -77,10 +78,9 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
           separated = false;
         }
       }
-      let className = 'open-menu';
-      if (this.props.menu.variable) {
-        className += ' variable';
-      }
+      let className = clsx('open-menu', {
+        'variable': this.props.menu.variable
+      });
       let ref = (htmlNode: HTMLDivElement | null) => {
         if (htmlNode && !this.scrolled) {
           this.scrolled = true;
@@ -247,7 +247,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
           }
         }
         if (titleAction) {
-          titleCellClassName += ' clickable';
+          titleCellClassName = clsx(titleCellClassName, 'clickable');
           onClick = (event: React.SyntheticEvent<HTMLElement>) => {
             if (this.ready) {
               this.props.onItemClicked(titleAction!);
@@ -295,12 +295,10 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
           let getToolTipContents = () => <Expression expression={info}/>;
           title = [title, <ExpressionToolTip active={this.state.titleHovered} position="right" parent={this.titleNode} getContents={getToolTipContents} delay={100} key="tooltip"/>];
         }
-        if (this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen) {
-          titleCellClassName += ' hover';
-        }
-        if (standardRow.isSelected()) {
-          titleCellClassName += ' selected';
-        }
+        titleCellClassName = clsx(titleCellClassName, {
+          'hover': this.state.titleHovered || this.state.contentsHovered || this.props.subMenuOpen,
+          'selected': standardRow.isSelected()
+        });
         let hasSubMenu = false;
         let onMouseEnter = () => {
           this.setState({titleHovered: true});
@@ -418,14 +416,12 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
   }
 
   render(): React.ReactNode {
-    let className = 'open-menu-item clickable';
     let hovered = this.props.hoveredExternally || this.state.hovered;
-    if (hovered) {
-      className += ' hover';
-    }
-    if (this.props.item.selected) {
-      className += ' selected';
-    }
+    let className = clsx('open-menu-item', {
+      'clickable': true,
+      'hover': hovered,
+      'selected': this.props.item.selected
+    });
     let expression = this.props.item.expression;
     let onMouseEnter = () => {
       this.setState({hovered: true});
@@ -521,13 +517,10 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
   }
 
   render(): React.ReactNode {
-    let className = 'open-menu-item';
-    if (this.state.hovered || this.state.editing || this.props.hoveredExternally) {
-      className += ' hover';
-    }
-    if (this.props.item.selected) {
-      className += ' selected';
-    }
+    let className = clsx('open-menu-item', {
+      'hover': this.state.hovered || this.state.editing || this.props.hoveredExternally,
+      'selected': this.props.item.selected
+    });
     let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       this.setState({
         edited: true,

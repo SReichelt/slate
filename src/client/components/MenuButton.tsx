@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
 import './Button.css';
@@ -33,17 +34,18 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
   }
 
   render(): React.ReactNode {
-    let className = 'button menu-button';
-    if (this.props.className) {
-      className += ' ' + this.props.className;
-    }
+    let enabled = (this.props.enabled === undefined || this.props.enabled);
+    let className = clsx('button', 'menu-button', this.props.className, {
+      'disabled': !enabled,
+      'hoverable': enabled,
+      'open': this.state.menuOpen
+    });
     let onMouseEnter = undefined;
     let onMouseLeave = undefined;
     let onMouseDown = undefined;
     let onMouseUp = undefined;
     let onClick = undefined;
-    if (this.props.enabled === undefined || this.props.enabled) {
-      className += ' hoverable';
+    if (enabled) {
       if (this.props.openOnHover) {
         onMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
           this.setState({menuOpen: true});
@@ -52,9 +54,6 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           this.setState({menuOpen: false});
         };
       } else {
-        if (this.state.menuOpen) {
-          className += ' open';
-        }
         onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
           eventHandled(event);
           if (this.state.menuOpen) {
@@ -73,8 +72,6 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           eventHandled(event);
         };
       }
-    } else {
-      className += ' disabled';
     }
     let children = this.props.children;
     if (this.state.menuOpen) {
@@ -88,15 +85,10 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           });
         }
       };
-      let menuClassName = 'menu-button-popup';
-      if (this.props.menuOnTop) {
-        menuClassName += ' menu-button-popup-top';
-      } else {
-        menuClassName += ' menu-button-popup-bottom';
-      }
-      if (this.props.menuClassName) {
-        menuClassName += ' ' + this.props.menuClassName;
-      }
+      let menuClassName = clsx('menu-button-popup', this.props.menuClassName, {
+        'menu-button-popup-top': this.props.menuOnTop,
+        'menu-button-popup-bottom': !this.props.menuOnTop
+      });
       let menu = (
         <div className={menuClassName} title={''} key="menu" ref={ref}>
           {this.props.menu}

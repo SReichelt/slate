@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 
 import './Button.css';
 
@@ -38,10 +39,13 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   }
 
   render(): React.ReactNode {
-    let className = 'button';
-    if (this.props.className) {
-      className += ' ' + this.props.className;
-    }
+    let enabled = (this.props.enabled === undefined || this.props.enabled);
+    let className = clsx('button', this.props.className, {
+      'disabled': !enabled,
+      'hoverable': enabled,
+      'pressed': this.state.pressed,
+      'selected': this.props.selected
+    });
     let onClick = undefined;
     let onMouseDown = undefined;
     let onMouseUp = undefined;
@@ -49,8 +53,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     let onTouchStart = undefined;
     let onTouchEnd = undefined;
     let onTouchCancel = undefined;
-    if (this.props.enabled === undefined || this.props.enabled) {
-      className += ' hoverable';
+    if (enabled) {
       if (this.props.onClick) {
         let propsOnClick = this.props.onClick;
         onClick = (event: React.SyntheticEvent<HTMLElement>) => {
@@ -92,14 +95,6 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         eventHandled(event);
         this.setState({pressed: false});
       };
-    } else {
-      className += ' disabled';
-    }
-    if (this.state.pressed) {
-      className += ' pressed';
-    }
-    if (this.props.selected) {
-      className += ' selected';
     }
     return (
       <div className={className} title={this.props.toolTipText} onClick={onClick} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onTouchCancel={onTouchCancel}>
