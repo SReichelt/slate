@@ -161,8 +161,8 @@ export abstract class GenericRenderer {
     return this.renderTemplate('Negation', {'operand': expression});
   }
 
-  protected renderInteger(value: Fmt.BN): Notation.TextExpression {
-    let result = new Notation.TextExpression(value.toString());
+  protected renderInteger(value: Fmt.BN | undefined): Notation.TextExpression {
+    let result = new Notation.TextExpression(value ? value.toString() : '');
     result.styleClasses = ['integer'];
     return result;
   }

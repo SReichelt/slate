@@ -265,12 +265,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.TextExpression) {
       if (this.props.interactionHandler && expression.onTextChanged) {
         let text = expression.text;
-        let latexInput = isLatexInput(text);
+        let supportLatexInput = !expression.hasStyleClass('integer');
+        let latexInput = supportLatexInput && isLatexInput(text);
         let setText = (newText: string) => {
           expression.text = newText;
           this.setState({inputError: false});
           this.forceUpdate();
-          if (expression.onTextChanged && !isLatexInput(newText)) {
+          if (expression.onTextChanged && !(supportLatexInput && isLatexInput(newText))) {
             if (expression.onTextChanged(newText)) {
               if (this.props.interactionHandler) {
                 this.props.interactionHandler.expressionChanged();

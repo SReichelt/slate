@@ -1757,7 +1757,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_Nat) {
       let result: Notation.TextExpression;
       if (rawArg instanceof Fmt.PlaceholderExpression) {
-        result = new Notation.TextExpression('');
+        result = this.renderInteger(undefined);
         result.requestTextInput = true;
       } else {
         let arg = rawArg as Fmt.IntegerExpression;
