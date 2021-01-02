@@ -22,7 +22,7 @@ import Button from './Button';
 import { PromiseHelper, renderPromise } from './PromiseHelper';
 
 import config from '../utils/config';
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
 import { getLatexInputSuggestions, replaceLatexCode, replaceLatexCodeIfUnambiguous } from '../utils/latexInput';
 
@@ -348,11 +348,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
             value={text}
             style={style}
             onChange={onChange}
-            onMouseDown={(event) => event.stopPropagation()}
-            onMouseUp={(event) => event.stopPropagation()}
-            onTouchStart={(event) => event.stopPropagation()}
-            onTouchCancel={(event) => event.stopPropagation()}
-            onTouchEnd={(event) => event.stopPropagation()}
+            onMouseDown={limitDefaultBehaviorToElement}
+            onMouseUp={limitDefaultBehaviorToElement}
+            onTouchStart={limitDefaultBehaviorToElement}
+            onTouchCancel={limitDefaultBehaviorToElement}
+            onTouchEnd={limitDefaultBehaviorToElement}
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
@@ -361,7 +361,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           />
         );
         return (
-          <span className={'menu-container'} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
+          <span className={'menu-container'} onTouchStart={limitDefaultBehaviorToElement} onTouchCancel={limitDefaultBehaviorToElement} onTouchEnd={limitDefaultBehaviorToElement}>
             {this.wrapRenderedExpression(input, { className, semanticLinks, isInputControl: true })}
             {menu}
           </span>
@@ -912,7 +912,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       let onClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if (event.button < 1) {
           this.setState({unfolded: !unfolded});
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
         }
       };
       let rows = [
@@ -979,19 +979,19 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     let interactive = hasMenu;
     let onMouseDown = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.menuClicked(onMenuOpened!, event)) : undefined;
-    let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && eventHandled(event)) : undefined;
-    let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && eventHandled(event)) : undefined;
+    let onMouseUp = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && disableOwnDefaultBehavior(event)) : undefined;
+    let onClick = hasMenu ? (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && disableOwnDefaultBehavior(event)) : undefined;
     if (placeholder instanceof Notation.InsertPlaceholderExpression && placeholder.action && !hasMenu) {
       onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
         if (event.button < 1) {
           this.setState({clicking: true});
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
         }
       };
       onMouseUp = (event: React.MouseEvent<HTMLElement>) => {
         if (event.button < 1) {
           this.setState({clicking: false});
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
         }
       };
       onClick = (event: React.MouseEvent<HTMLElement>) => (event.button < 1 && this.actionClicked(placeholder.action!, event));
@@ -1035,7 +1035,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       cells = <span className={'menu-cell'} key="content">{content}</span>;
     }
     return (
-      <span className={outerClassName} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
+      <span className={outerClassName} onTouchStart={limitDefaultBehaviorToElement} onTouchCancel={limitDefaultBehaviorToElement} onTouchEnd={limitDefaultBehaviorToElement}>
         <span className={menuClassName} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onClick={onClick} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
           <span className={'menu-row'}>
             {cells}
@@ -1102,13 +1102,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           // However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
           // So we do this anyway, but only in production mode, to prevent warnings from React.
           result = (
-            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => eventHandled(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={disableOwnDefaultBehavior} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
             </a>
           );
         } else {
           result = (
-            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={(event) => eventHandled(event)} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={disableOwnDefaultBehavior} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
               {result}
             </span>
           );
@@ -1266,7 +1266,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return;
     }
     if (event) {
-      eventHandled(event);
+      disableOwnDefaultBehavior(event);
     }
     this.permanentlyHighlighted = true;
     this.addToHoveredChildren();
@@ -1307,7 +1307,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private linkClicked(semanticLink: Notation.SemanticLink | undefined, event: React.SyntheticEvent<HTMLElement>): void {
     this.setState({clicking: false});
-    eventHandled(event);
+    disableOwnDefaultBehavior(event);
     if (this.props.interactionHandler && !this.props.interactionHandler.isBlocked() && semanticLink) {
       this.props.interactionHandler.linkClicked(semanticLink);
     }
@@ -1318,7 +1318,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return;
     }
     this.setState({clicking: false});
-    eventHandled(event);
+    disableOwnDefaultBehavior(event);
     if (action instanceof Menu.ImmediateExpressionMenuAction) {
       let result = action.onExecute();
       if (!(result instanceof CachedPromise)) {
@@ -1346,7 +1346,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       this.openMenu(onMenuOpened);
     }
-    eventHandled(event);
+    disableOwnDefaultBehavior(event);
   }
 
   private openMenu(onMenuOpened: () => Menu.ExpressionMenu): void {

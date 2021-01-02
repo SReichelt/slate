@@ -17,7 +17,7 @@ import * as FmtUtils from '../../shared/format/utils';
 import * as FmtLibrary from '../../shared/logics/library';
 import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState, LibraryItemNumber } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior } from '../utils/event';
 import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
 import CachedPromise from '../../shared/data/cachedPromise';
 
@@ -897,7 +897,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
 
   private itemClicked = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
     if (event.button < 1 || this.props.isSubsection) {
-      eventHandled(event);
+      disableOwnDefaultBehavior(event);
       this.clicked = true;
       if (this.props.isSubsection && !this.props.positionSelectionMode) {
         this.setState((prevState) => ({opened: !prevState.opened}));

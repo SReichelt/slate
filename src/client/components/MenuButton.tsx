@@ -5,7 +5,7 @@ import scrollIntoView from 'scroll-into-view-if-needed';
 import './Button.css';
 import './MenuButton.css';
 
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior } from '../utils/event';
 
 
 interface MenuButtonProps {
@@ -47,15 +47,11 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
     let onClick = undefined;
     if (enabled) {
       if (this.props.openOnHover) {
-        onMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
-          this.setState({menuOpen: true});
-        };
-        onMouseLeave = (event: React.MouseEvent<HTMLElement>) => {
-          this.setState({menuOpen: false});
-        };
+        onMouseEnter = (event: React.MouseEvent<HTMLElement>) => this.setState({menuOpen: true});
+        onMouseLeave = (event: React.MouseEvent<HTMLElement>) => this.setState({menuOpen: false});
       } else {
         onMouseDown = (event: React.MouseEvent<HTMLElement>) => {
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
           if (this.state.menuOpen) {
             this.closeMenu();
           } else {
@@ -66,11 +62,9 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           if (event.defaultPrevented) {
             this.closeMenu();
           }
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
         };
-        onClick = (event: React.MouseEvent<HTMLElement>) => {
-          eventHandled(event);
-        };
+        onClick = disableOwnDefaultBehavior;
       }
     }
     let children = this.props.children;

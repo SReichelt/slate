@@ -9,7 +9,7 @@ import Expression, { ExpressionInteractionHandler } from './Expression';
 import ExpressionToolTip from './ExpressionToolTip';
 import { renderPromise } from './PromiseHelper';
 
-import { eventHandled, eventHandledNoBlur } from '../utils/event';
+import { disableDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 
 import * as Notation from '../../shared/notation/notation';
@@ -95,11 +95,11 @@ class ExpressionMenu extends React.Component<ExpressionMenuProps, ExpressionMenu
         <div
           className={className}
           style={getMainFontStyle()}
-          onMouseDown={eventHandledNoBlur}
-          onMouseUp={(event) => event.stopPropagation()}
-          onTouchStart={(event) => event.stopPropagation()}
-          onTouchCancel={(event) => event.stopPropagation()}
-          onTouchEnd={(event) => event.stopPropagation()}
+          onMouseDown={disableDefaultBehavior}
+          onMouseUp={limitDefaultBehaviorToElement}
+          onTouchStart={limitDefaultBehaviorToElement}
+          onTouchCancel={limitDefaultBehaviorToElement}
+          onTouchEnd={limitDefaultBehaviorToElement}
           ref={ref}
         >
           <table className={'open-menu-table'}>
@@ -252,7 +252,7 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
             if (this.ready) {
               this.props.onItemClicked(titleAction!);
             }
-            eventHandled(event);
+            disableDefaultBehavior(event);
           };
           if (titleAction instanceof Menu.DialogExpressionMenuAction) {
             title = [title, '...'];
@@ -445,7 +445,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
       if (this.ready) {
         this.props.onItemClicked(this.props.item.action);
       }
-      eventHandled(event);
+      disableDefaultBehavior(event);
     };
     let toolTip: React.ReactNode = null;
     if (this.props.interactionHandler && expression.semanticLinks && this.htmlNode) {
@@ -463,7 +463,7 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
       toolTip = <ExpressionToolTip active={hovered} position="right" parent={this.htmlNode} getContents={getToolTipContents} delay={100} key="tooltip"/>;
     }
     return (
-      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={eventHandledNoBlur} onMouseUp={onClick} onTouchStart={(event) => eventHandled(event)} onTouchCancel={(event) => eventHandled(event)} onTouchEnd={onClick} ref={(node) => (this.htmlNode = node)}>
+      <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseDown={disableDefaultBehavior} onMouseUp={onClick} onTouchStart={disableDefaultBehavior} onTouchCancel={disableDefaultBehavior} onTouchEnd={onClick} ref={(node) => (this.htmlNode = node)}>
         <Expression expression={expression}/>
         {toolTip}
       </td>
@@ -531,7 +531,7 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
       if (event.key === 'Enter' || event.key === 'NumpadEnter') {
         this.props.item.text = this.state.text;
         this.props.onItemClicked(this.props.item.action);
-        eventHandled(event);
+        disableDefaultBehavior(event);
       }
     };
     let onMouseEnter = () => {

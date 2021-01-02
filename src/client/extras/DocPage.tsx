@@ -3,7 +3,7 @@ import * as React from 'react';
 import { renderPromise } from '../components/PromiseHelper';
 import { OnDocLinkClicked } from './DocLink';
 
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior } from '../utils/event';
 
 import { fetchText } from '../../shared/utils/fetch';
 import CachedPromise from '../../shared/data/cachedPromise';
@@ -40,7 +40,7 @@ const DocPage = React.memo((props: DocPageProps) => {
               target = undefined;
               onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
                 if (event.button < 1) {
-                  eventHandled(event);
+                  disableOwnDefaultBehavior(event);
                   props.onDocLinkClicked(href);
                 }
               };
