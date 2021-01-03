@@ -591,20 +591,20 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     let onBlur = () => {
       this.clearPermanentHighlight();
       this.setState({ inputFocused: false });
-      if (latexInput) {
+      if (supportLatexInput) {
         performLatexReplacement();
       }
     };
     let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       let newText = event.target.value;
-      if (latexInput) {
+      if (supportLatexInput) {
         newText = replaceExactLatexCodeOnly(newText);
       }
       setText(newText);
       this.triggerHighlightPermanently();
     };
-    let onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (latexInput && (event.key === 'Enter' || event.key === ' ')) {
+    let onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (supportLatexInput && (event.key === 'Enter' || event.key === ' ')) {
         performLatexReplacement();
         disableDefaultBehavior(event);
       }
@@ -662,7 +662,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         onTouchEnd={limitDefaultBehaviorToElement}
         onFocus={onFocus}
         onBlur={onBlur}
-        onKeyDown={onKeyDown}
+        onKeyPress={onKeyPress}
         ref={ref}
         autoFocus={expression.requestTextInput}
       />
