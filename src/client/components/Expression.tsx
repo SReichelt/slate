@@ -692,7 +692,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private renderRowExpression(expression: Notation.RowExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
     let renderedExpressions = expression.items.map((item: Notation.RenderedExpression, index: number) =>
       <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler} key={index}/>);
-    return this.wrapRenderedExpression(renderedExpressions, { ...renderedExpressionConfig, innerClassName: 'row' });
+    return this.wrapRenderedExpression(renderedExpressions, renderedExpressionConfig);
   }
 
   private renderParagraphExpression(expression: Notation.ParagraphExpression, className: string): React.ReactNode {
