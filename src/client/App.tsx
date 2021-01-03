@@ -1,6 +1,6 @@
 import * as React from 'react';
 import SplitPane from 'react-split-pane';
-import { withAlert, AlertManager } from 'react-alert';
+import * as Alert from 'react-alert';
 const Loading = require('react-loading-animation');
 
 import './App.css';
@@ -15,7 +15,7 @@ import LibraryItem from './components/LibraryItem';
 import SourceCodeView from './components/SourceCodeView';
 import Button from './components/Button';
 import MenuButton from './components/MenuButton';
-import Message from './components/Message';
+import Message, { getAlertTemplate } from './components/Message';
 import InsertDialog from './components/InsertDialog';
 import { LibraryItemInteractionHandler } from './components/InteractionHandler';
 import { renderPromise } from './components/PromiseHelper';
@@ -60,7 +60,11 @@ const appName = 'Slate';
 const selectedLibraryName = 'hlm';
 
 interface AppProps {
-  alert: AlertManager;
+  fileAccessor?: FileAccessor;
+}
+
+interface AppPropsWithAlert extends AppProps {
+  alert: Alert.AlertManager;
 }
 
 interface SelectionState {
@@ -91,7 +95,7 @@ interface AppState extends SelectionState, GitHubState {
   insertDialog?: Dialog.InsertDialog;
 }
 
-class App extends React.Component<AppProps, AppState> {
+class App extends React.Component<AppPropsWithAlert, AppState> {
   private static readonly gitHubAccessTokenStorageIdentifier = 'github_access_token';
 
   private static readonly renderedDefinitionOptions: Logic.FullRenderedDefinitionOptions = {
@@ -101,13 +105,14 @@ class App extends React.Component<AppProps, AppState> {
     includeRemarks: true
   };
 
+  private mounted: boolean = false;
   private fileAccessor: FileAccessor;
   private libraryDataProvider: LibraryDataProvider;
   private templateFileWatcher?: FileWatcher;
   private mruList = new MRUList;
   private gitHubRepositoryAccess?: GitHubRepositoryAccess;
 
-  constructor(props: AppProps) {
+  constructor(props: AppPropsWithAlert) {
     super(props);
 
     let libraryURI = librariesURIPrefix + selectedLibraryName;
@@ -125,7 +130,9 @@ class App extends React.Component<AppProps, AppState> {
     let selectionURI: string | undefined = undefined;
     let queryString: string | undefined = undefined;
 
-    if (config.vsCodeAPI) {
+    if (props.fileAccessor) {
+      this.fileAccessor = props.fileAccessor;
+    } else if (config.vsCodeAPI) {
       let fileAccessor = new VSCodeExtensionFileAccessor;
       window.onmessage = (event: MessageEvent) => {
         let message: Embedding.ResponseMessage = event.data;
@@ -238,6 +245,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount(): void {
+    this.mounted = true;
+
     if (!config.embedded) {
       window.onpopstate = () => {
         // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
@@ -292,10 +301,12 @@ class App extends React.Component<AppProps, AppState> {
 
     let templateFile = this.fileAccessor.openFile('data/notation/templates' + fileExtension, false);
     let setTemplates = (contents: string) => {
-      let templates = FmtReader.readString(contents, templateFile.fileName, FmtNotation.getMetaModel);
-      this.setState({templates: templates});
-      if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
-        this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
+      if (this.mounted) {
+        let templates = FmtReader.readString(contents, templateFile.fileName, FmtNotation.getMetaModel);
+        this.setState({templates: templates});
+        if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
+          this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
+        }
       }
     };
     this.templateFileWatcher = templateFile.watch?.(setTemplates);
@@ -313,6 +324,7 @@ class App extends React.Component<AppProps, AppState> {
     window.onbeforeunload = null;
     window.onmessage = null;
     this.templateFileWatcher?.close();
+    this.mounted = false;
   }
 
   private createGitHubAPIAccess(tokenPromise: Promise<string> | undefined): CachedPromise<GitHub.APIAccess> | undefined {
@@ -1107,4 +1119,14 @@ class App extends React.Component<AppProps, AppState> {
   };
 }
 
-export default withAlert()(App);
+const AppWithAlert = Alert.withAlert()(App);
+
+function WrappedApp(props: AppProps): React.ReactElement {
+  return (
+    <Alert.Provider template={getAlertTemplate} position="top right" offset="20pt">
+      <AppWithAlert {...props}/>
+    </Alert.Provider>
+  );
+}
+
+export default WrappedApp;

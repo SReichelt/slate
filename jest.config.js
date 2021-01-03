@@ -1,17 +1,14 @@
 module.exports = {
-  "roots": [
-    "<rootDir>/src"
+  roots: [
+    '<rootDir>/src'
   ],
-  "transform": {
-    "^.+\\.tsx?$": "ts-jest"
+  preset: 'ts-jest',
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/src/client/tsconfig.json'
+    }
   },
-  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
-  "moduleFileExtensions": [
-    "ts",
-    "tsx",
-    "js",
-    "jsx",
-    "json",
-    "node"
-  ],
-}
+  moduleNameMapper: {
+    '\\.(css)$': '<rootDir>/src/client/__mocks__/empty.ts'
+  }
+};

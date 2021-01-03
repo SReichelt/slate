@@ -1,22 +1,9 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "sourceMap": true,
-    "module": "commonjs",
-    "importHelpers": true,
-    "allowJs": true,
     "outDir": "../../dist/server",
-    "lib": ["es6"],
-    "moduleResolution": "node",
     "types": ["node"],
-    "skipLibCheck": true,
-    "downlevelIteration": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true
+    "allowJs": true
   },
   "files": [
     "./server.ts"

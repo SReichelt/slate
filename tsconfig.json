@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "build",
     "target": "es6",
     "sourceMap": true,
     "module": "commonjs",
     "importHelpers": true,
-    "allowJs": true,
+    "outDir": "build",
     "lib": ["es6"],
     "moduleResolution": "node",
     "skipLibCheck": true,

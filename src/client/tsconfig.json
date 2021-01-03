@@ -1,21 +1,9 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "sourceMap": true,
-    "module": "commonjs",
-    "importHelpers": true,
     "outDir": "../../dist/client",
     "lib": ["es6", "dom"],
-    "jsx": "react",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "downlevelIteration": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true
+    "jsx": "react"
   },
   "files": [
     "./client.tsx"
