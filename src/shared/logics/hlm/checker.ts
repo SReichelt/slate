@@ -1443,6 +1443,9 @@ export class HLMDefinitionChecker {
   }
 
   private checkMultiGoalProof(object: Object, proof: FmtHLM.ObjectContents_Proof | undefined, parameters: Fmt.ParameterList | undefined, goals: Fmt.Expression[], context: HLMCheckerContext): void {
+    if (!proof && !this.options.warnAboutMissingProofs) {
+      return;
+    }
     if (parameters) {
       if (proof) {
         if (!proof.parameters) {
@@ -1468,8 +1471,7 @@ export class HLMDefinitionChecker {
           object = proof;
         }
         this.checkProofValidity(object, proof, newGoals, context);
-      } else if (this.options.warnAboutMissingProofs
-                 && !newGoals.some((goal: Fmt.Expression) => this.utils.isTrueFormula(goal))) {
+      } else if (!newGoals.some((goal: Fmt.Expression) => this.utils.isTrueFormula(goal))) {
         this.message(object, parameters || !newGoals.length ? 'Proof required' : `Proof of ${newGoals.join(' or ')} required`, Logic.DiagnosticSeverity.Warning);
       }
     });
