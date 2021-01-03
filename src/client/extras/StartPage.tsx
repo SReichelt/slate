@@ -106,7 +106,7 @@ function StartPage(props: StartPageProps): React.ReactElement {
       renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer),
       renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer),
       renderTheoremExample(['Essentials', 'Numbers', 'Real', 'Roots of primes are irrational'], props),
-      renderTheoremExample(['Algebra', 'Semirings', 'Formulas', 'Binomial theorem'], props)
+      renderTheoremExample(['Algebra', 'Semirings', 'Formulas', 'Binomial theorem for commutative semirings'], props)
     ];
     exampleContents = examples.map((example: React.ReactNode, index: number) => <div className="example-container" key={index}>{example}</div>);
   } else {

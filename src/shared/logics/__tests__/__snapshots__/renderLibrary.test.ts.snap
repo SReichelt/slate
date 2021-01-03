@@ -7987,7 +7987,23 @@ References.
 `;
 
 exports[`render hlm library: 2.7.16.1 Algebra/Semirings/Formulas/Binomial%20theorem 1`] = `
-"Theorem 2.7.16.1 (Binomial theorem).  Let 𝐑 be a semiring, a, b ∈ 𝐑, n ∈ ℕ. Then:
+"Theorem 2.7.16.1 (Binomial theorem).  Let 𝐑 be a semiring, a, b ∈ 𝐑 such that a ⋅ b = b ⋅ a, n ∈ ℕ. Then:
+
+  (a + b)^n = (∑_𝐑)_(k = 0)^n (n, k) ⋅ a^(n−k) ⋅ b^k
+
+No proof.
+
+References.
+
+* https://en.wikipedia.org/wiki/Binomial_theorem
+* https://mathworld.wolfram.com/BinomialTheorem.html
+* https://proofwiki.org/wiki/Binomial_Theorem
+* https://ncatlab.org/nlab/show/binomial+theorem#combinatorial_interpretation
+* https://leanprover-community.github.io/mathlib_docs/data/nat/choose/sum.html#add_pow"
+`;
+
+exports[`render hlm library: 2.7.16.2 Algebra/Semirings/Formulas/Binomial%20theorem%20for%20commutative%20semirings 1`] = `
+"Corollary 2.7.16.2.  Let 𝐑 be a commutative semiring, a, b ∈ 𝐑, n ∈ ℕ. Then:
 
   (a + b)^n = (∑_𝐑)_(k = 0)^n (n, k) ⋅ a^(n−k) ⋅ b^k
 
