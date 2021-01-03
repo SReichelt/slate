@@ -20,12 +20,15 @@ Slate builds upon the following third-party software packages.
 * [react-responsive-modal](https://github.com/pradel/react-responsive-modal)
 * [remarkable-react](https://github.com/HHogg/remarkable-react)
 * [react-simplemde-editor](https://github.com/RIP21/react-simplemde-editor)
-* [MathJax](https://www.mathjax.org/) (currently just the font, not the rendering engine)
+* [clsx](https://github.com/lukeed/clsx)
+* [unicodeit](https://github.com/svenkreiss/unicodeit)
+* Fonts from [MathJax](https://www.mathjax.org/) and [GUST](http://www.gust.org.pl/projects/e-foundry/latin-modern)
 
 ## Backend
 
 * [Express](https://expressjs.com/)
 * [http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)
+* [node-fetch](https://github.com/node-fetch/node-fetch)
 * [Nodemailer](https://nodemailer.com/)
 
 ## Other

@@ -6,7 +6,7 @@ import './StandardDialog.css';
 
 import Button from './Button';
 
-import { eventHandled } from '../utils/event';
+import { disableDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getButtonIcon, ButtonType } from '../utils/icons';
 
 
@@ -28,7 +28,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
     if (props.okEnabled) {
       props.onOK();
     }
-    eventHandled(event);
+    disableDefaultBehavior(event);
   };
   let buttons: React.ReactNodeArray;
   if (props.okVisible) {
@@ -55,7 +55,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
   }
   return (
     <Modal open={true} onClose={props.onCancel} showCloseIcon={false} center={true} classNames={modalClassNames} animationDuration={0} key="dialog">
-      <form onSubmit={onOK} onTouchStart={(event) => event.stopPropagation()} onTouchCancel={(event) => event.stopPropagation()} onTouchEnd={(event) => event.stopPropagation()}>
+      <form onSubmit={onOK} onTouchStart={limitDefaultBehaviorToElement} onTouchCancel={limitDefaultBehaviorToElement} onTouchEnd={limitDefaultBehaviorToElement}>
         {props.children}
         <div className={'dialog-button-row'} key="buttons">
           {buttons}

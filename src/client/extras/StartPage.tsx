@@ -9,7 +9,7 @@ import { OnLinkClicked } from '../components/InteractionHandler';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 
 import config from '../utils/config';
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior } from '../utils/event';
 
 import * as Fmt from '../../shared/format/format';
 import * as Notation from '../../shared/notation/notation';
@@ -51,7 +51,7 @@ function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageP
   let href = props.libraryDataProvider!.pathToURI(path);
   let onClick = (event: React.MouseEvent<HTMLElement>) => {
     if (event.button < 1) {
-      eventHandled(event);
+      disableOwnDefaultBehavior(event);
       props.onLinkClicked(props.libraryDataProvider!, path);
     }
   };

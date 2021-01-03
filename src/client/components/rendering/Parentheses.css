@@ -1,0 +1,91 @@
+.paren-large {
+  margin: 1pt;
+  white-space: nowrap;
+}
+
+.paren-large.paren-round {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.paren-flat {
+  display: inline-block;
+  border-left: solid 1pt;
+  border-right: solid 1pt;
+  padding-left: 2pt;
+  padding-right: 2pt;
+}
+
+.paren-table {
+  display: inline-table;
+  border-collapse: collapse;
+}
+
+.paren-table-row {
+  display: table-row;
+}
+
+.paren-table-cell {
+  display: table-cell;
+}
+
+.paren-round-left, .paren-round-right, .paren-curly-left, .paren-curly-right, .paren-angle-left, .paren-angle-right {
+  vertical-align: top;
+  position: relative;
+}
+
+.paren-round-left, .paren-round-right, .paren-angle-left, .paren-angle-right {
+  width: 1ex;
+  min-width: 1ex;
+}
+
+.paren-curly-left, .paren-curly-right {
+  width: 1.2ex;
+  min-width: 1.2ex;
+}
+
+.paren-square-left {
+  width: 3pt;
+  min-width: 3pt;
+  border-left: solid 1.5pt;
+  border-top: solid 0.75pt;
+  border-bottom: solid 0.75pt;
+}
+
+.paren-square-right {
+  width: 3pt;
+  min-width: 3pt;
+  border-right: solid 1.5pt;
+  border-top: solid 0.75pt;
+  border-bottom: solid 0.75pt;
+}
+
+.paren-table-body {
+  min-width: 1pt;
+}
+
+.paren-left-hairline {
+  border-left: dashed 1px var(--light-foreground-color);
+  padding-left: 1pt;
+}
+
+.paren-right-hairline {
+  border-right: dashed 1px var(--light-foreground-color);
+  padding-right: 1pt;
+}
+
+.height-2 {
+  font-size: 110%;
+}
+
+.height-3 {
+  font-size: 120%;
+}
+
+.height-4 {
+  font-size: 130%;
+}
+
+.height-5 {
+  font-size: 140%;
+}

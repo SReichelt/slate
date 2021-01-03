@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior } from '../utils/event';
 
 
 export type OnDocLinkClicked = (uri: string) => void;
@@ -13,7 +13,7 @@ interface DocLinkProps {
 function DocLink(props: React.PropsWithChildren<DocLinkProps>): React.ReactElement {
   let onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (event.button < 1) {
-      eventHandled(event);
+      disableOwnDefaultBehavior(event);
       props.onDocLinkClicked(props.href);
     }
   };

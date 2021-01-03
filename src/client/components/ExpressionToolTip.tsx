@@ -1,4 +1,5 @@
 import * as React from 'react';
+import clsx from 'clsx';
 const ToolTip = require('react-portal-tooltip').default;
 
 import './ExpressionToolTip.css';
@@ -159,10 +160,9 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
     if (this.props.active) {
       this.contents = this.props.getContents();
     }
-    let className = 'tooltip permanent';
-    if (this.props.arrow) {
-      className += ' fixed-width';
-    }
+    let className = clsx('tooltip permanent', {
+      'fixed-width': this.props.arrow
+    });
     return (
       <ToolTip active={this.props.active} parent={this.props.parent} position={this.props.position} arrow={this.props.arrow ?? 'center'} group={this.props.group} style={PermanentToolTip.toolTipStyle} useHover={false}>
         <div className={className}>{this.contents}</div>

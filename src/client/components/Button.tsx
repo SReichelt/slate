@@ -1,8 +1,9 @@
 import * as React from 'react';
+import clsx from 'clsx';
 
 import './Button.css';
 
-import { eventHandled } from '../utils/event';
+import { disableOwnDefaultBehavior } from '../utils/event';
 
 
 // TODO should we use an HTML button element for this?
@@ -38,10 +39,13 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   }
 
   render(): React.ReactNode {
-    let className = 'button';
-    if (this.props.className) {
-      className += ' ' + this.props.className;
-    }
+    let enabled = (this.props.enabled === undefined || this.props.enabled);
+    let className = clsx('button', this.props.className, {
+      'disabled': !enabled,
+      'hoverable': enabled,
+      'pressed': this.state.pressed,
+      'selected': this.props.selected
+    });
     let onClick = undefined;
     let onMouseDown = undefined;
     let onMouseUp = undefined;
@@ -49,19 +53,18 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     let onTouchStart = undefined;
     let onTouchEnd = undefined;
     let onTouchCancel = undefined;
-    if (this.props.enabled === undefined || this.props.enabled) {
-      className += ' hoverable';
+    if (enabled) {
       if (this.props.onClick) {
         let propsOnClick = this.props.onClick;
         onClick = (event: React.SyntheticEvent<HTMLElement>) => {
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
           if (this.ready && !this.props.isMenuItem) {
             propsOnClick(false);
           }
         };
       }
       onMouseDown = (event: React.SyntheticEvent<HTMLElement>) => {
-        eventHandled(event);
+        disableOwnDefaultBehavior(event);
         this.setState({pressed: true});
         this.ready = true;
       };
@@ -69,8 +72,9 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         if (this.props.isMenuItem && this.ready && this.props.onClick) {
           this.props.onClick(false);
           event.preventDefault();
+          // Also propagate event to parent MenuButton in order to close menu.
         } else {
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
         }
         this.setState({pressed: false});
       };
@@ -81,25 +85,18 @@ class Button extends React.Component<ButtonProps, ButtonState> {
       onTouchEnd = (event: React.SyntheticEvent<HTMLElement>) => {
         if (this.props.isMenuItem) {
           event.preventDefault();
+          // Also propagate event to parent MenuButton in order to close menu.
         } else {
-          eventHandled(event);
+          disableOwnDefaultBehavior(event);
         }
         if (this.ready && this.props.onClick) {
           this.props.onClick(true);
         }
       };
       onTouchCancel = (event: React.SyntheticEvent<HTMLElement>) => {
-        eventHandled(event);
+        disableOwnDefaultBehavior(event);
         this.setState({pressed: false});
       };
-    } else {
-      className += ' disabled';
-    }
-    if (this.state.pressed) {
-      className += ' pressed';
-    }
-    if (this.props.selected) {
-      className += ' selected';
     }
     return (
       <div className={className} title={this.props.toolTipText} onClick={onClick} onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onTouchCancel={onTouchCancel}>
