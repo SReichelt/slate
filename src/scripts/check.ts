@@ -5,12 +5,14 @@ import * as FmtReader from '../shared/format/read';
 import * as FmtLibrary from '../shared/logics/library';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
+import { getExpectedDiagnostics } from '../shared/logics/diagnostics';
 import { PhysicalFileAccessor } from '../fs/data/physicalFileAccessor';
 import { LibraryDataProvider, LibraryDefinition, LibraryDataProviderOptions } from '../shared/data/libraryDataProvider';
 import CachedPromise from '../shared/data/cachedPromise';
 
 let errorCount = 0;
 let warningCount = 0;
+let unexpectedError = false;
 
 const logicCheckerOptions: Logic.LogicCheckerOptions = {
   supportPlaceholders: false,
@@ -55,29 +57,50 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
   return promise;
 }
 
-function checkItem(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
+function checkItem(libraryDefinition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
+  let definition = libraryDefinition.definition;
   let checker = libraryDataProvider.logic.getChecker();
-  return checker.checkDefinition(definition.definition, libraryDataProvider, logicCheckerOptions).then((checkResult: Logic.LogicCheckResult) => {
-    for (let diagnostic of checkResult.diagnostics) {
-      let message = diagnostic.message;
-      switch (diagnostic.severity) {
+  return checker.checkDefinition(definition, libraryDataProvider, logicCheckerOptions).then((checkResult: Logic.LogicCheckResult) => {
+    let expectedDiagnostics = getExpectedDiagnostics(definition);
+    for (let {message, severity} of checkResult.diagnostics) {
+      let expectedDiagnosticIndex = expectedDiagnostics.findIndex((diagnostic: Logic.LogicCheckDiagnostic) => (diagnostic.severity === severity && diagnostic.message === message));
+      if (expectedDiagnosticIndex >= 0) {
+        expectedDiagnostics.splice(expectedDiagnosticIndex, 1);
+      }
+      let prefix = 'Unknown';
+      switch (severity) {
       case Logic.DiagnosticSeverity.Error:
-        message = `Error: ${message}`;
+        prefix = 'Error';
+        if (expectedDiagnosticIndex < 0) {
+          unexpectedError = true;
+        }
         errorCount++;
         break;
       case Logic.DiagnosticSeverity.Warning:
-        message = `Warning: ${message}`;
+        prefix = 'Warning';
         warningCount++;
         break;
       case Logic.DiagnosticSeverity.Information:
-        message = `Information: ${message}`;
+        prefix = 'Information';
         break;
       case Logic.DiagnosticSeverity.Hint:
-        message = `Hint: ${message}`;
+        prefix = 'Hint';
         break;
       }
-      if (definition.fileReference) {
-        message = `${definition.fileReference.fileName}: ${message}`;
+      if (expectedDiagnosticIndex >= 0) {
+        prefix += ' (expected)';
+      }
+      message = `${prefix}: ${message}`;
+      if (libraryDefinition.fileReference) {
+        message = `${libraryDefinition.fileReference.fileName}: ${message}`;
+      }
+      console.error(message);
+    }
+    for (let {message} of expectedDiagnostics) {
+      message = `Warning: Expected diagnostic not found: ${message}`;
+      warningCount++;
+      if (libraryDefinition.fileReference) {
+        message = `${libraryDefinition.fileReference.fileName}: ${message}`;
       }
       console.error(message);
     }
@@ -93,7 +116,7 @@ let libraryFileName = process.argv[2];
 checkLibrary(libraryFileName)
   .then(() => {
     console.error(`Found ${errorCount} error(s) and ${warningCount} warning(s).`);
-    process.exit(errorCount ? 1 : 0);
+    process.exit(unexpectedError ? 1 : 0);
   })
   .catch((error) => {
     console.error(error);

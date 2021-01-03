@@ -4,6 +4,7 @@ import * as Fmt from '../../../format/format';
 import * as FmtLibrary from '../../library';
 import * as Logic from '../../logic';
 import * as Logics from '../../logics';
+import { getExpectedDiagnostics, adaptDiagnosticsForComparison } from '../../diagnostics';
 
 async function checkSection(libraryDataProvider: LibraryDataProvider) {
   let section = await libraryDataProvider.fetchLocalSection();
@@ -11,8 +12,8 @@ async function checkSection(libraryDataProvider: LibraryDataProvider) {
   for (let item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
-      let definition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
-      await checkItem(libraryDataProvider, definition);
+      let libraryDefinition = await libraryDataProvider.fetchLocalItem(ref.path.name, true);
+      await checkItem(libraryDataProvider, libraryDefinition);
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
       let ref = item.ref as Fmt.DefinitionRefExpression;
       let childProvider = await libraryDataProvider.getProviderForSection(ref.path);
@@ -21,39 +22,18 @@ async function checkSection(libraryDataProvider: LibraryDataProvider) {
   }
 }
 
-async function checkItem(libraryDataProvider: LibraryDataProvider, definition: LibraryDefinition) {
+async function checkItem(libraryDataProvider: LibraryDataProvider, libraryDefinition: LibraryDefinition) {
+  let definition = libraryDefinition.definition;
   let checker = libraryDataProvider.logic.getChecker();
   let options: Logic.LogicCheckerOptions = {
     supportPlaceholders: false,
     supportRechecking: false,
     warnAboutMissingProofs: true
   };
-  let checkResult: Logic.LogicCheckResult = await checker.checkDefinition(definition.definition, libraryDataProvider, options);
-  let expectedDiagnostics: Logic.LogicCheckDiagnostic[] = [];
-  if (definition.definition.documentation) {
-    for (let item of definition.definition.documentation.items) {
-      let severity: Logic.DiagnosticSeverity;
-      switch (item.kind) {
-      case 'expectedError':
-        severity = Logic.DiagnosticSeverity.Error;
-        break;
-      case 'expectedWarning':
-        severity = Logic.DiagnosticSeverity.Warning;
-        break;
-      default:
-        continue;
-      }
-      expectedDiagnostics.push({
-        object: definition.definition.name,
-        severity: severity,
-        message: item.text
-      });
-    }
-  }
-  for (let diagnostic of checkResult.diagnostics) {
-    diagnostic.object = definition.definition.name;
-  }
-  expect(checkResult.diagnostics).toEqual(expectedDiagnostics);
+  let checkResult = await checker.checkDefinition(definition, libraryDataProvider, options);
+  let expectedDiagnostics = getExpectedDiagnostics(definition);
+  let actualDiagnostics = adaptDiagnosticsForComparison(checkResult.diagnostics, definition);
+  expect(actualDiagnostics).toEqual(expectedDiagnostics);
 }
 
 test('run checker test suite', async () => {
