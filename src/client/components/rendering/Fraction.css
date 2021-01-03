@@ -1,0 +1,21 @@
+.fraction {
+  display: inline-table;
+  text-align: center;
+  vertical-align: 50%;
+  white-space: nowrap;
+  border-collapse: collapse;
+}
+
+.fraction-numerator-row, .fraction-denominator-row {
+  display: table-row;
+}
+
+.fraction-numerator, .fraction-denominator {
+  display: table-cell;
+  padding-left: 0.3ex;
+  padding-right: 0.3ex;
+}
+
+.fraction-denominator {
+  border-top: solid 0.6pt;
+}

@@ -1,0 +1,65 @@
+.subsup {
+  display: inline-table;
+  vertical-align: middle;
+  white-space: nowrap;
+  border-collapse: collapse;
+}
+
+.subsup-full {
+  margin-top: -0.75em;
+  margin-bottom: -0.75em;
+}
+
+.subsup-body-row {
+  display: table-row;
+}
+
+.subsup-sub-row, .subsup-sup-row {
+  display: table-row;
+  height: 0.75em;
+}
+
+.subsup-body, .subsup-empty {
+  display: table-cell;
+}
+
+.subsup-left-sub, .subsup-left-sup, .subsup-right-sub, .subsup-right-sup {
+  display: table-cell;
+  font-size: smaller;
+  position: relative;
+  line-height: 100%;
+}
+
+.subsup-left-sub, .subsup-left-sup {
+  text-align: right;
+}
+
+.subsup-right-sub, .subsup-right-sup {
+  text-align: left;
+}
+
+.subsup-left-sub, .subsup-right-sub {
+  vertical-align: top;
+  bottom: 0.2em;
+}
+
+.subsup-left-sup, .subsup-right-sup {
+  vertical-align: bottom;
+  top: -0.1em;
+}
+
+.subsup-full-row>.subsup-left-sub, .subsup-full-row>.subsup-right-sub {
+  bottom: 0.75em;
+}
+
+.subsup-full-row>.subsup-left-sup, .subsup-full-row>.subsup-right-sup {
+  top: 0.75em;
+}
+
+.subsup-body:not(:first-child)>.paren>.paren-round {
+  margin-left: -0.05ex;
+}
+
+.subsup-body:not(:last-child)>.paren>.paren-round {
+  margin-right: -0.05ex;
+}

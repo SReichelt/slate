@@ -1,0 +1,42 @@
+.overunder {
+  display: inline-table;
+  vertical-align: middle;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 100%;
+  border-collapse: collapse;
+}
+
+.overunder.noover {
+  vertical-align: initial;
+  margin-top: 0.9em;
+}
+
+.overunder-body-row {
+  display: table-row;
+  vertical-align: initial;
+}
+
+.overunder-over-row, .overunder-under-row {
+  display: table-row;
+  font-size: smaller;
+}
+
+.overunder-body, .overunder-over, .overunder-under {
+  display: table-cell;
+  height: 0.3em;
+}
+
+.overunder.shallow>.overunder-body-row>.overunder-body, .overunder.shallow>.overunder-body-row>.overunder-body * {
+  line-height: 80%;
+}
+
+.overunder.shallow.nounder>.overunder-body-row>.overunder-body {
+  position: relative;
+  top: -0.4em;
+}
+
+.overunder.shallow.nounder>.overunder-over-row>.overunder-over {
+  position: relative;
+  top: -0.2em;
+}

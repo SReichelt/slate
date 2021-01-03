@@ -1,0 +1,64 @@
+.radical {
+  display: inline-table;
+  margin-top: 0.1em;
+  margin-bottom: 0.2em;
+  white-space: nowrap;
+  border-collapse: collapse;
+}
+
+.radical-row {
+  display: table-row;
+}
+
+.radical-degree-col {
+  display: table-cell;
+  vertical-align: bottom;
+}
+
+.radical-degree-table {
+  display: table;
+}
+
+.radical-degree-top-row {
+  display: table-row;
+}
+
+.radical-degree-bottom-row {
+  display: table-row;
+}
+
+.radical-degree {
+  display: table-cell;
+  font-size: smaller;
+  line-height: 100%;
+  position: relative;
+  bottom: 0.25em;
+  left: 0.5pt;
+  min-width: 0.6em;
+  text-align: right;
+}
+
+.radical-degree-bottom-cell {
+  display: table-cell;
+  height: 0.3em;
+  position: relative;
+}
+
+.radical-diagonal {
+  display: table-cell;
+  width: 1ex;
+  min-width: 1ex;
+  position: relative;
+  overflow: visible;
+}
+
+.radical-diagonal svg {
+  overflow: visible;
+}
+
+.radical-radicand {
+  display: table-cell;
+  border-top: solid 0.8pt;
+  padding: 0.5pt 1.5pt 0pt 0.5pt;
+  line-height: 100%;
+}

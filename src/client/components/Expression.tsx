@@ -19,6 +19,11 @@ import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
 import Button from './Button';
+import { RoundParens, FlatParens, SquareParens, CurlyParens, AngleParens } from './rendering/Parentheses';
+import { SubSup } from './rendering/SubSup';
+import { renderOverUnder } from './rendering/OverUnder';
+import { renderFraction } from './rendering/Fraction';
+import { renderRadical } from './rendering/Radical';
 import { PromiseHelper, renderPromise } from './PromiseHelper';
 
 import config from '../utils/config';
@@ -91,6 +96,17 @@ export interface ExpressionState {
   unfolded?: boolean;
   openMenu?: Menu.ExpressionMenu;
   openDialog?: Dialog.DialogBase;
+}
+
+interface RenderedExpressionConfig {
+  className: string;
+  semanticLinks?: Notation.SemanticLink[];
+}
+
+interface WrappedExpressionConfig extends RenderedExpressionConfig {
+  innerClassName?: string;
+  isInputControl?: boolean;
+  placeholder?: Notation.PlaceholderExpression;
 }
 
 class Expression extends React.Component<ExpressionProps, ExpressionState> {
@@ -250,427 +266,35 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         semanticLinks = expression.semanticLinks;
       }
     }
-    this.semanticLinks = semanticLinks;
     if ((optionalParenLeft || optionalParenRight)
         && optionalParenMaxLevel === undefined
         && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
       return this.renderExpression(new Notation.ParenExpression(expression, optionalParenStyle), className, semanticLinks);
     }
+    this.semanticLinks = semanticLinks;
+    let renderedExpressionConfig: RenderedExpressionConfig = { className, semanticLinks };
     if (expression instanceof Notation.EmptyExpression) {
       if (semanticLinks) {
-        return this.wrapRenderedExpression('\u200b', { semanticLinks, className });
+        return this.wrapRenderedExpression('\u200b', renderedExpressionConfig);
       } else {
         return null;
       }
     } else if (expression instanceof Notation.TextExpression) {
-      if (this.props.interactionHandler && expression.onTextChanged) {
-        let text = expression.text;
-        let supportLatexInput = !expression.hasStyleClass('integer');
-        let latexInput = supportLatexInput && isLatexInput(text);
-        let setText = (newText: string) => {
-          expression.text = newText;
-          this.setState({inputError: false});
-          this.forceUpdate();
-          if (expression.onTextChanged && !(supportLatexInput && isLatexInput(newText))) {
-            if (expression.onTextChanged(newText)) {
-              if (this.props.interactionHandler) {
-                this.props.interactionHandler.expressionChanged();
-              }
-            } else {
-              this.setState({inputError: true});
-            }
-          }
-        };
-        let performLatexReplacement = () => {
-          let textAfterReplacement = replaceLatexCodeOrPrefix(text);
-          if (textAfterReplacement !== text) {
-            setText(textAfterReplacement);
-          }
-        };
-        let onFocus = () => {
-          this.highlightPermanently();
-          this.setState({ inputFocused: true });
-        };
-        let onBlur = () => {
-          this.clearPermanentHighlight();
-          this.setState({ inputFocused: false });
-          if (latexInput) {
-            performLatexReplacement();
-          }
-        };
-        let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-          let newText = event.target.value;
-          if (latexInput) {
-            newText = replaceExactLatexCodeOnly(newText);
-          }
-          setText(newText);
-          this.triggerHighlightPermanently();
-        };
-        let onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-          if (latexInput && (event.key === 'Enter' || event.key === ' ')) {
-            performLatexReplacement();
-            disableDefaultBehavior(event);
-          }
-        };
-        let ref = undefined;
-        if (expression.requestTextInput) {
-          ref = (htmlNode: HTMLInputElement | null) => {
-            if (htmlNode) {
-              expression.requestTextInput = false;
-              htmlNode.select();
-              htmlNode.focus();
-              this.triggerHighlightPermanently();
-            }
-          };
-        }
-        let inputClassName = clsx('expr-input', {
-          'input-error': this.state.inputError,
-          'input-latex': latexInput,
-          'italic': !latexInput && expression.hasStyleClass('var') && useItalicsForVariable(text)
-        });
-        let size = expression.inputLength ?? text.length + 1;
-        let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
-        let menu: JSX.Element | undefined = undefined;
-        if (latexInput && this.state.inputFocused) {
-          let suggestions = getLatexInputSuggestions(text);
-          let rows = suggestions.map((suggestion, rowIndex) => {
-            let action = new Menu.ImmediateExpressionMenuAction(() => {
-              setText(suggestion.unicodeCharacters);
-            });
-            let preview = new Notation.TextExpression(suggestion.unicodeCharacters);
-            preview.styleClasses = expression.styleClasses;
-            let item = new Menu.ExpressionMenuItem(preview, action);
-            item.selected = rowIndex === 0;
-            let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
-            row.subMenu = item;
-            return row;
-          });
-          if (rows.length > 0) {
-            let expressionMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
-            menu = <ExpressionMenu menu={expressionMenu} onItemClicked={this.onMenuItemClicked} />;
-          }
-        }
-        let input = (
-          <input
-            key="input"
-            type={'text'}
-            className={inputClassName}
-            value={text}
-            style={style}
-            onChange={onChange}
-            onMouseDown={limitDefaultBehaviorToElement}
-            onMouseUp={limitDefaultBehaviorToElement}
-            onTouchStart={limitDefaultBehaviorToElement}
-            onTouchCancel={limitDefaultBehaviorToElement}
-            onTouchEnd={limitDefaultBehaviorToElement}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onKeyDown={onKeyDown}
-            ref={ref}
-            autoFocus={expression.requestTextInput}
-          />
-        );
-        return (
-          <span className={'menu-container'} onTouchStart={limitDefaultBehaviorToElement} onTouchCancel={limitDefaultBehaviorToElement} onTouchEnd={limitDefaultBehaviorToElement}>
-            {this.wrapRenderedExpression(input, { className, semanticLinks, isInputControl: true })}
-            {menu}
-          </span>
-        );
-      } else {
-        let text = expression.text;
-        if (text) {
-          if (expression.hasStyleClass('integer')) {
-            let resultArray = [];
-            for (let endIndex = text.length; endIndex > 0; endIndex -= 3) {
-              let startIndex = endIndex - 3;
-              if (startIndex < 0) {
-                startIndex = 0;
-              }
-              resultArray.unshift(text.substring(startIndex, endIndex));
-              if (startIndex > 0) {
-                resultArray.unshift(<span className={'thousands-separator'} key={startIndex}/>);
-              }
-            }
-            return this.wrapRenderedExpression(resultArray, { semanticLinks, className });
-          } else {
-            let firstChar = text.charAt(0);
-            let lastChar = text.charAt(text.length - 1);
-            className = clsx(
-              className,
-              { 'space-start': firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a') },
-              expression.hasStyleClass('var') && useItalicsForVariable(text) && {
-                'italic': true,
-                'charcorner-tr': lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z',
-                'charcorner-large': lastChar === 'T' || lastChar === 'Y',
-                'charcorner-bl': firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y'
-              }
-            );
-            return this.wrapRenderedExpression(this.convertText(text), { semanticLinks, className });
-          }
-        } else {
-          return this.wrapRenderedExpression('\u200b', { semanticLinks, className });
-        }
-      }
+      return this.renderTextExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.RowExpression) {
       if (expression.items.length === 1) {
         return this.renderExpression(expression.items[0], className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
       } else {
-        className = clsx(className, 'row');
-        let renderedExpressions = expression.items.map((item: Notation.RenderedExpression, index: number) =>
-          <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler} key={index}/>);
-        return this.wrapRenderedExpression(renderedExpressions, { semanticLinks, className });
+        return this.renderRowExpression(expression, renderedExpressionConfig);
       }
     } else if (expression instanceof Notation.ParagraphExpression) {
-      className = clsx(className, 'paragraph');
-      return expression.paragraphs.map((paragraph: Notation.RenderedExpression, index: number) => (
-        <div className={className} key={index}>
-          <Expression expression={paragraph} parent={this} interactionHandler={this.props.interactionHandler}/>
-        </div>
-      ));
+      return this.renderParagraphExpression(expression, className);
     } else if (expression instanceof Notation.ListExpression) {
-      className = clsx(className, 'list');
-      if (expression.style instanceof Array) {
-        className = clsx(className, 'custom');
-        let rows = expression.items.map((item: Notation.RenderedExpression, index: number) => {
-          let itemClassName = clsx('list-item', index > 0 && 'space-above');
-          return (
-            <span className={itemClassName} key={index}>
-              <span className={'list-item-header'}>
-                {expression.style[index]}
-              </span>
-              <span className={'list-item-contents'}>
-                <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
-              </span>
-            </span>
-          );
-        });
-        return <span className={className}>{rows}</span>;
-      } else {
-        let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
-          return (
-            <li className={'list-item'} key={index}>
-              <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
-            </li>
-          );
-        });
-        return (expression.style === '1.'
-          ? <ol className={className}>{items}</ol>
-          : <ul className={className}>{items}</ul>);
-      }
+      return this.renderListExpression(expression, className);
     } else if (expression instanceof Notation.TableExpression) {
-      let colCount = 0;
-      for (let row of expression.items) {
-        if (colCount < row.length) {
-          colCount = row.length;
-        }
-      }
-      let rows: React.ReactNode[] = [];
-      let rowIndex = 0;
-      for (let row of expression.items) {
-        let colIndex = 0;
-        let columns: React.ReactNode[] = [];
-        for (let cell of row) {
-          columns.push(
-            <span className={'table-cell'} key={colIndex++}>
-              <Expression expression={cell} parent={this} interactionHandler={this.props.interactionHandler}/>
-            </span>
-          );
-        }
-        while (colIndex < colCount) {
-          columns.push(
-            <span className={'table-cell'} key={colIndex++}/>
-          );
-        }
-        let curRowIndex = rowIndex++;
-        let renderCurRow = (additionalClassName?: string) => (
-          <span className={clsx('table-row', additionalClassName)} key={curRowIndex}>
-            {columns}
-          </span>
-        );
-        if (row.length) {
-          let renderRow = row[0].getLineHeight().then((lineHeight: number) =>
-            renderCurRow(lineHeight ? undefined : 'large'));
-          rows.push(renderPromise(renderRow, curRowIndex.toString()));
-        } else {
-          rows.push(renderCurRow());
-        }
-      }
-      return this.wrapRenderedExpression(rows, { semanticLinks, className, innerClassName: 'table' });
+      return this.renderTableExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.ParenExpression) {
-      let render = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
-        if (surroundingParenStyle === expression.style) {
-          return this.renderExpression(expression.body, className, semanticLinks);
-        } else {
-          return expression.body.getLineHeight().then((lineHeight: number) => {
-            let parenResult: React.ReactNode = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
-            let handled = false;
-            let openParen = '';
-            let closeParen = '';
-            let parenClassName = 'paren-text';
-            switch (expression.style) {
-            case '()':
-              openParen = '(';
-              closeParen = ')';
-              if (lineHeight) {
-                parenClassName = 'paren-round-text';
-              } else {
-                parenResult = (
-                  <span className={'paren-large paren-round'}>
-                    <span className={'paren-round-row'}>
-                      <span className={'paren-round-left'}>
-                        <svg viewBox="0 -5.5 1 11" preserveAspectRatio="none">
-                          <path d="M 1 -5 C -0.25 -4 -0.25 4 1 5 C 0 3 0 -3 1 -5 Z" fill="var(--foreground-color)"/>
-                        </svg>
-                      </span>
-                      <span className={'paren-round-body'}>
-                        {parenResult}
-                      </span>
-                      <span className={'paren-round-right'}>
-                        <svg viewBox="0 -5.5 1 11" preserveAspectRatio="none">
-                          <path d="M 0 -5 C 1.25 -4 1.25 4 0 5 C 1 3 1 -3 0 -5 Z" fill="var(--foreground-color)"/>
-                        </svg>
-                      </span>
-                    </span>
-                  </span>
-                );
-                handled = true;
-              }
-              break;
-            case '||':
-              openParen = closeParen = '∣';
-              if (lineHeight) {
-                parenClassName = 'paren-flat-text';
-              } else {
-                parenResult = (
-                  <span className={'paren-large paren-flat'}>
-                    {parenResult}
-                  </span>
-                );
-                handled = true;
-              }
-              break;
-            case '[]':
-              openParen = '[';
-              closeParen = ']';
-              if (lineHeight) {
-                parenClassName = 'paren-square-text';
-              } else {
-                parenResult = (
-                  <span className={'paren-large paren-square'}>
-                    <span className={'paren-square-row'}>
-                      <span className={'paren-square-left'}/>
-                      <span className={'paren-square-body'}>
-                        {parenResult}
-                      </span>
-                      <span className={'paren-square-right'}/>
-                    </span>
-                  </span>
-                );
-                handled = true;
-              }
-              break;
-            case '{}':
-              openParen = '{';
-              closeParen = '}';
-              if (lineHeight) {
-                parenClassName = 'paren-curly-text';
-              } else {
-                parenResult = (
-                  <span className={'paren-large paren-curly'}>
-                    <span className={'paren-curly-row'}>
-                      <span className={'paren-curly-left'}>
-                        <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
-                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="var(--foreground-color)"/>
-                        </svg>
-                      </span>
-                      <span className={'paren-curly-body'}>
-                        {parenResult}
-                      </span>
-                      <span className={'paren-curly-right'}>
-                        <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
-                          <path d="M 0 -5 Q 0.6 -5 0.6 -3.5 L 0.6 -2 Q 0.6 0 1 0 Q 0.6 0 0.6 2 L 0.6 3.5 Q 0.6 5 0 5 Q 0.45 5 0.45 3 L 0.45 1.5 Q 0.45 -0.2 1 0 Q 0.45 0.2 0.45 -1.5 L 0.45 -3 Q 0.45 -5 0 -5 Z" fill="var(--foreground-color)"/>
-                        </svg>
-                      </span>
-                    </span>
-                  </span>
-                );
-                handled = true;
-              }
-              break;
-            case '{':
-              openParen = '{';
-              if (optionalParenRight) {
-                closeParen = '∣';
-              }
-              if (lineHeight) {
-                parenClassName = 'paren-curly-text';
-              } else {
-                let bodyClassName = clsx('paren-curly-body', closeParen && 'paren-right-hairline');
-                parenResult = (
-                  <span className={'paren-large paren-curly'}>
-                    <span className={'paren-curly-row'}>
-                      <span className={'paren-curly-left'}>
-                        <svg viewBox="0 -5 1 10" preserveAspectRatio="none">
-                          <path d="M 1 -5 Q 0.4 -5 0.4 -3.5 L 0.4 -2 Q 0.4 0 0 0 Q 0.4 0 0.4 2 L 0.4 3.5 Q 0.4 5 1 5 Q 0.55 5 0.55 3 L 0.55 1.5 Q 0.55 -0.2 0 0 Q 0.55 0.2 0.55 -1.5 L 0.55 -3 Q 0.55 -5 1 -5 Z" fill="var(--foreground-color)"/>
-                        </svg>
-                      </span>
-                      <span className={bodyClassName}>
-                        {parenResult}
-                      </span>
-                    </span>
-                  </span>
-                );
-                handled = true;
-              }
-              break;
-            case '<>':
-              openParen = '⟨';
-              closeParen = '⟩';
-              if (lineHeight) {
-                parenClassName = 'paren-angle-text';
-              } else {
-                parenResult = (
-                  <span className={'paren-large paren-angle'}>
-                    <span className={'paren-angle-row'}>
-                      <span className={'paren-angle-left'}>
-                        <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                          <path d="M 0.9 0 L 0.1 0.5 L 0.9 1" y2="0" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square" fill="transparent"/>
-                        </svg>
-                      </span>
-                      <span className={'paren-angle-body'}>
-                        {parenResult}
-                      </span>
-                      <span className={'paren-angle-right'}>
-                        <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                          <path d="M 0.1 0 L 0.9 0.5 L 0.1 1" y2="0" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square" fill="transparent"/>
-                        </svg>
-                      </span>
-                    </span>
-                  </span>
-                );
-                handled = true;
-              }
-              break;
-            }
-            if (!handled) {
-              let heightClassName = 'height';
-              for (let i = 1; i <= lineHeight; i++) {
-                heightClassName = clsx(heightClassName, `height-${i}`);
-              }
-              parenResult = [
-                <span className={parenClassName} key="open"><span className={heightClassName}>{openParen}</span></span>,
-                parenResult,
-                <span className={parenClassName} key="close"><span className={heightClassName}>{closeParen}</span></span>
-              ];
-            }
-            return parenResult;
-          });
-        }
-      });
-      return this.wrapRenderedExpression(
-        <PromiseHelper promise={render}/>,
-        { semanticLinks, className, innerClassName: 'paren' }
-      );
+      return this.renderParenExpression(expression, renderedExpressionConfig, optionalParenRight);
     } else if (expression instanceof Notation.OuterParenExpression) {
       if (((expression.left && optionalParenLeft) || (expression.right && optionalParenRight))
           && (expression.minLevel === undefined || optionalParenMaxLevel === undefined || expression.minLevel <= optionalParenMaxLevel)) {
@@ -681,264 +305,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.InnerParenExpression) {
       return this.renderExpression(expression.body, className, semanticLinks, expression.left, expression.right, expression.maxLevel);
     } else if (expression instanceof Notation.SubSupExpression) {
-      let renderWithLineHeight = (lineHeight?: number) => {
-        let subSupResult: React.ReactNode[] = [<Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>];
-        let sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sub"/> : null;
-        let sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sup"/> : null;
-        let preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSub"/> : null;
-        let preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSup"/> : null;
-        if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
-          if (expression.sub) {
-            subSupResult.push(<sub key="sub">{renderPromise(expression.sub.getLineHeight().then((subLineHeight: number) => subLineHeight ? sub : <sub>{sub}</sub>), undefined, () => sub)}</sub>);
-          }
-          if (expression.sup) {
-            subSupResult.push(<sup key="sup">{renderPromise(expression.sup.getLineHeight().then((supLineHeight: number) => supLineHeight ? sup : <sup>{sup}</sup>), undefined, () => sup)}</sup>);
-          }
-          if (expression.preSub) {
-            subSupResult.unshift(<sub key="preSub">{renderPromise(expression.preSub.getLineHeight().then((preSubLineHeight: number) => preSubLineHeight ? preSub : <sub>{preSub}</sub>), undefined, () => preSub)}</sub>);
-          }
-          if (expression.preSup) {
-            subSupResult.unshift(<sup key="preSup">{renderPromise(expression.preSup.getLineHeight().then((preSupLineHeight: number) => preSupLineHeight ? preSup : <sup>{preSup}</sup>), undefined, () => preSup)}</sup>);
-          }
-        } else {
-          let empty = <span className={'subsup-empty'} key="empty"/>;
-          let rightSub = null;
-          let rightSup = null;
-          if (sub) {
-            rightSub = <span className={'subsup-right-sub'} key="sub">{sub}</span>;
-          }
-          if (sup) {
-            rightSup = <span className={'subsup-right-sup'} key="sup">{sup}</span>;
-          }
-          let leftSub = null;
-          let leftSup = null;
-          if (preSub) {
-            leftSub = <span className={'subsup-left-sub'} key="sub">{preSub}</span>;
-          }
-          if (preSup) {
-            leftSup = <span className={'subsup-left-sup'} key="sup">{preSup}</span>;
-          }
-          if (lineHeight) {
-            subSupResult = [subSupResult];
-            if (leftSup || leftSub) {
-              subSupResult.unshift(
-                <span className={'subsup'} key="left">
-                  <span className={'subsup-sup-row'} key="sup">
-                    {leftSup ?? empty}
-                  </span>
-                  <span className={'subsup-sub-row'} key="sub">
-                    {leftSub ?? empty}
-                  </span>
-                </span>
-              );
-            }
-            if (rightSup || rightSub) {
-              subSupResult.push(
-                <span className={'subsup'} key="right">
-                  <span className={'subsup-sup-row'} key="sup">
-                    {rightSup ?? empty}
-                  </span>
-                  <span className={'subsup-sub-row'} key="sub">
-                    {rightSub ?? empty}
-                  </span>
-                </span>
-              );
-            }
-          } else {
-            return (
-              <span className={'subsup subsup-full'}>
-                <span className={'subsup-sup-row subsup-full-row'} key="sup">
-                  {(leftSup || leftSub) ? (leftSup ?? empty) : null}
-                  <span className={'subsup-empty'} key="middle"/>
-                  {(rightSup || rightSub) ? (rightSup ?? empty) : null}
-                </span>
-                <span className={'subsup-body-row'} key="body">
-                  {(leftSup || leftSub) ? empty : null}
-                  <span className={'subsup-body'} key="middle">
-                    {subSupResult}
-                  </span>
-                  {(rightSup || rightSub) ? empty : null}
-                </span>
-                <span className={'subsup-sub-row subsup-full-row'} key="sub">
-                  {(leftSup || leftSub) ? (leftSub ?? empty) : null}
-                  <span className={'subsup-empty'} key="middle"/>
-                  {(rightSup || rightSub) ? (rightSub ?? empty) : null}
-                </span>
-              </span>
-            );
-          }
-        }
-        return subSupResult;
-      };
-      let render = expression.body.getLineHeight().then(renderWithLineHeight);
-      return this.wrapRenderedExpression(
-        renderPromise(render, undefined, renderWithLineHeight),
-        { semanticLinks, className }
-      );
+      return this.renderSubSupExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.OverUnderExpression) {
-      let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-      let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-      let rows: React.ReactNode[] = [
-        <span className={'overunder-body-row'} key="body">
-          <span className={'overunder-body'}>
-            <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </span>
-        </span>,
-        <span className={'overunder-under-row'} key="under">
-          <span className={'overunder-under'}>
-            {under}
-          </span>
-        </span>
-      ];
-      if (over) {
-        rows.unshift(
-          <span className={'overunder-over-row'} key="over">
-            <span className={'overunder-over'}>
-              {over}
-            </span>
-          </span>
-        );
-      }
-      let innerClassName = clsx('overunder', {
-        'noover': !over,
-        'nounder': !under
-      });
-      return this.wrapRenderedExpression(rows, { semanticLinks, className, innerClassName });
+      return this.renderOverUnderExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.FractionExpression) {
-      let elements = [
-        <span className={'fraction-numerator-row'} key="numerator">
-          <span className={'fraction-numerator'}>
-            <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </span>
-        </span>,
-        <span className={'fraction-denominator-row'} key="denominator">
-          <span className={'fraction-denominator'}>
-            <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </span>
-        </span>
-      ];
-      return this.wrapRenderedExpression(elements, { semanticLinks, className, innerClassName: 'fraction' });
+      return this.renderFractionExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.RadicalExpression) {
-      let radicalElement = (
-        <span className={'radical-row'}>
-          <span className={'radical-degree-col'}>
-            <span className={'radical-degree-table'}>
-              <span className={'radical-degree-top-row'}>
-                <span className={'radical-degree'}>
-                  {expression.degree ? <Expression expression={expression.degree} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null}
-                </span>
-              </span>
-              <span className={'radical-degree-bottom-row'}>
-                <span className={'radical-degree-bottom-cell'}>
-                  <svg viewBox="0 0 1 1" preserveAspectRatio="xMaxYMax">
-                    <line x1="0.1" y1="0.35" x2="0.4" y2="0.1" stroke="var(--foreground-color)" strokeWidth="0.08" strokeLinecap="square"/>
-                    <line x1="0.45" y1="0.15" x2="1.05" y2="1" stroke="var(--foreground-color)" strokeWidth="0.2" strokeLinecap="square"/>
-                  </svg>
-                </span>
-              </span>
-            </span>
-          </span>
-          <span className={'radical-diagonal'}>
-            <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-              <line x1="0" y1="0.965" x2="1.025" y2="0.05" stroke="var(--foreground-color)" strokeWidth="0.1" strokeLinecap="square"/>
-            </svg>
-          </span>
-          <span className={'radical-radicand'}>
-            <Expression expression={expression.radicand} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </span>
-        </span>
-      );
-      return this.wrapRenderedExpression(radicalElement, { semanticLinks, className, innerClassName: 'radical' });
+      return this.renderRadicalExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.MarkdownExpression) {
-      let markdown: React.ReactNode;
-      if (this.props.interactionHandler && expression.onTextChanged) {
-        let onChange = (newText: string) => {
-          expression.text = newText;
-          this.forceUpdate();
-          if (expression.onTextChanged) {
-            expression.onTextChanged(newText);
-          }
-          if (this.props.interactionHandler) {
-            this.props.interactionHandler.expressionChanged(false);
-          }
-        };
-        let onSearch = undefined;
-        if (expression.searchURLs) {
-          let searchURLs = expression.searchURLs;
-          onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
-        }
-        if ('ontouchstart' in window) {
-          // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
-          markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
-          if (onSearch) {
-            markdown = (
-              <div>
-                {markdown}
-                <Button className={'standalone'} onClick={onSearch}>Search default references...</Button>
-              </div>
-            );
-          }
-        } else {
-          let key = 'markdown-editor';
-          let toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
-          if (!config.embedded) {
-            toolbar.push('guide');
-          }
-          if (onSearch) {
-            let searchButton: EasyMDE.ToolbarIcon = {
-              name: 'search',
-              action: onSearch,
-              className: 'fa fa-search',
-              title: 'Search Default References'
-            };
-            toolbar.push('|', searchButton);
-            key = 'markdown-editor-with-search';
-          }
-          let previewElement = document.createElement('div');
-          let options: EasyMDE.Options = {
-            toolbar: toolbar as any,
-            status: false,
-            spellChecker: false,
-            autoDownloadFontAwesome: false,
-            previewRender: (markdownPlaintext: string) => {
-              ReactDOM.render(this.renderMarkdown(markdownPlaintext, expression.onRenderCode), previewElement);
-              return previewElement.innerHTML;
-            }
-          };
-          markdown = <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
-        }
-      } else {
-        markdown = this.renderMarkdown(expression.text, expression.onRenderCode);
-      }
-      return (
-        <div className={clsx(className, 'markdown')}>
-          {markdown}
-          {this.renderDialog()}
-        </div>
-      );
+      return this.renderMarkdownExpression(expression, className);
     } else if (expression instanceof Notation.FoldableExpression) {
-      className = clsx(className, 'foldable');
-      let unfolded = this.state.unfolded ?? expression.initiallyUnfolded;
-      let onClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (event.button < 1) {
-          this.setState({unfolded: !unfolded});
-          disableOwnDefaultBehavior(event);
-        }
-      };
-      let rows = [
-        <div className={'paragraph foldable-heading'} onClick={onClick} key={'heading'}>
-          <span className={'foldable-icon'}>{getSectionIcon(unfolded)}</span>
-          <Expression expression={expression.heading} parent={this} interactionHandler={this.props.interactionHandler}/>
-        </div>
-      ];
-      if (unfolded) {
-        rows.push(
-          <div className={'paragraph'} key={'contents'}>
-            <Expression expression={expression.contents} parent={this} interactionHandler={this.props.interactionHandler}/>
-          </div>
-        );
-      }
-      return this.wrapRenderedExpression(rows, { semanticLinks, className });
+      return this.renderFoldableExpression(expression, renderedExpressionConfig);
     } else if (expression instanceof Notation.IndirectExpression) {
       return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Notation.PromiseExpression) {
@@ -949,36 +326,123 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.AbstractDecoratedExpression) {
       return this.renderExpression(expression.body, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Notation.PlaceholderExpression) {
-      className = clsx(className, 'placeholder');
-      let icon: React.ReactNode;
-      if (expression instanceof Notation.InsertPlaceholderExpression) {
-        let buttonType = (expression.mandatory ? ButtonType.InsertMandatory : ButtonType.Insert);
-        let hasSemanticLinkMenu = (semanticLinks ?? []).some(semanticLink => !!semanticLink.onMenuOpened);
-        let enabled = (expression.action !== undefined || hasSemanticLinkMenu || this.props.interactionHandler === undefined);
-        icon = getButtonIcon(buttonType, enabled);
-      } else {
-        icon = getDefinitionIcon(expression.placeholderType);
-      }
-      return this.wrapRenderedExpression(
-        <span className={'menu-placeholder'}>{icon}</span>,
-        { semanticLinks, className, placeholder: expression }
-      );
+      return this.renderPlaceholderExpression(expression, renderedExpressionConfig);
+    } else if (expression instanceof Notation.ErrorExpression) {
+      return this.renderError(expression.errorMessage, renderedExpressionConfig);
     } else {
-      className = clsx(className, 'error');
-      let error = expression instanceof Notation.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
-      return this.wrapRenderedExpression(`Error: ${error}`, { semanticLinks, className });
+      return this.renderError('Unknown expression type', renderedExpressionConfig);
     }
   }
 
-  private wrapRenderedExpressionWithMenuStuff(
+  private wrapRenderedExpression(
     content: React.ReactNode,
-    placeholder: Notation.PlaceholderExpression | undefined,
-    semanticLinks: Notation.SemanticLink[] | undefined,
+    { className, semanticLinks, placeholder, ...extraConfig }: WrappedExpressionConfig
+  ): React.ReactNode {
+    let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;
+    let alwaysShowMenu = false;
+    if (semanticLinks) {
+      for (let semanticLink of semanticLinks) {
+        if (semanticLink.onMenuOpened) {
+          onMenuOpened = semanticLink.onMenuOpened;
+          alwaysShowMenu = semanticLink.alwaysShowMenu || placeholder !== undefined;
+          if (semanticLink.autoOpenMenu && !this.autoOpenTimer) {
+            let autoOpenMenu = () => {
+              if (onMenuOpened && !this.state.openMenu) {
+                this.openMenu(onMenuOpened);
+              }
+            };
+            this.autoOpenTimer = setTimeout(autoOpenMenu, 0);
+          }
+        }
+        if (semanticLink.isDefinition) {
+          className = clsx(className, 'definition');
+        }
+      }
+    }
+    let adaptedConfig = { className, semanticLinks, placeholder, ...extraConfig };
+    let hasMenu = this.props.interactionHandler !== undefined && onMenuOpened !== undefined;
+    this.hasMenu = hasMenu;
+    if (hasMenu || placeholder !== undefined) {
+      return this.wrapRenderedExpressionWithMenuOrButton(content, adaptedConfig, onMenuOpened, hasMenu, alwaysShowMenu);
+    } else {
+      return this.wrapRenderedExpressionDefault(content, adaptedConfig);
+    }
+  }
+
+  private wrapRenderedExpressionDefault(
+    content: React.ReactNode,
+    { className, semanticLinks, innerClassName, isInputControl = false }: WrappedExpressionConfig
+  ): React.ReactNode {
+    let result = content;
+    className = clsx(className, innerClassName, this.state.hovered && 'hover');
+    if (this.props.interactionHandler && semanticLinks && semanticLinks.length && this.isInteractionEnabled(isInputControl)) {
+      className = clsx(className, 'interactive');
+      let uriLink: Notation.SemanticLink | undefined = undefined;
+      let uri: string | undefined = undefined;
+      for (let semanticLink of semanticLinks) {
+        let linkUri = this.props.interactionHandler.getURI(semanticLink);
+        if (linkUri) {
+          uriLink = semanticLink;
+          uri = linkUri;
+          className = clsx(className, 'link');
+        }
+      }
+      if (uri && !(config.development || config.embedded)) {
+        // This causes nested anchors, which, strictly speaking, are illegal.
+        // However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
+        // So we do this anyway, but only in production mode, to prevent warnings from React.
+        result = (
+          <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={disableOwnDefaultBehavior} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            {result}
+          </a>
+        );
+      } else {
+        result = (
+          <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={disableOwnDefaultBehavior} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
+            {result}
+          </span>
+        );
+      }
+      if (uriLink && this.props.interactionHandler.hasToolTip(uriLink) && this.htmlNode) {
+        let interactionHandler = this.props.interactionHandler;
+        let getToolTipContents = () => {
+          let toolTipContents = interactionHandler.getToolTipContents(uriLink!);
+          if (uri) {
+            toolTipContents = <a href={uri} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))}>{toolTipContents}</a>;
+          }
+          return toolTipContents;
+        };
+        let toolTip = <ExpressionToolTip active={this.state.showToolTip} position={this.toolTipPosition} parent={this.htmlNode} getContents={getToolTipContents} delay={250} key="tooltip"/>;
+        result = [result, toolTip];
+      }
+    } else {
+      result = (
+        <span className={className}>
+          {result}
+        </span>
+      );
+    }
+    let dialog = this.renderDialog();
+    return dialog ? [result, dialog] : result;
+  }
+
+  private renderDialog(): React.ReactNode {
+    if (this.state.openDialog) {
+      if (this.state.openDialog instanceof Dialog.InsertDialog) {
+        return <InsertDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+      } else if (this.state.openDialog instanceof Dialog.ExpressionDialog) {
+        return <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+      }
+    }
+    return null;
+  }
+
+  private wrapRenderedExpressionWithMenuOrButton(
+    content: React.ReactNode,
+    { className, semanticLinks, innerClassName, placeholder }: WrappedExpressionConfig,
     onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined,
     hasMenu: boolean,
-    hasVisibleMenu: boolean,
-    className: string,
-    innerClassName: string
+    alwaysShowMenu: boolean
   ): React.ReactNode {
     let menu: React.ReactNode = null;
     let dialog = this.renderDialog();
@@ -1012,6 +476,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     let onMouseEnter = interactive ? () => this.addToHoveredChildren() : undefined;
     let onMouseLeave = interactive ? () => { this.setState({clicking: false}); this.removeFromHoveredChildren(); } : undefined;
+    let hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
     let menuClassName = clsx('menu', {
       'hover': this.state.hovered,
       'open': this.state.openMenu,
@@ -1056,106 +521,158 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     );
   }
 
-  private wrapRenderedExpression(
-    content: React.ReactNode,
-    { semanticLinks, className, innerClassName = '', isInputControl = false, placeholder }: {
-      semanticLinks: Notation.SemanticLink[] | undefined,
-      className: string,
-      innerClassName?: string,
-      isInputControl?: boolean,
-      placeholder?: Notation.PlaceholderExpression
-    }
-  ): React.ReactNode {
-    let result = content;
-    let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;
-    let alwaysShowMenu = false;
-    if (semanticLinks) {
-      for (let semanticLink of semanticLinks) {
-        if (semanticLink.onMenuOpened) {
-          onMenuOpened = semanticLink.onMenuOpened;
-          alwaysShowMenu = semanticLink.alwaysShowMenu || placeholder !== undefined;
-          if (semanticLink.autoOpenMenu && !this.autoOpenTimer) {
-            let autoOpenMenu = () => {
-              if (onMenuOpened && !this.state.openMenu) {
-                this.openMenu(onMenuOpened);
-              }
-            };
-            this.autoOpenTimer = setTimeout(autoOpenMenu, 0);
-          }
-        }
-      }
-    }
-    if (semanticLinks && semanticLinks.some((semanticLink) => semanticLink.isDefinition)) {
-      className = clsx(className, 'definition');
-    }
-    let hasMenu = this.props.interactionHandler !== undefined && onMenuOpened !== undefined;
-    this.hasMenu = hasMenu;
-    let hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
-    if (hasMenu || placeholder !== undefined) {
-      return this.wrapRenderedExpressionWithMenuStuff(result, placeholder, semanticLinks, onMenuOpened, hasMenu, hasVisibleMenu, className, innerClassName);
+  private renderTextExpression(expression: Notation.TextExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    if (this.props.interactionHandler && expression.onTextChanged) {
+      return this.renderTextInputControl(expression, renderedExpressionConfig);
     } else {
-      className = clsx(className, innerClassName, this.state.hovered && 'hover');
-      if (this.props.interactionHandler && semanticLinks && semanticLinks.length && (isInputControl || !this.isPartOfMenu())) {
-        className = clsx(className, 'interactive');
-        let uriLink: Notation.SemanticLink | undefined = undefined;
-        let uri: string | undefined = undefined;
-        for (let semanticLink of semanticLinks) {
-          let linkUri = this.props.interactionHandler.getURI(semanticLink);
-          if (linkUri) {
-            uriLink = semanticLink;
-            uri = linkUri;
-            className = clsx(className, 'link');
-          }
-        }
-        if (uri && !(config.development || config.embedded)) {
-          // This causes nested anchors, which, strictly speaking, are illegal.
-          // However, there does not seem to be any replacement that supports middle-click for "open in new window/tab".
-          // So we do this anyway, but only in production mode, to prevent warnings from React.
-          result = (
-            <a className={className} href={uri} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={disableOwnDefaultBehavior} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-              {result}
-            </a>
-          );
-        } else {
-          result = (
-            <span className={className} onMouseEnter={() => this.addToHoveredChildren()} onMouseLeave={() => this.removeFromHoveredChildren()} onTouchStart={(event) => this.highlightPermanently(event)} onTouchEnd={disableOwnDefaultBehavior} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))} key="expr" ref={(htmlNode) => (this.htmlNode = htmlNode)}>
-              {result}
-            </span>
-          );
-        }
-        if (uriLink && this.props.interactionHandler.hasToolTip(uriLink) && this.htmlNode) {
-          let interactionHandler = this.props.interactionHandler;
-          let getToolTipContents = () => {
-            let toolTipContents = interactionHandler.getToolTipContents(uriLink!);
-            if (uri) {
-              toolTipContents = <a href={uri} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))}>{toolTipContents}</a>;
+      let text = expression.text;
+      if (text) {
+        if (expression.hasStyleClass('integer')) {
+          let resultArray = [];
+          for (let endIndex = text.length; endIndex > 0; endIndex -= 3) {
+            let startIndex = endIndex - 3;
+            if (startIndex < 0) {
+              startIndex = 0;
             }
-            return toolTipContents;
-          };
-          let toolTip = <ExpressionToolTip active={this.state.showToolTip} position={this.toolTipPosition} parent={this.htmlNode} getContents={getToolTipContents} delay={250} key="tooltip"/>;
-          result = [result, toolTip];
+            resultArray.unshift(text.substring(startIndex, endIndex));
+            if (startIndex > 0) {
+              resultArray.unshift(<span className={'thousands-separator'} key={startIndex}/>);
+            }
+          }
+          return this.wrapRenderedExpression(resultArray, renderedExpressionConfig);
+        } else {
+          let firstChar = text.charAt(0);
+          let lastChar = text.charAt(text.length - 1);
+          let innerClassName = clsx(
+            { 'space-start': firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a') },
+            expression.hasStyleClass('var') && useItalicsForVariable(text) && {
+              'italic': true,
+              'charcorner-tr': lastChar === 'f' || lastChar === 'C' || lastChar === 'E' || lastChar === 'F' || lastChar === 'H' || lastChar === 'I' || lastChar === 'J' || lastChar === 'K' || lastChar === 'M' || lastChar === 'N' || lastChar === 'S' || lastChar === 'T' || lastChar === 'U' || lastChar === 'V' || lastChar === 'W' || lastChar === 'X' || lastChar === 'Y' || lastChar === 'Z',
+              'charcorner-large': lastChar === 'T' || lastChar === 'Y',
+              'charcorner-bl': firstChar === 'f' || firstChar === 'g' || firstChar === 'j' || firstChar === 'y'
+            }
+          );
+          return this.wrapRenderedExpression(this.convertText(text), { ...renderedExpressionConfig, innerClassName });
         }
       } else {
-        result = (
-          <span className={className}>
-            {result}
-          </span>
-        );
+        return this.wrapRenderedExpression('\u200b', renderedExpressionConfig);
       }
-      let dialog = this.renderDialog();
-      return dialog ? [result, dialog] : result;
     }
   }
 
-  private renderDialog(): React.ReactNode {
-    if (this.state.openDialog) {
-      if (this.state.openDialog instanceof Dialog.InsertDialog) {
-        return <InsertDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
-      } else if (this.state.openDialog instanceof Dialog.ExpressionDialog) {
-        return <ExpressionDialog dialog={this.state.openDialog} onOK={this.onDialogOK} onCancel={this.onDialogClosed}/>;
+  private renderTextInputControl(expression: Notation.TextExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let text = expression.text;
+    let supportLatexInput = !expression.hasStyleClass('integer');
+    let latexInput = supportLatexInput && isLatexInput(text);
+    let setText = (newText: string) => {
+      expression.text = newText;
+      this.setState({inputError: false});
+      this.forceUpdate();
+      if (expression.onTextChanged && !(supportLatexInput && isLatexInput(newText))) {
+        if (expression.onTextChanged(newText)) {
+          if (this.props.interactionHandler) {
+            this.props.interactionHandler.expressionChanged();
+          }
+        } else {
+          this.setState({inputError: true});
+        }
+      }
+    };
+    let performLatexReplacement = () => {
+      let textAfterReplacement = replaceLatexCodeOrPrefix(text);
+      if (textAfterReplacement !== text) {
+        setText(textAfterReplacement);
+      }
+    };
+    let onFocus = () => {
+      this.highlightPermanently();
+      this.setState({ inputFocused: true });
+    };
+    let onBlur = () => {
+      this.clearPermanentHighlight();
+      this.setState({ inputFocused: false });
+      if (latexInput) {
+        performLatexReplacement();
+      }
+    };
+    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      let newText = event.target.value;
+      if (latexInput) {
+        newText = replaceExactLatexCodeOnly(newText);
+      }
+      setText(newText);
+      this.triggerHighlightPermanently();
+    };
+    let onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (latexInput && (event.key === 'Enter' || event.key === ' ')) {
+        performLatexReplacement();
+        disableDefaultBehavior(event);
+      }
+    };
+    let ref = undefined;
+    if (expression.requestTextInput) {
+      ref = (htmlNode: HTMLInputElement | null) => {
+        if (htmlNode) {
+          expression.requestTextInput = false;
+          htmlNode.select();
+          htmlNode.focus();
+          this.triggerHighlightPermanently();
+        }
+      };
+    }
+    let inputClassName = clsx('expr-input', {
+      'input-error': this.state.inputError,
+      'input-latex': latexInput,
+      'italic': !latexInput && expression.hasStyleClass('var') && useItalicsForVariable(text)
+    });
+    let size = expression.inputLength ?? text.length + 1;
+    let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
+    let menu: JSX.Element | undefined = undefined;
+    if (latexInput && this.state.inputFocused) {
+      let suggestions = getLatexInputSuggestions(text);
+      let rows = suggestions.map((suggestion, rowIndex) => {
+        let action = new Menu.ImmediateExpressionMenuAction(() => {
+          setText(suggestion.unicodeCharacters);
+        });
+        let preview = new Notation.TextExpression(suggestion.unicodeCharacters);
+        preview.styleClasses = expression.styleClasses;
+        let item = new Menu.ExpressionMenuItem(preview, action);
+        item.selected = rowIndex === 0;
+        let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
+        row.subMenu = item;
+        return row;
+      });
+      if (rows.length > 0) {
+        let expressionMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
+        menu = <ExpressionMenu menu={expressionMenu} onItemClicked={this.onMenuItemClicked} />;
       }
     }
-    return null;
+    let input = (
+      <input
+        key="input"
+        type={'text'}
+        className={inputClassName}
+        value={text}
+        style={style}
+        onChange={onChange}
+        onMouseDown={limitDefaultBehaviorToElement}
+        onMouseUp={limitDefaultBehaviorToElement}
+        onTouchStart={limitDefaultBehaviorToElement}
+        onTouchCancel={limitDefaultBehaviorToElement}
+        onTouchEnd={limitDefaultBehaviorToElement}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
+        ref={ref}
+        autoFocus={expression.requestTextInput}
+      />
+    );
+    return (
+      <span className={'menu-container'} onTouchStart={limitDefaultBehaviorToElement} onTouchCancel={limitDefaultBehaviorToElement} onTouchEnd={limitDefaultBehaviorToElement}>
+        {this.wrapRenderedExpression(input, { ...renderedExpressionConfig, isInputControl: true })}
+        {menu}
+      </span>
+    );
   }
 
   private convertText(text: string): React.ReactNode {
@@ -1170,6 +687,249 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else {
       return converter.result;
     }
+  }
+
+  private renderRowExpression(expression: Notation.RowExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let renderedExpressions = expression.items.map((item: Notation.RenderedExpression, index: number) =>
+      <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler} key={index}/>);
+    return this.wrapRenderedExpression(renderedExpressions, { ...renderedExpressionConfig, innerClassName: 'row' });
+  }
+
+  private renderParagraphExpression(expression: Notation.ParagraphExpression, className: string): React.ReactNode {
+    return expression.paragraphs.map((paragraph: Notation.RenderedExpression, index: number) => (
+      <div className={clsx(className, 'paragraph')} key={index}>
+        <Expression expression={paragraph} parent={this} interactionHandler={this.props.interactionHandler}/>
+      </div>
+    ));
+  }
+
+  private renderListExpression(expression: Notation.ListExpression, className: string): React.ReactNode {
+    className = clsx(className, 'list');
+    if (expression.style instanceof Array) {
+      className = clsx(className, 'custom');
+      let rows = expression.items.map((item: Notation.RenderedExpression, index: number) => {
+        let itemClassName = clsx('list-item', index > 0 && 'space-above');
+        return (
+          <span className={itemClassName} key={index}>
+            <span className={'list-item-header'}>
+              {expression.style[index]}
+            </span>
+            <span className={'list-item-contents'}>
+              <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
+            </span>
+          </span>
+        );
+      });
+      return <span className={className}>{rows}</span>;
+    } else {
+      let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
+        return (
+          <li className={'list-item'} key={index}>
+            <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
+          </li>
+        );
+      });
+      return (expression.style === '1.'
+        ? <ol className={className}>{items}</ol>
+        : <ul className={className}>{items}</ul>);
+    }
+  }
+
+  private renderTableExpression(expression: Notation.TableExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let colCount = 0;
+    for (let row of expression.items) {
+      if (colCount < row.length) {
+        colCount = row.length;
+      }
+    }
+    let rows: React.ReactNode[] = [];
+    let rowIndex = 0;
+    for (let row of expression.items) {
+      let colIndex = 0;
+      let columns: React.ReactNode[] = [];
+      for (let cell of row) {
+        columns.push(
+          <span className={'table-cell'} key={colIndex++}>
+            <Expression expression={cell} parent={this} interactionHandler={this.props.interactionHandler}/>
+          </span>
+        );
+      }
+      while (colIndex < colCount) {
+        columns.push(
+          <span className={'table-cell'} key={colIndex++}/>
+        );
+      }
+      let curRowIndex = rowIndex++;
+      let renderCurRow = (additionalClassName?: string) => (
+        <span className={clsx('table-row', additionalClassName)} key={curRowIndex}>
+          {columns}
+        </span>
+      );
+      if (row.length) {
+        let renderRow = row[0].getLineHeight().then((lineHeight: number) =>
+          renderCurRow(lineHeight ? undefined : 'large'));
+        rows.push(renderPromise(renderRow, curRowIndex.toString()));
+      } else {
+        rows.push(renderCurRow());
+      }
+    }
+    return this.wrapRenderedExpression(rows, { ...renderedExpressionConfig, innerClassName: 'table' });
+  }
+
+  private renderParenExpression(expression: Notation.ParenExpression, renderedExpressionConfig: RenderedExpressionConfig, optionalParenRight: boolean): React.ReactNode {
+    let render = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
+      if (surroundingParenStyle === expression.style) {
+        return this.renderExpression(expression.body, renderedExpressionConfig.className, renderedExpressionConfig.semanticLinks);
+      } else {
+        return expression.body.getLineHeight().then((lineHeight: number) => {
+          let body: React.ReactNode = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
+          switch (expression.style) {
+          case '()':
+            return <RoundParens lineHeight={lineHeight}>{body}</RoundParens>;
+          case '||':
+            return <FlatParens lineHeight={lineHeight}>{body}</FlatParens>;
+          case '[]':
+            return <SquareParens lineHeight={lineHeight}>{body}</SquareParens>;
+          case '{}':
+            return <CurlyParens lineHeight={lineHeight} left={'{'} right={'}'}>{body}</CurlyParens>;
+          case '{':
+            return <CurlyParens lineHeight={lineHeight} left={'{'} right={optionalParenRight ? '∣' : undefined}>{body}</CurlyParens>;
+          case '<>':
+            return <AngleParens lineHeight={lineHeight}>{body}</AngleParens>;
+          default:
+            return body;
+          }
+        });
+      }
+    });
+    return this.wrapRenderedExpression(
+      <PromiseHelper promise={render}/>,
+      { ...renderedExpressionConfig, innerClassName: 'paren' }
+    );
+  }
+
+  private renderSubSupExpression(expression: Notation.SubSupExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let renderWithLineHeight = (lineHeight?: number) => {
+      let body = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>;
+      let sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sub"/> : null;
+      let sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sup"/> : null;
+      let preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSub"/> : null;
+      let preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSup"/> : null;
+      if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
+        let subSupResult: React.ReactNode[] = [body];
+        if (expression.sub) {
+          subSupResult.push(<sub key="sub">{renderPromise(expression.sub.getLineHeight().then((subLineHeight: number) => subLineHeight ? sub : <sub>{sub}</sub>), undefined, () => sub)}</sub>);
+        }
+        if (expression.sup) {
+          subSupResult.push(<sup key="sup">{renderPromise(expression.sup.getLineHeight().then((supLineHeight: number) => supLineHeight ? sup : <sup>{sup}</sup>), undefined, () => sup)}</sup>);
+        }
+        if (expression.preSub) {
+          subSupResult.unshift(<sub key="preSub">{renderPromise(expression.preSub.getLineHeight().then((preSubLineHeight: number) => preSubLineHeight ? preSub : <sub>{preSub}</sub>), undefined, () => preSub)}</sub>);
+        }
+        if (expression.preSup) {
+          subSupResult.unshift(<sup key="preSup">{renderPromise(expression.preSup.getLineHeight().then((preSupLineHeight: number) => preSupLineHeight ? preSup : <sup>{preSup}</sup>), undefined, () => preSup)}</sup>);
+        }
+        return subSupResult;
+      } else {
+        return <SubSup sub={sub} sup={sup} preSub={preSub} preSup={preSup} lineHeight={lineHeight ?? 0}>{body}</SubSup>;
+      }
+    };
+    let render = expression.body.getLineHeight().then(renderWithLineHeight);
+    return this.wrapRenderedExpression(
+      renderPromise(render, undefined, renderWithLineHeight),
+      renderedExpressionConfig
+    );
+  }
+
+  private renderOverUnderExpression(expression: Notation.OverUnderExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let body = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+    let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+    let { contents, innerClassName } = renderOverUnder({ children: body, over, under });
+    return this.wrapRenderedExpression(contents, { ...renderedExpressionConfig, innerClassName });
+  }
+
+  private renderFractionExpression(expression: Notation.FractionExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let numerator = <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    let denominator = <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    let { contents, innerClassName } = renderFraction({ numerator, denominator });
+    return this.wrapRenderedExpression(contents, { ...renderedExpressionConfig, innerClassName });
+  }
+
+  private renderRadicalExpression(expression: Notation.RadicalExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let radicand = <Expression expression={expression.radicand} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    let degree: React.ReactNode = expression.degree ? <Expression expression={expression.degree} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+    let { contents, innerClassName } = renderRadical({ radicand, degree });
+    return this.wrapRenderedExpression(contents, { ...renderedExpressionConfig, innerClassName });
+  }
+
+  private renderMarkdownExpression(expression: Notation.MarkdownExpression, className: string): React.ReactNode {
+    let markdown: React.ReactNode;
+    if (this.props.interactionHandler && expression.onTextChanged) {
+      let onChange = (newText: string) => {
+        expression.text = newText;
+        this.forceUpdate();
+        if (expression.onTextChanged) {
+          expression.onTextChanged(newText);
+        }
+        if (this.props.interactionHandler) {
+          this.props.interactionHandler.expressionChanged(false);
+        }
+      };
+      let onSearch = undefined;
+      if (expression.searchURLs) {
+        let searchURLs = expression.searchURLs;
+        onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
+      }
+      if ('ontouchstart' in window) {
+        // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
+        markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
+        if (onSearch) {
+          markdown = (
+            <div>
+              {markdown}
+              <Button className={'standalone'} onClick={onSearch}>Search default references...</Button>
+            </div>
+          );
+        }
+      } else {
+        let key = 'markdown-editor';
+        let toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
+        if (!config.embedded) {
+          toolbar.push('guide');
+        }
+        if (onSearch) {
+          let searchButton: EasyMDE.ToolbarIcon = {
+            name: 'search',
+            action: onSearch,
+            className: 'fa fa-search',
+            title: 'Search Default References'
+          };
+          toolbar.push('|', searchButton);
+          key = 'markdown-editor-with-search';
+        }
+        let previewElement = document.createElement('div');
+        let options: EasyMDE.Options = {
+          toolbar: toolbar as any,
+          status: false,
+          spellChecker: false,
+          autoDownloadFontAwesome: false,
+          previewRender: (markdownPlaintext: string) => {
+            ReactDOM.render(this.renderMarkdown(markdownPlaintext, expression.onRenderCode), previewElement);
+            return previewElement.innerHTML;
+          }
+        };
+        markdown = <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
+      }
+    } else {
+      markdown = this.renderMarkdown(expression.text, expression.onRenderCode);
+    }
+    return (
+      <div className={clsx(className, 'markdown')}>
+        {markdown}
+        {this.renderDialog()}
+      </div>
+    );
   }
 
   private renderMarkdown(text: string, renderCode?: (code: string) => Notation.RenderedExpression): React.ReactElement {
@@ -1193,6 +953,50 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     md.renderer = new RemarkableReactRenderer(options);
     return md.render(text);
+  }
+
+  private renderFoldableExpression(expression: Notation.FoldableExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let unfolded = this.state.unfolded ?? expression.initiallyUnfolded;
+    let onClick = (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button < 1) {
+        this.setState({unfolded: !unfolded});
+        disableOwnDefaultBehavior(event);
+      }
+    };
+    let rows = [
+      <div className={'paragraph foldable-heading'} onClick={onClick} key={'heading'}>
+        <span className={'foldable-icon'}>{getSectionIcon(unfolded)}</span>
+        <Expression expression={expression.heading} parent={this} interactionHandler={this.props.interactionHandler}/>
+      </div>
+    ];
+    if (unfolded) {
+      rows.push(
+        <div className={'paragraph'} key={'contents'}>
+          <Expression expression={expression.contents} parent={this} interactionHandler={this.props.interactionHandler}/>
+        </div>
+      );
+    }
+    return this.wrapRenderedExpression(rows, { ...renderedExpressionConfig, innerClassName: 'foldable' });
+  }
+
+  private renderPlaceholderExpression(expression: Notation.PlaceholderExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    let icon: React.ReactNode;
+    if (expression instanceof Notation.InsertPlaceholderExpression) {
+      let buttonType = (expression.mandatory ? ButtonType.InsertMandatory : ButtonType.Insert);
+      let hasSemanticLinkMenu = (renderedExpressionConfig.semanticLinks ?? []).some(semanticLink => !!semanticLink.onMenuOpened);
+      let enabled = (expression.action !== undefined || hasSemanticLinkMenu || this.props.interactionHandler === undefined);
+      icon = getButtonIcon(buttonType, enabled);
+    } else {
+      icon = getDefinitionIcon(expression.placeholderType);
+    }
+    return this.wrapRenderedExpression(
+      <span className={'menu-placeholder'}>{icon}</span>,
+      { ...renderedExpressionConfig, innerClassName: 'placeholder', placeholder: expression }
+    );
+  }
+
+  private renderError(error: string, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+    return this.wrapRenderedExpression(`Error: ${error}`, { ...renderedExpressionConfig, innerClassName: 'error' });
   }
 
   private addToHoveredChildren(expression: Expression = this): void {
@@ -1309,6 +1113,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else {
       return false;
     }
+  }
+
+  private isInteractionEnabled(isInputControl: boolean): boolean {
+    // When clicking anywhere inside an expression with a menu, we want the menu to open.
+    // So disable tooltips and navigation.
+    // Input controls are an exception for obvious reasons.
+    return (isInputControl || !this.isPartOfMenu());
   }
 
   private isDirectlyHighlighted(): boolean {
