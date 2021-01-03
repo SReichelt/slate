@@ -979,11 +979,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     return this.wrapRenderedExpression(rows, { ...renderedExpressionConfig, innerClassName: 'foldable' });
   }
 
-  private renderPlaceholderExpression(expression: Notation.PlaceholderExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
+  private renderPlaceholderExpression(expression: Notation.PlaceholderExpression, { className, semanticLinks }: RenderedExpressionConfig): React.ReactNode {
     let icon: React.ReactNode;
     if (expression instanceof Notation.InsertPlaceholderExpression) {
       let buttonType = (expression.mandatory ? ButtonType.InsertMandatory : ButtonType.Insert);
-      let hasSemanticLinkMenu = (renderedExpressionConfig.semanticLinks ?? []).some(semanticLink => !!semanticLink.onMenuOpened);
+      let hasSemanticLinkMenu = (semanticLinks ?? []).some(semanticLink => !!semanticLink.onMenuOpened);
       let enabled = (expression.action !== undefined || hasSemanticLinkMenu || this.props.interactionHandler === undefined);
       icon = getButtonIcon(buttonType, enabled);
     } else {
@@ -991,7 +991,11 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     return this.wrapRenderedExpression(
       <span className={'menu-placeholder'}>{icon}</span>,
-      { ...renderedExpressionConfig, innerClassName: 'placeholder', placeholder: expression }
+      {
+        className: clsx(className, 'placeholder'),
+        semanticLinks,
+        placeholder: expression
+      }
     );
   }
 

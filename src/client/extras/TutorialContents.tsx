@@ -13,6 +13,7 @@ import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput, ExpressionMenuTextInputProps } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
+import { SubSup } from '../components/rendering/SubSup';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 import { PromiseHelper } from '../components/PromiseHelper';
 
@@ -4293,35 +4294,40 @@ class TutorialStates {
                         key: 0,
                         children: [
                           {
-                            type: Expression,
-                            key: 'preSub',
-                            toolTip: {
-                              contents: <p>Select φ here.</p>,
-                              position: 'bottom',
-                              index: 0,
-                              condition: (component: Expression) => !component.state.openMenu
-                            },
-                            componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
-                            elementAction: this.automateClick(),
+                            type: SubSup,
                             children: [
                               {
-                                type: ExpressionMenu,
+                                type: Expression,
+                                key: 'preSub',
+                                toolTip: {
+                                  contents: <p>Select φ here.</p>,
+                                  position: 'bottom',
+                                  index: 0,
+                                  condition: (component: Expression) => !component.state.openMenu
+                                },
+                                componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
+                                elementAction: this.automateClick(),
                                 children: [
                                   {
-                                    type: ExpressionMenuRow,
-                                    key: 0,
+                                    type: ExpressionMenu,
                                     children: [
                                       {
                                         type: ExpressionMenuRow,
+                                        key: 0,
                                         children: [
                                           {
-                                            type: ExpressionMenuItem,
-                                            key: 0,
-                                            manipulateProps: (props: ExpressionMenuItemProps) => ({
-                                              ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2))
-                                            }),
-                                            elementAction: this.automateClick()
+                                            type: ExpressionMenuRow,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuItem,
+                                                key: 0,
+                                                manipulateProps: (props: ExpressionMenuItemProps) => ({
+                                                  ...props,
+                                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg2))
+                                                }),
+                                                elementAction: this.automateClick()
+                                              }
+                                            ]
                                           }
                                         ]
                                       }
@@ -4374,110 +4380,115 @@ class TutorialStates {
                         key: 0,
                         children: [
                           {
-                            type: Expression,
-                            key: 'body',
-                            toolTip: {
-                              contents: <p>Here, please select the identity function, which is a definition in the library.</p>,
-                              position: 'bottom',
-                              index: 0,
-                              condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
-                            },
-                            componentAction: (component: Expression) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
-                            elementAction: this.automateClick(),
+                            type: SubSup,
                             children: [
                               {
-                                type: ExpressionMenu,
+                                type: Expression,
+                                key: 'body',
+                                toolTip: {
+                                  contents: <p>Here, please select the identity function, which is a definition in the library.</p>,
+                                  position: 'bottom',
+                                  index: 0,
+                                  condition: (component: Expression) => !(component.state.openMenu || component.state.openDialog)
+                                },
+                                componentAction: (component: Expression) => this.changeAdditionalStateData((oldAdditionalStateData) => component.state.openMenu ? null : oldAdditionalStateData === null ? undefined : oldAdditionalStateData),
+                                elementAction: this.automateClick(),
                                 children: [
                                   {
-                                    type: ExpressionMenuRow,
-                                    key: 2,
+                                    type: ExpressionMenu,
                                     children: [
                                       {
-                                        type: 'div',
-                                        key: 'title',
-                                        elementAction: this.automateClick()
-                                      }
-                                    ],
-                                    manipulateProps: (props: ExpressionMenuRowProps) => ({
-                                      ...props,
-                                      onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
-                                        if (action instanceof Menu.ImmediateExpressionMenuAction) {
-                                          this.changeState(this.fillTheoremClaim_equality_arg1_arg3);
-                                        } else {
-                                          this.changeAdditionalStateData(() => undefined);
-                                        }
-                                      })
-                                    })
-                                  }
-                                ]
-                              },
-                              {
-                                type: ExpressionDialog,
-                                children: [
-                                  {
-                                    type: StandardDialog,
-                                    children: [
-                                      {
-                                        type: ExpressionDialogItem,
-                                        key: 0,
+                                        type: ExpressionMenuRow,
+                                        key: 2,
                                         children: [
                                           {
-                                            type: LibraryTree,
+                                            type: 'div',
+                                            key: 'title',
+                                            elementAction: this.automateClick()
+                                          }
+                                        ],
+                                        manipulateProps: (props: ExpressionMenuRowProps) => ({
+                                          ...props,
+                                          onItemClicked: inject(props.onItemClicked, (result: void, action: Menu.ExpressionMenuAction) => {
+                                            if (action instanceof Menu.ImmediateExpressionMenuAction) {
+                                              this.changeState(this.fillTheoremClaim_equality_arg1_arg3);
+                                            } else {
+                                              this.changeAdditionalStateData(() => undefined);
+                                            }
+                                          })
+                                        })
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    type: ExpressionDialog,
+                                    children: [
+                                      {
+                                        type: StandardDialog,
+                                        children: [
+                                          {
+                                            type: ExpressionDialogItem,
+                                            key: 0,
                                             children: [
                                               {
-                                                type: SearchInput,
-                                                refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
-                                                toolTip: {
-                                                  contents: <p>Type "identity".</p>,
-                                                  position: 'bottom',
-                                                  index: 0,
-                                                  condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
-                                                },
-                                                manipulateProps: (props: SearchInputProps) => ({
-                                                  ...props,
-                                                  onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
-                                                }),
-                                                elementAction: this.automateTextInput('identity')
-                                              },
-                                              {
-                                                type: InnerLibraryTreeItems,
+                                                type: LibraryTree,
                                                 children: [
                                                   {
-                                                    type: LibraryTreeItem,
-                                                    key: 'Essentials',
+                                                    type: SearchInput,
+                                                    refConstraint: (refComponents) => !(refComponents.length > 0 && refComponents[0]?.props.selected),
+                                                    toolTip: {
+                                                      contents: <p>Type "identity".</p>,
+                                                      position: 'bottom',
+                                                      index: 0,
+                                                      condition: (component, tutorialState) => (tutorialState.additionalStateData === undefined)
+                                                    },
+                                                    manipulateProps: (props: SearchInputProps) => ({
+                                                      ...props,
+                                                      onSearch: inject(props.onSearch, () => this.changeAdditionalStateData(() => false))
+                                                    }),
+                                                    elementAction: this.automateTextInput('identity')
+                                                  },
+                                                  {
+                                                    type: InnerLibraryTreeItems,
                                                     children: [
                                                       {
-                                                        type: InnerLibraryTreeItems,
+                                                        type: LibraryTreeItem,
+                                                        key: 'Essentials',
                                                         children: [
                                                           {
-                                                            type: LibraryTreeItem,
-                                                            key: 'Functions',
+                                                            type: InnerLibraryTreeItems,
                                                             children: [
                                                               {
-                                                                type: InnerLibraryTreeItems,
+                                                                type: LibraryTreeItem,
+                                                                key: 'Functions',
                                                                 children: [
                                                                   {
-                                                                    type: LibraryTreeItem,
-                                                                    key: 'identity',
-                                                                    refIndex: 0,
+                                                                    type: InnerLibraryTreeItems,
                                                                     children: [
                                                                       {
-                                                                        key: 'item',
-                                                                        refConstraint: (refComponents) => (refComponents.length > 0 && !refComponents[0]?.props.selected),
+                                                                        type: LibraryTreeItem,
+                                                                        key: 'identity',
+                                                                        refIndex: 0,
                                                                         children: [
                                                                           {
-                                                                            key: 'display-span',
-                                                                            toolTip: {
-                                                                              contents: <p>Click here.</p>,
-                                                                              position: 'right',
-                                                                              index: 1
-                                                                            }
+                                                                            key: 'item',
+                                                                            refConstraint: (refComponents) => (refComponents.length > 0 && !refComponents[0]?.props.selected),
+                                                                            children: [
+                                                                              {
+                                                                                key: 'display-span',
+                                                                                toolTip: {
+                                                                                  contents: <p>Click here.</p>,
+                                                                                  position: 'right',
+                                                                                  index: 1
+                                                                                }
+                                                                              }
+                                                                            ],
+                                                                            elementAction: this.automateClick()
                                                                           }
                                                                         ],
-                                                                        elementAction: this.automateClick()
+                                                                        componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
                                                                       }
-                                                                    ],
-                                                                    componentAction: (component: LibraryTreeItem) => this.changeAdditionalStateData((oldAdditionalStateData) => (oldAdditionalStateData !== undefined || component.props.selected ? component.props.selected : undefined))
+                                                                    ]
                                                                   }
                                                                 ]
                                                               }
@@ -4490,22 +4501,22 @@ class TutorialStates {
                                                 ]
                                               }
                                             ]
+                                          },
+                                          {
+                                            type: Button,
+                                            key: 'ok',
+                                            refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
+                                            elementAction: this.automateClick()
                                           }
                                         ]
-                                      },
-                                      {
-                                        type: Button,
-                                        key: 'ok',
-                                        refConstraint: (refComponents) => (refComponents.length > 0 && refComponents[0]?.props.selected),
-                                        elementAction: this.automateClick()
                                       }
-                                    ]
+                                    ],
+                                    manipulateProps: (props: ExpressionDialogProps) => ({
+                                      ...props,
+                                      onOK: inject(props.onOK, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3))
+                                    })
                                   }
-                                ],
-                                manipulateProps: (props: ExpressionDialogProps) => ({
-                                  ...props,
-                                  onOK: inject(props.onOK, () => this.changeState(this.fillTheoremClaim_equality_arg1_arg3))
-                                })
+                                ]
                               }
                             ]
                           }
@@ -4556,45 +4567,50 @@ class TutorialStates {
                         key: 0,
                         children: [
                           {
-                            type: Expression,
-                            key: 'body',
-                            toolTip: {
-                              contents: <p>Note how Slate automatically figured out that this can only be the identity function on the natural numbers. Moreover, parentheses are displayed wherever the notation would cause ambiguities.</p>,
-                              position: 'top',
-                              index: 0,
-                              condition: (component: Expression) => !component.state.openMenu
-                            }
-                          },
-                          {
-                            type: Expression,
-                            key: 'sup',
-                            toolTip: {
-                              contents: <p>Select n here.</p>,
-                              position: 'bottom',
-                              index: 1,
-                              condition: (component: Expression) => !component.state.openMenu
-                            },
-                            componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
-                            elementAction: this.automateClick(),
+                            type: SubSup,
                             children: [
                               {
-                                type: ExpressionMenu,
+                                type: Expression,
+                                key: 'body',
+                                toolTip: {
+                                  contents: <p>Note how Slate automatically figured out that this can only be the identity function on the natural numbers. Moreover, parentheses are displayed wherever the notation would cause ambiguities.</p>,
+                                  position: 'top',
+                                  index: 0,
+                                  condition: (component: Expression) => !component.state.openMenu
+                                }
+                              },
+                              {
+                                type: Expression,
+                                key: 'sup',
+                                toolTip: {
+                                  contents: <p>Select n here.</p>,
+                                  position: 'bottom',
+                                  index: 1,
+                                  condition: (component: Expression) => !component.state.openMenu
+                                },
+                                componentAction: (component: Expression) => this.changeAdditionalStateData(() => component.state.openMenu),
+                                elementAction: this.automateClick(),
                                 children: [
                                   {
-                                    type: ExpressionMenuRow,
-                                    key: 0,
+                                    type: ExpressionMenu,
                                     children: [
                                       {
                                         type: ExpressionMenuRow,
+                                        key: 0,
                                         children: [
                                           {
-                                            type: ExpressionMenuItem,
-                                            key: 0,
-                                            manipulateProps: (props: ExpressionMenuItemProps) => ({
-                                              ...props,
-                                              onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg2))
-                                            }),
-                                            elementAction: this.automateClick()
+                                            type: ExpressionMenuRow,
+                                            children: [
+                                              {
+                                                type: ExpressionMenuItem,
+                                                key: 0,
+                                                manipulateProps: (props: ExpressionMenuItemProps) => ({
+                                                  ...props,
+                                                  onItemClicked: inject(props.onItemClicked, () => this.changeState(this.fillTheoremClaim_equality_arg2))
+                                                }),
+                                                elementAction: this.automateClick()
+                                              }
+                                            ]
                                           }
                                         ]
                                       }
