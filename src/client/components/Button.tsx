@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import './Button.css';
 
 import { disableOwnDefaultBehavior } from '../utils/event';
+import config from '../utils/config';
 
 
 // TODO should we use an HTML button element for this?
@@ -34,8 +35,12 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   }
 
   componentDidMount(): void {
-    this.ready = false;
-    setTimeout(() => (this.ready = true), clickDelay);
+    if (config.testing) {
+      this.ready = true;
+    } else {
+      this.ready = false;
+      setTimeout(() => (this.ready = true), clickDelay);
+    }
   }
 
   render(): React.ReactNode {

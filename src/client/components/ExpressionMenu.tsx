@@ -15,6 +15,7 @@ import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 import * as Notation from '../../shared/notation/notation';
 import * as Menu from '../../shared/notation/menu';
 import CachedPromise from '../../shared/data/cachedPromise';
+import config from '../utils/config';
 
 
 const clickDelay = 100;
@@ -150,12 +151,16 @@ export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, E
   }
 
   componentDidMount(): void {
-    this.ready = false;
-    setTimeout(() => (this.ready = true), clickDelay);
+    if (config.testing) {
+      this.ready = true;
+    } else {
+      this.ready = false;
+      setTimeout(() => (this.ready = true), clickDelay);
+    }
   }
 
   componentDidUpdate(prevProps: ExpressionMenuRowProps): void {
-    if (this.props.row !== prevProps.row) {
+    if (this.props.row !== prevProps.row && !config.testing) {
       this.ready = false;
       setTimeout(() => (this.ready = true), clickDelay);
     }
@@ -404,12 +409,16 @@ export class ExpressionMenuItem extends React.Component<ExpressionMenuItemProps,
   }
 
   componentDidMount(): void {
-    this.ready = false;
-    setTimeout(() => (this.ready = true), clickDelay);
+    if (config.testing) {
+      this.ready = true;
+    } else {
+      this.ready = false;
+      setTimeout(() => (this.ready = true), clickDelay);
+    }
   }
 
   componentDidUpdate(prevProps: ExpressionMenuItemProps): void {
-    if (this.props.item !== prevProps.item) {
+    if (this.props.item !== prevProps.item && !config.testing) {
       this.ready = false;
       setTimeout(() => (this.ready = true), clickDelay);
     }

@@ -23,7 +23,7 @@ export async function runClientTest(getTestProps: (callback: () => void) => AppT
   config.useMarkdownEditor = false;
 
   let origSetTimeout = window.setTimeout;
-  let newSetTimeout = (handler: () => void, timeout: number, ...rest: any) => origSetTimeout(handler, timeout / 10, ...rest);
+  let newSetTimeout = (handler: () => void, timeout: number, ...rest: any) => origSetTimeout(handler, 0, ...rest);
   window.setTimeout = newSetTimeout as any;
 
   let container = document.createElement('div');
