@@ -13,6 +13,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - name: Cache NPM dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules
       - name: Install NPM dependencies
         run: npm ci
       - name: Run tests
