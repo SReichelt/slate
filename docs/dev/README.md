@@ -65,8 +65,6 @@ Netlify is recommended because its serverless architecture reduces costs and is 
 
 ### Heroku
 
-_Unfortunately, the Heroku build stopped working after including a custom-built patched npm package. It can probably be fixed with a little bit of effort._
-
 1. Create an account at https://www.heroku.com/.
 2. Create a new Node.js app.
 3. Either configure the app to track your GitHub repository, or add Heroku as a Git remote and push to it (see https://devcenter.heroku.com/articles/git).
