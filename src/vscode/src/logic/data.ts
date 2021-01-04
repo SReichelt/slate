@@ -30,6 +30,14 @@ export class LibraryDocumentProvider {
 
     constructor(private fileAccessor: FileAccessor) {}
 
+    dispose(): void {
+        this.documents.clear();
+        for (let library of this.libraries.values()) {
+            library.libraryDataProvider.close();
+        }
+        this.libraries.clear();
+    }
+
     parseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
         let libraryDocument = this.tryParseDocument(event);
         if (libraryDocument) {

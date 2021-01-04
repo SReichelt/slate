@@ -19,6 +19,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
     let hoverProvider = new SlateLogicHoverProvider(libraryDocumentProvider);
 
     context.subscriptions.push(
+        libraryDocumentProvider,
         onDidParseDocument((event: ParseDocumentEvent) => {
             try {
                 let document = libraryDocumentProvider.parseDocument(event);

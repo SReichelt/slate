@@ -74,4 +74,5 @@ test('render hlm library', async () => {
   let templateFileContents = await templateFileReference.read();
   let templates = FmtReader.readString(templateFileContents, templateFileReference.fileName, FmtNotation.getMetaModel);
   await checkSection(libraryDataProvider, templates, {itemNumber: []});
+  libraryDataProvider.close();
 });

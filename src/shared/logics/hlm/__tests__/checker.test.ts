@@ -47,4 +47,5 @@ test('run checker test suite', async () => {
   };
   let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions);
   await checkSection(libraryDataProvider);
+  libraryDataProvider.close();
 });

@@ -246,7 +246,8 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
   }
   let outputFileAccessor = new PhysicalFileAccessor(outputDirName);
   let staticSiteGenerator = new StaticSiteGenerator(htmlTemplateFileName, templates, libraryURL, libraryURI, gitHubURL, outputFileAccessor);
-  return staticSiteGenerator.buildSection(libraryDataProvider, libraryItemInfo, htmlNavigation);
+  return staticSiteGenerator.buildSection(libraryDataProvider, libraryItemInfo, htmlNavigation)
+    .then(() => libraryDataProvider.close());
 }
 
 if (process.argv.length !== 9) {

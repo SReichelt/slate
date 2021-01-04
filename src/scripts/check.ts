@@ -35,7 +35,9 @@ function checkLibrary(fileName: string): CachedPromise<void> {
     allowPlaceholders: false
   };
   let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, libraryName);
-  return libraryDataProvider.fetchLocalSection().then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider));
+  return libraryDataProvider.fetchLocalSection()
+    .then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider))
+    .then(() => libraryDataProvider.close());
 }
 
 function checkSection(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
