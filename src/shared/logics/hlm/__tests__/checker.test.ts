@@ -41,6 +41,7 @@ test('run checker test suite', async () => {
     logic: Logics.hlm,
     fileAccessor: new PhysicalFileAccessor('src/shared/logics/hlm/__tests__/data'),
     watchForChanges: false,
+    enablePrefetching: true,
     checkMarkdownCode: false,
     allowPlaceholders: false
   };

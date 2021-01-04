@@ -59,7 +59,11 @@ const sourceCodeURLPrefix = `${config.projectRepositoryURL}/tree/master/`;
 const appName = 'Slate';
 const selectedLibraryName = 'hlm';
 
-interface AppProps {
+export interface AppTestProps {
+  tutorialTest?: () => void;
+}
+
+export interface AppProps extends AppTestProps {
   fileAccessor?: FileAccessor;
 }
 
@@ -123,7 +127,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       navigationPaneVisible: true,
       extraContentsVisible: false,
       editedDefinitions: [],
-      showStartPage: !(config.embedded || config.runningLocally)
+      showStartPage: !(config.embedded || config.runningLocally) || props.tutorialTest !== undefined
     };
 
     let libraryFileAccessor: FileAccessor | undefined = undefined;
@@ -182,7 +186,8 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     let libraryDataProviderOptions: LibraryDataProviderOptions = {
       logic: Logics.hlm,
       fileAccessor: libraryFileAccessor,
-      watchForChanges: true,
+      watchForChanges: !config.testing,
+      enablePrefetching: !config.testing,
       checkMarkdownCode: false,
       allowPlaceholders: config.embedded,
       externalURIPrefix: libraryURI
@@ -247,7 +252,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   componentDidMount(): void {
     this.mounted = true;
 
-    if (!config.embedded) {
+    if (!(config.embedded || config.testing)) {
       window.onpopstate = () => {
         // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
         let state: SelectionState = {
@@ -316,6 +321,10 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         this.setState({error: error.message});
         console.error(error);
       });
+
+    if (this.props.tutorialTest) {
+      this.startTutorial(false, true);
+    }
   }
 
   componentWillUnmount(): void {
@@ -324,6 +333,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     window.onbeforeunload = null;
     window.onmessage = null;
     this.templateFileWatcher?.close();
+    this.libraryDataProvider.close();
     this.mounted = false;
   }
 
@@ -1089,7 +1099,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     window.location.reload();
   };
 
-  private startTutorial = (withTouchWarning: boolean): void => {
+  private startTutorial = (withTouchWarning: boolean, runAutomatically: boolean = false): void => {
     let onChangeTutorialState = (stateTransitionFn: TutorialStateTransitionFn): void => {
       let oldTutorialState = this.state.tutorialState;
       let newTutorialState = stateTransitionFn(oldTutorialState);
@@ -1097,6 +1107,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         this.setState({tutorialState: newTutorialState});
         if (!newTutorialState) {
           this.navigateToRoot(true);
+          this.props.tutorialTest?.();
         }
       }
     };
@@ -1111,7 +1122,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       }
       this.forceUpdate();
     };
-    startTutorial(onChangeTutorialState, onReplaceDefinitionContents, this.docLinkClicked, withTouchWarning);
+    startTutorial(onChangeTutorialState, onReplaceDefinitionContents, this.docLinkClicked, withTouchWarning, runAutomatically);
   };
 
   private endTutorial = (): void => {

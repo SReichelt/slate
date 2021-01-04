@@ -66,6 +66,7 @@ export interface LibraryDataProviderOptions {
   logic: Logic.Logic;
   fileAccessor: FileAccessor;
   watchForChanges: boolean;
+  enablePrefetching: boolean;
   checkMarkdownCode: boolean;
   allowPlaceholders: boolean;
   externalURIPrefix?: string;
@@ -94,13 +95,15 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private path?: Fmt.NamedPathItem;
   private uri: string = '';
   private externalURI: string;
+  private active: boolean = true;
   private subsectionProviderCache = new Map<string, LibraryDataProvider>();
   private preloadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private fullyLoadedDefinitions = new Map<string, CachedPromise<LibraryDefinition>>();
   private editedDefinitions = new Map<string, LibraryDefinition>();
   private editedItemInfos = new Map<string, LibraryItemInfo>();
   private originalItemInfos = new Map<string, LibraryItemInfo>();
-  private prefetchQueue: PrefetchQueueItem[] = [];
+  private fileWatchers = new Set<FileWatcher>();
+  private prefetchQueue?: PrefetchQueueItem[];
   private prefetchTimer: any;
   private sectionChangeCounter = 0;
 
@@ -118,6 +121,31 @@ export class LibraryDataProvider implements LibraryDataAccessor {
       }
       this.itemNumber = [];
     }
+    if (options.enablePrefetching) {
+      this.prefetchQueue = [];
+    }
+  }
+
+  close(): void {
+    this.active = false;
+    if (this.prefetchTimer) {
+      clearTimeout(this.prefetchTimer);
+      this.prefetchTimer = undefined;
+    }
+    this.prefetchQueue = undefined;
+    for (let watcher of this.fileWatchers) {
+      watcher.close();
+    }
+    this.fileWatchers.clear();
+    this.originalItemInfos.clear();
+    this.editedItemInfos.clear();
+    this.editedDefinitions.clear();
+    this.fullyLoadedDefinitions.clear();
+    this.preloadedDefinitions.clear();
+    for (let subsectionProvider of this.subsectionProviderCache.values()) {
+      subsectionProvider.close();
+    }
+    this.subsectionProviderCache.clear();
   }
 
   getRootProvider(): LibraryDataProvider {
@@ -320,12 +348,14 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   }
 
   private preloadDefinitions(fileReference: FileReference, definitionName: string): CachedPromise<LibraryDefinition> {
-    if (this.options.watchForChanges && fileReference.watch) {
+    if (this.options.watchForChanges && fileReference.watch && this.active) {
       let watcher = fileReference.watch(() => {
         this.preloadedDefinitions.clear();
         this.sectionChangeCounter++;
         watcher.close();
+        this.fileWatchers.delete(watcher);
       });
+      this.fileWatchers.add(watcher);
     }
     return fileReference.read()
       .then((contents: string) => {
@@ -337,7 +367,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           throw new Error(`Unrecognized section file name "${sectionFileName}"`);
         }
         let sectionFile = sectionReader.readPartialFile();
-        if (stream.peekChar()) {
+        if (this.active && stream.peekChar()) {
           let itemReader = new FmtReader.Reader(stream, errorHandler, this.logic.getMetaModel);
           do {
             let itemFileName = itemReader.readIdentifier();
@@ -362,30 +392,35 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private watchFile(name: string, isSection: boolean, definitionName: string, getMetaModel: Meta.MetaModelGetter, watchedFile: WatchedFile): void {
     if (this.options.watchForChanges && watchedFile.fileReference.watch) {
       watchedFile.fileWatcher = watchedFile.fileReference.watch((newContents: string) => {
-        let currentEditedDefinition = this.editedDefinitions.get(name);
-        try {
-          let newLibraryDefinition = this.createLibraryDefinition(watchedFile.fileReference, definitionName, getMetaModel, newContents);
-          if (watchedFile.libraryDefinition) {
-            watchedFile.libraryDefinition.file = newLibraryDefinition.file;
-            watchedFile.libraryDefinition.definition = newLibraryDefinition.definition;
-            if (currentEditedDefinition) {
-              currentEditedDefinition.file = watchedFile.libraryDefinition.file.clone();
-              currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
+        if (this.active) {
+          let currentEditedDefinition = this.editedDefinitions.get(name);
+          try {
+            let newLibraryDefinition = this.createLibraryDefinition(watchedFile.fileReference, definitionName, getMetaModel, newContents);
+            if (watchedFile.libraryDefinition) {
+              watchedFile.libraryDefinition.file = newLibraryDefinition.file;
+              watchedFile.libraryDefinition.definition = newLibraryDefinition.definition;
+              if (currentEditedDefinition) {
+                currentEditedDefinition.file = watchedFile.libraryDefinition.file.clone();
+                currentEditedDefinition.definition = this.getMainDefinition(currentEditedDefinition.file, definitionName);
+              }
+            } else {
+              this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(newLibraryDefinition));
+              watchedFile.libraryDefinition = newLibraryDefinition;
             }
-          } else {
-            this.fullyLoadedDefinitions.set(name, CachedPromise.resolve(newLibraryDefinition));
-            watchedFile.libraryDefinition = newLibraryDefinition;
+          } catch (error) {
+            this.fullyLoadedDefinitions.delete(name);
+            if (!currentEditedDefinition && watchedFile.fileWatcher) {
+              watchedFile.fileWatcher.close();
+              this.fileWatchers.delete(watchedFile.fileWatcher);
+              watchedFile.fileWatcher = undefined;
+            }
           }
-        } catch (error) {
-          this.fullyLoadedDefinitions.delete(name);
-          if (!currentEditedDefinition) {
-            watchedFile.fileWatcher?.close();
+          if (isSection) {
+            this.sectionChangeCounter++;
           }
-        }
-        if (isSection) {
-          this.sectionChangeCounter++;
         }
       });
+      this.fileWatchers.add(watchedFile.fileWatcher);
     }
   }
 
@@ -408,7 +443,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           result = this.fileAccessor.preloadFile(uri + preloadExtension)
             .then((preloadFileReference: FileReference) => this.preloadDefinitions(preloadFileReference, definitionName))
             .catch(() => this.fetchDefinition(name, isSection, definitionName, getMetaModel, true));
-          this.preloadedDefinitions.set(name, result);
+          if (this.active) {
+            this.preloadedDefinitions.set(name, result);
+          }
         } else {
           result = this.fetchLocalSection(false)
             .then(() => {
@@ -430,7 +467,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
           watchedFile.libraryDefinition = libraryDefinition;
           return libraryDefinition;
         });
-        this.fullyLoadedDefinitions.set(name, result);
+        if (this.active) {
+          this.fullyLoadedDefinitions.set(name, result);
+        }
       }
     }
     return result;
@@ -440,25 +479,27 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let result = this.fetchDefinition(name, true, this.childName, FmtLibrary.getMetaModel, fullContentsRequired);
     if (prefetchContents) {
       result.then((libraryDefinition: LibraryDefinition) => {
-        let contents = libraryDefinition.definition.contents;
-        if (contents instanceof FmtLibrary.ObjectContents_Section) {
-          let index = 0;
-          for (let item of contents.items) {
-            if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.fileAccessor.preloadFile)) {
-              let path = (item.ref as Fmt.DefinitionRefExpression).path;
-              if (!path.parentPath && !this.preloadedDefinitions.has(path.name) && !this.fullyLoadedDefinitions.has(path.name)) {
-                let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
-                this.prefetchQueue.push({
-                  path: path,
-                  isSubsection: item instanceof FmtLibrary.MetaRefExpression_subsection,
-                  itemNumber: itemNumber
-                });
+        if (this.active) {
+          let contents = libraryDefinition.definition.contents;
+          if (contents instanceof FmtLibrary.ObjectContents_Section) {
+            let index = 0;
+            for (let item of contents.items) {
+              if (item instanceof FmtLibrary.MetaRefExpression_subsection || (item instanceof FmtLibrary.MetaRefExpression_item && !this.fileAccessor.preloadFile)) {
+                let path = (item.ref as Fmt.DefinitionRefExpression).path;
+                if (!path.parentPath && !this.preloadedDefinitions.has(path.name) && !this.fullyLoadedDefinitions.has(path.name)) {
+                  let itemNumber = this.itemNumber ? [...this.itemNumber, index + 1] : undefined;
+                  this.prefetchQueue?.push({
+                    path: path,
+                    isSubsection: item instanceof FmtLibrary.MetaRefExpression_subsection,
+                    itemNumber: itemNumber
+                  });
+                }
               }
+              index++;
             }
-            index++;
-          }
-          if (this.prefetchQueue.length) {
-            this.triggerPrefetching();
+            if (this.prefetchQueue?.length) {
+              this.triggerPrefetching();
+            }
           }
         }
       });
@@ -521,9 +562,9 @@ export class LibraryDataProvider implements LibraryDataAccessor {
     let resultPromise = this.fetchDefinition(name, false, name, this.logic.getMetaModel, fullContentsRequired);
     if (prefetchContents) {
       let result = resultPromise.getImmediateResult();
-      if (result && result.state === LibraryDefinitionState.Preloaded) {
+      if (result && result.state === LibraryDefinitionState.Preloaded && this.active) {
         let path = new Fmt.Path(name);
-        this.prefetchQueue.push({
+        this.prefetchQueue?.push({
           path: path,
           isSubsection: false
         });
@@ -930,17 +971,17 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   private triggerPrefetching(): void {
     if (!this.prefetchTimer) {
       let prefetch = () => {
+        this.prefetchTimer = undefined;
         for (let i = 0; i < 4; i++) {
           this.prefetch();
         }
-        this.prefetchTimer = undefined;
       };
       this.prefetchTimer = setTimeout(prefetch, 0);
     }
   }
 
   private prefetch = (): boolean => {
-    let prefetchQueueItem = this.prefetchQueue.shift();
+    let prefetchQueueItem = this.prefetchQueue?.shift();
     if (prefetchQueueItem) {
       if (prefetchQueueItem.isSubsection) {
         this.fetchSubsection(prefetchQueueItem.path, prefetchQueueItem.itemNumber, false)

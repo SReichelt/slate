@@ -221,6 +221,7 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
     logic: logic,
     fileAccessor: new PhysicalFileAccessor(path.dirname(libraryFileName)),
     watchForChanges: false,
+    enablePrefetching: true,
     checkMarkdownCode: false,
     allowPlaceholders: false
   };

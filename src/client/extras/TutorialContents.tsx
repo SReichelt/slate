@@ -4919,6 +4919,11 @@ class TutorialStates {
                       ),
                       position: 'bottom',
                       index: 0
+                    },
+                    elementAction: () => {
+                      if (this.runAutomatically) {
+                        this.changeState(undefined, null);
+                      }
                     }
                   }
                 ]
@@ -5328,7 +5333,7 @@ class TutorialStates {
   }
 }
 
-export function startTutorial(onChangeTutorialState: ChangeTutorialStateFn, onReplaceDefinitionContents: ReplaceDefinitionContentsFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean): void {
-  let tutorialStates = new TutorialStates(onChangeTutorialState, onReplaceDefinitionContents, onDocLinkClicked, withTouchWarning);
+export function startTutorial(onChangeTutorialState: ChangeTutorialStateFn, onReplaceDefinitionContents: ReplaceDefinitionContentsFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean, runAutomatically: boolean = false): void {
+  let tutorialStates = new TutorialStates(onChangeTutorialState, onReplaceDefinitionContents, onDocLinkClicked, withTouchWarning, runAutomatically);
   tutorialStates.start();
 }

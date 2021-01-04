@@ -103,6 +103,7 @@ export class LibraryDocumentProvider {
                 logic: logic,
                 fileAccessor: this.fileAccessor.createChildAccessor(libraryUri),
                 watchForChanges: true,
+                enablePrefetching: true,
                 checkMarkdownCode: false,
                 allowPlaceholders: true
             };

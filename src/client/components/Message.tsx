@@ -12,9 +12,9 @@ interface MessageState {
   visible: boolean;
 }
 
-const AlertTemplate = require('react-alert-template-basic').default;
 export function getAlertTemplate(props: AlertComponentPropsWithStyle): React.ReactElement {
   props.style['textTransform'] = 'initial';
+  const AlertTemplate = require('react-alert-template-basic').default;
   return AlertTemplate(props);
 }
 

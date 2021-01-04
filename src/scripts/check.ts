@@ -29,6 +29,7 @@ function checkLibrary(fileName: string): CachedPromise<void> {
   let libraryDataProviderOptions: LibraryDataProviderOptions = {
     logic: Logics.findLogic(contents.logic)!,
     fileAccessor: new PhysicalFileAccessor(path.dirname(fileName)),
+    enablePrefetching: true,
     watchForChanges: false,
     checkMarkdownCode: true,
     allowPlaceholders: false

@@ -65,6 +65,7 @@ test('render hlm library', async () => {
     logic: Logics.hlm,
     fileAccessor: fileAccessor.createChildAccessor('data/libraries/hlm'),
     watchForChanges: false,
+    enablePrefetching: true,
     checkMarkdownCode: false,
     allowPlaceholders: false
   };

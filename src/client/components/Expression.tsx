@@ -881,18 +881,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         let searchURLs = expression.searchURLs;
         onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
       }
-      if ('ontouchstart' in window) {
-        // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
-        markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
-        if (onSearch) {
-          markdown = (
-            <div>
-              {markdown}
-              <Button className={'standalone'} onClick={onSearch}>Search default references...</Button>
-            </div>
-          );
-        }
-      } else {
+      if (config.useMarkdownEditor) {
         let key = 'markdown-editor';
         let toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
         if (!config.embedded) {
@@ -920,6 +909,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
         };
         markdown = <ReactMarkdownEditor value={expression.text} onChange={onChange} options={options} key={key}/>;
+      } else {
+        // SimpleMDE currently doesn't work correctly on Android, so don't use it if we have a touch device.
+        markdown = <textarea className={'expr-textarea'} value={expression.text} onChange={(event) => onChange(event.target.value)}/>;
+        if (onSearch) {
+          markdown = (
+            <div>
+              {markdown}
+              <Button className={'standalone'} onClick={onSearch}>Search default references...</Button>
+            </div>
+          );
+        }
       }
     } else {
       markdown = this.renderMarkdown(expression.text, expression.onRenderCode);
