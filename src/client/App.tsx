@@ -1107,6 +1107,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         this.setState({tutorialState: newTutorialState});
         if (!newTutorialState) {
           this.navigateToRoot(true);
+          // Signal success if we are running the tutorial test.
           this.props.tutorialTest?.();
         }
       }
