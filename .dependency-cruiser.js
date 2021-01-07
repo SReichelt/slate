@@ -1,3 +1,46 @@
+function oneOf(...options) {
+  return options.map(option => `(${option})`).join('|');
+}
+
+function escapeRegex(str) {
+  return str.replace(/\\/g, '\\\\').replace(/\./g, '\\.');
+}
+
+function dir(path) {
+  return `^(${escapeRegex(path)}/)`;
+}
+
+function exact(str) {
+  return `^(${escapeRegex(str)})$`;
+}
+
+function file(path) {
+  return exact(path);
+}
+
+function someModule(moduleName) {
+  return exact(moduleName);
+}
+
+function modules(...moduleNames) {
+  return moduleNames.map(someModule);
+}
+
+function npmDep(packageName) {
+  return dir(`node_modules/${packageName}`);
+}
+
+function npmDeps(...packageNames) {
+  return packageNames.map(npmDep);
+}
+
+function testFilesWithinDir(path) {
+  return oneOf(
+    `${dir(path)}.*__mocks__/`,
+    `${dir(path)}.*/__mocks__/`,
+  );
+}
+
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
@@ -28,7 +71,9 @@ module.exports = {
           '(^|/)\\.[^/]+\\.(js|cjs|mjs|ts|json)$', // dot files
           '\\.d\\.ts$',                            // TypeScript declaration files
           '(^|/)tsconfig\\.json$',                 // TypeScript config
-          '(^|/)(babel|webpack)\\.config\\.(js|cjs|mjs|ts|json)$' // other configs
+          '(^|/)(babel|webpack)\\.config\\.(js|cjs|mjs|ts|json)$', // other configs
+          dir('src/vscode/webview'), // build output
+          dir('src/client/public/js'), // directly included in page
         ]
       },
       to: {},
@@ -146,9 +191,19 @@ module.exports = {
         'from.pathNot re of the not-to-dev-dep rule in the dependency-cruiser configuration',
       from: {
         path: '^(src)',
-        pathNot: '\\.(spec|test)\\.(js|mjs|cjs|ts|ls|coffee|litcoffee|coffee\\.md)$'
+        pathNot: [
+          '\\.(spec|test)\\.(js|mjs|cjs|ts|ls|coffee|litcoffee|coffee\\.md)$',
+          '.+/webpack.config\.js$',
+          dir('src/scripts'),
+        ]
       },
       to: {
+        pathNot: [
+          ...npmDeps(
+            '@types',
+            '.for-vscode/@types'
+          ),
+        ],
         dependencyTypes: [
           'npm-dev'
         ]
@@ -183,7 +238,140 @@ module.exports = {
           'npm-peer'
         ]
       }
-    }
+    },
+
+    /* application-specific architecture rules */
+    {
+      name: 'dependencies-of-shared',
+      severity: 'error',
+      from: {
+        path: dir('src/shared')
+      },
+      to: {
+        pathNot: [
+          dir('src/shared'),
+          dir('src/fs'),
+          ...npmDeps(
+            'node-fetch',
+            'markdown-escape',
+            'bn.js',
+          )
+        ]
+      }
+    },
+    {
+      name: 'dependencies-of-fs',
+      severity: 'error',
+      from: {
+        path: dir('src/fs')
+      },
+      to: {
+        pathNot: [
+          // TODO(SRe): is this okay?
+          dir('src/shared'), // 'shared' and 'fs' form a cycle
+          dir('src/fs'),
+          ...modules(
+            'path',
+            'fs',
+            'util',
+          ),
+        ]
+      }
+    },
+    {
+      name: 'dependencies-of-client',
+      severity: 'error',
+      from: {
+        path: dir('src/client'),
+        pathNot: [
+          file('src/client/webpack.config.js'),
+          testFilesWithinDir('src/client'),
+        ],
+      },
+      to: {
+        pathNot: [
+          dir('src/client'),
+          dir('src/shared'),
+          file('data/libraries/libraries.json'),
+          ...npmDeps(
+            '@fortawesome/fontawesome-free',
+            'clsx',
+            'easymde',
+            'query-string',
+            'react',
+            'react-alert',
+            'react-alert-template-basic',
+            'react-dom',
+            'react-loading-animation',
+            'react-portal-tooltip',
+            'react-responsive-modal',
+            'react-simplemde-editor',
+            'react-split-pane',
+            'remarkable',
+            'remarkable-react',
+            'scroll-into-view-if-needed',
+            'unicodeit',
+            'utf8',
+          ),
+        ]
+      }
+    },
+    {
+      name: 'dependencies-of-server',
+      severity: 'error',
+      from: {
+        path: dir('src/server'),
+        pathNot: [
+          dir('src/server/static'),
+          file('src/server/webpack.config.js'),
+          file('src/server/functions/webpack.config.js'),
+        ],
+      },
+      to: {
+        pathNot: [
+          dir('src/server'),
+          dir('src/shared'),
+          dir('src/fs'),
+          ...modules(
+            'child_process',
+            'fs',
+            'path',
+            'stream',
+            'url',
+          ),
+          ...npmDeps(
+            '@types',
+            'express',
+            'http-proxy-middleware',
+            'nodemailer',
+            'remarkable',
+          ),
+        ]
+      }
+    },
+    {
+      name: 'dependencies-of-vscode',
+      severity: 'error',
+      from: {
+        path: dir('src/vscode'),
+      },
+      to: {
+        pathNot: [
+          dir('src/vscode'),
+          dir('src/shared'),
+          dir('src/fs'),
+          ...modules(
+            'buffer',
+            'fs',
+            'path',
+            'util',
+          ),
+          ...npmDeps(
+            '.for-vscode',
+          ),
+        ]
+      }
+    },
   ],
   options: {
 
@@ -229,7 +417,7 @@ module.exports = {
     // moduleSystems: ['amd', 'cjs', 'es6', 'tsd'],
 
     /* prefix for links in html and svg output (e.g. 'https://github.com/you/yourrepo/blob/develop/'
-       to open it on your online repo or `vscode://file/${process.cwd()}/` to 
+       to open it on your online repo or `vscode://file/${process.cwd()}/` to
        open it in visual studio code),
      */
     // prefix: '',
@@ -280,7 +468,7 @@ module.exports = {
     /* Babel config ('.babelrc', '.babelrc.json', '.babelrc.json5', ...) to use
       for compilation (and whatever other naughty things babel plugins do to
       source code). This feature is well tested and usable, but might change
-      behavior a bit over time (e.g. more precise results for used module 
+      behavior a bit over time (e.g. more precise results for used module
       systems) without dependency-cruiser getting a major version bump.
      */
     // babelConfig: {
@@ -307,7 +495,7 @@ module.exports = {
 
         If you have an `exportsFields` attribute in your webpack config, that one
          will have precedence over the one specified here.
-      */ 
+      */
       exportsFields: ["exports"],
       /* List of conditions to check for in the exports field. e.g. use ['imports']
          if you're only interested in exposed es6 modules, ['require'] for commonjs,
