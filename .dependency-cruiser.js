@@ -38,6 +38,8 @@ function testFilesWithinDir(path) {
   return oneOf(
     `${dir(path)}.*__mocks__/`,
     `${dir(path)}.*/__mocks__/`,
+    `${dir(path)}.*__tests__/`,
+    `${dir(path)}.*/__tests__/`,
   );
 }
 
@@ -245,12 +247,12 @@ module.exports = {
       name: 'dependencies-of-shared',
       severity: 'error',
       from: {
-        path: dir('src/shared')
+        path: dir('src/shared'),
+        pathNot: testFilesWithinDir('src/shared')
       },
       to: {
         pathNot: [
           dir('src/shared'),
-          dir('src/fs'),
           ...npmDeps(
             'node-fetch',
             'markdown-escape',
@@ -267,8 +269,7 @@ module.exports = {
       },
       to: {
         pathNot: [
-          // TODO(SRe): is this okay?
-          dir('src/shared'), // 'shared' and 'fs' form a cycle
+          dir('src/shared'),
           dir('src/fs'),
           ...modules(
             'path',
