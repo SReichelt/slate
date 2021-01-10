@@ -1,48 +1,3 @@
-function oneOf(...options) {
-  return options.map(option => `(${option})`).join('|');
-}
-
-function escapeRegex(str) {
-  return str.replace(/\\/g, '\\\\').replace(/\./g, '\\.');
-}
-
-function dir(path) {
-  return `^(${escapeRegex(path)}/)`;
-}
-
-function exact(str) {
-  return `^(${escapeRegex(str)})$`;
-}
-
-function file(path) {
-  return exact(path);
-}
-
-function someModule(moduleName) {
-  return exact(moduleName);
-}
-
-function modules(...moduleNames) {
-  return moduleNames.map(someModule);
-}
-
-function npmDep(packageName) {
-  return dir(`node_modules/${packageName}`);
-}
-
-function npmDeps(...packageNames) {
-  return packageNames.map(npmDep);
-}
-
-function testFilesWithinDir(path) {
-  return oneOf(
-    `${dir(path)}.*__mocks__/`,
-    `${dir(path)}.*/__mocks__/`,
-    `${dir(path)}.*__tests__/`,
-    `${dir(path)}.*/__tests__/`,
-  );
-}
-
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
@@ -586,3 +541,48 @@ module.exports = {
   }
 };
 // generated: dependency-cruiser@9.21.4 on 2021-01-07T21:28:01.135Z
+
+function oneOf(...options) {
+  return options.map(option => `(${option})`).join('|');
+}
+
+function escapeRegex(str) {
+  return str.replace(/\\/g, '\\\\').replace(/\./g, '\\.');
+}
+
+function dir(path) {
+  return `^(${escapeRegex(path)}/)`;
+}
+
+function exact(str) {
+  return `^(${escapeRegex(str)})$`;
+}
+
+function file(path) {
+  return exact(path);
+}
+
+function someModule(moduleName) {
+  return exact(moduleName);
+}
+
+function modules(...moduleNames) {
+  return moduleNames.map(someModule);
+}
+
+function npmDep(packageName) {
+  return dir(`node_modules/${packageName}`);
+}
+
+function npmDeps(...packageNames) {
+  return packageNames.map(npmDep);
+}
+
+function testFilesWithinDir(path) {
+  return oneOf(
+    `${dir(path)}.*__mocks__/`,
+    `${dir(path)}.*/__mocks__/`,
+    `${dir(path)}.*__tests__/`,
+    `${dir(path)}.*/__tests__/`,
+  );
+}
