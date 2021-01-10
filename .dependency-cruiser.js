@@ -254,7 +254,7 @@ module.exports = {
         pathNot: [
           dir('src/shared'),
           ...npmDeps(
-            'node-fetch',
+            'node-fetch', // TODO: This is a node library, shared code shouldn't depend on it
             'markdown-escape',
             'bn.js',
           )
