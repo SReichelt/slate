@@ -360,7 +360,7 @@ module.exports = {
         pathNot: [
           dir('src/vscode'),
           dir('src/shared'),
-          dir('src/fs'),
+          dir('src/fs'), // TODO: remove this dependency
           ...modules(
             'buffer',
             'fs',
