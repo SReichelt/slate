@@ -1839,8 +1839,46 @@ y ∈ f(A) ⇒^def ∃ a ∈ A : y = f(a)
 Take x := a. f∣_A^(f(A))(a) = f(a) = y."
 `;
 
-exports[`render hlm library: 1.5.24 Essentials/Functions/Bijections 1`] = `
-"Definition 1.5.24.  Let X, Y be sets. We define:
+exports[`render hlm library: 1.5.24 Essentials/Functions/Composition%20of%20injective%20functions%20is%20injective 1`] = `
+"Proposition 1.5.24.  Let X, Y, Z be sets, f : X → Y be an injective function, g : Y → Z be an injective function. Then:
+
+  g ∘ f is injective
+
+Proof.  Let a, b ∈ X such that g(f(a)) = g(f(b)). Then a = b:
+
+g is injective ⇒^def ∀ c, d ∈ Y s.t. g(c) = g(d) : c = d
+ ⇒^(f(a),f(b) ∈ Y, g(f(a)) = g(f(b))) f(a) = f(b)
+
+f is injective ⇒^def ∀ x, y ∈ X s.t. f(x) = f(y) : x = y
+ ⇒^(a,b ∈ X, f(a) = f(b)) a = b"
+`;
+
+exports[`render hlm library: 1.5.25 Essentials/Functions/Composition%20of%20surjective%20functions%20is%20surjective 1`] = `
+"Proposition 1.5.25.  Let X, Y, Z be sets, f : X → Y be a surjective function, g : Y → Z be a surjective function. Then:
+
+  g ∘ f is surjective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.5.26 Essentials/Functions/Function%20is%20injective%20if%20composition%20is 1`] = `
+"Proposition 1.5.26.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions such that g ∘ f is injective. Then:
+
+  f is injective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.5.27 Essentials/Functions/Function%20is%20surjective%20if%20composition%20is 1`] = `
+"Proposition 1.5.27.  Let X, Y, Z be sets, f : X → Y, g : Y → Z be functions such that g ∘ f is surjective. Then:
+
+  g is surjective
+
+No proof."
+`;
+
+exports[`render hlm library: 1.5.28 Essentials/Functions/Bijections 1`] = `
+"Definition 1.5.28.  Let X, Y be sets. We define:
 
   (X ↔ Y) := {f : X → Y : f is bijective}
 
@@ -1858,8 +1896,8 @@ References.
 * https://ncatlab.org/nlab/show/bijection"
 `;
 
-exports[`render hlm library: 1.5.25 Essentials/Functions/inverse 1`] = `
-"Definition 1.5.25.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
+exports[`render hlm library: 1.5.29 Essentials/Functions/inverse 1`] = `
+"Definition 1.5.29.  Let X, Y be sets, f : X ↔ Y be a bijection. For g : Y ↔ X, we define:
 
   f^-1 = g  :⇔  g ∘ f = id_X
     ⇔  f ∘ g = id_Y
@@ -1877,8 +1915,8 @@ References.
 * https://leanprover-community.github.io/mathlib_docs/logic/function/basic.html#function.inv_fun"
 `;
 
-exports[`render hlm library: 1.5.26 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
-"Proposition 1.5.26.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
+exports[`render hlm library: 1.5.30 Essentials/Functions/Application%20of%20function%20and%20inverse%20is%20neutral 1`] = `
+"Proposition 1.5.30.  Let X, Y be sets, f : X ↔ Y be a bijection, x ∈ X. Then:
 
   f^-1(f(x)) = x
 
@@ -1888,8 +1926,8 @@ f^-1 ∘ f = id_X by definition of f^-1 ⇒^def ∀ z ∈ X 
  ⇒^(x ∈ X) f^-1(f(x)) = x"
 `;
 
-exports[`render hlm library: 1.5.27 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
-"Proposition 1.5.27.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
+exports[`render hlm library: 1.5.31 Essentials/Functions/Application%20of%20function%20after%20inverse%20is%20neutral 1`] = `
+"Proposition 1.5.31.  Let X, Y be sets, f : X ↔ Y be a bijection, y ∈ Y. Then:
 
   f(f^-1(y)) = y
 
@@ -1899,16 +1937,16 @@ f ∘ f^-1 = id_Y by definition of f^-1 ⇒^def ∀ z ∈ Y 
  ⇒^(y ∈ Y) f(f^-1(y)) = y"
 `;
 
-exports[`render hlm library: 1.5.28 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
-"Proposition 1.5.28.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
+exports[`render hlm library: 1.5.32 Essentials/Functions/Inverse%20of%20inverse%20yields%20original 1`] = `
+"Proposition 1.5.32.  Let X, Y be sets, f : X ↔ Y be a bijection. Then:
 
   (f^-1)^-1 = f
 
 Proof.  f^-1 ∘ f = id_X by definition of f^-1."
 `;
 
-exports[`render hlm library: 1.5.29 Essentials/Functions/Identity%20is%20its%20own%20inverse 1`] = `
-"Proposition 1.5.29.  Let X be a set. Then:
+exports[`render hlm library: 1.5.33 Essentials/Functions/Identity%20is%20its%20own%20inverse 1`] = `
+"Proposition 1.5.33.  Let X be a set. Then:
 
   id_X is bijective and (id_X)^-1 = id_X
 
@@ -1919,8 +1957,8 @@ References.
 * https://en.wikipedia.org/wiki/Inverse_function#Self-inverses"
 `;
 
-exports[`render hlm library: 1.5.30 Essentials/Functions/power%20to%20natural%20number 1`] = `
-"Definition 1.5.30.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
+exports[`render hlm library: 1.5.34 Essentials/Functions/power%20to%20natural%20number 1`] = `
+"Definition 1.5.34.  Let X be a set, f : X → X be a function, n ∈ ℕ. We define
 
   f^n
 
@@ -1935,14 +1973,14 @@ References.
 * https://mathworld.wolfram.com/IteratedMap.html"
 `;
 
-exports[`render hlm library: 1.5.31 Essentials/Functions/power%20to%20integer 1`] = `
-"Definition 1.5.31.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
+exports[`render hlm library: 1.5.35 Essentials/Functions/power%20to%20integer 1`] = `
+"Definition 1.5.35.  Let X be a set, f : X ↔ X be a bijection, a ∈ ℤ. We define:
 
   f^a := {f^a if a ≥ 0, (f^-1)^(−a) if a < 0"
 `;
 
-exports[`render hlm library: 1.5.32 Essentials/Functions/Power%20of%20identity%20to%20natural%20number%20is%20identity 1`] = `
-"Proposition 1.5.32.  Let X be a set, n ∈ ℕ. Then:
+exports[`render hlm library: 1.5.36 Essentials/Functions/Power%20of%20identity%20to%20natural%20number%20is%20identity 1`] = `
+"Proposition 1.5.36.  Let X be a set, n ∈ ℕ. Then:
 
   (id_X)^n = id_X
 
@@ -1955,17 +1993,17 @@ Proof.  By induction on n.
    =^1.5.13 id_X"
 `;
 
-exports[`render hlm library: 1.5.33 Essentials/Functions/Power%20of%20identity%20to%20integer%20is%20identity 1`] = `
-"Proposition 1.5.33.  Let X be a set, a ∈ ℤ. Then:
+exports[`render hlm library: 1.5.37 Essentials/Functions/Power%20of%20identity%20to%20integer%20is%20identity 1`] = `
+"Proposition 1.5.37.  Let X be a set, a ∈ ℤ. Then:
 
   (id_X)^a = id_X
 
 Proof.
 
-* Assume a ≥ 0. Then (id_X)^a = id_X by 1.5.32.
+* Assume a ≥ 0. Then (id_X)^a = id_X by 1.5.36.
 * Assume a < 0. Then:
-  ((id_X)^-1)^(−a) =^1.5.29 (id_X)^(−a)
-   =^1.5.32 id_X"
+  ((id_X)^-1)^(−a) =^1.5.33 (id_X)^(−a)
+   =^1.5.36 id_X"
 `;
 
 exports[`render hlm library: 1.6.1 Essentials/Operations/Operations 1`] = `
