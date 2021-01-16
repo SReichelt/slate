@@ -29,19 +29,19 @@ import * as FmtReader from '../shared/format/read';
 import * as FmtNotation from '../shared/notation/meta';
 import * as FmtLibrary from '../shared/logics/library';
 import * as Dialog from '../shared/notation/dialog';
-import * as Embedding from '../shared/api/embedding';
+import * as Embedding from '../envs/web/api/embedding';
 import { FileAccessor, WriteFileResult, FileWatcher } from '../shared/data/fileAccessor';
-import { WebFileAccessor, WebWriteFileResult } from '../shared/data/webFileAccessor';
-import { PreloadingWebFileAccessor } from '../shared/data/preloadingWebFileAccessor';
+import { WebFileAccessor, WebWriteFileResult } from '../envs/web/data/webFileAccessor';
+import { PreloadingWebFileAccessor } from '../envs/web/data/preloadingWebFileAccessor';
 import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderOptions, LibraryItemNumber } from '../shared/data/libraryDataProvider';
 import { fileExtension } from '../shared/data/constants';
 import { MRUList } from '../shared/data/mostRecentlyUsedList';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 
-import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from './data/gitHubFileAccessor';
+import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from '../envs/web/data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
-import * as GitHub from './data/gitHubAPIHandler';
+import * as GitHub from '../envs/web/data/gitHubAPIHandler';
 
 
 interface Libraries {

@@ -6,7 +6,7 @@ import * as FmtLibrary from '../shared/logics/library';
 import * as Logic from '../shared/logics/logic';
 import * as Logics from '../shared/logics/logics';
 import { getExpectedDiagnostics } from '../shared/logics/diagnostics';
-import { PhysicalFileAccessor } from '../fs/data/physicalFileAccessor';
+import { PhysicalFileAccessor } from '../envs/node/data/physicalFileAccessor';
 import { LibraryDataProvider, LibraryDefinition, LibraryDataProviderOptions } from '../shared/data/libraryDataProvider';
 import CachedPromise from '../shared/data/cachedPromise';
 

@@ -1,4 +1,4 @@
 import { wrapHandler } from './wrapHandler';
-import { handleAuth } from '../handlers/authHandler';
+import { handleAuth } from '../../generic/handlers/authHandler';
 
 export const handler = wrapHandler(handleAuth, 'GET');

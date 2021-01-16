@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as Fmt from '../shared/format/format';
 import * as FmtReader from '../shared/format/read';
-import { getMetaModelWithFallback } from '../fs/format/dynamic';
+import { getMetaModelWithFallback } from '../envs/node/format/dynamic';
 import * as Logics from '../shared/logics/logics';
 
 const Remarkable = require('remarkable').Remarkable;

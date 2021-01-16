@@ -1,8 +1,8 @@
 import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
 
-import { fetchJSON } from '../../shared/utils/fetch';
-import { AuthInfo } from '../../shared/api/auth';
+import { fetchJSON } from '../utils/fetch';
+import { AuthInfo } from '../api/auth';
 
 
 export { AuthInfo };

@@ -1,13 +1,13 @@
 import * as express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as config from '../config';
-import { FileAccessor } from '../../shared/data/fileAccessor';
-import { WebFileAccessor } from '../../shared/data/webFileAccessor';
-import { PhysicalFileAccessor } from '../../fs/data/physicalFileAccessor';
-import { LibraryPreloader } from '../preload/preload';
-import { fetchJSON } from '../../shared/utils/fetch';
-import CachedPromise from '../../shared/data/cachedPromise';
+import * as config from '../../config';
+import { FileAccessor } from '../../../shared/data/fileAccessor';
+import { WebFileAccessor } from '../../../envs/web/data/webFileAccessor';
+import { PhysicalFileAccessor } from '../../../envs/node/data/physicalFileAccessor';
+import { LibraryPreloader } from '../../generic/preload/preload';
+import { fetchJSON } from '../../../envs/web/utils/fetch';
+import CachedPromise from '../../../shared/data/cachedPromise';
 
 abstract class UpdateChecker {
   register(callback: () => CachedPromise<void>): void {

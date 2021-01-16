@@ -4,8 +4,8 @@ import { renderPromise } from '../components/PromiseHelper';
 import { OnDocLinkClicked } from './DocLink';
 
 import { disableOwnDefaultBehavior } from '../utils/event';
+import { fetchText } from '../../envs/web/utils/fetch';
 
-import { fetchText } from '../../shared/utils/fetch';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 

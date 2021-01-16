@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult, Context, Callback } from 'aws-lambda';
 import { Readable } from 'stream';
-import { Handler, Request, Response, Query } from '../handlers/types';
+import { Handler, Request, Response, Query } from '../../generic/handlers/types';
 
 class AWSRequest extends Readable implements Request {
   constructor(public url: string, public query: Query, body?: string | null) {

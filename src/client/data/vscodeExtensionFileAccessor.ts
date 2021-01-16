@@ -2,7 +2,7 @@ import config from '../utils/config';
 
 import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
 import { StandardFileReference, StandardFileWatcher } from '../../shared/data/fileAccessorImpl';
-import * as Embedding from '../../shared/api/embedding';
+import * as Embedding from '../../envs/web/api/embedding';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 

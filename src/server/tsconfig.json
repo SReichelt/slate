@@ -6,6 +6,6 @@
     "allowJs": true
   },
   "files": [
-    "./server.ts"
+    "express/server.ts"
   ]
 }

@@ -1,11 +1,11 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { fileExtension } from '../../shared/data/constants';
-import * as Fmt from '../../shared/format/format';
-import * as Meta from '../../shared/format/metaModel';
-import * as FmtDynamic from '../../shared/format/dynamic';
-import * as FmtMeta from '../../shared/format/meta';
-import * as FmtReader from '../../shared/format/read';
+import { fileExtension } from '../../../shared/data/constants';
+import * as Fmt from '../../../shared/format/format';
+import * as Meta from '../../../shared/format/metaModel';
+import * as FmtDynamic from '../../../shared/format/dynamic';
+import * as FmtMeta from '../../../shared/format/meta';
+import * as FmtReader from '../../../shared/format/read';
 
 export function getFileNameFromPathStr(sourceFileName: string, pathStr: string): string {
   pathStr = path.join(path.dirname(sourceFileName), pathStr);

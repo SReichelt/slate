@@ -1,4 +1,4 @@
-import { PhysicalFileAccessor } from '../../../../fs/data/physicalFileAccessor';
+import { PhysicalFileAccessor } from '../../../../envs/node/data/physicalFileAccessor';
 import { LibraryDataProvider, LibraryDataProviderOptions, LibraryDefinition } from '../../../data/libraryDataProvider';
 import * as Fmt from '../../../format/format';
 import * as FmtLibrary from '../../library';

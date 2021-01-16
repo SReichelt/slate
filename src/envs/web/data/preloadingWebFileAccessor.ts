@@ -1,6 +1,6 @@
-import { FileAccessor, FileReference } from './fileAccessor';
+import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
 import { WebFileAccessor, WebFileReference } from './webFileAccessor';
-import CachedPromise from './cachedPromise';
+import CachedPromise from '../../../shared/data/cachedPromise';
 
 export class PreloadingWebFileAccessor extends WebFileAccessor {
   constructor(baseURI: string, private preloadBaseURI: string) {

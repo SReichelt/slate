@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
-import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
-import CachedPromise from '../../shared/data/cachedPromise';
+import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../../shared/data/fileAccessor';
+import CachedPromise from '../../../shared/data/cachedPromise';
 
 export class PhysicalFileAccessor implements FileAccessor {
   constructor(private basePath?: string) {}

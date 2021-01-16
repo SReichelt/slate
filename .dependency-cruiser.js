@@ -212,7 +212,6 @@ module.exports = {
         pathNot: [
           dir('src/shared'),
           ...npmDeps(
-            'node-fetch', // TODO: This is a node library, shared code shouldn't depend on it
             'markdown-escape',
             'bn.js',
           )
@@ -220,15 +219,33 @@ module.exports = {
       }
     },
     {
-      name: 'dependencies-of-fs',
+      name: 'dependencies-of-web',
       severity: 'error',
       from: {
-        path: dir('src/fs')
+        path: dir('src/envs/web')
       },
       to: {
         pathNot: [
+          dir('src/envs/web'),
           dir('src/shared'),
-          dir('src/fs'),
+          ...npmDeps(
+            'node-fetch', // TODO: This is a node library, client code shouldn't depend on it
+            'utf8',
+            'query-string',
+          )
+        ]
+      }
+    },
+    {
+      name: 'dependencies-of-node',
+      severity: 'error',
+      from: {
+        path: dir('src/envs/node')
+      },
+      to: {
+        pathNot: [
+          dir('src/envs/node'),
+          dir('src/shared'),
           ...modules(
             'path',
             'fs',
@@ -243,7 +260,7 @@ module.exports = {
       from: {
         path: dir('src/client'),
         pathNot: [
-          file('src/client/webpack.config.js'),
+          webpackConfig(),
           testFilesWithinDir('src/client'),
         ],
       },
@@ -251,12 +268,12 @@ module.exports = {
         pathNot: [
           dir('src/client'),
           dir('src/shared'),
+          dir('src/envs/web'),
           file('data/libraries/libraries.json'),
           ...npmDeps(
             '@fortawesome/fontawesome-free',
             'clsx',
             'easymde',
-            'query-string',
             'react',
             'react-alert',
             'react-alert-template-basic',
@@ -270,7 +287,6 @@ module.exports = {
             'remarkable-react',
             'scroll-into-view-if-needed',
             'unicodeit',
-            'utf8',
           ),
         ]
       }
@@ -281,16 +297,15 @@ module.exports = {
       from: {
         path: dir('src/server'),
         pathNot: [
-          dir('src/server/static'),
-          file('src/server/webpack.config.js'),
-          file('src/server/functions/webpack.config.js'),
+          webpackConfig(),
         ],
       },
       to: {
         pathNot: [
           dir('src/server'),
           dir('src/shared'),
-          dir('src/fs'),
+          dir('src/envs/web'),
+          dir('src/envs/node'),
           ...modules(
             'child_process',
             'fs',
@@ -300,6 +315,7 @@ module.exports = {
           ),
           ...npmDeps(
             '@types',
+            'ejs',
             'express',
             'http-proxy-middleware',
             'nodemailer',
@@ -318,10 +334,11 @@ module.exports = {
         pathNot: [
           dir('src/vscode'),
           dir('src/shared'),
-          dir('src/fs'), // TODO: remove this dependency
+          dir('src/envs/node'), // TODO: remove this dependency because it breaks Live Share
+          dir('src/envs/web'),
           ...modules(
             'buffer',
-            'fs',
+            'fs', // TODO: remove this dependency because it breaks Live Share
             'path',
             'util',
           ),
@@ -329,6 +346,22 @@ module.exports = {
             '@types',
             'ejs',
           ),
+        ]
+      }
+    },
+    {
+      name: 'dependencies-to-logics',
+      severity: 'error',
+      from: {
+        pathNot: [
+          dir('src/shared/logics'),
+          file('src/scripts/refactor.ts'),
+          dir('src/client/extras')
+        ],
+      },
+      to: {
+        path: [
+          dir('src/shared/logics/[^/]+'),
         ]
       }
     },
@@ -584,6 +617,10 @@ function npmDepVSCode(packageName) {
 
 function npmDeps(...packageNames) {
   return packageNames.map(npmDep).concat(packageNames.map(npmDepVSCode));
+}
+
+function webpackConfig() {
+  return 'webpack\\.config\\.js$'
 }
 
 function testFilesWithinDir(path) {

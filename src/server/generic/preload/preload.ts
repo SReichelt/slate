@@ -1,11 +1,11 @@
-import { FileAccessor, FileWatcher } from '../../shared/data/fileAccessor';
-import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from '../../shared/data/constants';
-import * as Fmt from '../../shared/format/format';
-import * as Meta from '../../shared/format/metaModel';
-import * as FmtReader from '../../shared/format/read';
-import * as FmtWriter from '../../shared/format/write';
-import * as FmtLibrary from '../../shared/logics/library';
-import CachedPromise from '../../shared/data/cachedPromise';
+import { FileAccessor, FileWatcher } from '../../../shared/data/fileAccessor';
+import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from '../../../shared/data/constants';
+import * as Fmt from '../../../shared/format/format';
+import * as Meta from '../../../shared/format/metaModel';
+import * as FmtReader from '../../../shared/format/read';
+import * as FmtWriter from '../../../shared/format/write';
+import * as FmtLibrary from '../../../shared/logics/library';
+import CachedPromise from '../../../shared/data/cachedPromise';
 
 export abstract class LibraryPreloadGenerator {
   private readFile(uri: string, preloadURI: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.File> {
@@ -123,7 +123,7 @@ export class LibraryPreloader extends LibraryPreloadGenerator {
     return this.preloadedSections.get(preloadURI);
   }
 
-  clear() {
+  clear(): void {
     this.preloadedSections.clear();
     for (let watcher of this.watchers) {
       watcher.close();

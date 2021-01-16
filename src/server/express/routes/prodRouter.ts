@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as path from 'path';
-import { handleSubmit } from '../handlers/submitHandler';
+import { handleSubmit } from '../../generic/handlers/submitHandler';
 
 export function prodRouter(rootPath: string): express.Router {
   let router = express.Router();

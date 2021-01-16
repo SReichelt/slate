@@ -1,7 +1,7 @@
 import { Request, Response } from './types';
 import * as path from 'path';
 import * as nodemailer from 'nodemailer';
-import * as config from '../config';
+import * as config from '../../config';
 
 const mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
 

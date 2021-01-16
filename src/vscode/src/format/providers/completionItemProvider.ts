@@ -7,7 +7,7 @@ import { escapeIdentifier } from '../../../../shared/format/common';
 import * as FmtDynamic from '../../../../shared/format/dynamic';
 import * as FmtMeta from '../../../../shared/format/meta';
 import { fileExtension } from '../../../../shared/data/constants';
-import { getFileNameFromPath, getFileNameFromPathStr } from '../../../../fs/format/dynamic';
+import { getFileNameFromPath, getFileNameFromPathStr } from '../../../../envs/node/format/dynamic';
 import { ParsedDocument, ParsedDocumentMap } from '../parsedDocument';
 import { ReferencedDefinition, findReferencedDefinition, SignatureInfo, getSignatureInfo, getArgumentType } from '../navigate';
 import { readRange } from '../utils';

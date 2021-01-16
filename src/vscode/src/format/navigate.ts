@@ -4,7 +4,7 @@ import * as Fmt from '../../../shared/format/format';
 import * as Ctx from '../../../shared/format/context';
 import * as FmtDynamic from '../../../shared/format/dynamic';
 import * as FmtMeta from '../../../shared/format/meta';
-import { getFileNameFromPath, getFileNameFromPathStr } from '../../../fs/format/dynamic';
+import { getFileNameFromPath, getFileNameFromPathStr } from '../../../envs/node/format/dynamic';
 import { RangeInfo, areUrisEqual } from '../utils';
 import { ParsedDocument } from './parsedDocument';
 import { readRange } from './utils';
