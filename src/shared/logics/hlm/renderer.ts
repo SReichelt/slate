@@ -6,7 +6,7 @@ import * as Logic from '../logic';
 import * as HLMMacro from './macro';
 import { GenericRenderer, RenderedVariable, ArgumentWithInfo, RenderedTemplateArgument, RenderedTemplateArguments } from '../generic/renderer';
 import * as Notation from '../../notation/notation';
-import { HLMExpressionType } from './hlm';
+import { HLMExpressionType } from './types';
 import { HLMEditHandler, ParameterSelection, SetTermSelection, fullSetTermSelection, ElementTermSelection, fullElementTermSelection, FormulaSelection, fullFormulaSelection, InsertProofFn } from './editHandler';
 import { GenericEditHandler } from '../generic/editHandler';
 import { HLMUtils, HLMSubstitutionContext, HLMProofStepContext } from './utils';

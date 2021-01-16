@@ -2,7 +2,7 @@ import { GenericUtils, SubstitutionContext } from '../generic/utils';
 import * as Fmt from '../../format/format';
 import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
-import { HLMExpressionType } from './hlm';
+import { HLMExpressionType } from './types';
 import * as Macro from '../macro';
 import * as HLMMacro from './macro';
 import * as HLMMacros from './macros/macros';

@@ -4,13 +4,16 @@ module.exports = {
     /* rules from the 'recommended' preset: */
     {
       name: 'no-circular',
-      severity: 'warn',
+      severity: 'info',
       comment:
         'This dependency is part of a circular relationship. You might want to revise ' +
         'your solution (i.e. use dependency inversion, make sure the modules have a single responsibility) ',
       from: {},
       to: {
-        circular: true
+        circular: true,
+        pathNot: [
+          '\\.tsx$', // GUI components can be stacked mutually recursively
+        ]
       }
     },
     {

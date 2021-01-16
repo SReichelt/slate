@@ -11,7 +11,7 @@ import * as Dialog from '../../notation/dialog';
 import { GenericEditHandler, RenderTypeFn, RenderParameterFn, InsertParameterFn, RenderExpressionFn, InsertExpressionFn, SetExpressionFn, RenderExpressionsFn, RenderArgumentsFn, GetExpressionsFn } from '../generic/editHandler';
 import { LibraryDataProvider, LibraryItemInfo, LibraryDefinition } from '../../data/libraryDataProvider';
 import { MRUList } from '../../data/mostRecentlyUsedList';
-import { HLMExpressionType } from './hlm';
+import { HLMExpressionType } from './types';
 import { HLMEditAnalysis } from './edit';
 import { HLMUtils, HLMFormulaDefinition, HLMFormulaCase, HLMFormulaCases, unfoldAll, HLMSubstitutionContext, HLMEquivalenceListInfo, HLMSubstitutionResult, HLMProofStepContext } from './utils';
 import { HLMRenderUtils } from './renderUtils';

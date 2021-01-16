@@ -25,7 +25,7 @@ import * as FmtHLM from '../../shared/logics/hlm/meta';
 import * as Logic from '../../shared/logics/logic';
 import * as Menu from '../../shared/notation/menu';
 import { LibraryDefinition, LibraryDefinitionState } from '../../shared/data/libraryDataAccessor';
-import { HLMExpressionType } from '../../shared/logics/hlm/hlm';
+import { HLMExpressionType } from '../../shared/logics/hlm/types';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 

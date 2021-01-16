@@ -4,7 +4,7 @@ import * as FmtUtils from '../../format/utils';
 import * as FmtHLM from './meta';
 import * as Logic from '../logic';
 import * as HLMMacros from './macros/macros';
-import { HLMExpressionType } from './hlm';
+import { HLMExpressionType } from './types';
 import { HLMUtils, HLMSubstitutionContext, HLMTypeSearchParameters, HLMBaseContext, HLMProofStepContext, HLMFormulaCase, HLMFormulaDefinition, HLMEquivalenceListInfo, HLMSubstitutionSourceInfo, followSupersetsAndEmbeddings, findConstruction } from './utils';
 import { LibraryDataAccessor } from '../../data/libraryDataAccessor';
 import { InternalError } from '../../utils/exception';
