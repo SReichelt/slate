@@ -15,7 +15,6 @@
     "src/vscode"
   ],
   "scripts": {
-    "postinstall": "npm run install-vscode",
     "clean": "rimraf build dist src/vscode/webview && npm run clean-vscode",
     "lint": "eslint --no-eslintrc -c .eslintrc.json 'src/!(vscode)/**/*.@(ts|tsx)'",
     "depcruise": "depcruise -c .dependency-cruiser.js src",
@@ -28,7 +27,6 @@
     "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd src/client && webpack-dev-server -w",
     "fill-public": "copyfiles -E data/*/*.slate docs/* docs/**/* dist/public",
-    "install-vscode": "cd src/vscode && cross-env NODE_ENV= npm install",
     "clean-vscode": "cd src/vscode && npm run clean",
     "build-vscode": "cd src/vscode && npm run build",
     "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/js/* dist/public/fonts/**/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
