@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import config from '../utils/config';
 import { PhysicalFileAccessor } from '../../fs/data/physicalFileAccessor';
 
-import App, { AppTestProps } from '../App';
+import App, { AppTest, AppTestProps } from '../App';
 
 
 // Temporarily work around jest module loading incompatibility.
@@ -13,7 +13,7 @@ function fixModuleDefaultExport(moduleName: string): void {
   module.default = module;
 }
 
-export async function runClientTest(getTestProps: (callback: () => void) => AppTestProps): Promise<void> {
+export async function runClientTest(getTestProps: (appTest: AppTest) => AppTestProps): Promise<void> {
   fixModuleDefaultExport('clsx');
   fixModuleDefaultExport('scroll-into-view-if-needed');
   fixModuleDefaultExport('react-alert-template-basic');
@@ -31,8 +31,13 @@ export async function runClientTest(getTestProps: (callback: () => void) => AppT
 
   let fileAccessor = new PhysicalFileAccessor;
 
-  await new Promise<void>((resolve) =>
-    ReactDOM.render(<App fileAccessor={fileAccessor} {...getTestProps(resolve)}/>, container));
+  await new Promise<void>((resolve, reject) => {
+    const testProps = getTestProps({
+      onSucceeded: resolve,
+      onFailed: reject
+    });
+    ReactDOM.render(<App fileAccessor={fileAccessor} {...testProps}/>, container);
+  });
 
   ReactDOM.unmountComponentAtNode(container);
   container.remove();

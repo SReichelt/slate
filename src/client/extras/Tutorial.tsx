@@ -208,6 +208,7 @@ export interface DynamicTutorialState {
   initialDefinitionContentsState?: DynamicTutorialState;
   additionalStateData?: any;
   checkPreconditions?: (tutorialState: DynamicTutorialState, currentEditedDefinition: LibraryDefinition | undefined) => DynamicTutorialState | undefined;
+  testFailure?: Error;
 }
 
 export function addTutorial(component: React.Component<any, any>, node: React.ReactNode, tutorialState: DynamicTutorialState, currentEditedDefinition: LibraryDefinition | undefined): React.ReactNode {

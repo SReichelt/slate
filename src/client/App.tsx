@@ -59,8 +59,13 @@ const sourceCodeURLPrefix = `${config.projectRepositoryURL}/tree/master/`;
 const appName = 'Slate';
 const selectedLibraryName = 'hlm';
 
+export interface AppTest {
+  onSucceeded: () => void;
+  onFailed: (error: Error) => void;
+}
+
 export interface AppTestProps {
-  tutorialTest?: () => void;
+  tutorialTest?: AppTest;
 }
 
 export interface AppProps extends AppTestProps {
@@ -1107,8 +1112,9 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         this.setState({tutorialState: newTutorialState});
         if (!newTutorialState) {
           this.navigateToRoot(true);
-          // Signal success if we are running the tutorial test.
-          this.props.tutorialTest?.();
+          this.props.tutorialTest?.onSucceeded();
+        } else if (newTutorialState.testFailure) {
+          this.props.tutorialTest?.onFailed(newTutorialState.testFailure);
         }
       }
     };

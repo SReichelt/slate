@@ -5044,7 +5044,8 @@ class TutorialStates {
           }
         ]
       },
-      refComponents: []
+      refComponents: [],
+      testFailure: new Error('Unexpectedly left definition')
     };
   }
 
@@ -5054,7 +5055,8 @@ class TutorialStates {
       refComponents: [],
       editedDefinition: tutorialState.editedDefinition,
       initialDefinitionContents: tutorialState.initialDefinitionContents,
-      initialDefinitionContentsState: tutorialState.initialDefinitionContentsState
+      initialDefinitionContentsState: tutorialState.initialDefinitionContentsState,
+      testFailure: new Error('Definition contents do not match expectation')
     };
   }
 
