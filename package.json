@@ -10,9 +10,13 @@
   },
   "homepage": "https://slate-prover.org/",
   "main": "index.js",
+  "private": "true",
+  "workspaces": [
+    "src/vscode"
+  ],
   "scripts": {
-    "postinstall": "cd src/vscode && (mkdir ../../node_modules/.for-vscode || echo Will use existing node_modules.) && (ln -s ../../node_modules/.for-vscode node_modules || echo Will use existing or separate node_modules.) && cross-env NODE_ENV= npm install",
-    "clean": "rimraf build dist src/vscode/webview",
+    "postinstall": "npm run install-vscode",
+    "clean": "rimraf build dist src/vscode/webview && npm run clean-vscode",
     "lint": "eslint --no-eslintrc -c .eslintrc.json 'src/!(vscode)/**/*.@(ts|tsx)'",
     "depcruise": "depcruise -c .dependency-cruiser.js src",
     "test": "jest --silent && src/scripts/checkLibrary.sh",
@@ -24,14 +28,16 @@
     "build-client": "cd src/client && cross-env NODE_ENV=production webpack -p",
     "dev-client": "cd src/client && webpack-dev-server -w",
     "fill-public": "copyfiles -E data/*/*.slate docs/* docs/**/* dist/public",
-    "build-vscode": "cd src/vscode && (ln -s ../../node_modules/.for-vscode node_modules || echo Will use existing or separate node_modules.) && npm run build",
+    "install-vscode": "cd src/vscode && cross-env NODE_ENV= npm install",
+    "clean-vscode": "cd src/vscode && npm run clean",
+    "build-vscode": "cd src/vscode && npm run build",
     "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/js/* dist/public/fonts/**/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,FUNCTS,STATIC,CLIENT,PUBLIC,VSCODE\" -c \"bgBlue.bold,bgMagenta.bold,bgCyan.bold,bgGreen.bold,bgYellow.bold,bgRed.bold\" \"npm run build-server\" \"npm run build-functions\" \"npm run build-static\" \"npm run build-client\" \"npm run fill-public\" \"npm run build-vscode\" && npm run package-vscode",
     "start": "cross-env NODE_ENV=production node dist/server/server/server.js",
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\""
   },
   "engines": {
-    "node": "15.6.0"
+    "node": "^15.6.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",

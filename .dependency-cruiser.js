@@ -31,6 +31,7 @@ module.exports = {
           '(^|/)(babel|webpack)\\.config\\.(js|cjs|mjs|ts|json)$', // other configs
           dir('src/vscode/webview'), // build output
           dir('src/client/public/js'), // directly included in page
+          file('src/client/__mocks__/empty.ts'), // dummy file referenced from jest.config.js
         ]
       },
       to: {},
@@ -158,7 +159,9 @@ module.exports = {
         pathNot: [
           ...npmDeps(
             '@types',
-            '.for-vscode/@types'
+          ),
+          ...npmDepsVSCode(
+            '@types',
           ),
         ],
         dependencyTypes: [
@@ -322,8 +325,8 @@ module.exports = {
             'path',
             'util',
           ),
-          ...npmDeps(
-            '.for-vscode',
+          ...npmDepsVSCode(
+            '@types',
           ),
         ]
       }
@@ -574,8 +577,16 @@ function npmDep(packageName) {
   return dir(`node_modules/${packageName}`);
 }
 
+function npmDepVSCode(packageName) {
+  return dir(`src/vscode/node_modules/${packageName}`);
+}
+
 function npmDeps(...packageNames) {
   return packageNames.map(npmDep);
+}
+
+function npmDepsVSCode(...packageNames) {
+  return packageNames.map(npmDepVSCode);
 }
 
 function testFilesWithinDir(path) {
