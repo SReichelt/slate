@@ -31,7 +31,7 @@
     "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\""
   },
   "engines": {
-    "node": "14.13.1"
+    "node": "15.6.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
