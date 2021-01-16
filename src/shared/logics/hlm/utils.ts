@@ -1741,6 +1741,10 @@ export class HLMUtils extends GenericUtils {
     return this.getDeclaredSetInternal(term, visitedDefinitions).then((set: Fmt.Expression) => this.getFinalSupersetInternal(set, typeSearchParameters, visitedDefinitions));
   }
 
+  getCommonSuperset(terms: Fmt.Expression[]): CachedPromise<Fmt.Expression | undefined> {
+    return this.getCommonSupersetInternal(terms).or(() => this.getCommonFinalSuperset(terms));
+  }
+
   getCommonFinalSuperset(terms: Fmt.Expression[]): CachedPromise<Fmt.Expression | undefined> {
     let finalSetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
     for (let term of terms) {

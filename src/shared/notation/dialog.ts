@@ -61,7 +61,7 @@ export abstract class ExpressionDialogItem {
 }
 
 export class ExpressionDialogExpressionItem extends ExpressionDialogItem {
-  constructor(public expression: Notation.RenderedExpression) {
+  constructor(public onRenderExpression: () => Notation.RenderedExpression | undefined) {
     super();
   }
 }

@@ -1,6 +1,7 @@
 import { LibraryDataAccessor, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, formatItemNumber, LibraryItemNumber } from './libraryDataAccessor';
 import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from './fileAccessor';
 import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from './constants';
+import { InternalError } from '../utils/exception';
 import CachedPromise from './cachedPromise';
 import * as Fmt from '../format/format';
 import * as Meta from '../format/metaModel';
@@ -679,7 +680,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   editLocalItem(libraryDefinition: LibraryDefinition, itemInfo: LibraryItemInfo): LibraryDefinition {
     if (!libraryDefinition.fileReference) {
-      throw new Error('Internal error: trying to edit definition without file reference');
+      throw new InternalError('Trying to edit definition without file reference');
     }
     let name = libraryDefinition.definition.name;
     let clonedFile = libraryDefinition.file.clone();
@@ -703,7 +704,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   private localDefinitionModified(name: string, editedLibraryDefinition: LibraryDefinition): void {
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
-      throw new Error('Internal error: trying to modify definition that is not being edited');
+      throw new InternalError('Trying to modify definition that is not being edited');
     }
     editedLibraryDefinition.modified = true;
     this.prePublishLocalDefinition(editedLibraryDefinition);
@@ -752,7 +753,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
   submitLocalItem(editedLibraryDefinition: LibraryDefinition): CachedPromise<WriteFileResult> {
     let name = editedLibraryDefinition.definition.name;
     if (this.editedDefinitions.get(name) !== editedLibraryDefinition) {
-      return CachedPromise.reject(new Error('Internal error: trying to submit definition that is not being edited'));
+      return CachedPromise.reject(new InternalError('Trying to submit definition that is not being edited'));
     }
     let prevState = editedLibraryDefinition.state;
     editedLibraryDefinition.state = LibraryDefinitionState.Submitting;
@@ -820,7 +821,7 @@ export class LibraryDataProvider implements LibraryDataAccessor {
 
   private submitLocalDefinition(name: string, editedLibraryDefinition: LibraryDefinition, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     if (!editedLibraryDefinition.fileReference?.write) {
-      return CachedPromise.reject(new Error('Internal error: trying to submit definition without file reference'));
+      return CachedPromise.reject(new InternalError('Trying to submit definition without file reference'));
     }
     try {
       let contents = FmtWriter.writeString(editedLibraryDefinition.file);

@@ -17,14 +17,6 @@ export class EditAnalysis {
   expressionEditInfo = new Map<Fmt.Expression, ExpressionEditInfo>();
   usedParameterNames = new Set<string>();
 
-  clear() {
-    this.definitionContentsContext.clear();
-    this.newParameterContext.clear();
-    this.newArgumentContext.clear();
-    this.expressionEditInfo.clear();
-    this.usedParameterNames.clear();
-  }
-
   analyzeFile(file: Fmt.File, context: Ctx.Context): void {
     this.analyzeDefinitions(file.definitions, context);
   }

@@ -29,7 +29,7 @@ class LinkExtractor {
     }
   }
 
-  private triggerLinkCheck(uri: string) {
+  private triggerLinkCheck(uri: string): void {
     if (linksChecking < 10) {
       linksChecking++;
       linkCheck(uri, (err: any, result: any) => {
@@ -50,7 +50,7 @@ class LinkExtractor {
   }
 }
 
-function checkDefinitionLinks(fileName: string, definition: Fmt.Definition) {
+function checkDefinitionLinks(fileName: string, definition: Fmt.Definition): void {
   if (definition.documentation) {
     for (let documentationItem of definition.documentation.items) {
       let md = new Remarkable;

@@ -7,6 +7,7 @@ import * as Fmt from '../../shared/format/format';
 import * as Notation from '../../shared/notation/notation';
 import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
 import * as Logic from '../../shared/logics/logic';
+import { InternalError } from '../../shared/utils/exception';
 import CachedPromise from '../../shared/data/cachedPromise';
 
 
@@ -73,7 +74,7 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
 
   leaveBlocker(): void {
     if (this.blockCounter <= 0) {
-      throw new Error('Internal error: update block counter underflow');
+      throw new InternalError('Update block counter underflow');
     }
     this.blockCounter--;
   }

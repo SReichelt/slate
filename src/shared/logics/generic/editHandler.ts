@@ -28,18 +28,18 @@ export type SetExpressionFn = (expression: Fmt.Expression | undefined) => void;
 
 export type RenderExpressionsFn = (expressions: Fmt.Expression[]) => Notation.RenderedExpression;
 
-export type RenderArgumentsFn = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList) => Notation.RenderedExpression;
+export type RenderArgumentsFn<HandlerT extends GenericEditHandler> = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList, innerEditHandler: HandlerT) => Notation.RenderedExpression;
 
 export type GetExpressionsFn = (getPath: () => Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, fromMRUList: boolean) => CachedPromise<Fmt.Expression[]> | undefined;
 
 export abstract class GenericEditHandler {
+  protected editAnalysis: Edit.EditAnalysis;
   static lastInsertedParameter?: Fmt.Parameter;
 
-  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, protected editAnalysis: Edit.EditAnalysis, protected utils: GenericUtils, protected templates: Fmt.File, protected mruList: MRUList) {}
+  constructor(protected definition: Fmt.Definition, protected libraryDataProvider: LibraryDataProvider, private createEditAnalysisFn: () => Edit.EditAnalysis, protected utils: GenericUtils, protected templates: Fmt.File, protected mruList: MRUList) {}
 
   update(): CachedPromise<void> {
-    this.editAnalysis.clear();
-    this.editAnalysis.analyzeDefinition(this.definition, this.libraryDataProvider.logic.getRootContext());
+    this.editAnalysis = this.createEditAnalysisFn();
     return CachedPromise.resolve();
   }
 
@@ -354,7 +354,7 @@ export abstract class GenericEditHandler {
       title = new Notation.ParagraphExpression(paragraphs);
     }
     let dialog = new Dialog.ExpressionDialog([
-      new Dialog.ExpressionDialogInfoItem(title),
+      new Dialog.ExpressionDialogInfoItem(() => title),
       new Dialog.ExpressionDialogSeparatorItem
     ]);
     dialog.styleClasses = ['wide'];
@@ -371,8 +371,7 @@ export abstract class GenericEditHandler {
     let previewItem = this.createTemplateDialogPreviewItem(newNotation, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
     let messageItem: Dialog.ExpressionDialogInfoItem | undefined = undefined;
     if (isTopLevel) {
-      messageItem = new Dialog.ExpressionDialogInfoItem(new Notation.EmptyExpression);
-      messageItem.visible = false;
+      messageItem = new Dialog.ExpressionDialogInfoItem(() => undefined);
     }
     let requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
     previewItem.visible = requiredArgumentsFilled;
@@ -576,8 +575,7 @@ export abstract class GenericEditHandler {
     } else if (autoVariables.length) {
       this.setMessageItem(autoVariables, 'will be inferred automatically if possible', messageItem);
     } else {
-      messageItem.expression = new Notation.EmptyExpression;
-      messageItem.visible = false;
+      messageItem.onRenderExpression = () => undefined;
     }
     return true;
   }
@@ -601,8 +599,7 @@ export abstract class GenericEditHandler {
         variable.notation
       );
     }
-    messageItem.expression = new Notation.RowExpression(row);
-    messageItem.visible = true;
+    messageItem.onRenderExpression = () => new Notation.RowExpression(row);
   }
 
   private preFillArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, variables: RenderedVariable[]): void {

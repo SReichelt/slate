@@ -15,7 +15,7 @@ export class SubstitutionContext {
 }
 
 export class GenericUtils {
-  constructor(protected definition: Fmt.Definition, protected libraryDataAccessor: LibraryDataAccessor, protected supportPlaceholders: boolean) {}
+  constructor(public definition: Fmt.Definition, public libraryDataAccessor: LibraryDataAccessor, protected supportPlaceholders: boolean) {}
 
   private isSelfReferencePath(path: Fmt.Path): boolean {
     return (!path.parentPath && path.name === this.definition.name);

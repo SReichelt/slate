@@ -32,6 +32,14 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
     };
   }
 
+  componentDidMount(): void {
+    this.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
+  }
+
+  componentWillUnmount(): void {
+    this.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
+  }
+
   render(): React.ReactNode {
     let className = clsx('dialog-contents', this.props.dialog.styleClasses);
     let rows = [];
@@ -61,16 +69,27 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
   }
 
   private onItemChanged = (): void => {
+    this.checkOKEnabled();
+    if (this.props.dialog.onCheckUpdateNeeded?.()) {
+      this.forceUpdate();
+    }
+  };
+
+  private onExpressionChanged = (editorUpdateRequired: boolean): void => {
+    if (editorUpdateRequired) {
+      this.checkOKEnabled();
+      this.forceUpdate();
+    }
+  };
+
+  private checkOKEnabled(): void {
     if (this.props.dialog.onCheckOKEnabled) {
       let okEnabled = this.props.dialog.onCheckOKEnabled();
       if (this.state.okEnabled !== okEnabled) {
         this.setState({okEnabled: okEnabled});
       }
     }
-    if (this.props.dialog.onCheckUpdateNeeded?.()) {
-      this.forceUpdate();
-    }
-  };
+  }
 }
 
 export interface ExpressionDialogItemProps {
@@ -99,15 +118,9 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
 
   componentDidMount(): void {
     this.props.item.registerChangeListener(this.onItemChanged);
-    if (this.props.interactionHandler) {
-      this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
-    }
   }
 
   componentWillUnmount(): void {
-    if (this.props.interactionHandler) {
-      this.props.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
-    }
     this.props.item.unregisterChangeListener(this.onItemChanged);
   }
 
@@ -115,14 +128,6 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
     if (this.props.item !== prevProps.item) {
       prevProps.item.unregisterChangeListener(this.onItemChanged);
       this.props.item.registerChangeListener(this.onItemChanged);
-    }
-    if (this.props.interactionHandler !== prevProps.interactionHandler) {
-      if (prevProps.interactionHandler) {
-        prevProps.interactionHandler.unregisterExpressionChangeListener(this.onExpressionChanged);
-      }
-      if (this.props.interactionHandler) {
-        this.props.interactionHandler.registerExpressionChangeListener(this.onExpressionChanged);
-      }
     }
   }
 
@@ -133,156 +138,130 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
       'separated-below': this.props.separatedBelow
     });
     let cellClassName = 'dialog-cell';
-    if (!this.props.item.visible) {
-      return (
-        <tr className={className}>
-          <td className={cellClassName} colSpan={2}/>
-        </tr>
-      );
-    }
-    if (this.props.item instanceof Dialog.ExpressionDialogExpressionItem) {
-      let groupClassName: string | undefined = undefined;
-      if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
-        cellClassName = clsx(cellClassName, 'dialog-info-cell');
-      } else {
-        groupClassName = 'dialog-group';
-      }
-      return (
-        <tr className={className}>
-          <td className={cellClassName} colSpan={2}>
-            <div className={groupClassName}>
-              <Expression expression={this.props.item.expression} interactionHandler={this.props.interactionHandler}/>
-            </div>
-          </td>
-        </tr>
-      );
-    } else if (this.props.item instanceof Dialog.ExpressionDialogLinkItem) {
-      return (
-        <tr className={className}>
-          <td className={cellClassName} colSpan={2}>
-            <a href={this.props.item.onGetURL()} target={'_blank'}>{this.props.item.title}</a>
-          </td>
-        </tr>
-      );
-    } else if (this.props.item instanceof Dialog.ExpressionDialogParameterItem) {
-      let title: any = this.props.item.title;
-      if (title instanceof Notation.RenderedExpression) {
-        title = <Expression expression={title} key="title"/>;
-      }
-      title = [title, ':'];
-      if (this.props.item.onGetInfo && this.titleNode) {
-        let onGetInfo = this.props.item.onGetInfo;
-        let getToolTipContents = () => {
-          let info = onGetInfo();
-          if (info) {
-            return <Expression expression={info}/>;
+    let contents: React.ReactNode = null;
+    if (this.props.item.visible) {
+      if (this.props.item instanceof Dialog.ExpressionDialogExpressionItem) {
+        let expression = this.props.item.onRenderExpression();
+        if (expression) {
+          let groupClassName: string | undefined = undefined;
+          if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
+            cellClassName = clsx(cellClassName, 'dialog-info-cell');
           } else {
-            return null;
+            groupClassName = 'dialog-group';
           }
-        };
-        title = [title, <ExpressionToolTip active={this.state.titleHovered} position="top" parent={this.titleNode} getContents={getToolTipContents} delay={100} key="tooltip"/>];
-      }
-      return (
-        <tr className={className}>
-          <th className={clsx(cellClassName, 'dialog-param-title-cell')} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
-            {title}
-          </th>
-          <td className={cellClassName} key="value">
-            <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>
-          </td>
-        </tr>
-      );
-    } else if (this.props.item instanceof Dialog.ExpressionDialogListItem) {
-      let contents: React.ReactNode = null;
-      let listItem = this.props.item;
-      if (listItem.items.length) {
-        if (listItem instanceof Dialog.ExpressionDialogSelectionItem) {
-          let selectionItem = listItem;
           contents = (
-            <fieldset className={'dialog-group'}>
-              <div className={'dialog-radio-button-group'}>
-                {selectionItem.items.map((item: any, index: number) => {
-                  if (selectionItem.items.length > 1) {
-                    // If the dialog was opened from a nested placeholder, only onClick works, but onChange doesn't.
-                    // In addition, the "checked" status fails to update unless we change the key of the selected item.
-                    // I haven't figured out why.
-                    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-                      if (event.target.value === `item${index}` && selectionItem !== item) {
-                        selectionItem.selectedItem = item;
-                        selectionItem.changed();
-                      }
-                    };
-                    let onClick = () => {
-                      if (selectionItem !== item) {
-                        selectionItem.selectedItem = item;
-                        selectionItem.changed();
-                      }
-                    };
-                    let selected = selectionItem.selectedItem === item;
-                    return (
-                      <div key={selected ? -index : index}>
-                        <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>
-                        <label htmlFor={`radio${index}`} onClick={onClick}>
-                          <Expression expression={selectionItem.onRenderItem(item)}/>
-                        </label>
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div key={index}>
-                        <Expression expression={selectionItem.onRenderItem(item)}/>
-                      </div>
-                    );
-                  }
-                })}
-              </div>
-            </fieldset>
-          );
-        } else {
-          contents = (
-            <div className={'dialog-group'}>
-              {listItem.items.map((item: any, index: number) => (
-                <div key={index}>
-                  <Expression expression={listItem.onRenderItem(item)}/>
-                </div>
-              ))}
+            <div className={groupClassName}>
+              <Expression expression={expression} interactionHandler={this.props.interactionHandler}/>
             </div>
           );
         }
+      } else if (this.props.item instanceof Dialog.ExpressionDialogLinkItem) {
+        contents = <a href={this.props.item.onGetURL()} target={'_blank'}>{this.props.item.title}</a>;
+      } else if (this.props.item instanceof Dialog.ExpressionDialogParameterItem) {
+        let title: any = this.props.item.title;
+        if (title instanceof Notation.RenderedExpression) {
+          title = <Expression expression={title} key="title"/>;
+        }
+        title = [title, ':'];
+        if (this.props.item.onGetInfo && this.titleNode) {
+          let onGetInfo = this.props.item.onGetInfo;
+          let getToolTipContents = () => {
+            let info = onGetInfo();
+            if (info) {
+              return <Expression expression={info}/>;
+            } else {
+              return null;
+            }
+          };
+          title = [title, <ExpressionToolTip active={this.state.titleHovered} position="top" parent={this.titleNode} getContents={getToolTipContents} delay={100} key="tooltip"/>];
+        }
+        return (
+          <tr className={className}>
+            <th className={clsx(cellClassName, 'dialog-param-title-cell')} onMouseEnter={() => this.setState({titleHovered: true})} onMouseLeave={() => this.setState({titleHovered: false})} ref={(node) => (this.titleNode = node)} key="title">
+              {title}
+            </th>
+            <td className={cellClassName} key="value">
+              <Expression expression={this.props.item.onGetValue()} interactionHandler={this.props.interactionHandler}/>
+            </td>
+          </tr>
+        );
+      } else if (this.props.item instanceof Dialog.ExpressionDialogListItem) {
+        let listItem = this.props.item;
+        if (listItem.items.length) {
+          if (listItem instanceof Dialog.ExpressionDialogSelectionItem) {
+            let selectionItem = listItem;
+            contents = (
+              <fieldset className={'dialog-group'}>
+                <div className={'dialog-radio-button-group'}>
+                  {selectionItem.items.map((item: any, index: number) => {
+                    if (selectionItem.items.length > 1) {
+                      // If the dialog was opened from a nested placeholder, only onClick works, but onChange doesn't.
+                      // In addition, the "checked" status fails to update unless we change the key of the selected item.
+                      // I haven't figured out why.
+                      let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                        if (event.target.value === `item${index}` && selectionItem !== item) {
+                          selectionItem.selectedItem = item;
+                          selectionItem.changed();
+                        }
+                      };
+                      let onClick = () => {
+                        if (selectionItem !== item) {
+                          selectionItem.selectedItem = item;
+                          selectionItem.changed();
+                        }
+                      };
+                      let selected = selectionItem.selectedItem === item;
+                      return (
+                        <div key={selected ? -index : index}>
+                          <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>
+                          <label htmlFor={`radio${index}`} onClick={onClick}>
+                            <Expression expression={selectionItem.onRenderItem(item)}/>
+                          </label>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div key={index}>
+                          <Expression expression={selectionItem.onRenderItem(item)}/>
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
+              </fieldset>
+            );
+          } else {
+            contents = (
+              <div className={'dialog-group'}>
+                {listItem.items.map((item: any, index: number) => (
+                  <div key={index}>
+                    <Expression expression={listItem.onRenderItem(item)}/>
+                  </div>
+                ))}
+              </div>
+            );
+          }
+        }
+      } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
+        contents = (
+          <div className={'dialog-group'}>
+            <LibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked} autoFocusSearchInput={true}/>
+          </div>
+        );
       }
-      return (
-        <tr className={className}>
-          <td className={cellClassName} colSpan={2}>
-            {contents}
-          </td>
-        </tr>
-      );
-    } else if (this.props.item instanceof Dialog.ExpressionDialogTreeItem) {
-      return (
-        <tr className={className}>
-          <td className={cellClassName} colSpan={2}>
-            <div className={'dialog-group'}>
-              <LibraryTree libraryDataProvider={this.props.item.libraryDataProvider} templates={this.props.item.templates} onFilter={this.props.item.onFilter} selectedItemPath={this.props.item.selectedItemPath} onItemClicked={this.props.item.onItemClicked} autoFocusSearchInput={true}/>
-            </div>
-          </td>
-        </tr>
-      );
-    } else {
-      return undefined;
     }
+    return (
+      <tr className={className}>
+        <td className={cellClassName} colSpan={2}>
+          {contents}
+        </td>
+      </tr>
+    );
   }
 
   private onItemChanged = (): void => {
     this.forceUpdate();
-    if (this.props.onItemChanged) {
-      this.props.onItemChanged();
-    }
-  };
-
-  private onExpressionChanged = (editorUpdateRequired: boolean): void => {
-    if (editorUpdateRequired) {
-      this.onItemChanged();
-    }
+    this.props.onItemChanged?.();
   };
 }
 

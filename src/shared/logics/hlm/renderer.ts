@@ -2405,7 +2405,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (this.editHandler && onInsertProof) {
         let editHandler = this.editHandler;
         state.paragraphs.push(editHandler.createConditionalElement((checkResult: HLMCheckResult) => {
-          if (checkResult.incompleteProofs.size) {
+          if (checkResult.rechecker?.hasIncompleteProofs()) {
             return new Notation.EmptyExpression;
           } else {
             return editHandler.getProofInsertButton(onInsertProof);
@@ -3350,7 +3350,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
     let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
     let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
-    let onRenderArgumentList = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList) => this.renderArgumentList(parameterList, argumentList, undefined, ArgumentListStyle.Definitions);
+    let onRenderArgumentList = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList, innerEditHandler: HLMEditHandler) => {
+      let innerRenderer = new HLMRenderer(this.definition, this.libraryDataAccessor, this.utils, this.renderUtils, this.templates, this.options, innerEditHandler);
+      return innerRenderer.renderArgumentList(parameterList, argumentList, undefined, ArgumentListStyle.Definitions);
+    };
     return this.editHandler!.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula, onRenderArgumentList);
   }
 
