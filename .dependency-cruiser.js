@@ -160,9 +160,6 @@ module.exports = {
           ...npmDeps(
             '@types',
           ),
-          ...npmDepsVSCode(
-            '@types',
-          ),
         ],
         dependencyTypes: [
           'npm-dev'
@@ -325,8 +322,9 @@ module.exports = {
             'path',
             'util',
           ),
-          ...npmDepsVSCode(
+          ...npmDeps(
             '@types',
+            'ejs',
           ),
         ]
       }
@@ -582,11 +580,7 @@ function npmDepVSCode(packageName) {
 }
 
 function npmDeps(...packageNames) {
-  return packageNames.map(npmDep);
-}
-
-function npmDepsVSCode(...packageNames) {
-  return packageNames.map(npmDepVSCode);
+  return packageNames.map(npmDep).concat(packageNames.map(npmDepVSCode));
 }
 
 function testFilesWithinDir(path) {
