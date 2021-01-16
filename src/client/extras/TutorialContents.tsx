@@ -4205,7 +4205,7 @@ class TutorialStates {
                         type: Expression,
                         key: 0,
                         toolTip: {
-                          contents: <p>Here, please select the definition you just created, which should be the second item in the list of recently used definitions.</p>,
+                          contents: <p>Here, please select the definition you just created, which should be the first or second item in the list of recently used definitions.</p>,
                           position: 'bottom',
                           index: 0,
                           condition: (component: Expression) => !component.state.openMenu
