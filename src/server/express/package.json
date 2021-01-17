@@ -1,9 +1,9 @@
 {
   "name": "slate-server-express",
   "scripts": {
-    "build": "webpack -p server.ts -o ../../../dist/server/server.js",
+    "build": "webpack --mode production",
     "start": "cross-env NODE_ENV=production node ../../../dist/server/server.js",
-    "dev": "webpack --mode development server.ts -o ../../../dist/server/server.js && node --inspect=9229 ../../../dist/server/server.js"
+    "dev": "webpack --mode development && node --inspect=9229 ../../../dist/server/server.js"
   },
   "dependencies": {
     "slate-shared": "",
@@ -16,12 +16,9 @@
     "node-fetch": "^3.0.0-beta.9"
   },
   "devDependencies": {
-    "@types/express": "^4.17.9",
+    "@types/express": "^4.17.11",
     "@types/http-proxy-middleware": "^0.19.3",
-    "@types/node": "^14.14.14",
-    "@types/node-fetch": "^2.5.7",
-		"ts-loader": "^8.0.12",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "@types/node": "^14.14.21",
+    "@types/node-fetch": "^2.5.8"
   }
 }

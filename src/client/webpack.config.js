@@ -13,7 +13,6 @@ function outputPlaceholder(name) {
   return `<%= ${name} %>`;
 }
 
-/**@type {webpack.Plugin[]}*/
 const plugins = [
   new CopyWebpackPlugin({
     patterns: [
@@ -53,7 +52,7 @@ const plugins = [
 /**@type {webpack.Configuration}*/
 module.exports = {
   mode: process.env.NODE_ENV ?? 'development',
-  devtool: process.env.NODE_ENV === 'production' ? '' : 'inline-source-map',
+  devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
   entry: ['babel-polyfill', './client'],
   output: {
     path: path.join(projectRoot, 'dist', 'public'),

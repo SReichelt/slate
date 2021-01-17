@@ -2,14 +2,14 @@
 
 'use strict';
 
+const path = require('path');
 const webpack = require('webpack');
 
+const projectRoot = path.join(__dirname, '..', '..', '..', '..');
+
 /**@type {webpack.Configuration}*/
-module.exports = {
+const baseConfig = {
     target: 'node',
-    output: {
-        libraryTarget: 'umd'
-    },
     resolve: {
         extensions: ['.ts', '.js']
     },
@@ -30,3 +30,36 @@ module.exports = {
         ignored: /node_modules/
     }
 };
+
+const baseOutput = {
+    path: path.join(projectRoot, 'dist', 'functions'),
+    libraryTarget: 'umd'
+};
+
+/**@type {webpack.Configuration[]}*/
+module.exports = [
+    {
+        ...baseConfig,
+        output: {
+            ...baseOutput,
+            filename: 'auth-info.js'
+        },
+        entry: './authInfoFunction'
+    },
+    {
+        ...baseConfig,
+        output: {
+            ...baseOutput,
+            filename: 'auth.js'
+        },
+        entry: './authFunction'
+    },
+    {
+        ...baseConfig,
+        output: {
+            ...baseOutput,
+            filename: 'submit.js'
+        },
+        entry: './submitFunction'
+    }
+];

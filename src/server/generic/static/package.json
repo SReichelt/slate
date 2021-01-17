@@ -1,7 +1,7 @@
 {
   "name": "slate-static-scripts",
   "scripts": {
-    "build": "webpack -p buildPreload.ts -o ../../../../dist/public/download/static/buildPreload.js && webpack -p buildStatic.ts -o ../../../../dist/public/download/static/buildStatic.js"
+    "build": "webpack --mode production"
   },
   "dependencies": {
     "slate-shared": "",
@@ -12,9 +12,6 @@
   },
   "devDependencies": {
     "@types/ejs": "^3.0.5",
-    "@types/remarkable": "^2.0.0",
-		"ts-loader": "^8.0.12",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "@types/remarkable": "^2.0.0"
   }
 }

@@ -13,6 +13,7 @@ const MAX_SUGGESTIONS = 10;
 
 const allReplacements: LatexInputReplacement[] =
   (replacements as [string, string][])
+    .filter(([latexCode, _]) => !latexCode.endsWith('up'))  // Recent versions of unicodeit contain e.g. '\alpha' and '\alphaup', breaking immediate conversion.
     .map(([latexCode, unicodeCharacters]) => ({ latexCode, unicodeCharacters }))
     .sort((a, b) => a.latexCode.localeCompare(b.latexCode, 'en'));
 

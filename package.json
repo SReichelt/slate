@@ -47,26 +47,38 @@
     "package-vscode": "copyfiles -E -u 2 dist/public/* dist/public/js/* dist/public/fonts/**/* src/vscode/webview && cd src/vscode && npm run package && copyfiles -E *.vsix ../../dist/public/download",
     "build": "npm run clean && concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT,VSCODE\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\" \"npm run build-non-client\" \"npm run build-client\" \"npm run build-vscode\" && npm run package-vscode",
     "start": "npm run start-server",
-    "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\""
+    "dev": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev-server\" \"npm run dev-client\"",
+    "clean-workspace-node-modules": "find src -name 'node_modules' -exec rimraf '{}' \\;",
+    "update-dependencies": "find . -name 'package.json' -not -path '*/node_modules/*' -execdir npm-check-updates -u \\;"
   },
   "engines": {
     "node": "^15.6.0"
   },
   "dependencies": {
-    "tslib": "^2.0.3"
+    "tslib": "^2.1.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.19",
-    "@typescript-eslint/eslint-plugin": "^4.11.0",
-    "@typescript-eslint/parser": "^4.11.0",
+    "@types/jest": "^26.0.20",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
     "concurrently": "^5.3.0",
+    "copy-webpack-plugin": "^7.0.0",
     "copyfiles": "^2.4.1",
-    "dependency-cruiser": "^9.21.4",
-    "eslint": "^7.16.0",
-    "eslint-plugin-react": "^7.21.5",
+    "css-loader": "^5.0.1",
+    "dependency-cruiser": "^9.21.6",
+    "eslint": "^7.18.0",
+    "eslint-plugin-react": "^7.22.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.1",
     "jest": "^26.6.3",
     "rimraf": "^3.0.2",
+    "style-loader": "^2.0.0",
     "ts-jest": "^26.4.4",
-    "typescript": "^4.1.3"
+    "ts-loader": "^8.0.14",
+    "typescript": "^4.1.3",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.15.0",
+    "webpack-cli": "^4.3.1",
+    "webpack-dev-server": "^3.11.2"
   }
 }
