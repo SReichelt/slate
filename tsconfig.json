@@ -4,6 +4,7 @@
     "sourceMap": true,
     "module": "commonjs",
     "importHelpers": true,
+    "rootDir": ".",
     "outDir": "build",
     "lib": ["es6"],
     "moduleResolution": "node",
