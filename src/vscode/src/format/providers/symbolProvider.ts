@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../../shared/format/format';
-import * as Meta from '../../../../shared/format/metaModel';
-import * as FmtReader from '../../../../shared/format/read';
-import { fileExtension } from '../../../../shared/data/constants';
+import * as Fmt from 'slate-shared/format/format';
+import * as Meta from 'slate-shared/format/metaModel';
+import * as FmtReader from 'slate-shared/format/read';
+import { fileExtension } from 'slate-shared/data/constants';
 import { ParsedDocumentMap } from '../parsedDocument';
 import { parseFile } from '../parse';
 import { readRange } from '../utils';

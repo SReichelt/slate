@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../../shared/format/format';
+import * as Fmt from 'slate-shared/format/format';
 import { ParsedDocumentMap } from '../parsedDocument';
 import { DefinitionLink, getDefinitionLinks } from '../navigate';
 import { readRange } from '../utils';
 import { appendDocumentation } from '../documentation';
 import { HoverEvent } from '../../events';
-import CachedPromise from '../../../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 export class SlateDefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider {
     constructor(private parsedDocuments: ParsedDocumentMap, private hoverEventEmitter: vscode.EventEmitter<HoverEvent>) {}

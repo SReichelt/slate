@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../../shared/format/format';
+import * as Fmt from 'slate-shared/format/format';
 import { ParsedDocumentMap } from '../parsedDocument';
 
 export class SlateHighlightProvider implements vscode.DocumentHighlightProvider {

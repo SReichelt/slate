@@ -3,12 +3,12 @@ import * as React from 'react';
 import Expression, { ExpressionInteractionHandler, OnExpressionChanged, OnHoverChanged } from './Expression';
 import { renderPromise } from './PromiseHelper';
 
-import * as Fmt from '../../shared/format/format';
-import * as Notation from '../../shared/notation/notation';
-import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
-import * as Logic from '../../shared/logics/logic';
-import { InternalError } from '../../shared/utils/exception';
-import CachedPromise from '../../shared/data/cachedPromise';
+import * as Fmt from 'slate-shared/format/format';
+import * as Notation from 'slate-shared/notation/notation';
+import { LibraryDataProvider, LibraryDefinition } from 'slate-shared/data/libraryDataProvider';
+import * as Logic from 'slate-shared/logics/logic';
+import { InternalError } from 'slate-shared/utils/exception';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 export type OnLinkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path) => void;

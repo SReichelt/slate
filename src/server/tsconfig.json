@@ -1,11 +1,6 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/server",
-    "types": ["node"],
-    "allowJs": true
-  },
-  "files": [
-    "express/server.ts"
-  ]
+    "types": ["node"]
+  }
 }

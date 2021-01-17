@@ -1,0 +1,13 @@
+{
+  "name": "slate-server-generic",
+  "dependencies": {
+    "slate-shared": "",
+    "slate-env-web": "",
+    "slate-env-web-api": "",
+    "nodemailer": "^6.4.17"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.14",
+    "@types/nodemailer": "^6.4.0"
+  }
+}

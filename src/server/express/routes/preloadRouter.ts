@@ -1,13 +1,14 @@
 import * as express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as config from '../../config';
-import { FileAccessor } from '../../../shared/data/fileAccessor';
-import { WebFileAccessor } from '../../../envs/web/data/webFileAccessor';
-import { PhysicalFileAccessor } from '../../../envs/node/data/physicalFileAccessor';
-import { LibraryPreloader } from '../../generic/preload/preload';
-import { fetchJSON } from '../../../envs/web/utils/fetch';
-import CachedPromise from '../../../shared/data/cachedPromise';
+import { FileAccessor } from 'slate-shared/data/fileAccessor';
+import { WebFileAccessor } from 'slate-env-web/data/webFileAccessor';
+import { PhysicalFileAccessor } from 'slate-env-node/data/physicalFileAccessor';
+import { LibraryPreloader } from 'slate-server-generic/preload/preload';
+import { fetchJSON } from 'slate-env-web/utils/fetch';
+import CachedPromise from 'slate-shared/data/cachedPromise';
+
+const config = require('slate-server-generic/config');
 
 abstract class UpdateChecker {
   register(callback: () => CachedPromise<void>): void {

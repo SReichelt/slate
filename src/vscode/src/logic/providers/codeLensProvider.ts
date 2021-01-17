@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../../shared/format/format';
-import * as FmtLibrary from '../../../../shared/logics/library';
-import * as Notation from '../../../../shared/notation/notation';
-import { renderAsText, RenderAsTextOptions } from '../../../../shared/notation/textOutput';
-import * as Logic from '../../../../shared/logics/logic';
-import { LibraryDefinition } from '../../../../shared/data/libraryDataProvider';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtLibrary from 'slate-shared/logics/library';
+import * as Notation from 'slate-shared/notation/notation';
+import { renderAsText, RenderAsTextOptions } from 'slate-shared/notation/textOutput';
+import * as Logic from 'slate-shared/logics/logic';
+import { LibraryDefinition } from 'slate-shared/data/libraryDataProvider';
 import { LibraryDocumentProvider } from '../data';
 
 class SlateCodeLens extends vscode.CodeLens {

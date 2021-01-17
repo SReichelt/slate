@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as Fmt from '../../../../shared/format/format';
-import * as FmtDynamic from '../../../../shared/format/dynamic';
-import * as FmtMeta from '../../../../shared/format/meta';
-import * as FmtReader from '../../../../shared/format/read';
-import { escapeIdentifier } from '../../../../shared/format/common';
-import { fileExtension } from '../../../../shared/data/constants';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtDynamic from 'slate-shared/format/dynamic';
+import * as FmtMeta from 'slate-shared/format/meta';
+import * as FmtReader from 'slate-shared/format/read';
+import { escapeIdentifier } from 'slate-shared/format/common';
+import { fileExtension } from 'slate-shared/data/constants';
 import { ParsedDocument, ParsedDocumentMap } from '../parsedDocument';
 import { parseFile } from '../parse';
 import { isDefinitionReferenceToUri, getNameDefinitionLocation, findReferencedDefinition } from '../navigate';

@@ -3,7 +3,7 @@ const Loading = require('react-loading-animation');
 
 import './PromiseHelper.css';
 
-import CachedPromise from '../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 interface PromiseHelperProps {

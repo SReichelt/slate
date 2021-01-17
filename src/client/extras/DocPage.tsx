@@ -4,9 +4,9 @@ import { renderPromise } from '../components/PromiseHelper';
 import { OnDocLinkClicked } from './DocLink';
 
 import { disableOwnDefaultBehavior } from '../utils/event';
-import { fetchText } from '../../envs/web/utils/fetch';
+import { fetchText } from 'slate-env-web/utils/fetch';
 
-import CachedPromise from '../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 const RemarkableReactRenderer = require('remarkable-react').default;

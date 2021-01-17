@@ -1,11 +1,11 @@
-import { FileAccessor, FileWatcher } from '../../../shared/data/fileAccessor';
-import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from '../../../shared/data/constants';
-import * as Fmt from '../../../shared/format/format';
-import * as Meta from '../../../shared/format/metaModel';
-import * as FmtReader from '../../../shared/format/read';
-import * as FmtWriter from '../../../shared/format/write';
-import * as FmtLibrary from '../../../shared/logics/library';
-import CachedPromise from '../../../shared/data/cachedPromise';
+import { FileAccessor, FileWatcher } from 'slate-shared/data/fileAccessor';
+import { fileExtension, preloadExtension, indexFileName, defaultLibraryName } from 'slate-shared/data/constants';
+import * as Fmt from 'slate-shared/format/format';
+import * as Meta from 'slate-shared/format/metaModel';
+import * as FmtReader from 'slate-shared/format/read';
+import * as FmtWriter from 'slate-shared/format/write';
+import * as FmtLibrary from 'slate-shared/logics/library';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 export abstract class LibraryPreloadGenerator {
   private readFile(uri: string, preloadURI: string, getMetaModel: Meta.MetaModelGetter): CachedPromise<Fmt.File> {

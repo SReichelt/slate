@@ -509,7 +509,7 @@ export class ArgumentList extends Array<Argument> implements ExpressionObject<Ar
     return arg.value;
   }
 
-  setValue(name: string | undefined, index: number | undefined, value: Expression | undefined, insertAfter: string[] = []) {
+  setValue(name: string | undefined, index: number | undefined, value: Expression | undefined, insertAfter: string[] = []): void {
     let curIndex = 0;
     let removeIndex: number | undefined = undefined;
     let insertIndex = 0;

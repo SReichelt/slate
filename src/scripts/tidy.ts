@@ -1,9 +1,9 @@
 import * as fs from 'fs';
-import * as Fmt from '../shared/format/format';
-import * as FmtReader from '../shared/format/read';
-import * as FmtWriter from '../shared/format/write';
-import { getMetaModelWithFallback } from '../envs/node/format/dynamic';
-import * as Logics from '../shared/logics/logics';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtReader from 'slate-shared/format/read';
+import * as FmtWriter from 'slate-shared/format/write';
+import { getMetaModelWithFallback } from 'slate-env-node/format/dynamic';
+import * as Logics from 'slate-shared/logics/logics';
 //import { refactorFile } from './refactor';
 
 function tidy(fileName: string): void {

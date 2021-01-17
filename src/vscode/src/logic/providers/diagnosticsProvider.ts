@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as Logic from '../../../../shared/logics/logic';
+import * as Logic from 'slate-shared/logics/logic';
 import { LibraryDocument, LibraryDocumentProvider } from '../data';
 
 export class SlateDiagnosticsProvider {

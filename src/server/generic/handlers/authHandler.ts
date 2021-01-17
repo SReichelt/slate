@@ -1,7 +1,8 @@
 import { Request, Response } from './types';
-import { fetchJSON } from '../../../envs/web/utils/fetch';
-import { AuthInfo } from '../../../envs/web/api/auth';
-import * as config from '../../config';
+import { fetchJSON } from 'slate-env-web/utils/fetch';
+import { AuthInfo } from 'slate-env-web-api/auth';
+
+const config = require('../config');
 
 export function handleAuthInfo(req: Request, res: Response): void {
   if (config.GITHUB_CLIENT_ID && config.GITHUB_CLIENT_SECRET) {

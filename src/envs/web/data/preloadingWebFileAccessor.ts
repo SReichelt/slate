@@ -1,6 +1,6 @@
-import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
+import { FileAccessor, FileReference } from 'slate-shared/data/fileAccessor';
 import { WebFileAccessor, WebFileReference } from './webFileAccessor';
-import CachedPromise from '../../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 export class PreloadingWebFileAccessor extends WebFileAccessor {
   constructor(baseURI: string, private preloadBaseURI: string) {

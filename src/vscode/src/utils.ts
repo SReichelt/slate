@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../shared/format/format';
-import * as Ctx from '../../shared/format/context';
-import * as FmtReader from '../../shared/format/read';
+import * as Fmt from 'slate-shared/format/format';
+import * as Ctx from 'slate-shared/format/context';
+import * as FmtReader from 'slate-shared/format/read';
 
 export interface RangeInfo {
     object: Object;

@@ -1,19 +1,6 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "sourceMap": true,
-    "module": "commonjs",
-    "importHelpers": true,
-    "allowJs": true,
-    "lib": ["es6"],
-    "moduleResolution": "node",
-    "types": ["node"],
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "suppressImplicitAnyIndexErrors": true
+    "types": ["node"]
   }
 }

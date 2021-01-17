@@ -67,6 +67,6 @@ export class DummyMetaModel extends MetaModel {
 
 export type MetaModelGetter = (path?: Fmt.Path) => MetaModel;
 
-export function getDummyMetaModel(path: Fmt.Path) {
+export function getDummyMetaModel(path: Fmt.Path): MetaModel {
   return new DummyMetaModel(path.name);
 }

@@ -11,12 +11,12 @@ import DocLink, { OnDocLinkClicked } from './DocLink';
 import config from '../utils/config';
 import { disableOwnDefaultBehavior } from '../utils/event';
 
-import * as Fmt from '../../shared/format/format';
-import * as Notation from '../../shared/notation/notation';
-import { LibraryDataProvider, LibraryDefinition } from '../../shared/data/libraryDataProvider';
-import * as Logic from '../../shared/logics/logic';
-import * as Logics from '../../shared/logics/logics';
-import { HLMRenderer } from '../../shared/logics/hlm/renderer';
+import * as Fmt from 'slate-shared/format/format';
+import * as Notation from 'slate-shared/notation/notation';
+import { LibraryDataProvider, LibraryDefinition } from 'slate-shared/data/libraryDataProvider';
+import * as Logic from 'slate-shared/logics/logic';
+import * as Logics from 'slate-shared/logics/logics';
+import { HLMRenderer } from 'slate-shared/logics/hlm/renderer';
 
 
 interface StartPageProps {

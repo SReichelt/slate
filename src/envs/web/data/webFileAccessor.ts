@@ -1,8 +1,8 @@
 import type { RequestInit } from 'node-fetch';
 import { fetchAny, fetchVoid, fetchText } from '../utils/fetch';
-import { FileAccessor, FileReference, WriteFileResult } from '../../../shared/data/fileAccessor';
-import { StandardFileAccessor, StandardFileReference } from '../../../shared/data/fileAccessorImpl';
-import CachedPromise from '../../../shared/data/cachedPromise';
+import { FileAccessor, FileReference, WriteFileResult } from 'slate-shared/data/fileAccessor';
+import { StandardFileAccessor, StandardFileReference } from 'slate-shared/data/fileAccessorImpl';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 export class WebFileAccessor extends StandardFileAccessor implements FileAccessor {
   openFile(uri: string): FileReference {

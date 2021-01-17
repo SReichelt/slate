@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../shared/format/format';
-import * as FmtDynamic from '../../../shared/format/dynamic';
-import * as FmtMeta from '../../../shared/format/meta';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtDynamic from 'slate-shared/format/dynamic';
+import * as FmtMeta from 'slate-shared/format/meta';
 import { ParsedDocument } from './parsedDocument';
 import { findReferencedDefinition, getArgumentType, ReferencedDefinition } from './navigate';
 

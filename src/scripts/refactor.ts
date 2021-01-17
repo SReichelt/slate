@@ -1,5 +1,5 @@
-import * as Fmt from '../shared/format/format';
-import * as FmtHLM from '../shared/logics/hlm/meta';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtHLM from 'slate-shared/logics/hlm/meta';
 
 // This code can be used for systematic refactoring operations.
 // Uncomment the corresponding code in tidy.ts, edit this file, then run tidyLibrary.sh.

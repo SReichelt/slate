@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import * as FmtReader from '../../../../shared/format/read';
-import { fileExtension } from '../../../../shared/data/constants';
+import * as FmtReader from 'slate-shared/format/read';
+import { fileExtension } from 'slate-shared/data/constants';
 import { ParsedDocument, ParsedDocumentMap } from '../parsedDocument';
 import { DefinitionLink, getDefinitionLinks, isDefinitionReferenceToUri, getNameDefinitionLocation } from '../navigate';
 import { areUrisEqual } from '../../utils';

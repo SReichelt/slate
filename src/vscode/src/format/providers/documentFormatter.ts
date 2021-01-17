@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../../shared/format/format';
-import * as FmtReader from '../../../../shared/format/read';
-import * as FmtWriter from '../../../../shared/format/write';
-import { getMetaModelWithFallback } from '../../../../envs/node/format/dynamic';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtReader from 'slate-shared/format/read';
+import * as FmtWriter from 'slate-shared/format/write';
+import { getMetaModelWithFallback } from 'slate-env-node/format/dynamic';
 import { replaceDocumentText } from '../../utils';
 
 export class SlateDocumentFormatter implements vscode.DocumentFormattingEditProvider {

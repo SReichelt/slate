@@ -7,8 +7,8 @@ import ExpressionToolTip from './ExpressionToolTip';
 import LibraryTree from './LibraryTree';
 import { ExpressionInteractionHandlerImpl } from './InteractionHandler';
 
-import * as Notation from '../../shared/notation/notation';
-import * as Dialog from '../../shared/notation/dialog';
+import * as Notation from 'slate-shared/notation/notation';
+import * as Dialog from 'slate-shared/notation/dialog';
 
 
 export interface ExpressionDialogProps {

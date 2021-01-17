@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../shared/format/format';
-import * as FmtDynamic from '../../../shared/format/dynamic';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtDynamic from 'slate-shared/format/dynamic';
 import { RangeInfo } from '../utils';
 
 export interface ParsedDocument {

@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import { TextDecoder } from 'util';
 import { areUrisEqual, replaceDocumentText } from './utils';
-import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
-import { StandardFileAccessor, StandardFileReference, StandardFileWatcher } from '../../shared/data/fileAccessorImpl';
-import CachedPromise from '../../shared/data/cachedPromise';
+import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from 'slate-shared/data/fileAccessor';
+import { StandardFileAccessor, StandardFileReference, StandardFileWatcher } from 'slate-shared/data/fileAccessorImpl';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 interface WorkspaceFileAccessorState {
     watchers: StandardFileWatcher[];

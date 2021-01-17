@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import * as Fmt from '../shared/format/format';
-import * as FmtMeta from '../shared/format/meta';
-import * as FmtReader from '../shared/format/read';
-import { translateMemberName } from '../shared/format/common';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtMeta from 'slate-shared/format/meta';
+import * as FmtReader from 'slate-shared/format/read';
+import { translateMemberName } from 'slate-shared/format/common';
 
 interface ReferencedMetaModel {
   inFileName: string;

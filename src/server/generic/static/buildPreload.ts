@@ -1,9 +1,9 @@
 import * as path from 'path';
-import { FileAccessor } from '../../../shared/data/fileAccessor';
-import { fileExtension } from '../../../shared/data/constants';
-import { PhysicalFileAccessor } from '../../../envs/node/data/physicalFileAccessor';
+import { FileAccessor } from 'slate-shared/data/fileAccessor';
+import { fileExtension } from 'slate-shared/data/constants';
+import { PhysicalFileAccessor } from 'slate-env-node/data/physicalFileAccessor';
 import { LibraryPreloadGenerator } from '../preload/preload';
-import CachedPromise from '../../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 class LibraryPreloadWriter extends LibraryPreloadGenerator {
   constructor(private inputFileAccessor: FileAccessor, private outputFileAccessor: FileAccessor) {

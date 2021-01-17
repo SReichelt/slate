@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { handleAuthInfo, handleAuth } from '../../generic/handlers/authHandler';
+import { handleAuthInfo, handleAuth } from 'slate-server-generic/handlers/authHandler';
 
 export function authRouter(): express.Router {
   let router = express.Router();

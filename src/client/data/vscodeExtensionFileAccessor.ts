@@ -1,9 +1,9 @@
 import config from '../utils/config';
 
-import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from '../../shared/data/fileAccessor';
-import { StandardFileReference, StandardFileWatcher } from '../../shared/data/fileAccessorImpl';
-import * as Embedding from '../../envs/web/api/embedding';
-import CachedPromise from '../../shared/data/cachedPromise';
+import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from 'slate-shared/data/fileAccessor';
+import { StandardFileReference, StandardFileWatcher } from 'slate-shared/data/fileAccessorImpl';
+import * as Embedding from 'slate-env-web-api/embedding';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 export class VSCodeExtensionFileAccessor implements FileAccessor {

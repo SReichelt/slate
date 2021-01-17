@@ -23,25 +23,25 @@ import { renderPromise } from './components/PromiseHelper';
 import config from './utils/config';
 import { ButtonType, getButtonIcon } from './utils/icons';
 
-import CachedPromise from '../shared/data/cachedPromise';
-import * as Fmt from '../shared/format/format';
-import * as FmtReader from '../shared/format/read';
-import * as FmtNotation from '../shared/notation/meta';
-import * as FmtLibrary from '../shared/logics/library';
-import * as Dialog from '../shared/notation/dialog';
-import * as Embedding from '../envs/web/api/embedding';
-import { FileAccessor, WriteFileResult, FileWatcher } from '../shared/data/fileAccessor';
-import { WebFileAccessor, WebWriteFileResult } from '../envs/web/data/webFileAccessor';
-import { PreloadingWebFileAccessor } from '../envs/web/data/preloadingWebFileAccessor';
-import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderOptions, LibraryItemNumber } from '../shared/data/libraryDataProvider';
-import { fileExtension } from '../shared/data/constants';
-import { MRUList } from '../shared/data/mostRecentlyUsedList';
-import * as Logic from '../shared/logics/logic';
-import * as Logics from '../shared/logics/logics';
+import CachedPromise from 'slate-shared/data/cachedPromise';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtReader from 'slate-shared/format/read';
+import * as FmtNotation from 'slate-shared/notation/meta';
+import * as FmtLibrary from 'slate-shared/logics/library';
+import * as Dialog from 'slate-shared/notation/dialog';
+import * as Embedding from 'slate-env-web-api/embedding';
+import { FileAccessor, WriteFileResult, FileWatcher } from 'slate-shared/data/fileAccessor';
+import { WebFileAccessor, WebWriteFileResult } from 'slate-env-web/data/webFileAccessor';
+import { PreloadingWebFileAccessor } from 'slate-env-web/data/preloadingWebFileAccessor';
+import { LibraryDataProvider, LibraryDefinition, LibraryDefinitionState, LibraryItemInfo, LibraryDataProviderOptions, LibraryItemNumber } from 'slate-shared/data/libraryDataProvider';
+import { fileExtension } from 'slate-shared/data/constants';
+import { MRUList } from 'slate-shared/data/mostRecentlyUsedList';
+import * as Logic from 'slate-shared/logics/logic';
+import * as Logics from 'slate-shared/logics/logics';
 
-import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from '../envs/web/data/gitHubFileAccessor';
+import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from 'slate-env-web/data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
-import * as GitHub from '../envs/web/data/gitHubAPIHandler';
+import * as GitHub from 'slate-env-web/data/gitHubAPIHandler';
 
 
 interface Libraries {

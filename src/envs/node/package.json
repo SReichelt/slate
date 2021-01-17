@@ -1,0 +1,10 @@
+{
+  "name": "slate-env-node",
+  "dependencies": {
+    "slate-shared": ""
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.14",
+    "@types/remarkable": "^2.0.0"
+  }
+}

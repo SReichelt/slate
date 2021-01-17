@@ -4,11 +4,10 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const version = require('../../package.json').version;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const config = require('../server/config');
+const config = require('../server/generic/config');
 const projectRoot = path.join(__dirname, '..', '..');
 
 function outputPlaceholder(name) {

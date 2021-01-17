@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import * as Logic from '../../shared/logics/logic';
-import { LibraryItemInfo } from '../../shared/data/libraryDataAccessor';
+import * as Logic from 'slate-shared/logics/logic';
+import { LibraryItemInfo } from 'slate-shared/data/libraryDataAccessor';
 
 
 export enum ButtonType {
@@ -190,14 +190,13 @@ function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, it
       <rect x="-5" y="-5" width="10" height="10" fill="blue" stroke={getMainItemForegroundColor()} strokeWidth="0.5" transform="rotate(45)" key="rect"/>
     ];
   case Logic.LogicDefinitionType.Theorem:
-    let result: React.ReactNodeArray;
     if (itemInfo && (itemInfo.type === 'lemma' || itemInfo.type === 'corollary' || itemInfo.type === 'example')) {
-      result = [
+      return [
         <circle cx="0" cy="-1.5" r="3.5" fill="yellow" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="circle"/>,
         <rect x="-1.25" y="2" width="2.5" height="2.5" fill="gray" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="rect"/>
       ];
     } else {
-      result = [
+      let result: React.ReactNodeArray = [
         <circle cx="0" cy="-2" r="5" fill="yellow" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="circle"/>,
         <rect x="-1.7" y="2.7" width="3.4" height="4" fill="gray" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="rect"/>
       ];
@@ -206,8 +205,8 @@ function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, it
         result.unshift(<line x1="-8" y1="-2" x2="8" y2="-2" stroke="gray" strokeWidth="0.5" key="line2"/>);
         result.unshift(<line x1="-7" y1="2" x2="7" y2="-6" stroke="gray" strokeWidth="0.5" key="line3"/>);
       }
+      return result;
     }
-    return result;
   default:
     return [];
   }

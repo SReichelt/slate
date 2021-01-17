@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../../shared/format/format';
-import { renderAsText, RenderAsTextOptions } from '../../../../shared/notation/textOutput';
-import * as Logic from '../../../../shared/logics/logic';
-import { LibraryDefinition } from '../../../../shared/data/libraryDataProvider';
+import * as Fmt from 'slate-shared/format/format';
+import { renderAsText, RenderAsTextOptions } from 'slate-shared/notation/textOutput';
+import * as Logic from 'slate-shared/logics/logic';
+import { LibraryDefinition } from 'slate-shared/data/libraryDataProvider';
 import { HoverEvent } from '../../events';
 import { LibraryDocumentProvider } from '../data';
-import CachedPromise from '../../../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 export class SlateLogicHoverProvider {
     private static readonly renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {

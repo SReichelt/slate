@@ -12,9 +12,9 @@ import { renderPromise } from './PromiseHelper';
 import { disableDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getButtonIcon, ButtonType, getDefinitionIcon } from '../utils/icons';
 
-import * as Notation from '../../shared/notation/notation';
-import * as Menu from '../../shared/notation/menu';
-import CachedPromise from '../../shared/data/cachedPromise';
+import * as Notation from 'slate-shared/notation/notation';
+import * as Menu from 'slate-shared/notation/menu';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 import config from '../utils/config';
 
 

@@ -5,8 +5,8 @@ import { PromiseHelper } from '../components/PromiseHelper';
 
 import { ReactElementManipulator, traverseReactComponents } from '../utils/traverse';
 
-import { LibraryDefinition } from '../../shared/data/libraryDataAccessor';
-import * as Fmt from '../../shared/format/format';
+import { LibraryDefinition } from 'slate-shared/data/libraryDataAccessor';
+import * as Fmt from 'slate-shared/format/format';
 
 
 export interface TutorialToolTip {

@@ -4,11 +4,11 @@ import './LibraryItem.css';
 
 import Expression, { ExpressionInteractionHandler } from './Expression';
 
-import * as Fmt from '../../shared/format/format';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from '../../shared/data/libraryDataProvider';
-import { MRUList } from '../../shared/data/mostRecentlyUsedList';
-import * as Logic from '../../shared/logics/logic';
-import CachedPromise from '../../shared/data/cachedPromise';
+import * as Fmt from 'slate-shared/format/format';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState } from 'slate-shared/data/libraryDataProvider';
+import { MRUList } from 'slate-shared/data/mostRecentlyUsedList';
+import * as Logic from 'slate-shared/logics/logic';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 export interface LibraryItemProps {

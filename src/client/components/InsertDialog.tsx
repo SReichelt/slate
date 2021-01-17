@@ -4,8 +4,8 @@ import StandardDialog from './StandardDialog';
 import ValidationMessage from './ValidationMessage';
 import { SectionItemList } from './LibraryTree';
 
-import * as Dialog from '../../shared/notation/dialog';
-import * as Logic from '../../shared/logics/logic';
+import * as Dialog from 'slate-shared/notation/dialog';
+import * as Logic from 'slate-shared/logics/logic';
 
 
 export interface InsertDialogProps {

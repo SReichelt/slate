@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';  // TODO replace with vscode.workspace.fs / WorkspaceFileAccessor
-import * as Fmt from '../../../shared/format/format';
-import * as Ctx from '../../../shared/format/context';
-import * as FmtDynamic from '../../../shared/format/dynamic';
-import * as FmtMeta from '../../../shared/format/meta';
-import { getFileNameFromPath, getFileNameFromPathStr } from '../../../envs/node/format/dynamic';
+import * as Fmt from 'slate-shared/format/format';
+import * as Ctx from 'slate-shared/format/context';
+import * as FmtDynamic from 'slate-shared/format/dynamic';
+import * as FmtMeta from 'slate-shared/format/meta';
+import { getFileNameFromPath, getFileNameFromPathStr } from 'slate-env-node/format/dynamic';
 import { RangeInfo, areUrisEqual } from '../utils';
 import { ParsedDocument } from './parsedDocument';
 import { readRange } from './utils';

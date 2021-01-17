@@ -1,0 +1,14 @@
+{
+  "name": "slate-env-web",
+  "dependencies": {
+    "slate-env-web-api": "",
+    "slate-shared": "",
+    "node-fetch": "^3.0.0-beta.9",
+    "query-string": "^6.13.7",
+    "utf8": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.7",
+    "@types/utf8": "^2.1.6"
+  }
+}

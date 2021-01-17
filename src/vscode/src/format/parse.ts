@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../shared/format/format';
-import * as Meta from '../../../shared/format/metaModel';
-import * as FmtDynamic from '../../../shared/format/dynamic';
-import * as FmtMeta from '../../../shared/format/meta';
-import * as FmtReader from '../../../shared/format/read';
-import { getFileNameFromPath } from '../../../envs/node/format/dynamic';
+import * as Fmt from 'slate-shared/format/format';
+import * as Meta from 'slate-shared/format/metaModel';
+import * as FmtDynamic from 'slate-shared/format/dynamic';
+import * as FmtMeta from 'slate-shared/format/meta';
+import * as FmtReader from 'slate-shared/format/read';
+import { getFileNameFromPath } from 'slate-env-node/format/dynamic';
 import { RangeHandler, convertRange } from '../utils';
 import { ParsedDocument, NestedArgumentListInfo } from './parsedDocument';
 import { readRange, readRangeRaw } from './utils';

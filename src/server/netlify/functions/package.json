@@ -1,0 +1,14 @@
+{
+  "name": "slate-server-netlify-functions",
+  "scripts": {
+    "build": "webpack -p authInfoFunction.ts -o ../../../../dist/functions/auth-info.js && webpack -p authFunction.ts -o ../../../../dist/functions/auth.js && webpack -p submitFunction.ts -o ../../../../dist/functions/submit.js"
+  },
+  "dependencies": {
+    "slate-server-generic": ""
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.67",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
+  }
+}

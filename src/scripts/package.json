@@ -1,0 +1,13 @@
+{
+  "name": "slate-scripts",
+  "dependencies": {
+    "slate-shared": "",
+    "slate-env-node": "",
+    "remarkable": "^2.0.1",
+    "link-check": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.14",
+    "ts-node": "^9.1.1"
+  }
+}

@@ -3,8 +3,8 @@ import * as React from 'react';
 import Expression from './Expression';
 import { LibraryItemBase } from './LibraryItem';
 
-import * as FmtWriter from '../../shared/format/write';
-import * as SourceCodeDisplay from '../../shared/notation/sourceCodeDisplay';
+import * as FmtWriter from 'slate-shared/format/write';
+import * as SourceCodeDisplay from 'slate-shared/notation/sourceCodeDisplay';
 
 
 class SourceCodeView extends LibraryItemBase {

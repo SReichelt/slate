@@ -2,7 +2,7 @@ import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
 
 import { fetchJSON } from '../utils/fetch';
-import { AuthInfo } from '../api/auth';
+import { AuthInfo } from 'slate-env-web-api/auth';
 
 
 export { AuthInfo };

@@ -31,11 +31,11 @@ import { disableDefaultBehavior, disableOwnDefaultBehavior, limitDefaultBehavior
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
 import { isLatexInput, getLatexInputSuggestions, replaceLatexCodeOrPrefix, replaceExactLatexCodeOnly } from '../utils/latexInput';
 
-import * as Notation from '../../shared/notation/notation';
-import * as Menu from '../../shared/notation/menu';
-import * as Dialog from '../../shared/notation/dialog';
-import { convertUnicode, UnicodeConverter, UnicodeConversionOptions, useItalicsForVariable } from '../../shared/notation/unicode';
-import CachedPromise from '../../shared/data/cachedPromise';
+import * as Notation from 'slate-shared/notation/notation';
+import * as Menu from 'slate-shared/notation/menu';
+import * as Dialog from 'slate-shared/notation/dialog';
+import { convertUnicode, UnicodeConverter, UnicodeConversionOptions, useItalicsForVariable } from 'slate-shared/notation/unicode';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 export type OnExpressionChanged = (editorUpdateRequired: boolean) => void;

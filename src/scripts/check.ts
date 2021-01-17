@@ -1,14 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as Fmt from '../shared/format/format';
-import * as FmtReader from '../shared/format/read';
-import * as FmtLibrary from '../shared/logics/library';
-import * as Logic from '../shared/logics/logic';
-import * as Logics from '../shared/logics/logics';
-import { getExpectedDiagnostics } from '../shared/logics/diagnostics';
-import { PhysicalFileAccessor } from '../envs/node/data/physicalFileAccessor';
-import { LibraryDataProvider, LibraryDefinition, LibraryDataProviderOptions } from '../shared/data/libraryDataProvider';
-import CachedPromise from '../shared/data/cachedPromise';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtReader from 'slate-shared/format/read';
+import * as FmtLibrary from 'slate-shared/logics/library';
+import * as Logic from 'slate-shared/logics/logic';
+import * as Logics from 'slate-shared/logics/logics';
+import { getExpectedDiagnostics } from 'slate-shared/logics/diagnostics';
+import { PhysicalFileAccessor } from 'slate-env-node/data/physicalFileAccessor';
+import { LibraryDataProvider, LibraryDefinition, LibraryDataProviderOptions } from 'slate-shared/data/libraryDataProvider';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 let errorCount = 0;
 let warningCount = 0;

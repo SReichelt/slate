@@ -12,14 +12,14 @@ import Button from './Button';
 import MenuButton from './MenuButton';
 import { renderPromise } from './PromiseHelper';
 
-import * as Fmt from '../../shared/format/format';
-import * as FmtUtils from '../../shared/format/utils';
-import * as FmtLibrary from '../../shared/logics/library';
-import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState, LibraryItemNumber } from '../../shared/data/libraryDataProvider';
-import * as Logic from '../../shared/logics/logic';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtUtils from 'slate-shared/format/utils';
+import * as FmtLibrary from 'slate-shared/logics/library';
+import { LibraryDataProvider, LibraryDefinition, LibraryItemInfo, LibraryDefinitionState, LibraryItemNumber } from 'slate-shared/data/libraryDataProvider';
+import * as Logic from 'slate-shared/logics/logic';
 import { disableOwnDefaultBehavior } from '../utils/event';
 import { ButtonType, getButtonIcon, getSectionIcon, getDefinitionIcon } from '../utils/icons';
-import CachedPromise from '../../shared/data/cachedPromise';
+import CachedPromise from 'slate-shared/data/cachedPromise';
 
 
 export type OnFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => CachedPromise<boolean>;

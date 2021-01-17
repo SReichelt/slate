@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as Fmt from '../../../shared/format/format';
-import * as FmtReader from '../../../shared/format/read';
-import * as FmtLibrary from '../../../shared/logics/library';
-import * as Logics from '../../../shared/logics/logics';
-import { FileAccessor } from '../../../shared/data/fileAccessor';
-import { LibraryDataProvider, LibraryDataProviderOptions } from '../../../shared/data/libraryDataProvider';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtReader from 'slate-shared/format/read';
+import * as FmtLibrary from 'slate-shared/logics/library';
+import * as Logics from 'slate-shared/logics/logics';
+import { FileAccessor } from 'slate-shared/data/fileAccessor';
+import { LibraryDataProvider, LibraryDataProviderOptions } from 'slate-shared/data/libraryDataProvider';
 import { languageId } from '../slate';
 import { ParseDocumentEvent } from '../events';
 import { RangeInfo, RangeHandler, deleteUrisFromDiagnosticCollection, areUrisEqual, isEqualOrParentUriOf } from '../utils';

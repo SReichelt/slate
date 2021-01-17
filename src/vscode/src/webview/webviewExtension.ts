@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as ejs from 'ejs';
 import { languageId } from '../slate';
-import * as Embedding from '../../../envs/web/api/embedding';
-import { FileAccessor, FileReference } from '../../../shared/data/fileAccessor';
+import * as Embedding from 'slate-env-web-api/embedding';
+import { FileAccessor, FileReference } from 'slate-shared/data/fileAccessor';
 
 let currentWorkspaceFolder: vscode.WorkspaceFolder | undefined = undefined;
 let panel: vscode.WebviewPanel | undefined = undefined;

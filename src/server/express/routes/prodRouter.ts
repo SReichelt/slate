@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as path from 'path';
-import { handleSubmit } from '../../generic/handlers/submitHandler';
+import { handleSubmit } from 'slate-server-generic/handlers/submitHandler';
 
 export function prodRouter(rootPath: string): express.Router {
   let router = express.Router();

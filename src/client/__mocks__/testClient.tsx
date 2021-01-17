@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import config from '../utils/config';
-import { PhysicalFileAccessor } from '../../envs/node/data/physicalFileAccessor';
+import { PhysicalFileAccessor } from 'slate-env-node/data/physicalFileAccessor';
 
 import App, { AppTest, AppTestProps } from '../App';
 

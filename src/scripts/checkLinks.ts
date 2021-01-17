@@ -1,8 +1,8 @@
 import * as fs from 'fs';
-import * as Fmt from '../shared/format/format';
-import * as FmtReader from '../shared/format/read';
-import { getMetaModelWithFallback } from '../envs/node/format/dynamic';
-import * as Logics from '../shared/logics/logics';
+import * as Fmt from 'slate-shared/format/format';
+import * as FmtReader from 'slate-shared/format/read';
+import { getMetaModelWithFallback } from 'slate-env-node/format/dynamic';
+import * as Logics from 'slate-shared/logics/logics';
 
 const Remarkable = require('remarkable').Remarkable;
 const linkify = require('remarkable/linkify').linkify;

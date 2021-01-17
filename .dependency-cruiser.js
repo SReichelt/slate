@@ -96,7 +96,11 @@ module.exports = {
         "That's problematic as the package either (1) won't be available on live (2 - worse) will be " +
         "available on live with an non-guaranteed version. Fix it by adding the package to the dependencies " +
         "in your package.json.",
-      from: {},
+      from: {
+        pathNot: [
+          testFiles(),
+        ]
+      },
       to: {
         dependencyTypes: [
           'npm-no-pkg',
@@ -154,7 +158,7 @@ module.exports = {
         path: '^(src)',
         pathNot: [
           '\\.(spec|test)\\.(js|mjs|cjs|ts|ls|coffee|litcoffee|coffee\\.md)$',
-          '.+/webpack.config\.js$',
+          webpackConfig(),
           dir('src/scripts'),
         ]
       },
@@ -206,7 +210,9 @@ module.exports = {
       severity: 'error',
       from: {
         path: dir('src/shared'),
-        pathNot: testFilesWithinDir('src/shared')
+        pathNot: [
+          testFiles(),
+        ]
       },
       to: {
         pathNot: [
@@ -261,7 +267,7 @@ module.exports = {
         path: dir('src/client'),
         pathNot: [
           webpackConfig(),
-          testFilesWithinDir('src/client'),
+          testFiles(),
         ],
       },
       to: {
@@ -292,6 +298,7 @@ module.exports = {
       }
     },
     {
+      // TODO: divide into subdirs
       name: 'dependencies-of-server',
       severity: 'error',
       from: {
@@ -334,8 +341,8 @@ module.exports = {
         pathNot: [
           dir('src/vscode'),
           dir('src/shared'),
+          dir('src/envs/web/api'),
           dir('src/envs/node'), // TODO: remove this dependency because it breaks Live Share
-          dir('src/envs/web'),
           ...modules(
             'buffer',
             'fs', // TODO: remove this dependency because it breaks Live Share
@@ -579,10 +586,6 @@ module.exports = {
 };
 // generated: dependency-cruiser@9.21.4 on 2021-01-07T21:28:01.135Z
 
-function oneOf(...options) {
-  return options.map(option => `(${option})`).join('|');
-}
-
 function escapeRegex(str) {
   return str.replace(/\\/g, '\\\\').replace(/\./g, '\\.');
 }
@@ -620,14 +623,9 @@ function npmDeps(...packageNames) {
 }
 
 function webpackConfig() {
-  return 'webpack\\.config\\.js$'
+  return '/webpack\\.config\\.js$'
 }
 
-function testFilesWithinDir(path) {
-  return oneOf(
-    `${dir(path)}.*__mocks__/`,
-    `${dir(path)}.*/__mocks__/`,
-    `${dir(path)}.*__tests__/`,
-    `${dir(path)}.*/__tests__/`,
-  );
+function testFiles() {
+  return '/__mocks__/|/__tests__/';
 }
