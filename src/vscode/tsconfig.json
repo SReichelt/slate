@@ -6,7 +6,6 @@
         "lib": ["es6"],
         "sourceMap": true,
         "rootDir": "..",
-        "typeRoots": ["./node_modules/@types"],
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
