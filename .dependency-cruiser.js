@@ -218,8 +218,7 @@ module.exports = {
         pathNot: [
           dir('src/shared'),
           ...npmDeps(
-            'markdown-escape',
-            'bn.js',
+            'markdown-escape'
           )
         ]
       }

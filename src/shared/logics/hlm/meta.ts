@@ -4802,7 +4802,7 @@ export class MetaRefExpression_structural extends Fmt.MetaRefExpression {
 }
 
 export class ObjectContents_Proof extends Fmt.ObjectContents {
-  constructor(public _from: Fmt.BN | undefined, public _to: Fmt.BN | undefined, public parameters: Fmt.ParameterList | undefined, public goal: Fmt.Expression | undefined, public steps: Fmt.ParameterList) {
+  constructor(public _from: BigInt | undefined, public _to: BigInt | undefined, public parameters: Fmt.ParameterList | undefined, public goal: Fmt.Expression | undefined, public steps: Fmt.ParameterList) {
     super();
   }
 
@@ -4921,15 +4921,11 @@ export class ObjectContents_Proof extends Fmt.ObjectContents {
     if (this === objectContents && !replacedParameters.length) {
       return true;
     }
-    if (this._from !== undefined || objectContents._from !== undefined) {
-      if (this._from === undefined || objectContents._from === undefined || !this._from.eq(objectContents._from)) {
-        return false;
-      }
+    if (this._from !== objectContents._from) {
+      return false;
     }
-    if (this._to !== undefined || objectContents._to !== undefined) {
-      if (this._to === undefined || objectContents._to === undefined || !this._to.eq(objectContents._to)) {
-        return false;
-      }
+    if (this._to !== objectContents._to) {
+      return false;
     }
     if (!Fmt.areObjectsEquivalent(this.parameters, objectContents.parameters, fn, replacedParameters)) {
       return false;
@@ -5066,7 +5062,7 @@ export class MetaRefExpression_State extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
-  constructor(public side?: Fmt.BN, public result?: Fmt.Expression) {
+  constructor(public side?: BigInt, public result?: Fmt.Expression) {
     super();
   }
 
@@ -5118,10 +5114,8 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UseDef)) {
       return false;
     }
-    if (this.side !== undefined || expression.side !== undefined) {
-      if (this.side === undefined || expression.side === undefined || !this.side.eq(expression.side)) {
-        return false;
-      }
+    if (this.side !== expression.side) {
+      return false;
     }
     if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {
       return false;
@@ -5131,7 +5125,7 @@ export class MetaRefExpression_UseDef extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
-  constructor(public side: Fmt.BN | undefined, public caseProofs: ObjectContents_Proof[]) {
+  constructor(public side: BigInt | undefined, public caseProofs: ObjectContents_Proof[]) {
     super();
   }
 
@@ -5199,10 +5193,8 @@ export class MetaRefExpression_UseCases extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_UseCases)) {
       return false;
     }
-    if (this.side !== undefined || expression.side !== undefined) {
-      if (this.side === undefined || expression.side === undefined || !this.side.eq(expression.side)) {
-        return false;
-      }
+    if (this.side !== expression.side) {
+      return false;
     }
     if (this.caseProofs || expression.caseProofs) {
       if (!this.caseProofs || !expression.caseProofs || this.caseProofs.length !== expression.caseProofs.length) {
@@ -5322,7 +5314,7 @@ export class MetaRefExpression_UseExists extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
-  constructor(public source: Fmt.Expression, public sourceSide: Fmt.BN, public result?: Fmt.Expression) {
+  constructor(public source: Fmt.Expression, public sourceSide: BigInt, public result?: Fmt.Expression) {
     super();
   }
 
@@ -5379,10 +5371,8 @@ export class MetaRefExpression_Substitute extends Fmt.MetaRefExpression {
     if (!Fmt.areObjectsEquivalent(this.source, expression.source, fn, replacedParameters)) {
       return false;
     }
-    if (this.sourceSide !== undefined || expression.sourceSide !== undefined) {
-      if (this.sourceSide === undefined || expression.sourceSide === undefined || !this.sourceSide.eq(expression.sourceSide)) {
-        return false;
-      }
+    if (this.sourceSide !== expression.sourceSide) {
+      return false;
     }
     if (!Fmt.areObjectsEquivalent(this.result, expression.result, fn, replacedParameters)) {
       return false;
@@ -5568,7 +5558,7 @@ export class MetaRefExpression_UseImplicitOperator extends Fmt.MetaRefExpression
 }
 
 export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
-  constructor(public side?: Fmt.BN, public proof?: ObjectContents_Proof) {
+  constructor(public side?: BigInt, public proof?: ObjectContents_Proof) {
     super();
   }
 
@@ -5627,10 +5617,8 @@ export class MetaRefExpression_ProveDef extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveDef)) {
       return false;
     }
-    if (this.side !== undefined || expression.side !== undefined) {
-      if (this.side === undefined || expression.side === undefined || !this.side.eq(expression.side)) {
-        return false;
-      }
+    if (this.side !== expression.side) {
+      return false;
     }
     if (!Fmt.areObjectsEquivalent(this.proof, expression.proof, fn, replacedParameters)) {
       return false;
@@ -5882,7 +5870,7 @@ export class MetaRefExpression_ProveEquivalence extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
-  constructor(public side: Fmt.BN | undefined, public caseProofs: ObjectContents_Proof[]) {
+  constructor(public side: BigInt | undefined, public caseProofs: ObjectContents_Proof[]) {
     super();
   }
 
@@ -5950,10 +5938,8 @@ export class MetaRefExpression_ProveCases extends Fmt.MetaRefExpression {
     if (!(expression instanceof MetaRefExpression_ProveCases)) {
       return false;
     }
-    if (this.side !== undefined || expression.side !== undefined) {
-      if (this.side === undefined || expression.side === undefined || !this.side.eq(expression.side)) {
-        return false;
-      }
+    if (this.side !== expression.side) {
+      return false;
     }
     if (this.caseProofs || expression.caseProofs) {
       if (!this.caseProofs || !expression.caseProofs || this.caseProofs.length !== expression.caseProofs.length) {
@@ -6063,7 +6049,7 @@ export class MetaRefExpression_ProveByInduction extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression {
-  constructor(public source: Fmt.Expression, public sourceSide: Fmt.BN, public goal: Fmt.Expression, public proof?: ObjectContents_Proof) {
+  constructor(public source: Fmt.Expression, public sourceSide: BigInt, public goal: Fmt.Expression, public proof?: ObjectContents_Proof) {
     super();
   }
 
@@ -6133,10 +6119,8 @@ export class MetaRefExpression_ProveBySubstitution extends Fmt.MetaRefExpression
     if (!Fmt.areObjectsEquivalent(this.source, expression.source, fn, replacedParameters)) {
       return false;
     }
-    if (this.sourceSide !== undefined || expression.sourceSide !== undefined) {
-      if (this.sourceSide === undefined || expression.sourceSide === undefined || !this.sourceSide.eq(expression.sourceSide)) {
-        return false;
-      }
+    if (this.sourceSide !== expression.sourceSide) {
+      return false;
     }
     if (!Fmt.areObjectsEquivalent(this.goal, expression.goal, fn, replacedParameters)) {
       return false;

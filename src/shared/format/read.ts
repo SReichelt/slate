@@ -731,7 +731,7 @@ export class Reader {
     return str;
   }
 
-  tryReadInteger(): Fmt.BN | undefined {
+  tryReadInteger(): BigInt | undefined {
     let c = this.peekChar();
     if (isNumericalCharacter(c) || c === '+' || c === '-') {
       let numStr = '';
@@ -739,8 +739,7 @@ export class Reader {
         numStr += this.readAnyChar();
         c = this.peekChar();
       } while (isNumericalCharacter(c));
-      let num = new Fmt.BN(numStr, 10);
-      return num;
+      return BigInt(numStr);
     } else {
       return undefined;
     }

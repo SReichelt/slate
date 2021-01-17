@@ -2794,9 +2794,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let label = '?';
       if (proof._from !== undefined && proof._to !== undefined) {
         if (reverseSymbol) {
-          if (proof._from.eqn(1) && proof._to.eqn(2)) {
+          if (proof._from === BigInt(1) && proof._to === BigInt(2)) {
             label = symbol;
-          } else if (proof._from.eqn(2) && proof._to.eqn(1)) {
+          } else if (proof._from === BigInt(2) && proof._to === BigInt(1)) {
             label = reverseSymbol;
           }
         } else {

@@ -441,7 +441,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     if (expression instanceof Fmt.StringExpression) {
       result.push(expression.value);
     } else if (expression instanceof Fmt.IntegerExpression) {
-      result.push(expression.value.toNumber());
+      result.push(Number(expression.value));
     } else if (expression instanceof Fmt.VariableRefExpression) {
       let parameter = expression.variable;
       let param = parameter.name;
@@ -530,7 +530,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         let paramExpr = expression.param as Fmt.VariableRefExpression;
         let param = paramExpr.variable.name;
         let arg = this.getOptionalArg(param);
-        let dimensionValue = expression.dimension.toNumber();
+        let dimensionValue = Number(expression.dimension);
         let dimension = 0;
         while (arg instanceof Array && dimension < dimensionValue) {
           arg = arg.length ? arg[0] : undefined;

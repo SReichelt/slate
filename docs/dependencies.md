@@ -7,7 +7,6 @@ Slate builds upon the following third-party software packages.
 * [Node.js](https://nodejs.org/)
 * [TypeScript](https://www.typescriptlang.org/)
 * [fullstack-typescript](https://github.com/gilamran/fullstack-typescript) template
-* [bn.js](https://github.com/indutny/bn.js)
 * [markdown-escape](https://github.com/kemitchell/markdown-escape.js)
 
 ## Frontend

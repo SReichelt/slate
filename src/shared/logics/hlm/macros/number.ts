@@ -52,12 +52,12 @@ class NumberMacroInvocation implements HLMMacro.HLMMacroInvocation {
       if (this.value instanceof Fmt.IntegerExpression && definition.innerDefinitions.length === 2 && definition.innerDefinitions[0].parameters.length === 0 && definition.innerDefinitions[1].parameters.length === 1) {
         let name: string;
         let args = new Fmt.ArgumentList;
-        if (this.value.value.isZero()) {
+        if (this.value.value === BigInt(0)) {
           name = definition.innerDefinitions[0].name;
         } else {
           let predecessor = this.expression.clone() as Fmt.DefinitionRefExpression;
           let predecessorValueExpression = predecessor.path.arguments.getValue(this.valueParam.name) as Fmt.IntegerExpression;
-          predecessorValueExpression.value = this.value.value.subn(1);
+          predecessorValueExpression.value = this.value.value.valueOf() - BigInt(1);
           name = definition.innerDefinitions[1].name;
           args.push(new Fmt.Argument(definition.innerDefinitions[1].parameters[0].name, predecessor));
         }

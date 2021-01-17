@@ -1774,7 +1774,7 @@ class HLMCheckerState {
     }
   }
 
-  private checkSubstitutionSource(source: Fmt.Expression, sourceSide: Fmt.BN, context: HLMCheckerProofStepContext): HLMSubstitutionSourceInfo | undefined {
+  private checkSubstitutionSource(source: Fmt.Expression, sourceSide: BigInt, context: HLMCheckerProofStepContext): HLMSubstitutionSourceInfo | undefined {
     let equivalence = this.checkProofStepType(source, context);
     let sourceIndex = this.utils.externalToInternalIndex(sourceSide);
     if (equivalence && sourceIndex !== undefined) {
@@ -1784,7 +1784,7 @@ class HLMCheckerState {
     }
   }
 
-  private checkSubstitution(object: Object, source: Fmt.Expression, sourceSide: Fmt.BN, input: Fmt.Expression, output: Fmt.Expression, context: HLMCheckerProofStepContext): boolean {
+  private checkSubstitution(object: Object, source: Fmt.Expression, sourceSide: BigInt, input: Fmt.Expression, output: Fmt.Expression, context: HLMCheckerProofStepContext): boolean {
     let sourceContext: HLMCheckerProofStepContext = {
       ...context,
       originalGoal: undefined,

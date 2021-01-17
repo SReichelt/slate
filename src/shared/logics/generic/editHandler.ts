@@ -236,9 +236,11 @@ export abstract class GenericEditHandler {
     }
     integerItem.expectedTextLength = 4;
     integerItem.action = new Menu.ImmediateExpressionMenuAction(() => {
-      let value = new Fmt.BN(integerItem.text, 10);
-      let newNotation = new Fmt.IntegerExpression(value);
-      onSetNotation(newNotation);
+      try {
+        let value = BigInt(integerItem.text);
+        let newNotation = new Fmt.IntegerExpression(value);
+        onSetNotation(newNotation);
+      } catch {}
     });
     let integerRow = new Menu.StandardExpressionMenuRow('Number');
     integerRow.subMenu = integerItem;
@@ -932,13 +934,13 @@ export abstract class GenericEditHandler {
         if (!newText || newText === '-') {
           return false;
         }
-        let newValue: Fmt.BN;
+        let newValue: BigInt;
         try {
-          newValue = new Fmt.BN(newText);
+          newValue = BigInt(newText);
         } catch (error) {
           return false;
         }
-        if (newValue.isNeg() && !negativeValuesAllowed) {
+        if (newValue < BigInt(0) && !negativeValuesAllowed) {
           return false;
         }
         let newExpression = new Fmt.IntegerExpression(newValue);

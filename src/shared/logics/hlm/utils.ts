@@ -236,7 +236,7 @@ class HLMMacroInvocationConfigWithPlaceholders extends HLMMacroInvocationConfig 
       result.specialRole = Fmt.SpecialPlaceholderRole.Temporary;
       result.onFill = (expression: Fmt.Expression) => {
         if (expression instanceof Fmt.IntegerExpression) {
-          onSetValue(expression.value.toNumber());
+          onSetValue(Number(expression.value));
         }
       };
       return result;
@@ -2828,12 +2828,12 @@ export class HLMUtils extends GenericUtils {
     return result;
   }
 
-  externalToInternalIndex(externalIndex: Fmt.BN | undefined): number | undefined {
-    return externalIndex === undefined ? undefined : externalIndex.toNumber() - 1;
+  externalToInternalIndex(externalIndex: BigInt | undefined): number | undefined {
+    return externalIndex === undefined ? undefined : Number(externalIndex) - 1;
   }
 
-  internalToExternalIndex(internalIndex: number | undefined): Fmt.BN | undefined {
-    return internalIndex === undefined ? undefined : new Fmt.BN(internalIndex + 1);
+  internalToExternalIndex(internalIndex: number | undefined): BigInt | undefined {
+    return internalIndex === undefined ? undefined : BigInt(internalIndex + 1);
   }
 
   getPlaceholderArguments(params: Fmt.ParameterList, substitutionContext?: HLMSubstitutionContext, createPlaceholder: CreatePlaceholderFn = createStandardPlaceholder): Fmt.ArgumentList {

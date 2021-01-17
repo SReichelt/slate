@@ -793,7 +793,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
 }
 
 export class MetaRefExpression_for extends Fmt.MetaRefExpression {
-  constructor(public param: Fmt.Expression, public dimension: Fmt.BN, public item: Fmt.Expression, public separator?: Fmt.Expression) {
+  constructor(public param: Fmt.Expression, public dimension: BigInt, public item: Fmt.Expression, public separator?: Fmt.Expression) {
     super();
   }
 
@@ -856,10 +856,8 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
     if (!Fmt.areObjectsEquivalent(this.param, expression.param, fn, replacedParameters)) {
       return false;
     }
-    if (this.dimension !== undefined || expression.dimension !== undefined) {
-      if (this.dimension === undefined || expression.dimension === undefined || !this.dimension.eq(expression.dimension)) {
-        return false;
-      }
+    if (this.dimension !== expression.dimension) {
+      return false;
     }
     if (!Fmt.areObjectsEquivalent(this.item, expression.item, fn, replacedParameters)) {
       return false;

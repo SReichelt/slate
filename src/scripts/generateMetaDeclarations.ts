@@ -97,7 +97,7 @@ class MetaDeclarationGenerator {
   private getMemberContentType(type: Fmt.Expression): string | undefined {
     if (type instanceof Fmt.MetaRefExpression) {
       if (type instanceof FmtMeta.MetaRefExpression_Int) {
-        return 'Fmt.BN';
+        return 'BigInt';
       } else if (type instanceof FmtMeta.MetaRefExpression_String) {
         return 'string';
       } else if (type instanceof FmtMeta.MetaRefExpression_SingleParameter) {
@@ -446,13 +446,7 @@ class MetaDeclarationGenerator {
       outFileStr += this.outputComparisonCode(leftItem, rightItem, type.body, `${indent}    `);
       outFileStr += `${indent}  }\n`;
       outFileStr += `${indent}}\n`;
-    } else if (type instanceof FmtMeta.MetaRefExpression_Int) {
-      outFileStr += `${indent}if (${left} !== undefined || ${right} !== undefined) {\n`;
-      outFileStr += `${indent}  if (${left} === undefined || ${right} === undefined || !${left}.eq(${right})) {\n`;
-      outFileStr += `${indent}    return false;\n`;
-      outFileStr += `${indent}  }\n`;
-      outFileStr += `${indent}}\n`;
-    } else if (type instanceof FmtMeta.MetaRefExpression_String) {
+    } else if (type instanceof FmtMeta.MetaRefExpression_Int || type instanceof FmtMeta.MetaRefExpression_String) {
       outFileStr += `${indent}if (${left} !== ${right}) {\n`;
       outFileStr += `${indent}  return false;\n`;
       outFileStr += `${indent}}\n`;

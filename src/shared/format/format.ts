@@ -1,7 +1,4 @@
 import * as FmtWriter from './write';
-import * as BN from 'bn.js';
-
-export { BN };
 
 export type ExpressionTraversalFn = (subExpression: Expression) => void;
 export type ExpressionSubstitutionFn = (subExpression: Expression, indices?: Index[]) => Expression;
@@ -703,7 +700,7 @@ export abstract class Expression implements ExpressionObject<Expression> {
 }
 
 export class IntegerExpression extends Expression {
-  constructor(public value: BN) {
+  constructor(public value: BigInt) {
     super();
   }
 
@@ -717,7 +714,7 @@ export class IntegerExpression extends Expression {
 
   protected matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean {
     return expression instanceof IntegerExpression
-           && this.value.eq(expression.value);
+           && this.value === expression.value;
   }
 }
 
