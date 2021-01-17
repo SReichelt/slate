@@ -1,14 +1,14 @@
 import * as express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
+import fetch from 'node-fetch';
+import { config } from 'slate-server-generic/config';
 import { FileAccessor } from 'slate-shared/data/fileAccessor';
 import { WebFileAccessor } from 'slate-env-web/data/webFileAccessor';
 import { PhysicalFileAccessor } from 'slate-env-node/data/physicalFileAccessor';
 import { LibraryPreloader } from 'slate-server-generic/preload/preload';
-import { fetchJSON } from 'slate-env-web/utils/fetch';
+import FetchHelper from 'slate-env-web/utils/fetchHelper';
 import CachedPromise from 'slate-shared/data/cachedPromise';
-
-const config = require('slate-server-generic/config');
 
 abstract class UpdateChecker {
   register(callback: () => CachedPromise<void>): void {
@@ -28,13 +28,13 @@ class DummyUpdateChecker extends UpdateChecker {
 class GitHubUpdateChecker extends UpdateChecker {
   private currentSHA?: string;
 
-  constructor(private repositoryOwner: string, private repositoryName: string, private branch: string, private checkIntervalInMS: number, private delayInMS: number) {
+  constructor(private fetchHelper: FetchHelper, private repositoryOwner: string, private repositoryName: string, private branch: string, private checkIntervalInMS: number, private delayInMS: number) {
     super();
   }
 
   protected execute(callback: () => CachedPromise<void>): void {
     console.log(`Checking head of ${this.repositoryName} branch ${this.branch}...`);
-    fetchJSON(`https://api.github.com/repos/${this.repositoryOwner}/${this.repositoryName}/git/refs/heads/${this.branch}`)
+    this.fetchHelper.fetchJSON(`https://api.github.com/repos/${this.repositoryOwner}/${this.repositoryName}/git/refs/heads/${this.branch}`)
       .then((result: any) => {
         try {
           let newSHA = result.object.sha;
@@ -76,8 +76,9 @@ export function preloadRouter(rootPath: string): express.Router {
       let fileAccessor: FileAccessor;
       let updateChecker: UpdateChecker;
       if (config.IS_PRODUCTION) {
-        fileAccessor = new WebFileAccessor(`https://raw.githubusercontent.com/${repository.owner}/${repository.name}/${repository.branch}`);
-        updateChecker = new GitHubUpdateChecker(repository.owner, repository.name, repository.branch, 60000, 60000);
+        let fetchHelper = new FetchHelper(fetch);
+        fileAccessor = new WebFileAccessor(fetchHelper, `https://raw.githubusercontent.com/${repository.owner}/${repository.name}/${repository.branch}`);
+        updateChecker = new GitHubUpdateChecker(fetchHelper, repository.owner, repository.name, repository.branch, 60000, 60000);
       } else {
         fileAccessor = new PhysicalFileAccessor(path.join(librariesPath, libraryName));
         updateChecker = new DummyUpdateChecker;

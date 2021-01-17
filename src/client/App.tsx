@@ -39,9 +39,10 @@ import { MRUList } from 'slate-shared/data/mostRecentlyUsedList';
 import * as Logic from 'slate-shared/logics/logic';
 import * as Logics from 'slate-shared/logics/logics';
 
-import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from 'slate-env-web/data/gitHubFileAccessor';
+import { fetchHelper } from './utils/fetchHelper';
+import { GitHubFileAccessor, GitHubWriteFileResult, GitHubRepositoryAccess } from './data/gitHubFileAccessor';
 import { VSCodeExtensionFileAccessor } from './data/vscodeExtensionFileAccessor';
-import * as GitHub from 'slate-env-web/data/gitHubAPIHandler';
+import * as GitHub from './data/gitHubAPIHandler';
 
 
 interface Libraries {
@@ -151,7 +152,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       this.fileAccessor = fileAccessor;
       state.navigationPaneVisible = false;
     } else {
-      this.fileAccessor = new WebFileAccessor;
+      this.fileAccessor = new WebFileAccessor(fetchHelper);
 
       selectionURI = window.location.pathname;
       queryString = window.location.search;
@@ -175,10 +176,10 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
           libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess);
           state.selectedItemRepository = libraryRepository;
         } else {
-          libraryFileAccessor = new PreloadingWebFileAccessor(dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
+          libraryFileAccessor = new PreloadingWebFileAccessor(fetchHelper, dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         }
       } else {
-        let fallbackFileAccessor = new PreloadingWebFileAccessor(dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
+        let fallbackFileAccessor = new PreloadingWebFileAccessor(fetchHelper, dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess, fallbackFileAccessor);
         state.selectedItemRepository = libraryRepository;
       }

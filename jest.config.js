@@ -9,6 +9,6 @@ module.exports = {
     }
   },
   moduleNameMapper: {
-    '\\.(css)$': '<rootDir>/src/client/__mocks__/empty.ts'
+    '\\.css$': '<rootDir>/src/client/__mocks__/empty.ts'
   }
 };

@@ -1,14 +1,15 @@
 import * as queryString from 'query-string';
 import * as utf8 from 'utf8';
 
-import { fetchJSON } from '../utils/fetch';
+import { fetchHelper } from '../utils/fetchHelper';
+
 import { AuthInfo } from 'slate-env-web-api/auth';
 
 
 export { AuthInfo };
 
 export function getAuthInfo(): Promise<AuthInfo> {
-  return fetchJSON('github-auth/info');
+  return fetchHelper.fetchJSON('github-auth/info');
 }
 
 export function getLoginURL(authInfo: AuthInfo, location: Location): string {
@@ -59,7 +60,7 @@ export function parseQueryString(query: string): QueryStringResult {
     let parsedQuery = queryString.parse(query);
     let code = parsedQuery['code'];
     if (typeof code === 'string') {
-      result.token = fetchJSON(`github-auth/auth?code=${code}`)
+      result.token = fetchHelper.fetchJSON(`github-auth/auth?code=${code}`)
         .then((response) => response['access_token']);
     }
     let path = parsedQuery['path'];

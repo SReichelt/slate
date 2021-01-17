@@ -7,7 +7,6 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const config = require('../server/generic/config');
 const projectRoot = path.join(__dirname, '..', '..');
 
 function outputPlaceholder(name) {
@@ -53,8 +52,8 @@ const plugins = [
 
 /**@type {webpack.Configuration}*/
 module.exports = {
-  mode: config.IS_PRODUCTION ? 'production' : 'development',
-  devtool: config.IS_PRODUCTION ? '' : 'inline-source-map',
+  mode: process.env.NODE_ENV ?? 'development',
+  devtool: process.env.NODE_ENV === 'production' ? '' : 'inline-source-map',
   entry: ['babel-polyfill', './client'],
   output: {
     path: path.join(projectRoot, 'dist', 'public'),

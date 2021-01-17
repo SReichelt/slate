@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@types/node": "^14.14.14",
+    "@types/remarkable": "^2.0.0",
     "ts-node": "^9.1.1"
   }
 }

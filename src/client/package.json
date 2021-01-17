@@ -11,6 +11,7 @@
     "@fortawesome/fontawesome-free": "^5.15.1",
     "clsx": "^1.1.1",
     "easymde": "^2.13.0",
+    "query-string": "^6.13.7",
     "react": "^17.0.1",
     "react-alert": "^7.0.2",
     "react-alert-template-basic": "^1.0.0",
@@ -23,13 +24,15 @@
     "remarkable": "^2.0.1",
     "remarkable-react": "^1.4.3",
     "scroll-into-view-if-needed": "^2.2.26",
-    "unicodeit": "^0.7.0"
+    "unicodeit": "^0.7.0",
+    "utf8": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",
     "@types/react-alert": "^5.2.0",
     "@types/react-dom": "^17.0.0",
     "@types/remarkable": "^2.0.0",
+    "@types/utf8": "^2.1.6",
     "babel-polyfill": "^6.26.0",
     "chokidar": "^3.5.1",
     "copy-webpack-plugin": "^6.4.1",

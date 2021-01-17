@@ -1,17 +1,28 @@
 import { Request, Response } from './types';
 import * as path from 'path';
 import * as nodemailer from 'nodemailer';
+import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-const config = require('../config');
+const MAIL_TRANSPORT_CONFIG: SMTPTransport.Options | undefined = process.env.MAIL_HOST ? {
+  host: process.env.MAIL_HOST,
+  port: 465,
+  secure: true,
+  auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASSWORD
+  }
+} : undefined;
+const MAIL_FROM = process.env.MAIL_FROM;
+const MAIL_TO = process.env.MAIL_TO;
 
-const mailTransporter = config.MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(config.MAIL_TRANSPORT_CONFIG) : undefined;
+const mailTransporter = MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(MAIL_TRANSPORT_CONFIG) : undefined;
 
 export function handleSubmit(req: Request, res: Response): void {
-  if (mailTransporter && config.MAIL_FROM && config.MAIL_TO) {
+  if (mailTransporter && MAIL_FROM && MAIL_TO) {
     let requestPath = decodeURI(req.url);
     let mail: nodemailer.SendMailOptions = {
-      from: config.MAIL_FROM,
-      to: config.MAIL_TO,
+      from: MAIL_FROM,
+      to: MAIL_TO,
       subject: 'Slate submission: ' + requestPath,
       text: requestPath,
       attachments: [{

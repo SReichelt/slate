@@ -4,7 +4,7 @@ import { renderPromise } from '../components/PromiseHelper';
 import { OnDocLinkClicked } from './DocLink';
 
 import { disableOwnDefaultBehavior } from '../utils/event';
-import { fetchText } from 'slate-env-web/utils/fetch';
+import { fetchHelper } from '../utils/fetchHelper';
 
 import CachedPromise from 'slate-shared/data/cachedPromise';
 
@@ -24,7 +24,7 @@ const DocPage = React.memo((props: DocPageProps) => {
   let baseUriEnd = props.uri.lastIndexOf('/');
   let baseUri = baseUriEnd >= 0 ? props.uri.substring(0, baseUriEnd + 1) : '';
   let markdownUri = `${props.uri}${markdownSuffix}`;
-  let promise = fetchText(markdownUri).then((text: string) => {
+  let promise = fetchHelper.fetchText(markdownUri).then((text: string) => {
     let md = new Remarkable;
     md.use(linkify);
     md.renderer = new RemarkableReactRenderer({

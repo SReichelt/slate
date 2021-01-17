@@ -1,22 +1,29 @@
-import type { RequestInit } from 'node-fetch';
-import { fetchAny, fetchVoid, fetchText } from '../utils/fetch';
+import FetchHelper, { RequestInit, Response } from '../utils/fetchHelper';
 import { FileAccessor, FileReference, WriteFileResult } from 'slate-shared/data/fileAccessor';
 import { StandardFileAccessor, StandardFileReference } from 'slate-shared/data/fileAccessorImpl';
 import CachedPromise from 'slate-shared/data/cachedPromise';
 
 export class WebFileAccessor extends StandardFileAccessor implements FileAccessor {
+  constructor(protected fetchHelper: FetchHelper, baseURI: string = '') {
+    super(baseURI);
+  }
+
   openFile(uri: string): FileReference {
-    return new WebFileReference(this.baseURI + uri);
+    return new WebFileReference(this.fetchHelper, this.baseURI + uri);
   }
 
   createChildAccessor(uri: string): FileAccessor {
-    return new WebFileAccessor(this.baseURI + uri);
+    return new WebFileAccessor(this.fetchHelper, this.baseURI + uri);
   }
 }
 
 export class WebFileReference extends StandardFileReference {
+  constructor(private fetchHelper: FetchHelper, uri: string) {
+    super(uri);
+  }
+
   read(): CachedPromise<string> {
-    let result = fetchText(this.uri);
+    let result = this.fetchHelper.fetchText(this.uri);
     return new CachedPromise(result);
   }
 
@@ -25,8 +32,8 @@ export class WebFileReference extends StandardFileReference {
       method: 'PUT',
       body: contents
     };
-    let result = fetchAny(this.uri, options)
-      .then((response) => {
+    let result = this.fetchHelper.fetchAny(this.uri, options)
+      .then((response: Response) => {
         let writeFileResult = new WebWriteFileResult;
         writeFileResult.writtenDirectly = (response.status === 200);
         return writeFileResult;
@@ -38,7 +45,7 @@ export class WebFileReference extends StandardFileReference {
     let options: RequestInit = {
       method: 'REPORT'
     };
-    let result = fetchVoid(this.uri, options);
+    let result = this.fetchHelper.fetchVoid(this.uri, options);
     return new CachedPromise(result);
   }
 }

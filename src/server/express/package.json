@@ -12,12 +12,14 @@
     "slate-server-generic": "",
     "cross-env": "^7.0.3",
     "express": "^4.17.1",
-    "http-proxy-middleware": "^1.0.6"
+    "http-proxy-middleware": "^1.0.6",
+    "node-fetch": "^3.0.0-beta.9"
   },
   "devDependencies": {
-    "@types/node": "^14.14.14",
     "@types/express": "^4.17.9",
     "@types/http-proxy-middleware": "^0.19.3",
+    "@types/node": "^14.14.14",
+    "@types/node-fetch": "^2.5.7",
 		"ts-loader": "^8.0.12",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"

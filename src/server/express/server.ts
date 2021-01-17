@@ -1,11 +1,10 @@
-import * as express from 'express';
+import express from 'express';
 import * as path from 'path';
 import { authRouter } from './routes/authRouter';
 import { prodRouter } from './routes/prodRouter';
 import { devRouter } from './routes/devRouter';
 import { preloadRouter } from './routes/preloadRouter';
-
-const config = require('slate-server-generic/config');
+import { config } from 'slate-server-generic/config';
 
 express.static.mime.define({'text/plain': ['slate']});
 

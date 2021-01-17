@@ -1,6 +1,6 @@
 import * as GitHub from './gitHubAPIHandler';
+import { fetchHelper } from '../utils/fetchHelper';
 
-import { fetchText } from '../utils/fetch';
 import { FileAccessor, WriteFileResult, FileReference } from 'slate-shared/data/fileAccessor';
 import { StandardFileAccessor, StandardFileReference } from 'slate-shared/data/fileAccessorImpl';
 import CachedPromise from 'slate-shared/data/cachedPromise';
@@ -44,7 +44,7 @@ export class GitHubFileReference extends StandardFileReference {
   read(): CachedPromise<string> {
     return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
       let gitHubUri = GitHub.getDownloadURL(repositoryAccess.repository, this.uri);
-      let result = fetchText(gitHubUri);
+      let result = fetchHelper.fetchText(gitHubUri);
       return new CachedPromise(result);
     });
   }

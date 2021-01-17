@@ -34,7 +34,7 @@ module.exports = {
           '(^|/)(babel|webpack)\\.config\\.(js|cjs|mjs|ts|json)$', // other configs
           dir('src/vscode/webview'), // build output
           dir('src/client/public/js'), // directly included in page
-          file('src/client/__mocks__/empty.ts'), // dummy file referenced from jest.config.js
+          dir('src/client/__mocks__/empty.ts'), // dummy file referenced from jest.config.js
         ]
       },
       to: {},
@@ -122,8 +122,8 @@ module.exports = {
     {
       name: 'no-duplicate-dep-types',
       comment:
-        "Likeley this module depends on an external ('npm') package that occurs more than once " +
-        "in your package.json i.e. bot as a devDependencies and in dependencies. This will cause " +
+        "Likely this module depends on an external ('npm') package that occurs more than once " +
+        "in your package.json, i.e. both in devDependencies and in dependencies. This will cause " +
         "maintenance problems later on.",
       severity: 'warn',
       from: {},
@@ -166,6 +166,7 @@ module.exports = {
         pathNot: [
           ...npmDeps(
             '@types',
+            'node-fetch', // should actually be covered by the '@types' case, but dependency cruiser does not seem to recognize TypeScript's special "import type" statement
           ),
         ],
         dependencyTypes: [
@@ -179,7 +180,7 @@ module.exports = {
       comment:
         "This module depends on an npm package that is declared as an optional dependency " +
         "in your package.json. As this makes sense in limited situations only, it's flagged here. " +
-        "If you're using an optional dependency here by design - add an exception to your" +
+        "If you're using an optional dependency here by design - add an exception to your " +
         "depdency-cruiser configuration.",
       from: {},
       to: {
@@ -204,159 +205,11 @@ module.exports = {
       }
     },
 
-    /* application-specific architecture rules */
+    /* application-specific architecture rules:
+       this is quite minimal, as dependencies are actually encoded in package.json files, so the
+       generic 'no-non-package-json' rule will complain about those */
     {
-      name: 'dependencies-of-shared',
-      severity: 'error',
-      from: {
-        path: dir('src/shared'),
-        pathNot: [
-          testFiles(),
-        ]
-      },
-      to: {
-        pathNot: [
-          dir('src/shared'),
-          ...npmDeps(
-            'markdown-escape'
-          )
-        ]
-      }
-    },
-    {
-      name: 'dependencies-of-web',
-      severity: 'error',
-      from: {
-        path: dir('src/envs/web')
-      },
-      to: {
-        pathNot: [
-          dir('src/envs/web'),
-          dir('src/shared'),
-          ...npmDeps(
-            'node-fetch', // TODO: This is a node library, client code shouldn't depend on it
-            'utf8',
-            'query-string',
-          )
-        ]
-      }
-    },
-    {
-      name: 'dependencies-of-node',
-      severity: 'error',
-      from: {
-        path: dir('src/envs/node')
-      },
-      to: {
-        pathNot: [
-          dir('src/envs/node'),
-          dir('src/shared'),
-          ...modules(
-            'path',
-            'fs',
-            'util',
-          ),
-        ]
-      }
-    },
-    {
-      name: 'dependencies-of-client',
-      severity: 'error',
-      from: {
-        path: dir('src/client'),
-        pathNot: [
-          webpackConfig(),
-          testFiles(),
-        ],
-      },
-      to: {
-        pathNot: [
-          dir('src/client'),
-          dir('src/shared'),
-          dir('src/envs/web'),
-          file('data/libraries/libraries.json'),
-          ...npmDeps(
-            '@fortawesome/fontawesome-free',
-            'clsx',
-            'easymde',
-            'react',
-            'react-alert',
-            'react-alert-template-basic',
-            'react-dom',
-            'react-loading-animation',
-            'react-portal-tooltip',
-            'react-responsive-modal',
-            'react-simplemde-editor',
-            'react-split-pane',
-            'remarkable',
-            'remarkable-react',
-            'scroll-into-view-if-needed',
-            'unicodeit',
-          ),
-        ]
-      }
-    },
-    {
-      // TODO: divide into subdirs
-      name: 'dependencies-of-server',
-      severity: 'error',
-      from: {
-        path: dir('src/server'),
-        pathNot: [
-          webpackConfig(),
-        ],
-      },
-      to: {
-        pathNot: [
-          dir('src/server'),
-          dir('src/shared'),
-          dir('src/envs/web'),
-          dir('src/envs/node'),
-          ...modules(
-            'child_process',
-            'fs',
-            'path',
-            'stream',
-            'url',
-          ),
-          ...npmDeps(
-            '@types',
-            'ejs',
-            'express',
-            'http-proxy-middleware',
-            'nodemailer',
-            'remarkable',
-          ),
-        ]
-      }
-    },
-    {
-      name: 'dependencies-of-vscode',
-      severity: 'error',
-      from: {
-        path: dir('src/vscode'),
-      },
-      to: {
-        pathNot: [
-          dir('src/vscode'),
-          dir('src/shared'),
-          dir('src/envs/web/api'),
-          dir('src/envs/node'), // TODO: remove this dependency because it breaks Live Share
-          ...modules(
-            'buffer',
-            'fs', // TODO: remove this dependency because it breaks Live Share
-            'path',
-            'util',
-          ),
-          ...npmDeps(
-            '@types',
-            'ejs',
-          ),
-        ]
-      }
-    },
-    {
-      name: 'dependencies-to-logics',
+      name: 'dependencies-on-specific-logics',
       severity: 'error',
       from: {
         pathNot: [
@@ -367,10 +220,11 @@ module.exports = {
       },
       to: {
         path: [
-          dir('src/shared/logics/[^/]+'),
+          subdirs('src/shared/logics'),
         ]
       }
     },
+
   ],
   options: {
 
@@ -591,6 +445,10 @@ function escapeRegex(str) {
 
 function dir(path) {
   return `^(${escapeRegex(path)}/)`;
+}
+
+function subdirs(path) {
+  return `^(${escapeRegex(path)}/[^/]+/)`;
 }
 
 function exact(str) {
