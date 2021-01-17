@@ -34,7 +34,7 @@ module.exports = {
           '(^|/)(babel|webpack)\\.config\\.(js|cjs|mjs|ts|json)$', // other configs
           dir('src/vscode/webview'), // build output
           dir('src/client/public/js'), // directly included in page
-          dir('src/client/__mocks__/empty.ts'), // dummy file referenced from jest.config.js
+          file('src/client/__mocks__/empty.ts'), // dummy file referenced from jest.config.js
         ]
       },
       to: {},
@@ -99,6 +99,7 @@ module.exports = {
       from: {
         pathNot: [
           testFiles(),
+          webpackConfig(),
         ]
       },
       to: {
