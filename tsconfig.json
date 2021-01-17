@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "sourceMap": true,
-    "module": "commonjs",
-    "importHelpers": true,
     "rootDir": ".",
     "outDir": "build",
+    "target": "es6",
+    "module": "es6",
     "lib": ["es6"],
     "moduleResolution": "node",
+    "importHelpers": true,
+    "sourceMap": true,
     "skipLibCheck": true,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,7 +17,7 @@
     "strictNullChecks": true,
     "alwaysStrict": true
   },
-  "files": [
-    "src/shared/logics/logics.ts"
+  "include": [
+    "src/shared/**/*"
   ]
 }
