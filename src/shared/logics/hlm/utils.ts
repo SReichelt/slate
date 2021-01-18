@@ -1441,6 +1441,7 @@ export class HLMUtils extends GenericUtils {
   }
 
   private substituteStructuralCase(expression: FmtHLM.MetaRefExpression_structural | FmtHLM.MetaRefExpression_setStructuralCases | FmtHLM.MetaRefExpression_structuralCases, allowConstructorResult: boolean): CachedPromise<Fmt.Expression[] | undefined> {
+    // TODO also (first) check whether expression.term is a rewritten constructor term like "... + 1"
     return this.castAndFullyUnfoldElementTermOutside(expression.term, expression.construction).then((constructorTerms: Fmt.Expression[]) => {
       let resultPromise: CachedPromise<Fmt.Expression[] | undefined> = CachedPromise.resolve(undefined);
       for (let constructorTerm of constructorTerms) {
