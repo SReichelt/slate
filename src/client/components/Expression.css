@@ -15,11 +15,11 @@
   line-height: initial;
 }
 
-.expr.hover, .expr.hover span, .foldable-heading:hover {
+.expr.hover, .expr.hover>span, .expr.hover>span>span, .foldable-heading:hover {
   background-color: var(--expression-hover-background-color);
 }
 
-.expr.definition.hover, .expr.definition.hover span {
+.expr.definition.hover, .expr.definition.hover>span, .expr.definition.hover>span>span {
   background-color: var(--definition-hover-background-color);
 }
 

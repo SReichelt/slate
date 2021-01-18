@@ -13,6 +13,7 @@ import LibraryItem from '../components/LibraryItem';
 import Expression from '../components/Expression';
 import ExpressionMenu, { ExpressionMenuRow, ExpressionMenuRowProps, ExpressionMenuItem, ExpressionMenuItemProps, ExpressionMenuTextInput, ExpressionMenuTextInputProps } from '../components/ExpressionMenu';
 import ExpressionDialog, { ExpressionDialogProps, ExpressionDialogItem } from '../components/ExpressionDialog';
+import UnicodeTextInput from '../components/UnicodeTextInput';
 import { SubSup } from '../components/rendering/SubSup';
 import DocLink, { OnDocLinkClicked } from './DocLink';
 import { PromiseHelper } from '../components/PromiseHelper';
@@ -511,15 +512,20 @@ class TutorialStates {
                             key: 1,
                             children: [
                               {
-                                type: 'input',
-                                elementAction: this.automateTextInput('S,')
+                                type: UnicodeTextInput,
+                                children: [
+                                  {
+                                    type: 'input',
+                                    elementAction: this.automateTextInput('S,')
+                                  }
+                                ],
+                                toolTip: {
+                                  contents: <p>Type "S,T" to insert two parameters at once.</p>,
+                                  position: 'bottom',
+                                  index: 0
+                                }
                               }
-                            ],
-                            toolTip: {
-                              contents: <p>Type "S,T" to insert two parameters at once.</p>,
-                              position: 'bottom',
-                              index: 0
-                            }
+                            ]
                           }
                         ]
                       }
@@ -656,15 +662,20 @@ class TutorialStates {
                                 key: 0,
                                 children: [
                                   {
-                                    type: 'input',
-                                    elementAction: this.automateTextInput('f')
+                                    type: UnicodeTextInput,
+                                    children: [
+                                      {
+                                        type: 'input',
+                                        elementAction: this.automateTextInput('f')
+                                      }
+                                    ],
+                                    toolTip: {
+                                      contents: <p>Name this parameter "f".</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    }
                                   }
-                                ],
-                                toolTip: {
-                                  contents: <p>Name this parameter "f".</p>,
-                                  position: 'bottom',
-                                  index: 0
-                                }
+                                ]
                               }
                             ]
                           }
@@ -1162,15 +1173,20 @@ class TutorialStates {
                                 key: 0,
                                 children: [
                                   {
-                                    type: 'input',
-                                    elementAction: this.automateTextInput('g')
+                                    type: UnicodeTextInput,
+                                    children: [
+                                      {
+                                        type: 'input',
+                                        elementAction: this.automateTextInput('g')
+                                      }
+                                    ],
+                                    toolTip: {
+                                      contents: <p>Name this parameter "g".</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    }
                                   }
-                                ],
-                                toolTip: {
-                                  contents: <p>Name this parameter "g".</p>,
-                                  position: 'bottom',
-                                  index: 0
-                                }
+                                ]
                               }
                             ]
                           }
@@ -1564,15 +1580,20 @@ class TutorialStates {
                                 key: 0,
                                 children: [
                                   {
-                                    type: 'input',
-                                    elementAction: this.automateTextInput('n')
+                                    type: UnicodeTextInput,
+                                    children: [
+                                      {
+                                        type: 'input',
+                                        elementAction: this.automateTextInput('n')
+                                      }
+                                    ],
+                                    toolTip: {
+                                      contents: <p>Name this parameter "n".</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    }
                                   }
-                                ],
-                                toolTip: {
-                                  contents: <p>Name this parameter "n".</p>,
-                                  position: 'bottom',
-                                  index: 0
-                                }
+                                ]
                               }
                             ]
                           }
@@ -3010,8 +3031,13 @@ class TutorialStates {
                                                                     }),
                                                                     children: [
                                                                       {
-                                                                        type: 'input',
-                                                                        elementAction: this.automateTextInput('my', true)
+                                                                        type: UnicodeTextInput,
+                                                                        children: [
+                                                                          {
+                                                                            type: 'input',
+                                                                            elementAction: this.automateTextInput('my', true)
+                                                                          }
+                                                                        ]
                                                                       }
                                                                     ]
                                                                   }
@@ -3598,15 +3624,20 @@ class TutorialStates {
                                 key: 0,
                                 children: [
                                   {
-                                    type: 'input',
-                                    elementAction: this.automateTextInput('\\varphi', true)
+                                    type: UnicodeTextInput,
+                                    children: [
+                                      {
+                                        type: 'input',
+                                        elementAction: this.automateTextInput('\\varphi', true)
+                                      }
+                                    ],
+                                    toolTip: {
+                                      contents: <p>Name this parameter "φ" by typing "\varphi".</p>,
+                                      position: 'bottom',
+                                      index: 0
+                                    }
                                   }
-                                ],
-                                toolTip: {
-                                  contents: <p>Name this parameter "φ" by typing "\varphi".</p>,
-                                  position: 'bottom',
-                                  index: 0
-                                }
+                                ]
                               }
                             ]
                           }
@@ -4009,8 +4040,13 @@ class TutorialStates {
                                 key: 0,
                                 children: [
                                   {
-                                    type: 'input',
-                                    elementAction: this.automateTextInput('n')
+                                    type: UnicodeTextInput,
+                                    children: [
+                                      {
+                                        type: 'input',
+                                        elementAction: this.automateTextInput('n')
+                                      }
+                                    ]
                                   }
                                 ]
                               }

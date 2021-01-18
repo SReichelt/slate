@@ -79,9 +79,9 @@ export class ExpressionMenuSeparator extends ExpressionMenuRow {
 }
 
 export class ExpressionMenuTextInput extends ExpressionMenuCell {
-  text: string;
-  expectedTextLength: number;
-  action: ExpressionMenuAction;
+  constructor(public text: string, public expectedTextLength: number, public supportLatexInput: boolean, public action: ExpressionMenuAction) {
+    super();
+  }
 }
 
 export abstract class ExpressionMenuAction {

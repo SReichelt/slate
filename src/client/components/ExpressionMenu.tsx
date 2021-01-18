@@ -7,6 +7,7 @@ import './ExpressionMenu.css';
 
 import Expression, { ExpressionInteractionHandler } from './Expression';
 import ExpressionToolTip from './ExpressionToolTip';
+import UnicodeTextInput from './UnicodeTextInput';
 import { renderPromise } from './PromiseHelper';
 
 import { disableDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
@@ -133,7 +134,7 @@ export interface ExpressionMenuRowState {
 }
 
 interface ExpressionMenuInputRefHolder {
-  inputRef?: HTMLElement;
+  inputRef?: HTMLElement | null;
 }
 
 export class ExpressionMenuRow extends React.Component<ExpressionMenuRowProps, ExpressionMenuRowState> {
@@ -530,10 +531,10 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
       'hover': this.state.hovered || this.state.editing || this.props.hoveredExternally,
       'selected': this.props.item.selected
     });
-    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let onChangeValue = (newValue: string) => {
       this.setState({
         edited: true,
-        text: event.target.value
+        text: newValue
       });
     };
     let onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -581,7 +582,7 @@ export class ExpressionMenuTextInput extends React.Component<ExpressionMenuTextI
     };
     return (
       <td colSpan={this.props.colSpan} className={className} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseUp={onClick}>
-        <input type={'text'} value={this.state.text} size={this.props.item.expectedTextLength} onChange={onChange} onFocus={onFocus} onBlur={onBlur} onKeyPress={onKeyPress} ref={(element: HTMLInputElement) => (this.props.inputRefHolder.inputRef = element)}/>
+        <UnicodeTextInput value={this.state.text} size={this.props.item.expectedTextLength} onChangeValue={onChangeValue} onKeyPress={onKeyPress} onFocus={onFocus} onBlur={onBlur} supportLatexInput={this.props.item.supportLatexInput} inputRef={(element: HTMLElement | null) => (this.props.inputRefHolder.inputRef = element)}/>
       </td>
     );
   }

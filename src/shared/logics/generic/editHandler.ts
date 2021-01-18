@@ -86,18 +86,16 @@ export abstract class GenericEditHandler {
   }
 
   private getTitleRow(info: LibraryItemInfo): Menu.ExpressionMenuRow {
-    let titleItem = new Menu.ExpressionMenuTextInput;
-    titleItem.text = info.title || '';
-    titleItem.expectedTextLength = 20;
-    titleItem.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let titleText = info.title || '';
+    let titleAction = new Menu.ImmediateExpressionMenuAction(() => {
       let newInfo = {
         ...info,
-        title: titleItem.text || undefined
+        title: titleText || undefined
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
     });
     let titleRow = new Menu.StandardExpressionMenuRow('Title');
-    titleRow.subMenu = titleItem;
+    titleRow.subMenu = new Menu.ExpressionMenuTextInput(titleText, 20, false, titleAction);
     titleRow.selected = info.title !== undefined;
     return titleRow;
   }
@@ -227,39 +225,29 @@ export abstract class GenericEditHandler {
   }
 
   private getNotationMenuIntegerRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
-    let integerItem = new Menu.ExpressionMenuTextInput;
-    if (notation instanceof Fmt.IntegerExpression) {
-      integerItem.selected = true;
-      integerItem.text = notation.value.toString();
-    } else {
-      integerItem.text = '';
-    }
-    integerItem.expectedTextLength = 4;
-    integerItem.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let text = notation instanceof Fmt.IntegerExpression ? notation.value.toString() : '';
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       try {
         let value = BigInt(integerItem.text);
         let newNotation = new Fmt.IntegerExpression(value);
         onSetNotation(newNotation);
       } catch {}
     });
+    let integerItem = new Menu.ExpressionMenuTextInput(text, 4, false, action);
+    integerItem.selected = (notation !== undefined);
     let integerRow = new Menu.StandardExpressionMenuRow('Number');
     integerRow.subMenu = integerItem;
     return integerRow;
   }
 
   private getNotationMenuTextRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
-    let textItem = new Menu.ExpressionMenuTextInput;
-    if (notation instanceof Fmt.StringExpression) {
-      textItem.selected = true;
-      textItem.text = notation.value;
-    } else {
-      textItem.text = '';
-    }
-    textItem.expectedTextLength = 4;
-    textItem.action = new Menu.ImmediateExpressionMenuAction(() => {
+    let text = notation instanceof Fmt.StringExpression ? notation.value : '';
+    let action = new Menu.ImmediateExpressionMenuAction(() => {
       let newNotation = new Fmt.StringExpression(textItem.text);
       onSetNotation(newNotation);
     });
+    let textItem = new Menu.ExpressionMenuTextInput(text, 4, true, action);
+    textItem.selected = (notation !== undefined);
     let textRow = new Menu.StandardExpressionMenuRow(title);
     textRow.subMenu = textItem;
     return textRow;

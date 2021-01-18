@@ -19,6 +19,7 @@ import ExpressionMenu from './ExpressionMenu';
 import InsertDialog from './InsertDialog';
 import ExpressionDialog from './ExpressionDialog';
 import Button from './Button';
+import UnicodeTextInput from './UnicodeTextInput';
 import { RoundParens, FlatParens, SquareParens, CurlyParens, AngleParens } from './rendering/Parentheses';
 import { SubSup } from './rendering/SubSup';
 import { renderOverUnder } from './rendering/OverUnder';
@@ -27,9 +28,9 @@ import { renderRadical } from './rendering/Radical';
 import { PromiseHelper, renderPromise } from './PromiseHelper';
 
 import config from '../utils/config';
-import { disableDefaultBehavior, disableOwnDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
+import { disableOwnDefaultBehavior, limitDefaultBehaviorToElement } from '../utils/event';
 import { getDefinitionIcon, getButtonIcon, ButtonType, getSectionIcon } from '../utils/icons';
-import { isLatexInput, getLatexInputSuggestions, replaceLatexCodeOrPrefix, replaceExactLatexCodeOnly } from '../utils/latexInput';
+import { isLatexInput } from '../utils/latexInput';
 
 import * as Notation from 'slate-shared/notation/notation';
 import * as Menu from 'slate-shared/notation/menu';
@@ -92,7 +93,6 @@ export interface ExpressionState {
   showToolTip: boolean;
   clicking: boolean;
   inputError: boolean;
-  inputFocused: boolean;
   unfolded?: boolean;
   openMenu?: Menu.ExpressionMenu;
   openDialog?: Dialog.DialogBase;
@@ -129,8 +129,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       hovered: false,
       showToolTip: false,
       clicking: false,
-      inputError: false,
-      inputFocused: false
+      inputError: false
     };
 
     this.updateOptionalProps(props);
@@ -561,15 +560,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderTextInputControl(expression: Notation.TextExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let text = expression.text;
+    let value = expression.text;
     let supportLatexInput = !expression.hasStyleClass('integer');
-    let latexInput = supportLatexInput && isLatexInput(text);
-    let setText = (newText: string) => {
-      expression.text = newText;
+    let onChangeValue = (newValue: string) => {
+      expression.text = newValue;
       this.setState({inputError: false});
       this.forceUpdate();
-      if (expression.onTextChanged && !(supportLatexInput && isLatexInput(newText))) {
-        if (expression.onTextChanged(newText)) {
+      if (expression.onTextChanged && !(supportLatexInput && isLatexInput(newValue))) {
+        if (expression.onTextChanged(newValue)) {
           if (this.props.interactionHandler) {
             this.props.interactionHandler.expressionChanged();
           }
@@ -577,38 +575,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           this.setState({inputError: true});
         }
       }
-    };
-    let performLatexReplacement = () => {
-      let textAfterReplacement = replaceLatexCodeOrPrefix(text);
-      if (textAfterReplacement !== text) {
-        setText(textAfterReplacement);
-      }
-    };
-    let onFocus = () => {
-      this.highlightPermanently();
-      this.setState({ inputFocused: true });
-    };
-    let onBlur = () => {
-      this.clearPermanentHighlight();
-      this.setState({ inputFocused: false });
-      if (supportLatexInput) {
-        performLatexReplacement();
-      }
-    };
-    let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      let newText = event.target.value;
-      if (supportLatexInput) {
-        newText = replaceExactLatexCodeOnly(newText);
-      }
-      setText(newText);
       this.triggerHighlightPermanently();
     };
-    let onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (supportLatexInput && (event.key === 'Enter' || event.key === ' ')) {
-        performLatexReplacement();
-        disableDefaultBehavior(event);
-      }
-    };
+    let inputClassName = clsx('expr-input', {
+      'input-error': this.state.inputError,
+      'italic': expression.hasStyleClass('var') && useItalicsForVariable(value)
+    });
     let ref = undefined;
     if (expression.requestTextInput) {
       ref = (htmlNode: HTMLInputElement | null) => {
@@ -620,59 +592,21 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       };
     }
-    let inputClassName = clsx('expr-input', {
-      'input-error': this.state.inputError,
-      'input-latex': latexInput,
-      'italic': !latexInput && expression.hasStyleClass('var') && useItalicsForVariable(text)
-    });
-    let size = expression.inputLength ?? text.length + 1;
-    let style = {'width': `${size}ch`, 'minWidth': `${size}ex`};
-    let menu: JSX.Element | undefined = undefined;
-    if (latexInput && this.state.inputFocused) {
-      let suggestions = getLatexInputSuggestions(text);
-      let rows = suggestions.map((suggestion, rowIndex) => {
-        let action = new Menu.ImmediateExpressionMenuAction(() => {
-          setText(suggestion.unicodeCharacters);
-        });
-        let preview = new Notation.TextExpression(suggestion.unicodeCharacters);
-        preview.styleClasses = expression.styleClasses;
-        let item = new Menu.ExpressionMenuItem(preview, action);
-        item.selected = rowIndex === 0;
-        let row = new Menu.StandardExpressionMenuRow(suggestion.latexCode);
-        row.subMenu = item;
-        return row;
-      });
-      if (rows.length > 0) {
-        let expressionMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
-        menu = <ExpressionMenu menu={expressionMenu} onItemClicked={this.onMenuItemClicked} />;
-      }
-    }
     let input = (
-      <input
+      <UnicodeTextInput
         key="input"
-        type={'text'}
         className={inputClassName}
-        value={text}
-        style={style}
-        onChange={onChange}
-        onMouseDown={limitDefaultBehaviorToElement}
-        onMouseUp={limitDefaultBehaviorToElement}
-        onTouchStart={limitDefaultBehaviorToElement}
-        onTouchCancel={limitDefaultBehaviorToElement}
-        onTouchEnd={limitDefaultBehaviorToElement}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onKeyPress={onKeyPress}
-        ref={ref}
-        autoFocus={expression.requestTextInput}
+        value={expression.text}
+        size={expression.inputLength ?? value.length + 1}
+        onChangeValue={onChangeValue}
+        onFocus={() => this.highlightPermanently()}
+        onBlur={() => this.clearPermanentHighlight()}
+        supportLatexInput={supportLatexInput}
+        previewStyleClasses={expression.styleClasses}
+        inputRef={ref}
       />
     );
-    return (
-      <span className={'menu-container'} onTouchStart={limitDefaultBehaviorToElement} onTouchCancel={limitDefaultBehaviorToElement} onTouchEnd={limitDefaultBehaviorToElement}>
-        {this.wrapRenderedExpression(input, { ...renderedExpressionConfig, isInputControl: true })}
-        {menu}
-      </span>
-    );
+    return this.wrapRenderedExpression(input, { ...renderedExpressionConfig, isInputControl: true });
   }
 
   private convertText(text: string): React.ReactNode {
