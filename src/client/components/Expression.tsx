@@ -811,8 +811,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       };
       let onSearch = undefined;
-      if (expression.searchURLs) {
-        const searchURLs = expression.searchURLs;
+      const searchURLs = expression.searchURLs;
+      if (searchURLs) {
         onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
       }
       if (config.useMarkdownEditor) {

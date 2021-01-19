@@ -657,8 +657,8 @@ export class HLMUtils extends GenericUtils {
 
   private referencesCaseParameter(structuralCase: FmtHLM.ObjectContents_StructuralCase): boolean {
     let referencesCaseParameter = false;
-    if (structuralCase.parameters) {
-      const parameters = structuralCase.parameters;
+    const parameters = structuralCase.parameters;
+    if (parameters) {
       structuralCase.value.traverse((subExpression: Fmt.Expression) => {
         if (subExpression instanceof Fmt.VariableRefExpression && this.parameterListContainsParameter(parameters, subExpression.variable)) {
           referencesCaseParameter = true;
@@ -898,8 +898,8 @@ export class HLMUtils extends GenericUtils {
           };
         };
         const parametersResult = this.unfoldParameters(formula.parameters, unfoldParameters, cloneExpression);
-        if (formula.formula) {
-          const innerFormula = formula.formula;
+        const innerFormula = formula.formula;
+        if (innerFormula) {
           return this.concatResults(parametersResult, () => this.getNextFormulas(innerFormula, unfoldParameters).then((nextFormulas: Fmt.Expression[] | undefined) =>
             nextFormulas?.map((nextFormula: Fmt.Expression) =>
               formula instanceof FmtHLM.MetaRefExpression_existsUnique ? new FmtHLM.MetaRefExpression_existsUnique(formula.parameters, nextFormula) : formula instanceof FmtHLM.MetaRefExpression_exists ? new FmtHLM.MetaRefExpression_exists(formula.parameters, nextFormula) : new FmtHLM.MetaRefExpression_forall(formula.parameters, nextFormula))));

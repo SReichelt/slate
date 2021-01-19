@@ -98,8 +98,8 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
 
   let manipulateContents = traverseChildren;
   let elementAction = entry.elementAction;
-  if (entry.toolTip) {
-    const toolTip = entry.toolTip;
+  const toolTip = entry.toolTip;
+  if (toolTip) {
     let parentNode: HTMLElement | null = null;
     const toolTipParent = {
       getBoundingClientRect(): ClientRect {

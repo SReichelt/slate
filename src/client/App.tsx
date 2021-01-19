@@ -876,8 +876,8 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     const dialog = this.state.insertDialog;
     if (dialog && dialog.libraryDataProvider) {
       const libraryDataProvider = dialog.libraryDataProvider;
-      if (dialog.definitionType) {
-        const definitionType = dialog.definitionType;
+      const definitionType = dialog.definitionType;
+      if (definitionType) {
         return libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
           .then((libraryDefinition: LibraryDefinition) => {
             const localPath = new Fmt.Path(result.name);

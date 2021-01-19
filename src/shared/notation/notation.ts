@@ -648,8 +648,8 @@ export class UserDefinedExpression extends ExpressionWithArgs {
 
   private orderMatches(expression: Fmt.Expression): boolean {
     let result: boolean | undefined = undefined;
-    if (this.config.isBeforeFn) {
-      const isBeforeFn = this.config.isBeforeFn;
+    const isBeforeFn = this.config.isBeforeFn;
+    if (isBeforeFn) {
       expression.traverse((subExpression: Fmt.Expression) => {
         if (result !== false && subExpression instanceof FmtNotation.MetaRefExpression_rev) {
           const arg: any[] = [];

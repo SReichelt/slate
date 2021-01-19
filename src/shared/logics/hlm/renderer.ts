@@ -3653,20 +3653,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addDefinitionParts(definitions.concat(innerDefinition), result);
       }
       if (contents instanceof FmtHLM.ObjectContents_Definition) {
-        if (contents.notation) {
-          const notation = contents.notation;
+        const notation = contents.notation;
+        if (notation) {
           result.set(notation, () => this.renderDefinitionNotationExpression(notation, definitions));
         }
         if (contents instanceof FmtHLM.ObjectContents_Construction) {
-          if (contents.embedding) {
-            const embedding = contents.embedding;
+          const embedding = contents.embedding;
+          if (embedding) {
             result.set(embedding.parameter, () => this.renderParameter(embedding.parameter, false, false, false));
             result.set(embedding.target, () => this.renderElementTerm(embedding.target, fullElementTermSelection));
             this.addProofParts(embedding.wellDefinednessProof, result);
           }
         } else if (contents instanceof FmtHLM.ObjectContents_Constructor) {
-          if (contents.equalityDefinition) {
-            const equalityDefinition = contents.equalityDefinition;
+          const equalityDefinition = contents.equalityDefinition;
+          if (equalityDefinition) {
             this.addParameterListParts(equalityDefinition.leftParameters, undefined, result);
             this.addParameterListParts(equalityDefinition.rightParameters, undefined, result);
             for (const item of equalityDefinition.definition) {
@@ -3677,8 +3677,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             this.addProofParts(equalityDefinition.symmetryProof, result);
             this.addProofParts(equalityDefinition.transitivityProof, result);
           }
-          if (contents.rewrite) {
-            const rewrite = contents.rewrite;
+          const rewrite = contents.rewrite;
+          if (rewrite) {
             this.addElementTermParts(rewrite.value, result);
             if (rewrite.theorem) {
               this.addGenericExpressionParts(rewrite.theorem, result);
@@ -3820,8 +3820,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (proof.parameters) {
         this.addParameterListParts(proof.parameters, undefined, result);
       }
-      if (proof.goal) {
-        const goal = proof.goal;
+      const goal = proof.goal;
+      if (goal) {
         result.set(goal, () => this.renderFormula(goal, fullFormulaSelection));
       }
       for (const step of proof.steps) {

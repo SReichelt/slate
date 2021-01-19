@@ -59,8 +59,8 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     let onTouchEnd = undefined;
     let onTouchCancel = undefined;
     if (enabled) {
-      if (this.props.onClick) {
-        const propsOnClick = this.props.onClick;
+      const propsOnClick = this.props.onClick;
+      if (propsOnClick) {
         onClick = (event: React.SyntheticEvent<HTMLElement>) => {
           disableOwnDefaultBehavior(event);
           if (this.ready && !this.props.isMenuItem) {
