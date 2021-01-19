@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as Fmt from 'slate-shared/format/format';
 
 export function appendDocumentation(documentation: Fmt.DocumentationComment, includeAll: boolean, specificParameter: Fmt.Parameter | undefined, result: vscode.MarkdownString): void {
-    for (let item of documentation.items) {
+    for (const item of documentation.items) {
         if (specificParameter) {
             if (specificParameter !== item.parameter) {
                 continue;

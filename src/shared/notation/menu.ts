@@ -14,7 +14,7 @@ export class ExpressionMenu extends ExpressionMenuBase {
   }
 
   isSelected(): boolean {
-    let rows = this.rows.getImmediateResult();
+    const rows = this.rows.getImmediateResult();
     if (rows && rows.some((row) => row.selected)) {
       return true;
     }
@@ -50,7 +50,7 @@ export class ExpressionMenuItemList extends ExpressionMenuRow {
     if (super.isSelected()) {
       return true;
     }
-    let items = this.items.getImmediateResult();
+    const items = this.items.getImmediateResult();
     if (items && items.some((item) => item.selected)) {
       return true;
     }

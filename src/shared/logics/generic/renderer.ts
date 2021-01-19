@@ -36,7 +36,7 @@ export class ArgumentWithInfo {
   }
 
   static getArgIndex(args: RenderedTemplateArguments, value: Notation.ExpressionValue): number {
-    for (let arg of Object.values(args)) {
+    for (const arg of Object.values(args)) {
       if (arg instanceof ArgumentWithInfo && arg.getValue() === value) {
         return arg.index;
       }
@@ -69,12 +69,12 @@ export abstract class GenericRenderer {
     } catch (error) {
       return new Notation.ErrorExpression(error.message);
     }
-    let config = this.getRenderedTemplateConfig(args, 0, negationCount);
+    const config = this.getRenderedTemplateConfig(args, 0, negationCount);
     return new Notation.TemplateInstanceExpression(template, config, this.templates);
   }
 
   renderNotationExpression(notation: Fmt.Expression, args: RenderedTemplateArguments = {}, omitArguments: number = 0, negationCount: number = 0, forceInnerNegations: number = 0): Notation.RenderedExpression {
-    let config = this.getRenderedTemplateConfig(args, omitArguments, negationCount, forceInnerNegations);
+    const config = this.getRenderedTemplateConfig(args, omitArguments, negationCount, forceInnerNegations);
     return this.renderUserDefinedExpression(notation, config);
   }
 
@@ -83,7 +83,7 @@ export abstract class GenericRenderer {
   }
 
   private getRenderedTemplateConfig(args: RenderedTemplateArguments, omitArguments: number, negationCount: number, forceInnerNegations: number = 0): Notation.RenderedTemplateConfig {
-    let getArgFn = (name: string) => ArgumentWithInfo.getValue(args[name]);
+    const getArgFn = (name: string) => ArgumentWithInfo.getValue(args[name]);
     let isBeforeFn = undefined;
     if (Object.values(args).some((arg) => (arg instanceof ArgumentWithInfo))) {
       isBeforeFn = (value1: Notation.ExpressionValue, value2: Notation.ExpressionValue) => (ArgumentWithInfo.getArgIndex(args, value1) < ArgumentWithInfo.getArgIndex(args, value2));
@@ -102,7 +102,7 @@ export abstract class GenericRenderer {
     if (items.length === 1) {
       return items[0];
     } else {
-      let args: RenderedTemplateArguments = {'items': items};
+      const args: RenderedTemplateArguments = {'items': items};
       if (separator !== undefined) {
         args['separator'] = separator;
       }
@@ -120,24 +120,24 @@ export abstract class GenericRenderer {
       suffixes = [];
       underscorePos = rest.indexOf('_');
       while (underscorePos > 0) {
-        let suffix = new Notation.TextExpression(rest.substring(0, underscorePos));
+        const suffix = new Notation.TextExpression(rest.substring(0, underscorePos));
         suffix.styleClasses = ['var'];
         suffixes.push(suffix);
         rest = rest.substring(underscorePos + 1);
         underscorePos = rest.indexOf('_');
       }
-      let lastSuffix = new Notation.TextExpression(rest);
+      const lastSuffix = new Notation.TextExpression(rest);
       lastSuffix.styleClasses = ['var'];
       suffixes.push(lastSuffix);
     }
-    let text = new Notation.TextExpression(name);
+    const text = new Notation.TextExpression(name);
     text.styleClasses = ['var'];
     if (isDefinition && this.variableNameEditHandler) {
       this.variableNameEditHandler.addVariableNameEditor(text, param, parameterList);
     }
     let result: Notation.RenderedExpression = text;
     if (suffixes) {
-      let subExpression = new Notation.SubSupExpression(result);
+      const subExpression = new Notation.SubSupExpression(result);
       subExpression.sub = this.renderGroup(suffixes, ',');
       subExpression.fallback = new Notation.RowExpression([result, new Notation.TextExpression('_'), subExpression.sub]);
       subExpression.styleClasses = ['var'];
@@ -162,13 +162,13 @@ export abstract class GenericRenderer {
   }
 
   protected renderInteger(value: BigInt | undefined): Notation.TextExpression {
-    let result = new Notation.TextExpression(value?.toString() ?? '');
+    const result = new Notation.TextExpression(value?.toString() ?? '');
     result.styleClasses = ['integer'];
     return result;
   }
 
   protected addSemanticLink(expression: Notation.RenderedExpression, linkedObject: Object): Notation.SemanticLink {
-    let semanticLink = new Notation.SemanticLink(linkedObject);
+    const semanticLink = new Notation.SemanticLink(linkedObject);
     if (expression.semanticLinks) {
       expression.semanticLinks.unshift(semanticLink);
     } else {
@@ -178,7 +178,7 @@ export abstract class GenericRenderer {
   }
 
   protected setDefinitionSemanticLink(expression: Notation.RenderedExpression, linkedObject: Object, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression, onGetVariables: () => RenderedVariable[], isPredicate: boolean): Notation.SemanticLink {
-    let semanticLink = new Notation.SemanticLink(linkedObject, true);
+    const semanticLink = new Notation.SemanticLink(linkedObject, true);
     if (this.editHandler) {
       this.editHandler.addNotationMenu(semanticLink, notation, onSetNotation, onGetDefault, onGetVariables, isPredicate, this);
     }
@@ -187,7 +187,7 @@ export abstract class GenericRenderer {
   }
 
   protected renderSubHeading(heading: string): Notation.RenderedExpression {
-    let subHeading = new Notation.TextExpression(`${heading}.`);
+    const subHeading = new Notation.TextExpression(`${heading}.`);
     subHeading.styleClasses = ['sub-heading'];
     return subHeading;
   }
@@ -197,7 +197,7 @@ export abstract class GenericRenderer {
   }
 
   protected addDefinitionRemarks(paragraphs: Notation.RenderedExpression[]): void {
-    for (let kind of allRemarkKinds) {
+    for (const kind of allRemarkKinds) {
       if (kind) {
         this.addDefinitionRemarksOfKind(paragraphs, kind);
       }
@@ -205,23 +205,23 @@ export abstract class GenericRenderer {
   }
 
   private addDefinitionRemarksOfKind(paragraphs: Notation.RenderedExpression[], kind: string | undefined): void {
-    let definition = this.definition;
-    let texts: string[] = [];
+    const definition = this.definition;
+    const texts: string[] = [];
     if (definition.documentation) {
-      for (let item of definition.documentation.items) {
+      for (const item of definition.documentation.items) {
         if (item.kind === kind) {
           texts.push(item.text);
         }
       }
     }
-    let canEdit = this.editHandler && kind !== 'example';
+    const canEdit = this.editHandler && kind !== 'example';
     if (texts.length || canEdit) {
-      let text = texts.join(kind === 'example' ? ', ' : '\n\n');
-      let markdown = new Notation.MarkdownExpression(text);
+      const text = texts.join(kind === 'example' ? ', ' : '\n\n');
+      const markdown = new Notation.MarkdownExpression(text);
       markdown.onRenderCode = (code: string) => {
         try {
-          let metaModel = this.libraryDataAccessor.logic.getMetaModel();
-          let expression = readCode(code, metaModel);
+          const metaModel = this.libraryDataAccessor.logic.getMetaModel();
+          const expression = readCode(code, metaModel);
           return this.renderExpression(expression);
         } catch (error) {
           return new Notation.ErrorExpression(error.message);
@@ -235,9 +235,9 @@ export abstract class GenericRenderer {
         if (headingText === 'Example' && texts.length > 1) {
           headingText = 'Examples';
         }
-        let heading = this.renderSubHeading(headingText);
+        const heading = this.renderSubHeading(headingText);
         if (canEdit) {
-          let initiallyUnfolded = text.length > 0 && !this.utils.containsPlaceholders();
+          const initiallyUnfolded = text.length > 0 && !this.utils.containsPlaceholders();
           paragraphs.push(new Notation.FoldableExpression(heading, markdown, initiallyUnfolded));
         } else {
           paragraphs.push(heading, markdown);
@@ -252,13 +252,13 @@ export abstract class GenericRenderer {
 
   protected applyName(name: Fmt.Expression, args: RenderedTemplateArguments, definitionRef: Fmt.DefinitionRefExpression, result: Notation.RenderedExpression[]): string | undefined {
     result.length = 0;
-    let expression = this.renderNotationExpression(name, args);
-    let mainItem = this.splitName(expression, result);
+    const expression = this.renderNotationExpression(name, args);
+    const mainItem = this.splitName(expression, result);
     this.addSemanticLink(mainItem, definitionRef);
     if (mainItem instanceof Notation.TextExpression) {
       return mainItem.text;
     } else if (mainItem instanceof Notation.TemplateInstanceExpression && mainItem.template.name === 'DependentWord') {
-      let word = mainItem.config.getArgFn('word');
+      const word = mainItem.config.getArgFn('word');
       if (typeof word === 'string') {
         return word;
       }
@@ -281,7 +281,7 @@ export abstract class GenericRenderer {
 
   protected replaceName(name: string | undefined, definitionRef: Fmt.DefinitionRefExpression | undefined, alwaysApply: boolean, result: Notation.RenderedExpression[]): void {
     if (name && (alwaysApply || !result.length)) {
-      let newName = new Notation.TextExpression(name);
+      const newName = new Notation.TextExpression(name);
       this.addSemanticLink(newName, definitionRef || newName);
       if (result.length) {
         result[0] = newName;
@@ -303,7 +303,7 @@ export abstract class GenericRenderer {
     } else {
       let nounStart = noun[0];
       if (nounStart instanceof Notation.PlaceholderExpression && noun.length > 2) {
-        let space = noun[1];
+        const space = noun[1];
         if (space instanceof Notation.TextExpression && space.text === ' ') {
           nounStart = noun[2];
         }
@@ -334,7 +334,7 @@ export abstract class GenericRenderer {
     // TODO handle single-letter case, in particular variables include e.g. greek letters
     // (Note: We currently do not even have access to the variable name.)
     if (nextWord && nextWord.length > 1) {
-      let firstChar = nextWord.charAt(0).toLowerCase();
+      const firstChar = nextWord.charAt(0).toLowerCase();
       switch (firstChar) {
       case 'a':
       case 'e':
@@ -352,10 +352,10 @@ export abstract class GenericRenderer {
   }
 
   protected addExtractedProperties(properties: PropertyInfo[], singular: Notation.RenderedExpression[], plural: Notation.RenderedExpression[]): void {
-    for (let property of properties) {
-      let space = new Notation.TextExpression(' ');
+    for (const property of properties) {
+      const space = new Notation.TextExpression(' ');
       if (property.property) {
-        let renderedProperty = new Notation.TextExpression(property.property);
+        const renderedProperty = new Notation.TextExpression(property.property);
         if (property.definitionRef) {
           this.addSemanticLink(renderedProperty, property.definitionRef);
         }
@@ -365,7 +365,7 @@ export abstract class GenericRenderer {
         plural.unshift(renderedProperty);
       }
       else if (property.singular) {
-        let preposition = new Notation.TextExpression(' with ');
+        const preposition = new Notation.TextExpression(' with ');
         singular.push(preposition);
         plural.push(preposition);
         if (property.article) {

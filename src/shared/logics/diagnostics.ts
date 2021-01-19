@@ -2,9 +2,9 @@ import * as Fmt from '../format/format';
 import * as Logic from './logic';
 
 export function getExpectedDiagnostics(definition: Fmt.Definition): Logic.LogicCheckDiagnostic[] {
-  let result: Logic.LogicCheckDiagnostic[] = [];
+  const result: Logic.LogicCheckDiagnostic[] = [];
   if (definition.documentation) {
-    for (let item of definition.documentation.items) {
+    for (const item of definition.documentation.items) {
       let severity: Logic.DiagnosticSeverity;
       switch (item.kind) {
       case 'expectedError':
@@ -27,7 +27,7 @@ export function getExpectedDiagnostics(definition: Fmt.Definition): Logic.LogicC
 }
 
 export function adaptDiagnosticsForComparison(diagnostics: Logic.LogicCheckDiagnostic[], definition: Fmt.Definition): Logic.LogicCheckDiagnostic[] {
-  for (let diagnostic of diagnostics) {
+  for (const diagnostic of diagnostics) {
     diagnostic.object = definition.name; // see above
   }
   return diagnostics;

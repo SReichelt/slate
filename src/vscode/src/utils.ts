@@ -19,8 +19,8 @@ export function convertLocation(location: FmtReader.Location): vscode.Position {
 }
 
 export function convertRange(range: FmtReader.Range): vscode.Range {
-    let start = convertLocation(range.start);
-    let end = convertLocation(range.end);
+    const start = convertLocation(range.start);
+    const end = convertLocation(range.end);
     return new vscode.Range(start, end);
 }
 
@@ -43,7 +43,7 @@ export class RangeHandler implements FmtReader.RangeHandler {
     pathAliases: Fmt.PathAlias[] = [];
 
     reportRange(info: FmtReader.ObjectRangeInfo): void {
-        let rangeInfo = convertRangeInfo(info);
+        const rangeInfo = convertRangeInfo(info);
         this.rangeList.push(rangeInfo);
         this.rangeMap.set(info.object, rangeInfo);
         if (info.object instanceof Fmt.PathAlias) {
@@ -53,7 +53,7 @@ export class RangeHandler implements FmtReader.RangeHandler {
 
     reportConversion(raw: Fmt.Expression, converted: Fmt.ObjectContents): void {
         if (raw instanceof Fmt.CompoundExpression) {
-            let rangeInfo = this.rangeMap.get(raw);
+            const rangeInfo = this.rangeMap.get(raw);
             if (rangeInfo) {
                 this.rangeMap.set(converted, rangeInfo);
             }
@@ -71,8 +71,8 @@ export interface RenamedUri {
 }
 
 export function changeParentUri(renamedParentUri: RenamedUri, childUri: vscode.Uri): vscode.Uri | undefined {
-    let oldParentUriStr = renamedParentUri.oldUri.toString();
-    let childUriStr = childUri.toString();
+    const oldParentUriStr = renamedParentUri.oldUri.toString();
+    const childUriStr = childUri.toString();
     if (childUriStr.startsWith(oldParentUriStr)) {
         if (childUriStr.length === oldParentUriStr.length) {
             return renamedParentUri.newUri;
@@ -93,23 +93,23 @@ export function isEqualOrParentUriOf(parentUri: vscode.Uri, childUri: vscode.Uri
 }
 
 export function deleteUrisFromDiagnosticCollection(uris: vscode.Uri[], diagnosticCollection: vscode.DiagnosticCollection): void {
-    let invalidatedDiagnosticUris: vscode.Uri[] = [];
+    const invalidatedDiagnosticUris: vscode.Uri[] = [];
     diagnosticCollection.forEach((diagnosticUri: vscode.Uri) => {
-        for (let uri of uris) {
+        for (const uri of uris) {
             if (isEqualOrParentUriOf(uri, diagnosticUri)) {
                 invalidatedDiagnosticUris.push(diagnosticUri);
                 break;
             }
         }
     });
-    for (let uri of invalidatedDiagnosticUris) {
+    for (const uri of invalidatedDiagnosticUris) {
         diagnosticCollection.delete(uri);
     }
 }
 
 export function matchesQuery(name: string, query: string): boolean {
     let pos = 0;
-    for (let c of query) {
+    for (const c of query) {
         pos = name.indexOf(c, pos);
         if (pos < 0) {
             return false;
@@ -119,7 +119,7 @@ export function matchesQuery(name: string, query: string): boolean {
 }
 
 export function replaceDocumentText(document: vscode.TextDocument, newText: string): vscode.TextEdit | undefined {
-    let oldText = document.getText();
+    const oldText = document.getText();
     if (newText === oldText) {
         return undefined;
     }
@@ -136,7 +136,7 @@ export function replaceDocumentText(document: vscode.TextDocument, newText: stri
             break;
         }
     }
-    let range = new vscode.Range(
+    const range = new vscode.Range(
         document.positionAt(start),
         document.positionAt(oldEnd)
     );

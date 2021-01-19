@@ -37,9 +37,9 @@ class GitHubUpdateChecker extends UpdateChecker {
     this.fetchHelper.fetchJSON(`https://api.github.com/repos/${this.repositoryOwner}/${this.repositoryName}/git/refs/heads/${this.branch}`)
       .then((result: any) => {
         try {
-          let newSHA = result.object.sha;
+          const newSHA = result.object.sha;
           if (this.currentSHA !== newSHA) {
-            let executeCallback = () => {
+            const executeCallback = () => {
               callback()
                 .catch((callbackError) => console.error(callbackError))
                 .then(() => setTimeout(() => this.execute(callback), this.checkIntervalInMS));
@@ -65,35 +65,35 @@ class GitHubUpdateChecker extends UpdateChecker {
 }
 
 export function preloadRouter(rootPath: string): express.Router {
-  let router = express.Router();
-  let dataPath = path.join(rootPath, 'data');
-  let librariesPath = path.join(dataPath, 'libraries');
+  const router = express.Router();
+  const dataPath = path.join(rootPath, 'data');
+  const librariesPath = path.join(dataPath, 'libraries');
 
   try {
-    let libraries = JSON.parse(fs.readFileSync(path.join(librariesPath, 'libraries.json'), 'utf8'));
-    for (let libraryName of Object.keys(libraries)) {
-      let repository = libraries[libraryName];
+    const libraries = JSON.parse(fs.readFileSync(path.join(librariesPath, 'libraries.json'), 'utf8'));
+    for (const libraryName of Object.keys(libraries)) {
+      const repository = libraries[libraryName];
       let fileAccessor: FileAccessor;
       let updateChecker: UpdateChecker;
       if (config.IS_PRODUCTION) {
-        let fetchHelper = new FetchHelper(fetch);
+        const fetchHelper = new FetchHelper(fetch);
         fileAccessor = new WebFileAccessor(fetchHelper, `https://raw.githubusercontent.com/${repository.owner}/${repository.name}/${repository.branch}`);
         updateChecker = new GitHubUpdateChecker(fetchHelper, repository.owner, repository.name, repository.branch, 60000, 60000);
       } else {
         fileAccessor = new PhysicalFileAccessor(path.join(librariesPath, libraryName));
         updateChecker = new DummyUpdateChecker;
       }
-      let preloader = new LibraryPreloader(fileAccessor);
+      const preloader = new LibraryPreloader(fileAccessor);
       updateChecker.register(() => {
         console.log(`Preloading library "${libraryName}"...`);
         return preloader.preloadLibrary()
           .then(() => console.log(`Finished preloading library "${libraryName}".`));
       });
-      let uriPrefix = `/preload/libraries/${libraryName}/`;
+      const uriPrefix = `/preload/libraries/${libraryName}/`;
       router.get(uriPrefix + '*', (req, resp) => {
-        let requestURI = req.url;
+        const requestURI = req.url;
         if (requestURI.startsWith(uriPrefix)) {
-          let preloadedContents = preloader.getPreloadedSection(requestURI.substring(uriPrefix.length));
+          const preloadedContents = preloader.getPreloadedSection(requestURI.substring(uriPrefix.length));
           if (preloadedContents) {
             resp.send(preloadedContents);
             return;

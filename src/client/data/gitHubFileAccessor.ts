@@ -16,7 +16,7 @@ export class GitHubFileAccessor extends StandardFileAccessor implements FileAcce
   }
 
   openFile(uri: string, createNew: boolean): FileReference {
-    let fallbackFileReference = this.fallbackFileAccessor?.openFile(uri, createNew);
+    const fallbackFileReference = this.fallbackFileAccessor?.openFile(uri, createNew);
     return new GitHubFileReference(this.repositoryAccess, this.baseURI + uri, createNew, fallbackFileReference);
   }
 
@@ -31,7 +31,7 @@ export class GitHubFileAccessor extends StandardFileAccessor implements FileAcce
   }
 
   createChildAccessor(uri: string): FileAccessor {
-    let childFallbackFileAccessor = this.fallbackFileAccessor?.createChildAccessor(uri);
+    const childFallbackFileAccessor = this.fallbackFileAccessor?.createChildAccessor(uri);
     return new GitHubFileAccessor(this.repositoryAccess, childFallbackFileAccessor, this.baseURI + uri);
   }
 }
@@ -43,8 +43,8 @@ export class GitHubFileReference extends StandardFileReference {
 
   read(): CachedPromise<string> {
     return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
-      let gitHubUri = GitHub.getDownloadURL(repositoryAccess.repository, this.uri);
-      let result = fetchHelper.fetchText(gitHubUri);
+      const gitHubUri = GitHub.getDownloadURL(repositoryAccess.repository, this.uri);
+      const result = fetchHelper.fetchText(gitHubUri);
       return new CachedPromise(result);
     });
   }
@@ -52,9 +52,9 @@ export class GitHubFileReference extends StandardFileReference {
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
       if (repositoryAccess.apiAccess) {
-        let result = repositoryAccess.apiAccess.writeFile(repositoryAccess.repository, this.uri, contents, this.createNew, isPartOfGroup)
+        const result = repositoryAccess.apiAccess.writeFile(repositoryAccess.repository, this.uri, contents, this.createNew, isPartOfGroup)
           .then((pullRequestState) => {
-            let writeFileResult = new GitHubWriteFileResult;
+            const writeFileResult = new GitHubWriteFileResult;
             writeFileResult.pullRequestState = pullRequestState;
             return writeFileResult;
           });
@@ -72,7 +72,7 @@ export class GitHubFileReference extends StandardFileReference {
       return CachedPromise.reject();
     } else {
       return this.repositoryAccess.then((repositoryAccess: GitHubRepositoryAccess) => {
-        let infoURL = GitHub.getInfoURL(repositoryAccess.repository, this.uri);
+        const infoURL = GitHub.getInfoURL(repositoryAccess.repository, this.uri);
         window.open(infoURL, '_blank');
       });
     }

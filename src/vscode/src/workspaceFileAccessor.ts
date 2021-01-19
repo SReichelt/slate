@@ -27,8 +27,8 @@ export class WorkspaceFileAccessor extends StandardFileAccessor implements FileA
         if (this.state.applyingEdit) {
             return;
         }
-        let uri = document.uri.toString();
-        for (let watcher of this.state.watchers) {
+        const uri = document.uri.toString();
+        for (const watcher of this.state.watchers) {
             if (watcher.uri === uri) {
                 watcher.changed(document.getText());
             }
@@ -45,14 +45,14 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
     }
 
     read(): CachedPromise<string> {
-        for (let document of vscode.workspace.textDocuments) {
+        for (const document of vscode.workspace.textDocuments) {
             if (areUrisEqual(document.uri, this.vscodeUri)) {
                 return CachedPromise.resolve(document.getText());
             }
         }
-        let resultPromise = vscode.workspace.fs.readFile(this.vscodeUri)
+        const resultPromise = vscode.workspace.fs.readFile(this.vscodeUri)
             .then((buffer: Uint8Array) => {
-                let textDecoder = new TextDecoder;
+                const textDecoder = new TextDecoder;
                 return textDecoder.decode(buffer);
             });
         return new CachedPromise(resultPromise);
@@ -61,7 +61,7 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
     write(contents: string, isPartOfGroup: boolean, prePublish: boolean = false): CachedPromise<WriteFileResult> {
         let resultPromise: Thenable<void>;
         if (this.createNew) {
-            let workspaceEdit = new vscode.WorkspaceEdit;
+            const workspaceEdit = new vscode.WorkspaceEdit;
             workspaceEdit.createFile(this.vscodeUri);
             workspaceEdit.insert(this.vscodeUri, new vscode.Position(0, 0), contents);
             resultPromise = this.applyEdit(workspaceEdit, false);
@@ -69,9 +69,9 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
         } else {
             resultPromise = vscode.workspace.openTextDocument(this.vscodeUri)
                 .then((document: vscode.TextDocument) => {
-                    let textEdit = replaceDocumentText(document, contents);
+                    const textEdit = replaceDocumentText(document, contents);
                     if (textEdit) {
-                        let workspaceEdit = new vscode.WorkspaceEdit;
+                        const workspaceEdit = new vscode.WorkspaceEdit;
                         workspaceEdit.set(this.vscodeUri, [textEdit]);
                         return this.applyEdit(workspaceEdit, false);
                     }
@@ -99,16 +99,16 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
     }
 
     unPrePublish(): CachedPromise<void> {
-        for (let document of vscode.workspace.textDocuments) {
+        for (const document of vscode.workspace.textDocuments) {
             if (areUrisEqual(document.uri, this.vscodeUri)) {
                 if (document.isDirty) {
-                    let resultPromise = vscode.workspace.fs.readFile(this.vscodeUri)
+                    const resultPromise = vscode.workspace.fs.readFile(this.vscodeUri)
                         .then((buffer: Uint8Array) => {
-                            let textDecoder = new TextDecoder;
-                            let text = textDecoder.decode(buffer);
-                            let textEdit = replaceDocumentText(document, text);
+                            const textDecoder = new TextDecoder;
+                            const text = textDecoder.decode(buffer);
+                            const textEdit = replaceDocumentText(document, text);
                             if (textEdit) {
-                                let workspaceEdit = new vscode.WorkspaceEdit;
+                                const workspaceEdit = new vscode.WorkspaceEdit;
                                 workspaceEdit.set(this.vscodeUri, [textEdit]);
                                 return this.applyEdit(workspaceEdit, true);
                             }
@@ -127,7 +127,7 @@ export class WorkspaceFileReference extends StandardFileReference implements Fil
     }
 
     view(openLocally: boolean): CachedPromise<void> {
-        let resultPromise = vscode.window.showTextDocument(this.vscodeUri, {
+        const resultPromise = vscode.window.showTextDocument(this.vscodeUri, {
             viewColumn: vscode.ViewColumn.One,
             preserveFocus: true,
             preview: true

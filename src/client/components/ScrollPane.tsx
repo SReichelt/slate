@@ -18,7 +18,7 @@ class ScrollPane extends React.Component<ScrollPaneProps> {
   }
 
   render(): React.ReactNode {
-    let ref = (htmlNode: HTMLElement | null) => {
+    const ref = (htmlNode: HTMLElement | null) => {
       this.scrollPaneNode = htmlNode;
       if (this.props.onRef) {
         this.props.onRef(htmlNode);

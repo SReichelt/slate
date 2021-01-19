@@ -32,14 +32,14 @@ export class LibraryDocumentProvider {
 
     dispose(): void {
         this.documents.clear();
-        for (let library of this.libraries.values()) {
+        for (const library of this.libraries.values()) {
             library.libraryDataProvider.close();
         }
         this.libraries.clear();
     }
 
     parseDocument(event: ParseDocumentEvent): LibraryDocument | undefined {
-        let libraryDocument = this.tryParseDocument(event);
+        const libraryDocument = this.tryParseDocument(event);
         if (libraryDocument) {
             this.documents.set(event.document, libraryDocument);
         } else {
@@ -52,16 +52,16 @@ export class LibraryDocumentProvider {
         if (!event.file) {
             return undefined;
         }
-        let isSection = (event.file.metaModelPath.name === FmtLibrary.metaModel.name);
-        let rangeHandler = new RangeHandler;
+        const isSection = (event.file.metaModelPath.name === FmtLibrary.metaModel.name);
+        const rangeHandler = new RangeHandler;
         if (isSection) {
             event.file = FmtReader.readString(event.document.getText(), event.document.fileName, FmtLibrary.getMetaModel, rangeHandler);
         }
-        let [libraryUri, itemUri] = this.splitUri(event);
+        const [libraryUri, itemUri] = this.splitUri(event);
         if (!libraryUri || !itemUri) {
             return undefined;
         }
-        let library = this.getLibrary(event, isSection, libraryUri);
+        const library = this.getLibrary(event, isSection, libraryUri);
         if (!library) {
             return undefined;
         }
@@ -69,16 +69,16 @@ export class LibraryDocumentProvider {
             library.diagnosticCollection.delete(event.document.uri);
             return undefined;
         }
-        let path = library.libraryDataProvider.uriToPath(itemUri, true);
+        const path = library.libraryDataProvider.uriToPath(itemUri, true);
         if (!path) {
             library.diagnosticCollection.delete(event.document.uri);
             return undefined;
         }
-        let documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);
+        const documentLibraryDataProvider = library.libraryDataProvider.getProviderForSection(path.parentPath);
         if (!isSection) {
             try {
-                let stream = new FmtReader.StringInputStream(event.document.getText());
-                let errorHandler = new FmtReader.DefaultErrorHandler(event.document.fileName, false, true);
+                const stream = new FmtReader.StringInputStream(event.document.getText());
+                const errorHandler = new FmtReader.DefaultErrorHandler(event.document.fileName, false, true);
                 event.file = FmtReader.readStream(stream, errorHandler, library.libraryDataProvider.logic.getMetaModel, rangeHandler);
             } catch (error) {
                 library.diagnosticCollection.delete(event.document.uri);
@@ -99,15 +99,15 @@ export class LibraryDocumentProvider {
     private getLibrary(event: ParseDocumentEvent, isSection: boolean, libraryUri: string): Library | undefined {
         let library = this.libraries.get(libraryUri);
         if (!library) {
-            let logicName = this.getLogicName(event, isSection);
+            const logicName = this.getLogicName(event, isSection);
             if (!logicName) {
                 return undefined;
             }
-            let logic = Logics.findLogic(logicName);
+            const logic = Logics.findLogic(logicName);
             if (!logic) {
                 return undefined;
             }
-            let options: LibraryDataProviderOptions = {
+            const options: LibraryDataProviderOptions = {
                 logic: logic,
                 fileAccessor: this.fileAccessor.createChildAccessor(libraryUri),
                 watchForChanges: true,
@@ -125,18 +125,18 @@ export class LibraryDocumentProvider {
     }
 
     private splitUri(event: ParseDocumentEvent): [string | undefined, string | undefined] {
-        let documentUri = event.document.uri.toString();
-        let workspaceFolder = vscode.workspace.getWorkspaceFolder(event.document.uri);
+        const documentUri = event.document.uri.toString();
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(event.document.uri);
         if (!workspaceFolder) {
             return [undefined, undefined];
         }
-        let libraryBaseUri = workspaceFolder.uri.toString() + '/data/libraries/';
+        const libraryBaseUri = workspaceFolder.uri.toString() + '/data/libraries/';
         let slashPos: number;
         if (documentUri.startsWith(libraryBaseUri)) {
             slashPos = documentUri.indexOf('/', libraryBaseUri.length);
         } else {
-            let testDataUriPart = '/__tests__/data/';
-            let testDataPos = documentUri.indexOf(testDataUriPart);
+            const testDataUriPart = '/__tests__/data/';
+            const testDataPos = documentUri.indexOf(testDataUriPart);
             if (testDataPos >= 0) {
                 slashPos = testDataPos + testDataUriPart.length - 1;
             } else {
@@ -152,7 +152,7 @@ export class LibraryDocumentProvider {
         }
         if (isSection) {
             if (event.file.definitions.length) {
-                let contents = event.file.definitions[0].contents;
+                const contents = event.file.definitions[0].contents;
                 if (contents instanceof FmtLibrary.ObjectContents_Section) {
                     return contents.logic;
                 }
@@ -168,19 +168,19 @@ export class LibraryDocumentProvider {
     }
 
     invalidateUris(uris: vscode.Uri[]): void {
-        let invalidatedDocuments: vscode.TextDocument[] = [];
-        for (let [document, libraryDocument] of this.documents) {
-            for (let uri of uris) {
+        const invalidatedDocuments: vscode.TextDocument[] = [];
+        for (const [document, libraryDocument] of this.documents) {
+            for (const uri of uris) {
                 if (isEqualOrParentUriOf(uri, document.uri)) {
                     invalidatedDocuments.push(document);
                     libraryDocument.document = undefined;
                 }
             }
         }
-        for (let document of invalidatedDocuments) {
+        for (const document of invalidatedDocuments) {
             this.documents.delete(document);
         }
-        for (let library of this.libraries.values()) {
+        for (const library of this.libraries.values()) {
             deleteUrisFromDiagnosticCollection(uris, library.diagnosticCollection);
         }
     }

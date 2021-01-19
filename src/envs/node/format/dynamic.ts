@@ -39,13 +39,13 @@ export function getFileNameFromPath(sourceFileName: string, targetPath: Fmt.Name
 }
 
 export function readMetaModel(fileName: string, reportRange?: FmtReader.RangeHandler): Fmt.File {
-  let fileContents = fs.readFileSync(fileName, 'utf8');
+  const fileContents = fs.readFileSync(fileName, 'utf8');
   return FmtReader.readString(fileContents, fileName, FmtMeta.getMetaModel, reportRange);
 }
 
 export function getMetaModel(sourceFileName: string, metaModelPath: Fmt.Path): FmtDynamic.DynamicMetaModel {
-  let fileName = getFileNameFromPath(sourceFileName, metaModelPath);
-  let file = readMetaModel(fileName);
+  const fileName = getFileNameFromPath(sourceFileName, metaModelPath);
+  const file = readMetaModel(fileName);
   return new FmtDynamic.DynamicMetaModel(file, fileName, (otherPath: Fmt.Path) => getMetaModel(fileName, otherPath));
 }
 

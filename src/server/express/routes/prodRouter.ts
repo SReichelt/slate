@@ -3,9 +3,9 @@ import * as path from 'path';
 import { handleSubmit } from 'slate-server-generic/handlers/submitHandler';
 
 export function prodRouter(rootPath: string): express.Router {
-  let router = express.Router();
+  const router = express.Router();
 
-  let publicPath = path.join(rootPath, 'dist', 'public');
+  const publicPath = path.join(rootPath, 'dist', 'public');
 
   router.put('/data/libraries/*', handleSubmit);
 

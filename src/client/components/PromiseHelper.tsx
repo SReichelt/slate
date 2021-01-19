@@ -36,7 +36,7 @@ export class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHe
   }
 
   private updatePromise(props: PromiseHelperProps): void {
-    let promise = props.promise;
+    const promise = props.promise;
 
     this.currentPromise = promise;
     if (this.state.promiseResult !== undefined || this.state.errorMessage !== undefined) {
@@ -76,7 +76,7 @@ export class PromiseHelper extends React.Component<PromiseHelperProps, PromiseHe
 }
 
 export function renderPromise<T extends React.ReactNode>(promise: CachedPromise<T>, key?: string, getFallback?: () => React.ReactNode): React.ReactElement | T {
-  let immediateResult = promise.getImmediateResult();
+  const immediateResult = promise.getImmediateResult();
   if (immediateResult === undefined) {
     return <PromiseHelper promise={promise} getFallback={getFallback} key={key}/>;
   } else {

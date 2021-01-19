@@ -19,7 +19,7 @@ class HTMLUnicodeConverter<T> implements UnicodeConverter {
   constructor(private renderer: HTMLRenderer<T>) {}
 
   outputText(text: string, style?: string | undefined): void {
-    let content = this.renderer.renderText(text);
+    const content = this.renderer.renderText(text);
     this.result.push(style ? this.renderer.renderElement('span', {'class': style}, content) : content);
   }
 
@@ -45,10 +45,10 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
       && (expression instanceof Notation.SubSupExpression || expression instanceof Notation.OverUnderExpression || expression instanceof Notation.FractionExpression || expression instanceof Notation.RadicalExpression)) {
     return renderAsHTML(new Notation.ParenExpression(expression, optionalParenStyle), renderer, options);
   }
-  let getLinkURI = options.getLinkURI;
+  const getLinkURI = options.getLinkURI;
   if (expression.semanticLinks && getLinkURI) {
-    for (let semanticLink of expression.semanticLinks) {
-      let uri = getLinkURI(semanticLink);
+    for (const semanticLink of expression.semanticLinks) {
+      const uri = getLinkURI(semanticLink);
       if (uri) {
         options = {
           ...options,
@@ -61,7 +61,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
   if (expression instanceof Notation.EmptyExpression) {
     return CachedPromise.resolve(renderer.concat([]));
   } else if (expression instanceof Notation.TextExpression) {
-    let unicodeConverter = new HTMLUnicodeConverter(renderer);
+    const unicodeConverter = new HTMLUnicodeConverter(renderer);
     convertUnicode(expression.text, unicodeConverter, options);
     let result = unicodeConverter.result.length === 1 ? unicodeConverter.result[0] : renderer.concat(unicodeConverter.result);
     if (expression.hasStyleClass('var') && useItalicsForVariable(expression.text)) {
@@ -75,7 +75,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
       resultPromise = renderList(expression.items.map((item) => renderAsHTML(item, renderer, options)), renderer);
     }
   } else if (expression instanceof Notation.ParagraphExpression) {
-    let paragraphs = expression.paragraphs.map((item: Notation.RenderedExpression) =>
+    const paragraphs = expression.paragraphs.map((item: Notation.RenderedExpression) =>
       renderAsHTML(item, renderer, options).then((content: T) =>
         renderer.renderElement('div', {'class': 'paragraph'}, content)));
     resultPromise = renderList(paragraphs, renderer);
@@ -85,30 +85,30 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     }
     return resultPromise;
   } else if (expression instanceof Notation.ListExpression) {
-    let items = expression.items.map((item: Notation.RenderedExpression) =>
+    const items = expression.items.map((item: Notation.RenderedExpression) =>
       renderAsHTML(item, renderer, options).then((content: T) =>
         renderer.renderElement('li', {}, content)));
     return renderList(items, renderer).then((list: T) =>
       renderer.renderElement(expression.style === '1.' ? 'ol' : 'ul', {'class': getClassName('list', expression)}, list));
   } else if (expression instanceof Notation.TableExpression) {
-    let makeCell = (cell: T) => renderer.renderElement('span', {'class': 'table-cell'}, cell);
-    let makeTextCell = (text: string) => makeCell(renderer.renderText(text));
-    let makeRow = (row: T) => renderer.renderElement('span', {'class': 'table-row'}, row);
-    let makeTable = (table: T) => renderer.renderElement('span', {'class': getClassName('table', expression)}, table);
-    let isAligned = (expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid'));
-    let isDefinitionList = expression.hasStyleClass('definitions');
-    let isConstruction = expression.hasStyleClass('construction');
-    let separator = isConstruction ? makeTextCell('\u00a0|\u00a0') : isAligned ? undefined : makeTextCell('\u00a0');
-    let secondarySeparator = isDefinitionList ? makeTextCell('\u00a0\u00a0') : undefined;
-    let rows = expression.items.map((row: Notation.RenderedExpression[]) => {
-      let cells = row.map((cell: Notation.RenderedExpression) =>
+    const makeCell = (cell: T) => renderer.renderElement('span', {'class': 'table-cell'}, cell);
+    const makeTextCell = (text: string) => makeCell(renderer.renderText(text));
+    const makeRow = (row: T) => renderer.renderElement('span', {'class': 'table-row'}, row);
+    const makeTable = (table: T) => renderer.renderElement('span', {'class': getClassName('table', expression)}, table);
+    const isAligned = (expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid'));
+    const isDefinitionList = expression.hasStyleClass('definitions');
+    const isConstruction = expression.hasStyleClass('construction');
+    const separator = isConstruction ? makeTextCell('\u00a0|\u00a0') : isAligned ? undefined : makeTextCell('\u00a0');
+    const secondarySeparator = isDefinitionList ? makeTextCell('\u00a0\u00a0') : undefined;
+    const rows = expression.items.map((row: Notation.RenderedExpression[]) => {
+      const cells = row.map((cell: Notation.RenderedExpression) =>
         renderAsHTML(cell, renderer, options).then(makeCell));
       return renderList(cells, renderer, separator, secondarySeparator).then(makeRow);
     });
     return renderList(rows, renderer).then(makeTable);
   } else if (expression instanceof Notation.ParenExpression) {
     resultPromise = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
-      let body = renderAsHTML(expression.body, renderer, options);
+      const body = renderAsHTML(expression.body, renderer, options);
       if (surroundingParenStyle === expression.style) {
         return body;
       } else {
@@ -139,7 +139,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
           break;
         }
         return body.then((content) => {
-          let result = [content];
+          const result = [content];
           if (openParen) {
             result.unshift(renderer.renderText(openParen));
           }
@@ -160,8 +160,8 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
   } else if (expression instanceof Notation.InnerParenExpression) {
     resultPromise = renderAsHTML(expression.body, renderer, options, expression.left, expression.right, expression.maxLevel);
   } else if (expression instanceof Notation.SubSupExpression) {
-    let items = [renderAsHTML(expression.body, renderer, options, true, true)];
-    let innerOptions: RenderAsHTMLOptions = {
+    const items = [renderAsHTML(expression.body, renderer, options, true, true)];
+    const innerOptions: RenderAsHTMLOptions = {
       ...options,
       shrinkMathSpaces: true
     };
@@ -183,8 +183,8 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     }
     resultPromise = renderList(items, renderer);
   } else if (expression instanceof Notation.OverUnderExpression) {
-    let items = [renderAsHTML(expression.body, renderer, options, true, true)];
-    let innerOptions: RenderAsHTMLOptions = {
+    const items = [renderAsHTML(expression.body, renderer, options, true, true)];
+    const innerOptions: RenderAsHTMLOptions = {
       ...options,
       shrinkMathSpaces: true
     };
@@ -198,7 +198,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
     }
     resultPromise = renderList(items, renderer);
   } else if (expression instanceof Notation.MarkdownExpression) {
-    let result = renderer.renderMarkdown(expression.text);
+    const result = renderer.renderMarkdown(expression.text);
     return CachedPromise.resolve(renderer.renderElement('div', {'class': getClassName('markdown', expression)}, result));
   } else if (expression instanceof Notation.IndirectExpression) {
     try {
@@ -217,12 +217,12 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
   } else if (expression instanceof Notation.PlaceholderExpression) {
     return CachedPromise.resolve(renderer.renderText('?'));
   } else {
-    let error = expression instanceof Notation.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
+    const error = expression instanceof Notation.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
     return CachedPromise.resolve(renderer.renderText(`[Error: ${error}]`));
   }
   if (expression.semanticLinks && getLinkURI) {
-    for (let semanticLink of expression.semanticLinks) {
-      let uri = getLinkURI(semanticLink);
+    for (const semanticLink of expression.semanticLinks) {
+      const uri = getLinkURI(semanticLink);
       if (uri) {
         return resultPromise.then((result: T) =>
           renderer.renderElement('a', {'href': uri, 'class': getClassName('expr', expression)}, result));
@@ -238,7 +238,7 @@ export function renderAsHTML<T>(expression: Notation.RenderedExpression, rendere
 
 function getClassName(className: string, expression: Notation.RenderedExpression): string {
   if (expression.styleClasses) {
-    for (let styleClass of expression.styleClasses) {
+    for (const styleClass of expression.styleClasses) {
       className += ' ' + styleClass;
     }
   }
@@ -248,8 +248,8 @@ function getClassName(className: string, expression: Notation.RenderedExpression
 function renderList<T>(items: CachedPromise<T>[], renderer: HTMLRenderer<T>, separator?: T, secondarySeparator?: T): CachedPromise<T> {
   let resultPromise: CachedPromise<T[]> = CachedPromise.resolve([]);
   let index = 0;
-  for (let itemPromise of items) {
-    let currentSeparator = (secondarySeparator !== undefined && index > 1 ? secondarySeparator : separator);
+  for (const itemPromise of items) {
+    const currentSeparator = (secondarySeparator !== undefined && index > 1 ? secondarySeparator : separator);
     resultPromise = resultPromise.then((currentResult: T[]) =>
       itemPromise.then((item: T) =>
         currentResult.length ? (currentSeparator ? currentResult.concat(currentSeparator, item) : currentResult.concat(item)) : [item]));

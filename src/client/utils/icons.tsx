@@ -196,7 +196,7 @@ function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, it
         <rect x="-1.25" y="2" width="2.5" height="2.5" fill="gray" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="rect"/>
       ];
     } else {
-      let result: React.ReactNodeArray = [
+      const result: React.ReactNodeArray = [
         <circle cx="0" cy="-2" r="5" fill="yellow" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="circle"/>,
         <rect x="-1.7" y="2.7" width="3.4" height="4" fill="gray" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="rect"/>
       ];

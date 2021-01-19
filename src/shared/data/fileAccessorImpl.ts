@@ -22,7 +22,7 @@ export class StandardFileWatcher implements FileWatcher {
   }
 
   close(): void {
-    let watchers = this.watchers;
+    const watchers = this.watchers;
     for (let i = 0; i < watchers.length; i++) {
       if (watchers[i] === this) {
         watchers.splice(i, 1);

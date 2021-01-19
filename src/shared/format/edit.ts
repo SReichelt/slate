@@ -29,7 +29,7 @@ export class EditAnalysis {
   }
 
   analyzeDefinitions(definitions: Fmt.Definition[], context: Ctx.Context): void {
-    for (let definition of definitions) {
+    for (const definition of definitions) {
       this.analyzeDefinition(definition, context);
     }
   }
@@ -37,9 +37,9 @@ export class EditAnalysis {
   analyzeDefinition(definition: Fmt.Definition, context: Ctx.Context): void {
     context = new Ctx.ParentInfoContext(definition, context);
     this.analyzeParameterList(definition.parameters, context);
-    let typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
+    const typeContext = context.metaModel.getDefinitionTypeContext(definition, context);
     this.analyzeExpression(definition.type, false, (newValue) => (definition.type = newValue!), undefined, typeContext);
-    let contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
+    const contentsContext = context.metaModel.getDefinitionContentsContext(definition, context);
     if (!this.definitionContentsContext.has(definition)) {
       this.definitionContentsContext.set(definition, contentsContext);
     }
@@ -50,7 +50,7 @@ export class EditAnalysis {
   }
 
   analyzeParameterList(parameters: Fmt.ParameterList, context: Ctx.Context): void {
-    for (let parameter of parameters) {
+    for (const parameter of parameters) {
       this.analyzeParameter(parameter, context);
       context = context.metaModel.getNextParameterContext(parameter, context);
     }
@@ -63,7 +63,7 @@ export class EditAnalysis {
     if (parameter.name !== '_') {
       this.usedParameterNames.add(parameter.name);
     }
-    let typeContext = context.metaModel.getParameterTypeContext(parameter, context);
+    const typeContext = context.metaModel.getParameterTypeContext(parameter, context);
     this.analyzeExpression(parameter.type, false, (newValue) => (parameter.type = newValue!), undefined, typeContext);
     if (parameter.defaultValue) {
       this.analyzeExpression(parameter.defaultValue, true, (newValue) => (parameter.defaultValue = newValue), undefined, context);
@@ -74,10 +74,10 @@ export class EditAnalysis {
   }
 
   analyzeArgumentList(args: Fmt.ArgumentList, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
-    let previousArgs = new Fmt.ArgumentList;
+    const previousArgs = new Fmt.ArgumentList;
     for (let index = 0; index < args.length; index++) {
-      let arg = args[index];
-      let onRemove = () => args.splice(index, 1);
+      const arg = args[index];
+      const onRemove = () => args.splice(index, 1);
       this.analyzeArgument(arg, index, previousArgs, onApplyConvertedArgument, onRemove, context);
       context = context.metaModel.getNextArgumentContext(arg, index, context);
       previousArgs.push(arg);
@@ -88,8 +88,8 @@ export class EditAnalysis {
   }
 
   analyzeArgument(arg: Fmt.Argument, argIndex: number, previousArgs: Fmt.ArgumentList, onApplyConvertedArgument: (() => void) | undefined, onRemove: () => void, context: Ctx.Context): void {
-    let valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
-    let onSetValue = (newValue: Fmt.Expression | undefined) => {
+    const valueContext = context.metaModel.getArgumentValueContext(arg, argIndex, previousArgs, context);
+    const onSetValue = (newValue: Fmt.Expression | undefined) => {
       if (newValue) {
         arg.value = newValue;
       } else {
@@ -104,8 +104,8 @@ export class EditAnalysis {
     if (contents instanceof Fmt.GenericObjectContents) {
       this.analyzeArgumentList(contents.arguments, undefined, context);
     } else {
-      let args = contents.toArgumentList(true);
-      let onApply = () => contents.fromArgumentList(args);
+      const args = contents.toArgumentList(true);
+      const onApply = () => contents.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
     }
   }
@@ -142,16 +142,16 @@ export class EditAnalysis {
     if (expression instanceof Fmt.GenericMetaRefExpression) {
       this.analyzeArgumentList(expression.arguments, undefined, context);
     } else {
-      let args = expression.toArgumentList();
-      let onApply = () => expression.fromArgumentList(args);
+      const args = expression.toArgumentList();
+      const onApply = () => expression.fromArgumentList(args);
       this.analyzeArgumentList(args, onApply, context);
     }
   }
 
   analyzeExpressions(expressions: Fmt.Expression[], minLength: number, onApplyConvertedArgument: (() => void) | undefined, context: Ctx.Context): void {
-    let canRemove = expressions.length > minLength;
+    const canRemove = expressions.length > minLength;
     for (let index = 0; index < expressions.length; index++) {
-      let onSetValue = (newValue: Fmt.Expression | undefined) => {
+      const onSetValue = (newValue: Fmt.Expression | undefined) => {
         if (newValue) {
           expressions[index] = newValue;
         } else {

@@ -27,13 +27,13 @@ export class VSCodeExtensionFileAccessor implements FileAccessor {
 
   messageReceived(message: Embedding.ResponseMessage): void {
     if (message.index !== undefined) {
-      let request = VSCodeExtensionFileAccessor.requests.get(message.index);
+      const request = VSCodeExtensionFileAccessor.requests.get(message.index);
       if (request) {
         request(message);
       }
     }
     if (message.command === 'UPDATE' && message.text) {
-      for (let watcher of VSCodeExtensionFileAccessor.watchers) {
+      for (const watcher of VSCodeExtensionFileAccessor.watchers) {
         if (watcher.uri === message.uri) {
           watcher.changed(message.text);
         }
@@ -48,14 +48,14 @@ export class VSCodeExtensionFileReference extends StandardFileReference implemen
   }
 
   read(): CachedPromise<string> {
-    let index = VSCodeExtensionFileAccessor.index++;
-    let requestMessage: Embedding.RequestMessage = {
+    const index = VSCodeExtensionFileAccessor.index++;
+    const requestMessage: Embedding.RequestMessage = {
       command: 'GET',
       index: index,
       uri: this.uri
     };
     config.vsCodeAPI!.postMessage(requestMessage);
-    let promise = new Promise<string>((resolve, reject) => {
+    const promise = new Promise<string>((resolve, reject) => {
       VSCodeExtensionFileAccessor.requests.set(index, (responseMessage: Embedding.ResponseMessage) => {
         if (responseMessage.command === 'RESPONSE' && responseMessage.text) {
           resolve(responseMessage.text);
@@ -68,15 +68,15 @@ export class VSCodeExtensionFileReference extends StandardFileReference implemen
   }
 
   write(contents: string, isPartOfGroup: boolean, prePublish: boolean = false): CachedPromise<WriteFileResult> {
-    let index = VSCodeExtensionFileAccessor.index++;
-    let requestMessage: Embedding.RequestMessage = {
+    const index = VSCodeExtensionFileAccessor.index++;
+    const requestMessage: Embedding.RequestMessage = {
       command: this.createNew ? 'CREATE' : prePublish ? 'EDIT' : 'PUT',
       index: index,
       uri: this.uri,
       text: contents
     };
     config.vsCodeAPI!.postMessage(requestMessage);
-    let promise = new Promise<WriteFileResult>((resolve, reject) => {
+    const promise = new Promise<WriteFileResult>((resolve, reject) => {
       VSCodeExtensionFileAccessor.requests.set(index, (responseMessage: Embedding.ResponseMessage) => {
         if (responseMessage.command === 'RESPONSE') {
           this.createNew = false;
@@ -94,14 +94,14 @@ export class VSCodeExtensionFileReference extends StandardFileReference implemen
   }
 
   unPrePublish(): CachedPromise<void> {
-    let index = VSCodeExtensionFileAccessor.index++;
-    let requestMessage: Embedding.RequestMessage = {
+    const index = VSCodeExtensionFileAccessor.index++;
+    const requestMessage: Embedding.RequestMessage = {
       command: 'REVERT',
       index: index,
       uri: this.uri
     };
     config.vsCodeAPI!.postMessage(requestMessage);
-    let promise = new Promise<void>((resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       VSCodeExtensionFileAccessor.requests.set(index, (responseMessage: Embedding.ResponseMessage) => {
         if (responseMessage.command === 'RESPONSE') {
           resolve();
@@ -118,14 +118,14 @@ export class VSCodeExtensionFileReference extends StandardFileReference implemen
   }
 
   view(openLocally: boolean): CachedPromise<void> {
-    let index = VSCodeExtensionFileAccessor.index++;
-    let requestMessage: Embedding.RequestMessage = {
+    const index = VSCodeExtensionFileAccessor.index++;
+    const requestMessage: Embedding.RequestMessage = {
       command: 'SELECT',
       index: index,
       uri: this.uri
     };
     config.vsCodeAPI!.postMessage(requestMessage);
-    let promise = new Promise<void>((resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       VSCodeExtensionFileAccessor.requests.set(index, (responseMessage: Embedding.ResponseMessage) => {
         if (responseMessage.command === 'RESPONSE') {
           resolve();

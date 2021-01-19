@@ -189,7 +189,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     }
     this.clearOpenMenu();
     if (props.parent) {
-      for (let expression of this.hoveredChildren) {
+      for (const expression of this.hoveredChildren) {
         props.parent.removeFromHoveredChildren(expression);
       }
     }
@@ -271,7 +271,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       return this.renderExpression(new Notation.ParenExpression(expression, optionalParenStyle), className, semanticLinks);
     }
     this.semanticLinks = semanticLinks;
-    let renderedExpressionConfig: RenderedExpressionConfig = { className, semanticLinks };
+    const renderedExpressionConfig: RenderedExpressionConfig = { className, semanticLinks };
     if (expression instanceof Notation.EmptyExpression) {
       if (semanticLinks) {
         return this.wrapRenderedExpression('\u200b', renderedExpressionConfig);
@@ -318,7 +318,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     } else if (expression instanceof Notation.IndirectExpression) {
       return this.renderExpression(expression.resolve(), className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle);
     } else if (expression instanceof Notation.PromiseExpression) {
-      let render = expression.promise.then((innerExpression: Notation.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
+      const render = expression.promise.then((innerExpression: Notation.RenderedExpression) => this.renderExpression(innerExpression, className, semanticLinks, optionalParenLeft, optionalParenRight, optionalParenMaxLevel, optionalParenStyle));
       return <PromiseHelper promise={render}/>;
     } else if (expression instanceof Notation.AssociativeExpression) {
       return this.renderExpression(expression.body, className, semanticLinks);
@@ -340,12 +340,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     let onMenuOpened: (() => Menu.ExpressionMenu) | undefined = undefined;
     let alwaysShowMenu = false;
     if (semanticLinks) {
-      for (let semanticLink of semanticLinks) {
+      for (const semanticLink of semanticLinks) {
         if (semanticLink.onMenuOpened) {
           onMenuOpened = semanticLink.onMenuOpened;
           alwaysShowMenu = semanticLink.alwaysShowMenu || placeholder !== undefined;
           if (semanticLink.autoOpenMenu && !this.autoOpenTimer) {
-            let autoOpenMenu = () => {
+            const autoOpenMenu = () => {
               if (onMenuOpened && !this.state.openMenu) {
                 this.openMenu(onMenuOpened);
               }
@@ -358,8 +358,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       }
     }
-    let adaptedConfig = { className, semanticLinks, placeholder, ...extraConfig };
-    let hasMenu = this.props.interactionHandler !== undefined && onMenuOpened !== undefined;
+    const adaptedConfig = { className, semanticLinks, placeholder, ...extraConfig };
+    const hasMenu = this.props.interactionHandler !== undefined && onMenuOpened !== undefined;
     this.hasMenu = hasMenu;
     if (hasMenu || placeholder !== undefined) {
       return this.wrapRenderedExpressionWithMenuOrButton(content, adaptedConfig, onMenuOpened, hasMenu, alwaysShowMenu);
@@ -378,8 +378,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       className = clsx(className, 'interactive');
       let uriLink: Notation.SemanticLink | undefined = undefined;
       let uri: string | undefined = undefined;
-      for (let semanticLink of semanticLinks) {
-        let linkUri = this.props.interactionHandler.getURI(semanticLink);
+      for (const semanticLink of semanticLinks) {
+        const linkUri = this.props.interactionHandler.getURI(semanticLink);
         if (linkUri) {
           uriLink = semanticLink;
           uri = linkUri;
@@ -403,15 +403,15 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         );
       }
       if (uriLink && this.props.interactionHandler.hasToolTip(uriLink) && this.htmlNode) {
-        let interactionHandler = this.props.interactionHandler;
-        let getToolTipContents = () => {
+        const interactionHandler = this.props.interactionHandler;
+        const getToolTipContents = () => {
           let toolTipContents = interactionHandler.getToolTipContents(uriLink!);
           if (uri) {
             toolTipContents = <a href={uri} onClick={(event) => (event.button < 1 && this.linkClicked(uriLink, event))}>{toolTipContents}</a>;
           }
           return toolTipContents;
         };
-        let toolTip = <ExpressionToolTip active={this.state.showToolTip} position={this.toolTipPosition} parent={this.htmlNode} getContents={getToolTipContents} delay={250} key="tooltip"/>;
+        const toolTip = <ExpressionToolTip active={this.state.showToolTip} position={this.toolTipPosition} parent={this.htmlNode} getContents={getToolTipContents} delay={250} key="tooltip"/>;
         result = [result, toolTip];
       }
     } else {
@@ -421,7 +421,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         </span>
       );
     }
-    let dialog = this.renderDialog();
+    const dialog = this.renderDialog();
     return dialog ? [result, dialog] : result;
   }
 
@@ -444,7 +444,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     alwaysShowMenu: boolean
   ): React.ReactNode {
     let menu: React.ReactNode = null;
-    let dialog = this.renderDialog();
+    const dialog = this.renderDialog();
     if (dialog) {
       menu = dialog;
     } else if (this.state.openMenu) {
@@ -473,10 +473,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         this.semanticLinks = semanticLinks = [new Notation.SemanticLink(placeholder, false, false)];
       }
     }
-    let onMouseEnter = interactive ? () => this.addToHoveredChildren() : undefined;
-    let onMouseLeave = interactive ? () => { this.setState({clicking: false}); this.removeFromHoveredChildren(); } : undefined;
-    let hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
-    let menuClassName = clsx('menu', {
+    const onMouseEnter = interactive ? () => this.addToHoveredChildren() : undefined;
+    const onMouseLeave = interactive ? () => { this.setState({clicking: false}); this.removeFromHoveredChildren(); } : undefined;
+    const hasVisibleMenu = hasMenu && (alwaysShowMenu || this.isDirectlyHighlighted());
+    const menuClassName = clsx('menu', {
       'hover': this.state.hovered,
       'open': this.state.openMenu,
       'interactive': interactive,
@@ -524,10 +524,10 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.props.interactionHandler && expression.onTextChanged) {
       return this.renderTextInputControl(expression, renderedExpressionConfig);
     } else {
-      let text = expression.text;
+      const text = expression.text;
       if (text) {
         if (expression.hasStyleClass('integer')) {
-          let resultArray = [];
+          const resultArray = [];
           for (let endIndex = text.length; endIndex > 0; endIndex -= 3) {
             let startIndex = endIndex - 3;
             if (startIndex < 0) {
@@ -540,9 +540,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           }
           return this.wrapRenderedExpression(resultArray, renderedExpressionConfig);
         } else {
-          let firstChar = text.charAt(0);
-          let lastChar = text.charAt(text.length - 1);
-          let innerClassName = clsx(
+          const firstChar = text.charAt(0);
+          const lastChar = text.charAt(text.length - 1);
+          const innerClassName = clsx(
             { 'space-start': firstChar === ' ' || firstChar === '\xa0' || (firstChar >= '\u2000' && firstChar <= '\u200a') },
             expression.hasStyleClass('var') && useItalicsForVariable(text) && {
               'italic': true,
@@ -560,9 +560,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderTextInputControl(expression: Notation.TextExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let value = expression.text;
-    let supportLatexInput = !expression.hasStyleClass('integer');
-    let onChangeValue = (newValue: string) => {
+    const value = expression.text;
+    const supportLatexInput = !expression.hasStyleClass('integer');
+    const onChangeValue = (newValue: string) => {
       expression.text = newValue;
       this.setState({inputError: false});
       this.forceUpdate();
@@ -577,7 +577,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       }
       this.triggerHighlightPermanently();
     };
-    let inputClassName = clsx('expr-input', {
+    const inputClassName = clsx('expr-input', {
       'input-error': this.state.inputError,
       'italic': expression.hasStyleClass('var') && useItalicsForVariable(value)
     });
@@ -592,7 +592,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         }
       };
     }
-    let input = (
+    const input = (
       <UnicodeTextInput
         key="input"
         className={inputClassName}
@@ -610,8 +610,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private convertText(text: string): React.ReactNode {
-    let converter = new ExpressionUnicodeConverter;
-    let options: UnicodeConversionOptions = {
+    const converter = new ExpressionUnicodeConverter;
+    const options: UnicodeConversionOptions = {
       convertStandardCharacters: true,
       shrinkMathSpaces: this.shrinkMathSpaces
     };
@@ -624,7 +624,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderRowExpression(expression: Notation.RowExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let renderedExpressions = expression.items.map((item: Notation.RenderedExpression, index: number) =>
+    const renderedExpressions = expression.items.map((item: Notation.RenderedExpression, index: number) =>
       <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler} key={index}/>);
     return this.wrapRenderedExpression(renderedExpressions, renderedExpressionConfig);
   }
@@ -641,8 +641,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     className = clsx(className, 'list');
     if (expression.style instanceof Array) {
       className = clsx(className, 'custom');
-      let rows = expression.items.map((item: Notation.RenderedExpression, index: number) => {
-        let itemClassName = clsx('list-item', index > 0 && 'space-above');
+      const rows = expression.items.map((item: Notation.RenderedExpression, index: number) => {
+        const itemClassName = clsx('list-item', index > 0 && 'space-above');
         return (
           <span className={itemClassName} key={index}>
             <span className={'list-item-header'}>
@@ -656,7 +656,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       });
       return <span className={className}>{rows}</span>;
     } else {
-      let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
+      const items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
         return (
           <li className={'list-item'} key={index}>
             <Expression expression={item} parent={this} interactionHandler={this.props.interactionHandler}/>
@@ -671,17 +671,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private renderTableExpression(expression: Notation.TableExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
     let colCount = 0;
-    for (let row of expression.items) {
+    for (const row of expression.items) {
       if (colCount < row.length) {
         colCount = row.length;
       }
     }
-    let rows: React.ReactNode[] = [];
+    const rows: React.ReactNode[] = [];
     let rowIndex = 0;
-    for (let row of expression.items) {
+    for (const row of expression.items) {
       let colIndex = 0;
-      let columns: React.ReactNode[] = [];
-      for (let cell of row) {
+      const columns: React.ReactNode[] = [];
+      for (const cell of row) {
         columns.push(
           <span className={'table-cell'} key={colIndex++}>
             <Expression expression={cell} parent={this} interactionHandler={this.props.interactionHandler}/>
@@ -693,14 +693,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           <span className={'table-cell'} key={colIndex++}/>
         );
       }
-      let curRowIndex = rowIndex++;
-      let renderCurRow = (additionalClassName?: string) => (
+      const curRowIndex = rowIndex++;
+      const renderCurRow = (additionalClassName?: string) => (
         <span className={clsx('table-row', additionalClassName)} key={curRowIndex}>
           {columns}
         </span>
       );
       if (row.length) {
-        let renderRow = row[0].getLineHeight().then((lineHeight: number) =>
+        const renderRow = row[0].getLineHeight().then((lineHeight: number) =>
           renderCurRow(lineHeight ? undefined : 'large'));
         rows.push(renderPromise(renderRow, curRowIndex.toString()));
       } else {
@@ -711,12 +711,12 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderParenExpression(expression: Notation.ParenExpression, renderedExpressionConfig: RenderedExpressionConfig, optionalParenRight: boolean): React.ReactNode {
-    let render = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
+    const render = expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
       if (surroundingParenStyle === expression.style) {
         return this.renderExpression(expression.body, renderedExpressionConfig.className, renderedExpressionConfig.semanticLinks);
       } else {
         return expression.body.getLineHeight().then((lineHeight: number) => {
-          let body: React.ReactNode = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
+          const body: React.ReactNode = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} key="body"/>;
           switch (expression.style) {
           case '()':
             return <RoundParens lineHeight={lineHeight}>{body}</RoundParens>;
@@ -743,14 +743,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderSubSupExpression(expression: Notation.SubSupExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let renderWithLineHeight = (lineHeight?: number) => {
-      let body = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>;
-      let sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sub"/> : null;
-      let sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sup"/> : null;
-      let preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSub"/> : null;
-      let preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSup"/> : null;
+    const renderWithLineHeight = (lineHeight?: number) => {
+      const body = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler} addInnerParens={true} key="body"/>;
+      const sub: React.ReactNode = expression.sub ? <Expression expression={expression.sub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sub"/> : null;
+      const sup: React.ReactNode = expression.sup ? <Expression expression={expression.sup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="sup"/> : null;
+      const preSub: React.ReactNode = expression.preSub ? <Expression expression={expression.preSub} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSub"/> : null;
+      const preSup: React.ReactNode = expression.preSup ? <Expression expression={expression.preSup} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler} key="preSup"/> : null;
       if (lineHeight && !(expression.sub && expression.sup) && !(expression.preSub && expression.preSup)) {
-        let subSupResult: React.ReactNode[] = [body];
+        const subSupResult: React.ReactNode[] = [body];
         if (expression.sub) {
           subSupResult.push(<sub key="sub">{renderPromise(expression.sub.getLineHeight().then((subLineHeight: number) => subLineHeight ? sub : <sub>{sub}</sub>), undefined, () => sub)}</sub>);
         }
@@ -768,7 +768,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
         return <SubSup sub={sub} sup={sup} preSub={preSub} preSup={preSup} lineHeight={lineHeight ?? 0}>{body}</SubSup>;
       }
     };
-    let render = expression.body.getLineHeight().then(renderWithLineHeight);
+    const render = expression.body.getLineHeight().then(renderWithLineHeight);
     return this.wrapRenderedExpression(
       renderPromise(render, undefined, renderWithLineHeight),
       renderedExpressionConfig
@@ -776,31 +776,31 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderOverUnderExpression(expression: Notation.OverUnderExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let body = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>;
-    let over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-    let under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-    let { contents, innerClassName } = renderOverUnder({ children: body, over, under });
+    const body = <Expression expression={expression.body} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    const over: React.ReactNode = expression.over ? <Expression expression={expression.over} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+    const under: React.ReactNode = expression.under ? <Expression expression={expression.under} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+    const { contents, innerClassName } = renderOverUnder({ children: body, over, under });
     return this.wrapRenderedExpression(contents, { ...renderedExpressionConfig, innerClassName });
   }
 
   private renderFractionExpression(expression: Notation.FractionExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let numerator = <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>;
-    let denominator = <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>;
-    let { contents, innerClassName } = renderFraction({ numerator, denominator });
+    const numerator = <Expression expression={expression.numerator} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    const denominator = <Expression expression={expression.denominator} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    const { contents, innerClassName } = renderFraction({ numerator, denominator });
     return this.wrapRenderedExpression(contents, { ...renderedExpressionConfig, innerClassName });
   }
 
   private renderRadicalExpression(expression: Notation.RadicalExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let radicand = <Expression expression={expression.radicand} parent={this} interactionHandler={this.props.interactionHandler}/>;
-    let degree: React.ReactNode = expression.degree ? <Expression expression={expression.degree} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
-    let { contents, innerClassName } = renderRadical({ radicand, degree });
+    const radicand = <Expression expression={expression.radicand} parent={this} interactionHandler={this.props.interactionHandler}/>;
+    const degree: React.ReactNode = expression.degree ? <Expression expression={expression.degree} shrinkMathSpaces={true} parent={this} interactionHandler={this.props.interactionHandler}/> : null;
+    const { contents, innerClassName } = renderRadical({ radicand, degree });
     return this.wrapRenderedExpression(contents, { ...renderedExpressionConfig, innerClassName });
   }
 
   private renderMarkdownExpression(expression: Notation.MarkdownExpression, className: string): React.ReactNode {
     let markdown: React.ReactNode;
     if (this.props.interactionHandler && expression.onTextChanged) {
-      let onChange = (newText: string) => {
+      const onChange = (newText: string) => {
         expression.text = newText;
         this.forceUpdate();
         if (expression.onTextChanged) {
@@ -812,17 +812,17 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
       };
       let onSearch = undefined;
       if (expression.searchURLs) {
-        let searchURLs = expression.searchURLs;
+        const searchURLs = expression.searchURLs;
         onSearch = () => this.openSearchDialog(searchURLs, expression.defaultSearchText);
       }
       if (config.useMarkdownEditor) {
         let key = 'markdown-editor';
-        let toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
+        const toolbar: (string | EasyMDE.ToolbarIcon)[] = ['bold', 'italic', '|', 'unordered-list', 'ordered-list', 'link', 'code', '|', 'preview'];
         if (!config.embedded) {
           toolbar.push('guide');
         }
         if (onSearch) {
-          let searchButton: EasyMDE.ToolbarIcon = {
+          const searchButton: EasyMDE.ToolbarIcon = {
             name: 'search',
             action: onSearch,
             className: 'fa fa-search',
@@ -831,8 +831,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
           toolbar.push('|', searchButton);
           key = 'markdown-editor-with-search';
         }
-        let previewElement = document.createElement('div');
-        let options: EasyMDE.Options = {
+        const previewElement = document.createElement('div');
+        const options: EasyMDE.Options = {
           toolbar: toolbar as any,
           status: false,
           spellChecker: false,
@@ -867,7 +867,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderMarkdown(text: string, renderCode?: (code: string) => Notation.RenderedExpression): React.ReactElement {
-    let md = new Remarkable({
+    const md = new Remarkable({
       linkTarget: '_blank',
       typographer: true
     });
@@ -890,14 +890,14 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private renderFoldableExpression(expression: Notation.FoldableExpression, renderedExpressionConfig: RenderedExpressionConfig): React.ReactNode {
-    let unfolded = this.state.unfolded ?? expression.initiallyUnfolded;
-    let onClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const unfolded = this.state.unfolded ?? expression.initiallyUnfolded;
+    const onClick = (event: React.MouseEvent<HTMLDivElement>) => {
       if (event.button < 1) {
         this.setState({unfolded: !unfolded});
         disableOwnDefaultBehavior(event);
       }
     };
-    let rows = [
+    const rows = [
       <div className={'paragraph foldable-heading'} onClick={onClick} key={'heading'}>
         <span className={'foldable-icon'}>{getSectionIcon(unfolded)}</span>
         <Expression expression={expression.heading} parent={this} interactionHandler={this.props.interactionHandler}/>
@@ -916,9 +916,9 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private renderPlaceholderExpression(expression: Notation.PlaceholderExpression, { className, semanticLinks }: RenderedExpressionConfig): React.ReactNode {
     let icon: React.ReactNode;
     if (expression instanceof Notation.InsertPlaceholderExpression) {
-      let buttonType = (expression.mandatory ? ButtonType.InsertMandatory : ButtonType.Insert);
-      let hasSemanticLinkMenu = (semanticLinks ?? []).some(semanticLink => !!semanticLink.onMenuOpened);
-      let enabled = (expression.action !== undefined || hasSemanticLinkMenu || this.props.interactionHandler === undefined);
+      const buttonType = (expression.mandatory ? ButtonType.InsertMandatory : ButtonType.Insert);
+      const hasSemanticLinkMenu = (semanticLinks ?? []).some(semanticLink => !!semanticLink.onMenuOpened);
+      const enabled = (expression.action !== undefined || hasSemanticLinkMenu || this.props.interactionHandler === undefined);
       icon = getButtonIcon(buttonType, enabled);
     } else {
       icon = getDefinitionIcon(expression.placeholderType);
@@ -954,7 +954,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (expression.permanentlyHighlighted) {
       return;
     }
-    let index = this.hoveredChildren.indexOf(expression);
+    const index = this.hoveredChildren.indexOf(expression);
     if (index >= 0) {
       this.hoveredChildren.splice(index, 1);
     }
@@ -967,8 +967,8 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   private updateHover(): void {
     if (this.props.interactionHandler) {
       if (!this.props.parent) {
-        let hover: Notation.SemanticLink[] = [];
-        for (let expression of this.hoveredChildren) {
+        const hover: Notation.SemanticLink[] = [];
+        for (const expression of this.hoveredChildren) {
           if (expression.isDirectlyHovered() && expression.semanticLinks) {
             hover.push(...expression.semanticLinks);
           }
@@ -990,13 +990,13 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   }
 
   private onHoverChanged = (hover: Object[]): void => {
-    let hovered = this.isHovered(hover);
+    const hovered = this.isHovered(hover);
     this.setState((prevState: ExpressionState) => prevState.hovered !== hovered ? {hovered: hovered} : null);
   };
 
   private isHovered(hover: Object[]): boolean {
     if (hover.length && this.semanticLinks) {
-      for (let semanticLink of this.semanticLinks) {
+      for (const semanticLink of this.semanticLinks) {
         if (hover.indexOf(semanticLink.linkedObject) >= 0) {
           return true;
         }
@@ -1039,7 +1039,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.props.parent) {
       this.props.parent.clearAllPermanentHighlights();
     } else {
-      for (let expression of this.hoveredChildren) {
+      for (const expression of this.hoveredChildren) {
         expression.clearPermanentHighlight();
       }
     }
@@ -1147,7 +1147,7 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
   };
 
   private onDialogOK = (result: Dialog.DialogResultBase) => {
-    let dialog = this.state.openDialog;
+    const dialog = this.state.openDialog;
     this.clearPermanentHighlight();
     if (dialog && dialog.onOK) {
       dialog.onOK(result);
@@ -1164,24 +1164,24 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
 
   private openSearchDialog(searchURLs: Notation.MarkdownExpressionSearchURL[], defaultSearchText?: string): void {
     let searchText = defaultSearchText || '';
-    let searchTextExpression = new Notation.TextExpression(searchText);
+    const searchTextExpression = new Notation.TextExpression(searchText);
     searchTextExpression.onTextChanged = (newText: string) => {
       searchText = newText;
       return true;
     };
     searchTextExpression.requestTextInput = true;
     searchTextExpression.inputLength = 20;
-    let items = [
+    const items = [
       new Dialog.ExpressionDialogParameterItem('Search default references for', () => searchTextExpression),
       new Dialog.ExpressionDialogSeparatorItem
     ];
-    for (let searchUrl of searchURLs) {
+    for (const searchUrl of searchURLs) {
       items.push(new Dialog.ExpressionDialogLinkItem(searchUrl.title, () => (searchUrl.searchUrlPrefix + encodeURI(searchText))));
     }
-    let dialog = new Dialog.ExpressionDialog(items);
+    const dialog = new Dialog.ExpressionDialog(items);
     if (!config.embedded) {
       dialog.onOK = () => {
-        for (let searchUrl of searchURLs) {
+        for (const searchUrl of searchURLs) {
           window.open(searchUrl.searchUrlPrefix + encodeURI(searchText), '_blank');
         }
       };

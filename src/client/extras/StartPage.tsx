@@ -30,7 +30,7 @@ interface StartPageProps {
 
 function getParentPath(names: string[]): Fmt.PathItem | undefined {
   if (names.length) {
-    let name = names.pop()!;
+    const name = names.pop()!;
     return new Fmt.NamedPathItem(name, getParentPath(names));
   } else {
     return undefined;
@@ -38,18 +38,18 @@ function getParentPath(names: string[]): Fmt.PathItem | undefined {
 }
 
 function buildExamplePath(names: string[]): Fmt.Path {
-  let name = names.pop()!;
+  const name = names.pop()!;
   return new Fmt.Path(name, undefined, getParentPath(names));
 }
 
 function buildExample(names: string[]): Fmt.DefinitionRefExpression {
-  let path = buildExamplePath(names);
+  const path = buildExamplePath(names);
   return new Fmt.DefinitionRefExpression(path);
 }
 
 function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageProps): React.ReactNode {
-  let href = props.libraryDataProvider!.pathToURI(path);
-  let onClick = (event: React.MouseEvent<HTMLElement>) => {
+  const href = props.libraryDataProvider!.pathToURI(path);
+  const onClick = (event: React.MouseEvent<HTMLElement>) => {
     if (event.button < 1) {
       disableOwnDefaultBehavior(event);
       props.onLinkClicked(props.libraryDataProvider!, path);
@@ -63,9 +63,9 @@ function wrapExample(example: React.ReactNode, path: Fmt.Path, props: StartPageP
 }
 
 function renderDefinitionExample(names: string[], props: StartPageProps, renderer: HLMRenderer): React.ReactNode {
-  let example = buildExample(names);
-  let expression = renderer.renderExampleExpression(example);
-  let result = [
+  const example = buildExample(names);
+  const expression = renderer.renderExampleExpression(example);
+  const result = [
     <div className="example-title" key="title">Definition:</div>,
     <div key="result"><Expression expression={expression}/></div>
   ];
@@ -73,18 +73,18 @@ function renderDefinitionExample(names: string[], props: StartPageProps, rendere
 }
 
 function renderTheoremExample(names: string[], props: StartPageProps): React.ReactNode {
-  let examplePath = buildExamplePath(names);
-  let libraryDataProvider = props.libraryDataProvider!.getProviderForSection(examplePath.parentPath);
-  let definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name, false);
-  let expressionPromise = definitionPromise.then((definition: LibraryDefinition) => {
-    let rendererOptions: Logic.LogicRendererOptions = {
+  const examplePath = buildExamplePath(names);
+  const libraryDataProvider = props.libraryDataProvider!.getProviderForSection(examplePath.parentPath);
+  const definitionPromise = libraryDataProvider.fetchLocalItem(examplePath.name, false);
+  const expressionPromise = definitionPromise.then((definition: LibraryDefinition) => {
+    const rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: false
     };
-    let definitionRenderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, props.templates!, rendererOptions);
+    const definitionRenderer = Logics.hlm.getDisplay().getDefinitionRenderer(definition.definition, libraryDataProvider, props.templates!, rendererOptions);
     return definitionRenderer.renderDefinitionSummary(undefined, true)!;
   });
-  let expression = new Notation.PromiseExpression(expressionPromise);
-  let result = <Expression expression={expression}/>;
+  const expression = new Notation.PromiseExpression(expressionPromise);
+  const result = <Expression expression={expression}/>;
   return wrapExample(result, examplePath, props);
 }
 
@@ -97,12 +97,12 @@ function StartPage(props: StartPageProps): React.ReactElement {
   let exampleContents: React.ReactNode = null;
 
   if (props.libraryDataProvider && props.templates) {
-    let dummyDefinition = new Fmt.Definition('', new Fmt.PlaceholderExpression(undefined), new Fmt.ParameterList);
-    let rendererOptions: Logic.LogicRendererOptions = {
+    const dummyDefinition = new Fmt.Definition('', new Fmt.PlaceholderExpression(undefined), new Fmt.ParameterList);
+    const rendererOptions: Logic.LogicRendererOptions = {
       includeProofs: false
     };
-    let renderer = Logics.hlm.getDisplay().getDefinitionRenderer(dummyDefinition, props.libraryDataProvider, props.templates, rendererOptions);
-    let examples = [
+    const renderer = Logics.hlm.getDisplay().getDefinitionRenderer(dummyDefinition, props.libraryDataProvider, props.templates, rendererOptions);
+    const examples = [
       renderDefinitionExample(['Essentials', 'Sets', 'finite'], props, renderer),
       renderDefinitionExample(['Essentials', 'Numbers', 'Natural', 'Prime', 'prime'], props, renderer),
       renderTheoremExample(['Essentials', 'Numbers', 'Real', 'Roots of primes are irrational'], props),

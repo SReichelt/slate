@@ -10,9 +10,9 @@ export class MRUList {
     while (path.parentPath instanceof Fmt.Path) {
       path = path.parentPath;
     }
-    let newPath = new Fmt.Path(path.name, undefined, path.parentPath);
+    const newPath = new Fmt.Path(path.name, undefined, path.parentPath);
     let index = 0;
-    for (let entry of this.entries) {
+    for (const entry of this.entries) {
       if (newPath.isEquivalentTo(entry)) {
         if (index) {
           this.entries.splice(index, 1);
@@ -41,7 +41,7 @@ export class MRUListIterator {
 
   next(): CachedPromise<Fmt.Path | undefined> {
     if (this.entriesIndex < this.entries.length) {
-      let entry = this.entries[this.entriesIndex++];
+      const entry = this.entries[this.entriesIndex++];
       return CachedPromise.resolve(entry);
     } else if (this.libraryDataAccessor) {
       if (!this.sectionContentsPromise) {
@@ -54,9 +54,9 @@ export class MRUListIterator {
           return undefined;
         }
         while (this.sectionContentsIndex < contents.length) {
-          let item = contents[this.sectionContentsIndex++];
+          const item = contents[this.sectionContentsIndex++];
           if (item instanceof FmtLibrary.MetaRefExpression_item && item.ref instanceof Fmt.DefinitionRefExpression) {
-            let path = this.libraryDataAccessor.getAbsolutePath(item.ref.path);
+            const path = this.libraryDataAccessor.getAbsolutePath(item.ref.path);
             if (!this.entries.some((entry: Fmt.Path) => path.isEquivalentTo(entry))) {
               return path;
             }

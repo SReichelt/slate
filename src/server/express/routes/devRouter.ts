@@ -5,7 +5,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { exec } from 'child_process';
 
 function makeDirectories(fileName: string): void {
-  let dirName = path.dirname(fileName);
+  const dirName = path.dirname(fileName);
   if (dirName && !fs.existsSync(dirName)) {
     makeDirectories(dirName);
     fs.mkdirSync(dirName);
@@ -13,11 +13,11 @@ function makeDirectories(fileName: string): void {
 }
 
 function saveLocally(request: express.Request, response: express.Response, localPath: string): void {
-  let requestPath = decodeURI(request.url);
-  let fileName = path.join(localPath, requestPath);
+  const requestPath = decodeURI(request.url);
+  const fileName = path.join(localPath, requestPath);
   try {
     makeDirectories(fileName);
-    let stream = fs.createWriteStream(fileName);
+    const stream = fs.createWriteStream(fileName);
     stream.on('error', (error: any) => {
       console.error(error);
       response.sendStatus(400);
@@ -31,17 +31,17 @@ function saveLocally(request: express.Request, response: express.Response, local
 }
 
 function openInVSCode(request: express.Request, response: express.Response, localPath: string): void {
-  let requestPath = decodeURI(request.url);
-  let fileName = path.join(localPath, requestPath);
+  const requestPath = decodeURI(request.url);
+  const fileName = path.join(localPath, requestPath);
   // Use exec instead of spawn to make this work on Windows.
   exec(`code "${fileName}"`);
   response.sendStatus(200);
 }
 
 export function devRouter(rootPath: string): express.Router {
-  let router = express.Router();
+  const router = express.Router();
 
-  let dataPath = path.join(rootPath, 'data');
+  const dataPath = path.join(rootPath, 'data');
 
   router.use('/data', express.static(dataPath));
   router.use('/docs', express.static(path.join(rootPath, 'docs')));

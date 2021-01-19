@@ -12,12 +12,12 @@ export class TupleMacro implements HLMMacro.HLMMacro {
   name = 'tuple';
 
   instantiate(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): TupleMacroInstance {
-    let itemsParam = definition.parameters.getParameter('items');
-    let contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
-    let variables: Fmt.ParameterList = contents.variables || new Fmt.ParameterList;
-    let length = variables.getParameter('length');
-    let references: Fmt.ArgumentList = contents.references || new Fmt.ArgumentList;
-    let tuples = references.getValue('Tuples');
+    const itemsParam = definition.parameters.getParameter('items');
+    const contents = definition.contents as FmtHLM.ObjectContents_MacroOperator;
+    const variables: Fmt.ParameterList = contents.variables || new Fmt.ParameterList;
+    const length = variables.getParameter('length');
+    const references: Fmt.ArgumentList = contents.references || new Fmt.ArgumentList;
+    const tuples = references.getValue('Tuples');
     return new TupleMacroInstance(definition, itemsParam, length, tuples);
   }
 }
@@ -26,20 +26,20 @@ class TupleMacroInstance implements HLMMacro.HLMMacroInstance {
   constructor(private definition: Fmt.Definition, private itemsParam: Fmt.Parameter, private length: Fmt.Parameter, private tuples: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
-    let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
+    const result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
     // TODO
     return result;
   }
 
   invoke(utils: HLMUtils, expression: Fmt.DefinitionRefExpression, config: Macro.MacroInvocationConfig): TupleMacroInvocation {
-    let items = expression.path.arguments.getValue(this.itemsParam.name) as Fmt.ArrayExpression;
+    const items = expression.path.arguments.getValue(this.itemsParam.name) as Fmt.ArrayExpression;
     let tuplesRef = utils.substitutePath(this.tuples, expression.path, [this.definition]);
-    let onSetLength = (newLength: number) => {
+    const onSetLength = (newLength: number) => {
       if (items.items.length > newLength) {
         items.items.length = newLength;
       } else {
         while (items.items.length < newLength) {
-          let newItem = config.createArgumentExpression?.(this.itemsParam);
+          const newItem = config.createArgumentExpression?.(this.itemsParam);
           if (newItem) {
             items.items.push(newItem);
           } else {
@@ -57,7 +57,7 @@ class TupleMacroInvocation implements HLMMacro.HLMMacroInvocation {
   constructor(public expression: Fmt.DefinitionRefExpression, private config: Macro.MacroInvocationConfig, private itemsParam: Fmt.Parameter, private items: Fmt.ArrayExpression, private tuplesRef: Fmt.Expression) {}
 
   check(): CachedPromise<Logic.LogicCheckDiagnostic[]> {
-    let result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
+    const result: CachedPromise<Logic.LogicCheckDiagnostic[]> = CachedPromise.resolve([]);
     // TODO
     return result;
   }

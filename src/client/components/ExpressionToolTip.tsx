@@ -63,7 +63,7 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
           ExpressionToolTip.showTimer = undefined;
           ExpressionToolTip.showTimerOwner = undefined;
         }
-        let show = () => this.setState((prevState) => (prevState.visible ? null : {visible: true}));
+        const show = () => this.setState((prevState) => (prevState.visible ? null : {visible: true}));
         if (this.props.delay) {
           ExpressionToolTip.showTimer = setTimeout(show, this.props.delay);
           ExpressionToolTip.showTimerOwner = this;
@@ -96,7 +96,7 @@ class ExpressionToolTip extends React.Component<ExpressionToolTipProps, Expressi
   render(): React.ReactNode {
     let visible = false;
     if (this.state.visible) {
-      let contents = this.props.getContents();
+      const contents = this.props.getContents();
       if (contents) {
         ExpressionToolTip.currentContents = contents;
         ExpressionToolTip.currentContentsOwner = this;
@@ -138,7 +138,7 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
   private updateTimer(): void {
     this.stopTimer();
     if (this.props.refreshInterval) {
-      let refresh = () => {
+      const refresh = () => {
         this.forceUpdate();
       };
       this.refreshTimer = setInterval(refresh, this.props.refreshInterval);
@@ -160,7 +160,7 @@ export class PermanentToolTip extends React.Component<PermanentToolTipProps> {
     if (this.props.active) {
       this.contents = this.props.getContents();
     }
-    let className = clsx('tooltip permanent', {
+    const className = clsx('tooltip permanent', {
       'fixed-width': this.props.arrow
     });
     return (

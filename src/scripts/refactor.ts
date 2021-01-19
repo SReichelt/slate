@@ -16,7 +16,7 @@ function refactorExpression(expression: Fmt.Expression): void {
   } else if (expression instanceof Fmt.ParameterExpression) {
     refactorParameterList(expression.parameters);
   } else if (expression instanceof FmtHLM.MetaRefExpression_structural || expression instanceof FmtHLM.MetaRefExpression_setStructuralCases || expression instanceof FmtHLM.MetaRefExpression_structuralCases) {
-    for (let structuralCase of expression.cases) {
+    for (const structuralCase of expression.cases) {
       if (structuralCase.parameters) {
         refactorParameterList(structuralCase.parameters);
       }
@@ -27,8 +27,8 @@ function refactorExpression(expression: Fmt.Expression): void {
 }
 
 function refactorParameterList(parameterList: Fmt.ParameterList): void {
-  for (let param of parameterList) {
-    let type = param.type;
+  for (const param of parameterList) {
+    const type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       refactorParameterList(type.sourceParameters);
       refactorParameterList(type.targetParameters);
@@ -55,7 +55,7 @@ function refactorDefinition(definition: Fmt.Definition): void {
 }
 
 function refactorDefinitions(definitions: Fmt.DefinitionList): void {
-  for (let definition of definitions) {
+  for (const definition of definitions) {
     refactorDefinition(definition);
   }
 }

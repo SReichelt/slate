@@ -14,7 +14,7 @@ export const macros: HLMMacro.HLMMacro[] = [
 ];
 
 export function instantiateMacro(libraryDataAccessor: LibraryDataAccessor, definition: Fmt.Definition): HLMMacro.HLMMacroInstance {
-  let macro = macros.find((value: HLMMacro.HLMMacro) => value.name === definition.name);
+  const macro = macros.find((value: HLMMacro.HLMMacro) => value.name === definition.name);
   if (macro) {
     return macro.instantiate(libraryDataAccessor, definition);
   } else {

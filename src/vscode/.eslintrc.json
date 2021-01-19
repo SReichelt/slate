@@ -85,6 +85,6 @@
         "no-new-wrappers": "warn",
         "no-trailing-spaces": "warn",
         "no-unused-labels": "warn",
-        "prefer-const": "off"
+        "prefer-const": "warn"
     }
 }

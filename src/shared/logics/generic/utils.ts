@@ -41,12 +41,12 @@ export class GenericUtils {
   }
 
   getOuterDefinition(expression: Fmt.DefinitionRefExpression): CachedPromise<Fmt.Definition> {
-    let path = FmtUtils.getOuterPath(expression.path);
+    const path = FmtUtils.getOuterPath(expression.path);
     return this.getDefinition(path);
   }
 
   getItemInfo(expression: Fmt.DefinitionRefExpression): CachedPromise<LibraryItemInfo> {
-    let path = FmtUtils.getOuterPath(expression.path);
+    const path = FmtUtils.getOuterPath(expression.path);
     return this.libraryDataAccessor.getItemInfo(path);
   }
 
@@ -61,7 +61,7 @@ export class GenericUtils {
   analyzeDefinitionRefPath(childPaths: Fmt.Path[], outerDefinition: Fmt.Definition, definitions: Fmt.Definition[], argumentLists: Fmt.ArgumentList[]): void {
     let definition = outerDefinition;
     let isFirst = true;
-    for (let childPath of childPaths) {
+    for (const childPath of childPaths) {
       if (isFirst) {
         isFirst = false;
       } else {
@@ -73,7 +73,7 @@ export class GenericUtils {
   }
 
   analyzeDefinitionRef(expression: Fmt.DefinitionRefExpression, outerDefinition: Fmt.Definition, definitions: Fmt.Definition[], argumentLists: Fmt.ArgumentList[]): void {
-    let childPaths: Fmt.Path[] = [];
+    const childPaths: Fmt.Path[] = [];
     this.splitPath(expression.path, childPaths);
     this.analyzeDefinitionRefPath(childPaths, outerDefinition, definitions, argumentLists);
   }
@@ -108,7 +108,7 @@ export class GenericUtils {
         if (subExpression instanceof Fmt.DefinitionRefExpression) {
           let newPath = GenericUtils.adjustPath(subExpression.path, targetPath);
           newPath = this.libraryDataAccessor.simplifyPath(newPath);
-          let newExpression = new Fmt.DefinitionRefExpression(newPath);
+          const newExpression = new Fmt.DefinitionRefExpression(newPath);
           return newExpression;
         } else {
           return subExpression;
@@ -118,7 +118,7 @@ export class GenericUtils {
   }
 
   private static adjustPath<PathItemType extends Fmt.PathItem>(path: PathItemType, targetPath: Fmt.PathItem | undefined): PathItemType {
-    let newPath: PathItemType = Object.create(path);
+    const newPath: PathItemType = Object.create(path);
     newPath.parentPath = path.parentPath ? GenericUtils.adjustPath(path.parentPath, targetPath) : targetPath;
     return newPath;
   }
@@ -142,7 +142,7 @@ export class GenericUtils {
   }
 
   createParameter(type: Fmt.Expression, defaultName: string, usedNames?: Set<string>): Fmt.Parameter {
-    let name = usedNames ? this.getUnusedDefaultName(defaultName, usedNames) : defaultName;
+    const name = usedNames ? this.getUnusedDefaultName(defaultName, usedNames) : defaultName;
     return new Fmt.Parameter(name, type);
   }
 
@@ -165,7 +165,7 @@ export class GenericUtils {
   }
 
   findReferencedParameters(expression: Fmt.Expression): Fmt.Parameter[] {
-    let result: Fmt.Parameter[] = [];
+    const result: Fmt.Parameter[] = [];
     expression.traverse((subExpression: Fmt.Expression) => {
       if (subExpression instanceof Fmt.VariableRefExpression) {
         result.push(subExpression.variable);
@@ -175,10 +175,10 @@ export class GenericUtils {
   }
 
   reorderArguments(argumentList: Fmt.ArgumentList, expression: Fmt.Expression): void {
-    let refs = this.findReferencedParameters(expression);
+    const refs = this.findReferencedParameters(expression);
     let lastArgIndex = argumentList.length;
     for (let refIndex = refs.length - 1; refIndex >= 0; refIndex--) {
-      let ref = refs[refIndex];
+      const ref = refs[refIndex];
       for (let argIndex = 0; argIndex < argumentList.length; argIndex++) {
         if (ref.name === argumentList[argIndex].name) {
           if (argIndex > lastArgIndex) {

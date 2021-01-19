@@ -15,7 +15,7 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
   result: Notation.RenderedExpression;
 
   constructor(private renderer?: Logic.LogicRenderer) {
-    let root = new Notation.RowExpression([]);
+    const root = new Notation.RowExpression([]);
     root.styleClasses = ['source-code'];
     this.stack = [{
       range: root,
@@ -25,7 +25,7 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
   }
 
   private addExpression(expression: Notation.RenderedExpression): void {
-    let back = this.stack[this.stack.length - 1];
+    const back = this.stack[this.stack.length - 1];
     if (back.range) {
       if (back.object instanceof Fmt.Argument && !expression.styleClasses) {
         expression.styleClasses = ['arg'];
@@ -43,11 +43,11 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
   }
 
   startRange(object: Object, name: boolean, link: boolean, tag: boolean, signature: boolean): void {
-    let back = this.stack[this.stack.length - 1];
+    const back = this.stack[this.stack.length - 1];
     if (back.range) {
       if (object instanceof Fmt.PlaceholderExpression) {
-        let placeholder = new Notation.PlaceholderExpression(object.placeholderType);
-        let semanticLink = new Notation.SemanticLink(object, false, back.isMathematical);
+        const placeholder = new Notation.PlaceholderExpression(object.placeholderType);
+        const semanticLink = new Notation.SemanticLink(object, false, back.isMathematical);
         if (this.renderer) {
           this.renderer.addPlaceholderMenu(object, semanticLink);
         }
@@ -61,7 +61,7 @@ export class SourceCodeStream implements FmtWriter.OutputStream {
         if (object instanceof Fmt.Argument && object.name === 'notation') {
           isMathematical = false;
         }
-        let range = new Notation.RowExpression([]);
+        const range = new Notation.RowExpression([]);
         range.styleClasses = ['source-code'];
         if (((object instanceof Fmt.Expression || object instanceof Fmt.Argument || object instanceof Fmt.DocumentationComment || object instanceof Fmt.DocumentationItem)
              && !link && !tag && !signature)

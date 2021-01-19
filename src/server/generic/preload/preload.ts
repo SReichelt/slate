@@ -17,8 +17,8 @@ export abstract class LibraryPreloadGenerator {
   protected abstract getFileContents(uri: string, preloadURI: string): CachedPromise<string>;
 
   private writeFile(name: string, file: Fmt.File): string {
-    let stream = new FmtWriter.StringOutputStream;
-    let writer = new FmtWriter.Writer(stream, false, false, '', '', '');
+    const stream = new FmtWriter.StringOutputStream;
+    const writer = new FmtWriter.Writer(stream, false, false, '', '', '');
     writer.writeIdentifier(name, file, true);
     writer.write(' ');
     writer.writeFile(file);
@@ -27,8 +27,8 @@ export abstract class LibraryPreloadGenerator {
 
   private minifyContents(args: Fmt.ArgumentList): void {
     for (let argIndex = args.length - 1; argIndex >= 0; argIndex--) {
-      let arg = args[argIndex];
-      let name = arg.name;
+      const arg = args[argIndex];
+      const name = arg.name;
       if (name && (name === 'proof' || name === 'proofs' || name.endsWith('Proof') || name.endsWith('Proofs'))) {
         args.splice(argIndex, 1);
       } else if (arg.value instanceof Fmt.CompoundExpression) {
@@ -38,10 +38,10 @@ export abstract class LibraryPreloadGenerator {
   }
 
   private getItemContents(baseURI: string, preloadURI: string, name: string): CachedPromise<string> {
-    let uri = baseURI + encodeURI(name) + fileExtension;
+    const uri = baseURI + encodeURI(name) + fileExtension;
     return this.readFile(uri, preloadURI, Meta.getDummyMetaModel)
       .then((file: Fmt.File) => {
-        for (let definition of file.definitions) {
+        for (const definition of file.definitions) {
           if (definition.contents instanceof Fmt.GenericObjectContents) {
             this.minifyContents(definition.contents.arguments);
           }
@@ -55,19 +55,19 @@ export abstract class LibraryPreloadGenerator {
   }
 
   private preloadSection(baseURI: string, name: string): CachedPromise<void> {
-    let indexURI = baseURI + encodeURI(name) + fileExtension;
-    let preloadURI = indexURI + preloadExtension;
+    const indexURI = baseURI + encodeURI(name) + fileExtension;
+    const preloadURI = indexURI + preloadExtension;
     return this.readFile(indexURI, preloadURI, FmtLibrary.getMetaModel)
       .then((file: Fmt.File) => {
-        let promises: CachedPromise<string>[] = [];
-        for (let definition of file.definitions) {
+        const promises: CachedPromise<string>[] = [];
+        for (const definition of file.definitions) {
           if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
-            for (let item of definition.contents.items) {
+            for (const item of definition.contents.items) {
               if (item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof FmtLibrary.MetaRefExpression_item) {
-                let itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
+                const itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
                 if (!itemPath.parentPath) {
                   if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-                    let promise = this.preloadSection(baseURI + encodeURI(itemPath.name) + '/', indexFileName)
+                    const promise = this.preloadSection(baseURI + encodeURI(itemPath.name) + '/', indexFileName)
                       .catch((error) => console.error(error))
                       .then(() => '');
                     promises.push(promise);
@@ -82,7 +82,7 @@ export abstract class LibraryPreloadGenerator {
         return CachedPromise.all(promises)
           .then((allFileContents: string[]) => {
             let contents = this.writeFile(name, file);
-            for (let fileContents of allFileContents) {
+            for (const fileContents of allFileContents) {
               contents += fileContents;
             }
             return contents;
@@ -103,9 +103,9 @@ export class LibraryPreloader extends LibraryPreloadGenerator {
   }
 
   protected getFileContents(uri: string, preloadURI: string): CachedPromise<string> {
-    let fileReference = this.fileAccessor.openFile(uri, false);
+    const fileReference = this.fileAccessor.openFile(uri, false);
     if (fileReference.watch) {
-      let watcher = fileReference.watch(() => {
+      const watcher = fileReference.watch(() => {
         this.preloadedSections.delete(preloadURI);
         watcher.close();
         this.watchers.delete(watcher);
@@ -125,7 +125,7 @@ export class LibraryPreloader extends LibraryPreloadGenerator {
 
   clear(): void {
     this.preloadedSections.clear();
-    for (let watcher of this.watchers) {
+    for (const watcher of this.watchers) {
       watcher.close();
     }
     this.watchers.clear();

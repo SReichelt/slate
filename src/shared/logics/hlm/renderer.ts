@@ -116,21 +116,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderDefinition(itemInfo: CachedPromise<LibraryItemInfo> | undefined, options: Logic.RenderedDefinitionOptions): Notation.RenderedExpression | undefined {
-    let paragraphs: Notation.RenderedExpression[] = [];
-    let row: Notation.RenderedExpression[] = [];
+    const paragraphs: Notation.RenderedExpression[] = [];
+    const row: Notation.RenderedExpression[] = [];
     let space: string | undefined = undefined;
     if (options.includeLabel && itemInfo !== undefined) {
       row.push(this.renderDefinitionLabel(itemInfo));
       space = '  ';
     }
-    let definition = this.definition;
-    let contents = definition.contents;
+    const definition = this.definition;
+    const contents = definition.contents;
     let cases: ExtractedStructuralCase[] | undefined = undefined;
     let hasCases = false;
     if (contents instanceof FmtHLM.ObjectContents_MacroOperator) {
       this.addDefinitionText(paragraphs);
     } else {
-      let hasParameters = definition.parameters.length > 0;
+      const hasParameters = definition.parameters.length > 0;
       if (hasParameters || this.editHandler) {
         if (space) {
           row.push(new Notation.TextExpression(space));
@@ -151,9 +151,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (!introText) {
             introText = new Notation.InsertPlaceholderExpression;
           }
-          let semanticLink = new Notation.SemanticLink(introText, false, false);
-          let onRenderStandardIntro = () => this.renderStandardTheoremIntro(hasParameters);
-          let onRenderEquivalenceIntro = () => this.renderEquivalenceTheoremIntro(hasParameters);
+          const semanticLink = new Notation.SemanticLink(introText, false, false);
+          const onRenderStandardIntro = () => this.renderStandardTheoremIntro(hasParameters);
+          const onRenderEquivalenceIntro = () => this.renderEquivalenceTheoremIntro(hasParameters);
           this.editHandler.addTheoremTypeMenu(semanticLink, onRenderStandardIntro, onRenderEquivalenceIntro);
           introText.semanticLinks = [semanticLink];
         }
@@ -164,9 +164,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           introText = this.renderExplicitDefinitionIntro();
         }
         if ((contents instanceof FmtHLM.ObjectContents_ExplicitOperator || contents instanceof FmtHLM.ObjectContents_ImplicitOperator) && this.editHandler) {
-          let semanticLink = new Notation.SemanticLink(introText, false, false);
-          let onRenderExplicitIntro = () => this.renderExplicitDefinitionIntro();
-          let onRenderImplicitIntro = (parameter: Fmt.Parameter) => this.renderImplicitDefinitionIntro(parameter);
+          const semanticLink = new Notation.SemanticLink(introText, false, false);
+          const onRenderExplicitIntro = () => this.renderExplicitDefinitionIntro();
+          const onRenderImplicitIntro = (parameter: Fmt.Parameter) => this.renderImplicitDefinitionIntro(parameter);
           this.editHandler.addImplicitDefinitionMenu(semanticLink, onRenderExplicitIntro, onRenderImplicitIntro);
           introText.semanticLinks = [semanticLink];
         }
@@ -188,9 +188,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (row.length) {
       paragraphs.unshift(row.length === 1 ? row[0] : new Notation.RowExpression(row));
     }
-    let definitionRef = this.renderDefinedSymbol([definition]);
+    const definitionRef = this.renderDefinedSymbol([definition]);
     if (hasCases) {
-      let definitionRow = new Notation.RowExpression([definitionRef]);
+      const definitionRow = new Notation.RowExpression([definitionRef]);
       definitionRow.styleClasses = ['display-math'];
       paragraphs.push(definitionRow);
       paragraphs.push(new Notation.TextExpression('by:'));
@@ -207,37 +207,37 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderDefinitionSummary(innerDefinition?: Fmt.Definition, multiLine: boolean = false): Notation.RenderedExpression | undefined {
-    let definition = innerDefinition || this.definition;
-    let contents = definition.contents;
+    const definition = innerDefinition || this.definition;
+    const contents = definition.contents;
     if (contents instanceof FmtHLM.ObjectContents_Theorem) {
       let claim: Notation.RenderedExpression | undefined = undefined;
       if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
-        let formulaSelection: FormulaSelection = {
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: true
         };
         claim = this.renderFormula(contents.claim, formulaSelection);
       } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-        let formulaSelection: FormulaSelection = {
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: true
         };
-        let items = contents.conditions.map((formula) => this.renderFormula(formula, formulaSelection));
+        const items = contents.conditions.map((formula) => this.renderFormula(formula, formulaSelection));
         claim = this.renderTemplate('EquivalenceRelation', {
                                       'operands': items
                                     });
       }
       if (claim) {
         if (definition.parameters.length) {
-          let extractedConstraints: ConstraintExtractionContainer = {};
-          let parameters = this.readOnlyRenderer.renderParameterList(definition.parameters, false, false, false, undefined, undefined, extractedConstraints);
-          let addendum = new Notation.RowExpression([new Notation.TextExpression('if '), parameters]);
+          const extractedConstraints: ConstraintExtractionContainer = {};
+          const parameters = this.readOnlyRenderer.renderParameterList(definition.parameters, false, false, false, undefined, undefined, extractedConstraints);
+          const addendum = new Notation.RowExpression([new Notation.TextExpression('if '), parameters]);
           addendum.styleClasses = ['addendum'];
-          let extendedClaimPromise = extractedConstraints.resultPromise!.then((constraintParams: Fmt.Parameter[]) => {
+          const extendedClaimPromise = extractedConstraints.resultPromise!.then((constraintParams: Fmt.Parameter[]) => {
             if (constraintParams.length) {
-              let constraints = this.renderParameters(constraintParams, false, true, false);
+              const constraints = this.renderParameters(constraintParams, false, true, false);
               claim!.optionalParenStyle = '[]';
               return this.renderTemplate('ImplicationRelation', {
                                            'operands': [constraints, claim]
@@ -246,7 +246,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               return claim!;
             }
           });
-          let extendedClaim = new Notation.PromiseExpression(extendedClaimPromise);
+          const extendedClaim = new Notation.PromiseExpression(extendedClaimPromise);
           if (multiLine) {
             return new Notation.ParagraphExpression([extendedClaim, addendum]);
           } else {
@@ -257,21 +257,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       }
     } else if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
-      let definitions = [definition];
+      const definitions = [definition];
       if (definition !== this.definition) {
         definitions.unshift(this.definition);
       }
-      let omitArguments = contents instanceof FmtHLM.ObjectContents_Construction ? 1 : 2;
+      const omitArguments = contents instanceof FmtHLM.ObjectContents_Construction ? 1 : 2;
       let result = this.renderDefinitionRef(definitions, undefined, omitArguments);
-      let definitionNotation = this.renderUtils.getDefinitionNotation(definition);
-      let pluralName = definitionNotation?.pluralName;
+      const definitionNotation = this.renderUtils.getDefinitionNotation(definition);
+      const pluralName = definitionNotation?.pluralName;
       if (pluralName) {
-        let options: ArgumentRenderingOptions = {
+        const options: ArgumentRenderingOptions = {
           omitArguments: omitArguments
         };
         let name = this.renderDefinitionNotationExpression(pluralName, definitions, undefined, options);
         name = this.splitName(name);
-        let nameWithParens = new Notation.ParenExpression(name, '()');
+        const nameWithParens = new Notation.ParenExpression(name, '()');
         nameWithParens.styleClasses = ['addendum-hint'];
         result = new Notation.RowExpression([
           result,
@@ -285,8 +285,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderDefinitionLabel(itemInfo: CachedPromise<LibraryItemInfo>): Notation.RenderedExpression {
-    let formattedInfoPromise = itemInfo.then((info: LibraryItemInfo) => {
-      let typeLabelText = this.getDefinitionTypeLabel(info.type);
+    const formattedInfoPromise = itemInfo.then((info: LibraryItemInfo) => {
+      const typeLabelText = this.getDefinitionTypeLabel(info.type);
       let text = this.editHandler ? '' : typeLabelText;
       text += ' ';
       text += formatItemNumber(info.itemNumber);
@@ -300,17 +300,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           title.styleClasses = ['mini-placeholder'];
         }
         if (this.editHandler) {
-          let semanticLink = new Notation.SemanticLink(title, false, false);
+          const semanticLink = new Notation.SemanticLink(title, false, false);
           this.editHandler.addTitleMenu(semanticLink, info);
           title.semanticLinks = [semanticLink];
         }
-        let row: Notation.RenderedExpression[] = [new Notation.TextExpression(text + ' '), title, new Notation.TextExpression('.')];
+        const row: Notation.RenderedExpression[] = [new Notation.TextExpression(text + ' '), title, new Notation.TextExpression('.')];
         if (this.editHandler) {
-          let typeLabel = new Notation.TextExpression(typeLabelText);
+          const typeLabel = new Notation.TextExpression(typeLabelText);
           if (this.definition.contents instanceof FmtHLM.ObjectContents_Theorem || this.definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
-            let semanticLink = new Notation.SemanticLink(typeLabel, false, false);
-            let onRenderType = (type: string | undefined) => {
-              let renderedType = new Notation.TextExpression(this.getDefinitionTypeLabel(type));
+            const semanticLink = new Notation.SemanticLink(typeLabel, false, false);
+            const onRenderType = (type: string | undefined) => {
+              const renderedType = new Notation.TextExpression(this.getDefinitionTypeLabel(type));
               renderedType.styleClasses = ['label'];
               return renderedType;
             };
@@ -325,7 +325,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return new Notation.TextExpression(text);
       }
     });
-    let result = new Notation.PromiseExpression(formattedInfoPromise);
+    const result = new Notation.PromiseExpression(formattedInfoPromise);
     result.styleClasses = ['label'];
     return result;
   }
@@ -343,7 +343,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderImplicitDefinitionIntro(parameter: Fmt.Parameter): Notation.RenderedExpression {
-    let row: Notation.RenderedExpression[] = [
+    const row: Notation.RenderedExpression[] = [
       new Notation.TextExpression('For '),
       this.renderParameter(parameter, false, true, false),
       new Notation.TextExpression(', we define')
@@ -360,7 +360,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderParameterList(parameters: Fmt.ParameterList, sentence: boolean, abbreviate: boolean, forcePlural: boolean, associatedDefinition?: Fmt.Definition, elementParameterOverrides?: ElementParameterOverrides, extractedConstraints?: ConstraintExtractionContainer): Notation.RenderedExpression {
-    let initialState: ParameterListState = {
+    const initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
       abbreviate: abbreviate,
@@ -382,7 +382,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderParameters(parameters: Fmt.Parameter[], sentence: boolean, abbreviate: boolean, forcePlural: boolean, elementParameterOverrides?: ElementParameterOverrides, extractedConstraints?: ConstraintExtractionContainer): Notation.RenderedExpression {
-    let initialState: ParameterListState = {
+    const initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
       abbreviate: abbreviate,
@@ -402,7 +402,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderParameter(parameter: Fmt.Parameter, sentence: boolean, forcePlural: boolean, markAsDummy: boolean, elementParameterOverrides?: ElementParameterOverrides): Notation.RenderedExpression {
-    let initialState: ParameterListState = {
+    const initialState: ParameterListState = {
       fullSentence: sentence,
       sentence: sentence,
       abbreviate: true,
@@ -426,18 +426,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (indices) {
       renderer = Object.create(this);
       renderer.additionalIndices = new Map(renderer.additionalIndices);
-      for (let param of parameters) {
+      for (const param of parameters) {
         renderer.additionalIndices.set(param, indices);
       }
     }
 
-    let state: ParameterListState = {...initialState};
+    const state: ParameterListState = {...initialState};
     if (extractedConstraints) {
       state.extractedConstraints = [];
     }
     let resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]> = CachedPromise.resolve([]);
     resolveDefinitions = renderer.extractParameterDefinitions(parameters, resolveDefinitions);
-    let render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => renderer.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
+    const render = resolveDefinitions.then((constraintDefinitions: (Fmt.Definition | undefined)[]) => renderer.renderParametersWithResolvedDefinitions(parameters, constraintDefinitions, state, indices));
     if (extractedConstraints) {
       extractedConstraints.resultPromise = render.then(() => state.extractedConstraints!);
     }
@@ -445,9 +445,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private extractParameterDefinitions(parameters: Fmt.Parameter[], resolveDefinitions: CachedPromise<(Fmt.Definition | undefined)[]>): CachedPromise<(Fmt.Definition | undefined)[]> {
-    for (let param of parameters) {
+    for (const param of parameters) {
       let expression: Fmt.Expression | undefined = undefined;
-      let type = param.type;
+      const type = param.type;
       if (type instanceof FmtHLM.MetaRefExpression_Subset) {
         expression = type.superset;
       } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
@@ -475,13 +475,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderParametersWithResolvedDefinitions(parameters: Fmt.Parameter[], constraintDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices?: Notation.RenderedExpression[]): Notation.RenderedExpression {
-    let row: Notation.RenderedExpression[] = [];
-    let remainingParameters = parameters.slice();
-    let remainingDefinitions = constraintDefinitions.slice();
-    let currentGroup: Fmt.Parameter[] = [];
+    const row: Notation.RenderedExpression[] = [];
+    const remainingParameters = parameters.slice();
+    const remainingDefinitions = constraintDefinitions.slice();
+    const currentGroup: Fmt.Parameter[] = [];
     let currentGroupDefinition: Fmt.Definition | undefined = undefined;
     while (remainingParameters.length) {
-      let param = remainingParameters[0];
+      const param = remainingParameters[0];
       if (currentGroup.length && param.type !== currentGroup[0].type) {
         this.addParameterGroup(currentGroup, currentGroupDefinition, remainingParameters, remainingDefinitions, state, indices, row);
         currentGroup.length = 0;
@@ -516,7 +516,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         // Occurs if bound parameter list is empty.
         row.push(new Notation.TextExpression(', '));
       }
-      let stateCopy: ParameterListState = {
+      const stateCopy: ParameterListState = {
         ...state,
         associatedParameterList: undefined,
         inInsertMenu: true
@@ -524,11 +524,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (stateCopy.started) {
         stateCopy.fullSentence = false;
       }
-      let onRenderParam = (parameter: Fmt.Parameter) => this.renderParametersWithInitialState([parameter], stateCopy, indices);
-      let onInsertParam = (parameter: Fmt.Parameter) => {
+      const onRenderParam = (parameter: Fmt.Parameter) => this.renderParametersWithInitialState([parameter], stateCopy, indices);
+      const onInsertParam = (parameter: Fmt.Parameter) => {
         state.associatedParameterList!.push(parameter);
         if (stateCopy.associatedDefinition && this.utils.isValueParamType(parameter.type)) {
-          let contents = stateCopy.associatedDefinition.contents;
+          const contents = stateCopy.associatedDefinition.contents;
           if (contents instanceof FmtHLM.ObjectContents_Definition) {
             contents.notation = undefined;
             contents.definitionNotation = undefined;
@@ -536,21 +536,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         GenericEditHandler.lastInsertedParameter = parameter;
       };
-      let paramSelection: ParameterSelection = {
+      const paramSelection: ParameterSelection = {
         allowSets: !state.inExistsUnique,
         allowConstraint: state.fullSentence || !isEmpty,
         allowProposition: state.associatedDefinition !== undefined && (state.associatedParameterList !== state.associatedDefinition.parameters || state.associatedDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) && !state.inExistsUnique,
         allowDefinition: state.fullSentence && !state.inExistsUnique,
         allowBinder: state.associatedDefinition !== undefined && !state.inForEach && !state.inExistsUnique
       };
-      let insertButton = this.editHandler.getParameterInsertButton(onRenderParam, onInsertParam, paramSelection, state.inForEach);
+      const insertButton = this.editHandler.getParameterInsertButton(onRenderParam, onInsertParam, paramSelection, state.inForEach);
       row.push(insertButton);
     }
   }
 
   private addParameterGroup(parameters: Fmt.Parameter[], definition: Fmt.Definition | undefined, remainingParameters: Fmt.Parameter[], remainingDefinitions: (Fmt.Definition | undefined)[], state: ParameterListState, indices: Notation.RenderedExpression[] | undefined, row: Notation.RenderedExpression[]): void {
-    let param = parameters[0];
-    let type = param.type;
+    const param = parameters[0];
+    const type = param.type;
 
     if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       this.addBinder(type, state, indices, row);
@@ -571,15 +571,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.inDefinition = false;
     state.inDefinitionNotationGroup = false;
 
-    let targetState = {
+    const targetState = {
       ...state,
       associatedParameterList: type.targetParameters
     };
-    let targetIndices = this.addIndices(type, indices);
+    const targetIndices = this.addIndices(type, indices);
     row.push(this.renderParametersWithInitialState(type.targetParameters, targetState, targetIndices));
 
     row.push(new Notation.TextExpression(state.abbreviate ? ' f.e. ' : ' for each '));
-    let sourceState: ParameterListState = {
+    const sourceState: ParameterListState = {
       ...state,
       fullSentence: false,
       sentence: false,
@@ -616,14 +616,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
 
-    let formulaSelection: FormulaSelection = {
+    const formulaSelection: FormulaSelection = {
       allowTruthValue: false,
       allowEquiv: true,
       allowCases: true
     };
     let formula = this.renderFormula(type.formula, formulaSelection);
     while (remainingParameters.length) {
-      let nextType = remainingParameters[0].type;
+      const nextType = remainingParameters[0].type;
       if (nextType instanceof FmtHLM.MetaRefExpression_Constraint && this.hasAssociativeArg(nextType.formula)) {
         formula = this.renderFormula(nextType.formula, formulaSelection, formula);
         remainingParameters.pop();
@@ -635,7 +635,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (state.sentence && !(state.inConstraint || (remainingParameters.length && remainingParameters[0].type instanceof FmtHLM.MetaRefExpression_Constraint))) {
       row.push(formula);
     } else {
-      let formulaWithParens = new Notation.InnerParenExpression(formula);
+      const formulaWithParens = new Notation.InnerParenExpression(formula);
       formulaWithParens.maxLevel = -2;
       if (state.sentence && !remainingParameters.length) {
         formulaWithParens.right = false;
@@ -667,26 +667,26 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     state.inConstraint = false;
     state.inDefinition = false;
 
-    let variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.inInsertMenu, state.associatedParameterList, state.elementParameterOverrides);
+    const variableDefinitions = this.renderVariableDefinitions(parameters, indices, state.inInsertMenu, state.associatedParameterList, state.elementParameterOverrides);
     let variableNotation: Notation.RenderedExpression | undefined;
-    let noun: PropertyInfo = {
+    const noun: PropertyInfo = {
       isFeature: false,
       extracted: false
     };
-    let singular: Notation.RenderedExpression[] = [];
-    let plural: Notation.RenderedExpression[] = [];
+    const singular: Notation.RenderedExpression[] = [];
+    const plural: Notation.RenderedExpression[] = [];
     let combineWithNext = false;
     if (definition && state.enableSpecializations) {
-      let definitionRef = this.getNotationDefinitionRef(type);
+      const definitionRef = this.getNotationDefinitionRef(type);
       if (definitionRef instanceof Fmt.DefinitionRefExpression) {
         noun.definitionRef = definitionRef;
-        let definitions: Fmt.Definition[] = [];
-        let argumentLists: Fmt.ArgumentList[] = [];
+        const definitions: Fmt.Definition[] = [];
+        const argumentLists: Fmt.ArgumentList[] = [];
         this.utils.analyzeDefinitionRef(definitionRef, definition, definitions, argumentLists);
-        let innerDefinition = definitions[definitions.length - 1];
-        let definitionNotation = this.renderUtils.getDefinitionNotation(innerDefinition);
+        const innerDefinition = definitions[definitions.length - 1];
+        const definitionNotation = this.renderUtils.getDefinitionNotation(innerDefinition);
         if (definitionNotation) {
-          let args = this.getRenderedTemplateArguments(definitions, argumentLists);
+          const args = this.getRenderedTemplateArguments(definitions, argumentLists);
           args[definitionNotation.parameter.name] = variableDefinitions;
           if (definitionNotation.notation) {
             variableNotation = this.renderNotationExpression(definitionNotation.notation, args);
@@ -696,14 +696,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             if (definitionNotation.singularName) {
               noun.singular = this.applyName(definitionNotation.singularName, args, definitionRef, singular);
               if (definitionNotation.singularName instanceof Fmt.StringExpression && remainingParameters && remainingParameters.length && remainingDefinitions && remainingDefinitions.length) {
-                let nextDefinitionRef = this.getNotationDefinitionRef(remainingParameters[0].type);
-                let nextDefinition = remainingDefinitions[0];
+                const nextDefinitionRef = this.getNotationDefinitionRef(remainingParameters[0].type);
+                const nextDefinition = remainingDefinitions[0];
                 if (nextDefinitionRef instanceof Fmt.DefinitionRefExpression && nextDefinition) {
-                  let nextDefinitions: Fmt.Definition[] = [];
-                  let nextArgumentLists: Fmt.ArgumentList[] = [];
+                  const nextDefinitions: Fmt.Definition[] = [];
+                  const nextArgumentLists: Fmt.ArgumentList[] = [];
                   this.utils.analyzeDefinitionRef(nextDefinitionRef, nextDefinition, nextDefinitions, nextArgumentLists);
-                  let nextInnerDefinition = nextDefinitions[nextDefinitions.length - 1];
-                  let nextDefinitionNotation = this.renderUtils.getDefinitionNotation(nextInnerDefinition);
+                  const nextInnerDefinition = nextDefinitions[nextDefinitions.length - 1];
+                  const nextDefinitionNotation = this.renderUtils.getDefinitionNotation(nextInnerDefinition);
                   if (nextDefinitionNotation && nextDefinitionNotation.singularName instanceof Fmt.StringExpression && definitionNotation.singularName.value === nextDefinitionNotation.singularName.value) {
                     combineWithNext = true;
                   }
@@ -735,17 +735,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addExtractedProperties(properties, singular, plural);
       }
       if (this.editHandler && state.associatedParameterList && !state.inDefinitionNotationGroup && !remainingParameters?.length) {
-        let firstObjectParam = parameters[0];
-        let onRenderFormulas = (expressions: Fmt.Expression[]) => this.renderConstraintMenuItem(expressions, firstObjectParam);
-        let parameterList = state.associatedParameterList;
-        let onInsertParam = (parameter: Fmt.Parameter) => parameterList.push(parameter);
+        const firstObjectParam = parameters[0];
+        const onRenderFormulas = (expressions: Fmt.Expression[]) => this.renderConstraintMenuItem(expressions, firstObjectParam);
+        const parameterList = state.associatedParameterList;
+        const onInsertParam = (parameter: Fmt.Parameter) => parameterList.push(parameter);
         this.editHandler.addPropertyInsertButton(parameterList, singular, plural, parameters, onInsertParam, onRenderFormulas);
       }
       if (!variableNotation) {
         variableNotation = variableDefinitions;
       }
       if (state.abbreviate) {
-        let which = parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural;
+        const which = parameters.length === 1 && !state.forcePlural && !combineWithNext ? singular : plural;
         row.push(...which);
         row.push(new Notation.TextExpression(' '));
         row.push(variableNotation);
@@ -754,7 +754,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (combineWithNext) {
           state.inDefinitionNotationGroup = true;
         } else {
-          let isPlural = parameters.length > 1 || state.inDefinitionNotationGroup;
+          const isPlural = parameters.length > 1 || state.inDefinitionNotationGroup;
           this.addNounDefinition(isPlural ? plural : singular, noun.article, isPlural, state.sentence, row);
           state.inDefinitionNotationGroup = false;
         }
@@ -762,7 +762,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (variableNotation) {
       row.push(variableNotation);
     } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-      let termSelection: SetTermSelection = {
+      const termSelection: SetTermSelection = {
         allowEnumeration: true,
         allowSubset: true,
         allowCases: false
@@ -772,7 +772,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                      'superset': this.renderSetTerm(type.superset, termSelection)
                                    }));
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let termSelection: SetTermSelection = {
+      const termSelection: SetTermSelection = {
         allowEnumeration: true,
         allowSubset: false,
         allowCases: false
@@ -816,7 +816,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     return new Notation.PromiseExpression(constraintDefinitionPromise.then((constraintDefinition: Fmt.Definition | undefined) => {
       if (constraintDefinition) {
-        let constraintProperty = this.renderUtils.getConstraintProperty(firstObjectParam, constraint as Fmt.DefinitionRefExpression, negationCount, constraintDefinition);
+        const constraintProperty = this.renderUtils.getConstraintProperty(firstObjectParam, constraint as Fmt.DefinitionRefExpression, negationCount, constraintDefinition);
         if (constraintProperty && !constraintProperty.isFeature) {
           let property: string | undefined = undefined;
           if (constraintProperty.property) {
@@ -838,7 +838,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
         }
       }
-      let renderedFormulas = expressions.map((expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!);
+      const renderedFormulas = expressions.map((expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!);
       return this.renderGroup(renderedFormulas, ', ');
     }));
   }
@@ -854,15 +854,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderVariableDefinitions(parameters: Fmt.Parameter[], indices?: Notation.RenderedExpression[], markAsDummy: boolean = false, parameterList?: Fmt.ParameterList, elementParameterOverrides?: ElementParameterOverrides): Notation.RenderedExpression {
-    let items = parameters.map((param) => this.renderVariable(param, indices, true, markAsDummy, parameterList, elementParameterOverrides));
+    const items = parameters.map((param) => this.renderVariable(param, indices, true, markAsDummy, parameterList, elementParameterOverrides));
     return this.renderGroup(items);
   }
 
   renderVariable(param: Fmt.Parameter, indices?: Notation.RenderedExpression[], isDefinition: boolean = false, isDummy: boolean = false, parameterList?: Fmt.ParameterList, elementParameterOverrides?: ElementParameterOverrides): Notation.RenderedExpression {
     if (elementParameterOverrides) {
-      let variableOverride = elementParameterOverrides.get(param);
+      const variableOverride = elementParameterOverrides.get(param);
       if (variableOverride) {
-        let termPromise = variableOverride.then((term: Fmt.Expression) => this.readOnlyRenderer.renderElementTerm(term, fullElementTermSelection));
+        const termPromise = variableOverride.then((term: Fmt.Expression) => this.readOnlyRenderer.renderElementTerm(term, fullElementTermSelection));
         return new Notation.PromiseExpression(termPromise);
       }
     }
@@ -870,41 +870,41 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderDefinedSymbol(definitions: Fmt.Definition[]): Notation.RenderedExpression {
-    let innerDefinition = definitions[definitions.length - 1];
-    let contents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
-    let definitionRef = this.renderDefinitionRef(definitions);
-    let onSetNotation = (notation: Fmt.Expression | undefined) => {
+    const innerDefinition = definitions[definitions.length - 1];
+    const contents = innerDefinition.contents as FmtHLM.ObjectContents_Definition;
+    const definitionRef = this.renderDefinitionRef(definitions);
+    const onSetNotation = (notation: Fmt.Expression | undefined) => {
       if (notation) {
-        let referencedParams = this.utils.findReferencedParameters(notation);
-        for (let definition of definitions) {
+        const referencedParams = this.utils.findReferencedParameters(notation);
+        for (const definition of definitions) {
           this.utils.markUnreferencedParametersAsAuto(definition.parameters, referencedParams);
         }
       }
       contents.notation = notation;
     };
-    let onGetDefault = () => this.renderDefaultDefinitionRef(definitions);
-    let onGetVariables = () => {
-      let parameters: Fmt.Parameter[] = [];
-      for (let definition of definitions) {
+    const onGetDefault = () => this.renderDefaultDefinitionRef(definitions);
+    const onGetVariables = () => {
+      const parameters: Fmt.Parameter[] = [];
+      for (const definition of definitions) {
         parameters.push(...definition.parameters);
       }
-      let variables: RenderedVariable[] = [];
+      const variables: RenderedVariable[] = [];
       this.addRenderedVariables(parameters, variables);
       return variables;
     };
-    let isPredicate = contents instanceof FmtHLM.ObjectContents_Predicate;
+    const isPredicate = contents instanceof FmtHLM.ObjectContents_Predicate;
     this.setDefinitionSemanticLink(definitionRef, innerDefinition, contents.notation, onSetNotation, onGetDefault, onGetVariables, isPredicate);
     return definitionRef;
   }
 
   renderSetTerm(term: Fmt.Expression, termSelection: SetTermSelection): Notation.RenderedExpression {
-    let result = this.renderSetTermInternal(term, false);
+    const result = this.renderSetTermInternal(term, false);
     if (!result) {
       return new Notation.ErrorExpression('Unknown expression type');
     }
-    let semanticLink = this.addSemanticLink(result, term);
+    const semanticLink = this.addSemanticLink(result, term);
     if (this.editHandler) {
-      let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, true)!;
+      const onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, true)!;
       this.editHandler.addSetTermMenu(semanticLink, term, onRenderTerm, termSelection);
     }
     return result;
@@ -912,22 +912,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderSetTermInternal(term: Fmt.Expression, markParametersAsDummy: boolean): Notation.RenderedExpression | undefined {
     if (term instanceof FmtHLM.MetaRefExpression_enumeration) {
-      let termSelection: ElementTermSelection = {
+      const termSelection: ElementTermSelection = {
         allowCases: false,
         allowConstructors: true
       };
-      let items = term.terms ? term.terms.map((item) => this.renderElementTerm(item, termSelection)) : [];
+      const items = term.terms ? term.terms.map((item) => this.renderElementTerm(item, termSelection)) : [];
       if (this.editHandler) {
-        let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
+        const onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
         this.editHandler.addEnumerationInsertButton(items, term, onRenderTerm, termSelection);
       }
       return this.renderTemplate('Enumeration', {
                                    'items': items
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
-      let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
-      let formula = this.renderUtils.convertStructuralCaseToOverride([term.parameter], term.formula, elementParameterOverrides);
-      let formulaSelection: FormulaSelection = {
+      const elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
+      const formula = this.renderUtils.convertStructuralCaseToOverride([term.parameter], term.formula, elementParameterOverrides);
+      const formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: false,
         allowCases: true
@@ -937,9 +937,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    'constraint': this.renderFormula(formula, formulaSelection)
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
-      let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
-      let element = this.renderUtils.convertStructuralCaseToOverride(term.parameters, term.term, elementParameterOverrides);
-      let termSelection: ElementTermSelection = {
+      const elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
+      const element = this.renderUtils.convertStructuralCaseToOverride(term.parameters, term.term, elementParameterOverrides);
+      const termSelection: ElementTermSelection = {
         allowCases: false,
         allowConstructors: true
       };
@@ -948,7 +948,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    'constraint': this.renderParameterList(term.parameters, false, false, false, undefined, elementParameterOverrides)
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
-      let renderCase = (value: Fmt.Expression | undefined) => {
+      const renderCase = (value: Fmt.Expression | undefined) => {
         if (value) {
           return this.renderSetTerm(value, fullSetTermSelection);
         } else {
@@ -969,13 +969,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderElementTerm(term: Fmt.Expression, termSelection: ElementTermSelection): Notation.RenderedExpression {
-    let result = this.renderElementTermInternal(term);
+    const result = this.renderElementTermInternal(term);
     if (!result) {
       return new Notation.ErrorExpression('Unknown expression type');
     }
-    let semanticLink = this.addSemanticLink(result, term);
+    const semanticLink = this.addSemanticLink(result, term);
     if (this.editHandler) {
-      let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
+      const onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
       this.editHandler.addElementTermMenu(semanticLink, term, onRenderTerm, termSelection);
     }
     return result;
@@ -983,14 +983,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   renderElementTermInternal(term: Fmt.Expression): Notation.RenderedExpression | undefined {
     if (term instanceof FmtHLM.MetaRefExpression_cases) {
-      let rows = term.cases.map((item) => {
-        let value = this.renderElementTerm(item.value, fullElementTermSelection);
-        let formulaSelection: FormulaSelection = {
+      const rows = term.cases.map((item) => {
+        const value = this.renderElementTerm(item.value, fullElementTermSelection);
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: false
         };
-        let formula = this.renderFormula(item.formula, formulaSelection);
+        const formula = this.renderFormula(item.formula, formulaSelection);
         return this.buildCaseRow(value, formula);
       });
       if (this.editHandler) {
@@ -1000,7 +1000,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    'cases': rows
                                  });
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
-      let renderCase = (value: Fmt.Expression | undefined) => {
+      const renderCase = (value: Fmt.Expression | undefined) => {
         if (value) {
           return this.renderElementTerm(value, fullElementTermSelection);
         } else {
@@ -1023,13 +1023,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderFormula(formula: Fmt.Expression, formulaSelection: FormulaSelection, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression {
-    let [result, innerFormula] = this.renderFormulaInternal(formula, replaceAssociativeArg);
+    const [result, innerFormula] = this.renderFormulaInternal(formula, replaceAssociativeArg);
     if (!result) {
       return new Notation.ErrorExpression('Unknown expression type');
     }
-    let semanticLink = this.addSemanticLink(result, formula);
+    const semanticLink = this.addSemanticLink(result, formula);
     if (this.editHandler) {
-      let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
+      const onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
       this.editHandler.addFormulaMenu(semanticLink, formula, onRenderFormula, formulaSelection);
     }
     this.addSemanticLink(result, innerFormula);
@@ -1039,7 +1039,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private renderFormulaInternal(formula: Fmt.Expression, replaceAssociativeArg?: Notation.RenderedExpression): [Notation.RenderedExpression | undefined, Fmt.Expression] {
     let negationCount = 0;
     while (formula instanceof FmtHLM.MetaRefExpression_not) {
-      let innerFormula = formula.formula;
+      const innerFormula = formula.formula;
       if (innerFormula instanceof Fmt.VariableRefExpression
           || innerFormula instanceof Fmt.IndexedExpression
           || innerFormula instanceof Fmt.PlaceholderExpression
@@ -1051,7 +1051,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       negationCount++;
       formula = innerFormula;
     }
-    let result = this.renderFormulaWithNegationCount(formula, negationCount, replaceAssociativeArg);
+    const result = this.renderFormulaWithNegationCount(formula, negationCount, replaceAssociativeArg);
     if (result) {
       result.optionalParenStyle = '[]';
     }
@@ -1060,7 +1060,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderFormulaWithNegationCount(formula: Fmt.Expression, negationCount: number, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression | undefined {
     if (formula instanceof FmtHLM.MetaRefExpression_not) {
-      let formulaSelection: FormulaSelection = {
+      const formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: false,
         allowCases: true
@@ -1070,14 +1070,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_and) {
       if (formula.formulas) {
-        let formulaSelection: FormulaSelection = {
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: true
         };
-        let operands: Notation.RenderedExpression[] = [];
+        const operands: Notation.RenderedExpression[] = [];
         let prevItem: Notation.RenderedExpression | undefined = undefined;
-        for (let item of formula.formulas) {
+        for (const item of formula.formulas) {
           if (this.hasAssociativeArg(item)) {
             operands.pop();
           } else {
@@ -1094,12 +1094,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_or) {
       if (formula.formulas) {
-        let formulaSelection: FormulaSelection = {
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: true
         };
-        let operands = formula.formulas.map((item) => this.renderFormula(item, formulaSelection));
+        const operands = formula.formulas.map((item) => this.renderFormula(item, formulaSelection));
         return this.renderTemplate('Disjunction', {
                                      'operands': operands
                                    }, negationCount);
@@ -1107,17 +1107,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return this.renderTemplate('False', {}, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_equiv) {
-      let formulaSelection: FormulaSelection = {
+      const formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: false,
         allowCases: true
       };
-      let operands = formula.formulas.map((item) => this.renderFormula(item, formulaSelection));
+      const operands = formula.formulas.map((item) => this.renderFormula(item, formulaSelection));
       return this.renderTemplate('EquivalenceRelation', {
                                    'operands': operands
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall) {
-      let formulaSelection: FormulaSelection = {
+      const formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: true,
         allowCases: true
@@ -1128,7 +1128,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_exists) {
       if (formula.formula) {
-        let formulaSelection: FormulaSelection = {
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: false
@@ -1143,7 +1143,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    }, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
-      let initialState: ParameterListState = {
+      const initialState: ParameterListState = {
         fullSentence: false,
         sentence: false,
         abbreviate: true,
@@ -1160,7 +1160,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         associatedParameterList: formula.parameters
       };
       if (formula.formula) {
-        let formulaSelection: FormulaSelection = {
+        const formulaSelection: FormulaSelection = {
           allowTruthValue: false,
           allowEquiv: false,
           allowCases: false
@@ -1175,11 +1175,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    }, negationCount);
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_in) {
-      let elementTermSelection: ElementTermSelection = {
+      const elementTermSelection: ElementTermSelection = {
         allowCases: false,
         allowConstructors: true
       };
-      let setTermSelection: SetTermSelection = {
+      const setTermSelection: SetTermSelection = {
         allowEnumeration: true,
         allowSubset: false,
         allowCases: true
@@ -1191,12 +1191,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    ]
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_sub) {
-      let subsetTermSelection: SetTermSelection = {
+      const subsetTermSelection: SetTermSelection = {
         allowEnumeration: false,
         allowSubset: false,
         allowCases: false
       };
-      let supersetTermSelection: SetTermSelection = {
+      const supersetTermSelection: SetTermSelection = {
         allowEnumeration: true,
         allowSubset: true,
         allowCases: true
@@ -1216,7 +1216,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    'operands': formula.terms.map((item) => this.renderElementTerm(item, fullElementTermSelection))
                                  }, negationCount);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
-      let renderCase = (value: Fmt.Expression | undefined) => {
+      const renderCase = (value: Fmt.Expression | undefined) => {
         if (value) {
           return this.renderFormula(value, fullFormulaSelection);
         } else {
@@ -1230,45 +1230,45 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], renderCase: (value: Fmt.Expression | undefined) => Notation.RenderedExpression): Notation.RenderedExpression {
-    let termSelection: ElementTermSelection = {
+    const termSelection: ElementTermSelection = {
       allowCases: false,
       allowConstructors: false
     };
-    let termNotation = this.renderElementTerm(term, termSelection);
+    const termNotation = this.renderElementTerm(term, termSelection);
     let rows: Notation.RenderedExpression[][];
     if (cases.length) {
       rows = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
         let constructorNotation: Notation.RenderedExpression;
         if (construction instanceof Fmt.DefinitionRefExpression) {
-          let constructorPromise = this.utils.getStructuralCaseTerm(construction.path, structuralCase);
-          let constructorNotationPromise = constructorPromise.then((constructorExpr: Fmt.Expression) => this.renderElementTerm(constructorExpr, termSelection));
+          const constructorPromise = this.utils.getStructuralCaseTerm(construction.path, structuralCase);
+          const constructorNotationPromise = constructorPromise.then((constructorExpr: Fmt.Expression) => this.renderElementTerm(constructorExpr, termSelection));
           constructorNotation = new Notation.PromiseExpression(constructorNotationPromise);
         } else {
           constructorNotation = new Notation.TextExpression('…');
         }
-        let formula = this.renderTemplate('EqualityRelation', {
+        const formula = this.renderTemplate('EqualityRelation', {
                                             'operands': [termNotation, constructorNotation]
                                           });
-        let value = renderCase(structuralCase.value);
-        let row = this.buildCaseRow(value, formula);
+        const value = renderCase(structuralCase.value);
+        const row = this.buildCaseRow(value, formula);
         if (structuralCase.parameters) {
           this.addCaseParameters(structuralCase.parameters, undefined, row);
         }
         return row;
       });
     } else {
-      let formula = this.renderTemplate('EqualityRelation', {
+      const formula = this.renderTemplate('EqualityRelation', {
                                           'operands': [termNotation, new Notation.TextExpression('…')]
                                         });
       if (this.editHandler && this.editHandler.isTemporaryExpression(term)) {
-        let row = this.buildCaseRow(renderCase(undefined), formula);
-        let ellipsis = new Notation.TextExpression('⋮');
+        const row = this.buildCaseRow(renderCase(undefined), formula);
+        const ellipsis = new Notation.TextExpression('⋮');
         ellipsis.styleClasses = ['ellipsis'];
-        let ellipsisRow = [ellipsis, ellipsis];
+        const ellipsisRow = [ellipsis, ellipsis];
         rows = [row, ellipsisRow];
       } else {
-        let ellipsis = new Notation.TextExpression('…');
-        let row = this.buildCaseRow(ellipsis, formula);
+        const ellipsis = new Notation.TextExpression('…');
+        const row = this.buildCaseRow(ellipsis, formula);
         rows = [row];
       }
     }
@@ -1285,17 +1285,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addCaseParameters(parameters: Fmt.Parameter[], elementParameterOverrides: ElementParameterOverrides | undefined, row: Notation.RenderedExpression[]): void {
     if (parameters.length) {
-      let extractedConstraints: ConstraintExtractionContainer = {};
-      let parameterList = this.readOnlyRenderer.renderParameters(parameters, false, false, false, elementParameterOverrides, extractedConstraints);
-      let extendedParameterListPromise = extractedConstraints.resultPromise!.then((constraintParams: Fmt.Parameter[]) => {
+      const extractedConstraints: ConstraintExtractionContainer = {};
+      const parameterList = this.readOnlyRenderer.renderParameters(parameters, false, false, false, elementParameterOverrides, extractedConstraints);
+      const extendedParameterListPromise = extractedConstraints.resultPromise!.then((constraintParams: Fmt.Parameter[]) => {
         if (constraintParams.length) {
           return new Notation.RowExpression([parameterList, new Notation.TextExpression(' with suitable conditions')]);
         } else {
           return parameterList;
         }
       });
-      let extendedParameterList = new Notation.PromiseExpression(extendedParameterListPromise);
-      let caseParameters = new Notation.ParenExpression(extendedParameterList, '()');
+      const extendedParameterList = new Notation.PromiseExpression(extendedParameterListPromise);
+      const caseParameters = new Notation.ParenExpression(extendedParameterList, '()');
       caseParameters.styleClasses = ['case-parameters'];
       row.push(caseParameters);
     }
@@ -1313,7 +1313,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         } else if (expression.arguments) {
           // Fallback when rendering code within markdown.
           for (let argIndex = expression.arguments.length - 1; argIndex >= 0; argIndex--) {
-            let arg = expression.arguments[argIndex];
+            const arg = expression.arguments[argIndex];
             let value = arg.value;
             if (value instanceof Fmt.CompoundExpression && value.arguments.length) {
               value = value.arguments[0].value;
@@ -1324,24 +1324,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         expression = expression.body;
       }
       if (expression instanceof Fmt.VariableRefExpression) {
-        let additionalIndices = this.additionalIndices.get(expression.variable);
+        const additionalIndices = this.additionalIndices.get(expression.variable);
         if (additionalIndices) {
           indices = indices ? [...additionalIndices, ...indices] : additionalIndices;
         }
-        let isDefinition = (expression as any).isDefinition === true;
-        let elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
+        const isDefinition = (expression as any).isDefinition === true;
+        const elementParameterOverrides = parameterOverrides?.elementParameterOverrides;
         return this.renderVariable(expression.variable, indices, isDefinition, false, undefined, elementParameterOverrides);
       } else {
         return undefined;
       }
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
-      let definitionRefExpression = expression;
-      let childPaths: Fmt.Path[] = [];
+      const definitionRefExpression = expression;
+      const childPaths: Fmt.Path[] = [];
       this.utils.splitPath(definitionRefExpression.path, childPaths);
-      let definitionPromise = this.utils.getDefinition(childPaths[0]);
-      let expressionPromise = definitionPromise.then((definition) => {
-        let definitions: Fmt.Definition[] = [];
-        let argumentLists: Fmt.ArgumentList[] = [];
+      const definitionPromise = this.utils.getDefinition(childPaths[0]);
+      const expressionPromise = definitionPromise.then((definition) => {
+        const definitions: Fmt.Definition[] = [];
+        const argumentLists: Fmt.ArgumentList[] = [];
         this.utils.analyzeDefinitionRefPath(childPaths, definition, definitions, argumentLists);
         let macroInvocation: HLMMacro.HLMMacroInvocation | undefined = undefined;
         if (definitions.length === 1 && definitions[0].contents instanceof FmtHLM.ObjectContents_MacroOperator) {
@@ -1358,8 +1358,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderItemNumber(expression: Fmt.DefinitionRefExpression): Notation.RenderedExpression {
-    let itemNumberPromise = this.utils.getItemInfo(expression).then((itemInfo: LibraryItemInfo) => new Notation.TextExpression(formatItemNumber(itemInfo.itemNumber)));
-    let result = new Notation.PromiseExpression(itemNumberPromise);
+    const itemNumberPromise = this.utils.getItemInfo(expression).then((itemInfo: LibraryItemInfo) => new Notation.TextExpression(formatItemNumber(itemInfo.itemNumber)));
+    const result = new Notation.PromiseExpression(itemNumberPromise);
     this.addSemanticLink(result, expression);
     return result;
   }
@@ -1367,8 +1367,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   renderExpression(expression: Fmt.Expression): Notation.RenderedExpression {
     let result: Notation.RenderedExpression | undefined;
     if (expression instanceof Fmt.DefinitionRefExpression && !(expression.path.parentPath instanceof Fmt.Path) && !expression.path.arguments.length) {
-      let definitionPromise = this.utils.getDefinition(expression.path);
-      let expressionPromise = definitionPromise.then((definition) => {
+      const definitionPromise = this.utils.getDefinition(expression.path);
+      const expressionPromise = definitionPromise.then((definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Definition) {
           return this.renderDefinitionRef([definition], undefined, 2);
         } else {
@@ -1396,19 +1396,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   renderExampleExpression(expression: Fmt.DefinitionRefExpression): Notation.RenderedExpression {
-    let definitionPromise = this.utils.getDefinition(expression.path);
-    let expressionPromise = definitionPromise.then((definition) => {
+    const definitionPromise = this.utils.getDefinition(expression.path);
+    const expressionPromise = definitionPromise.then((definition) => {
       return this.renderDefinitionRef([definition]);
     });
-    let result = new Notation.PromiseExpression(expressionPromise);
+    const result = new Notation.PromiseExpression(expressionPromise);
     this.addSemanticLink(result, expression);
     return result;
   }
 
   private renderDefinitionRef(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], omitArguments: number = 0, negationCount: number = 0, parameterOverrides?: ParameterOverrides, replaceAssociativeArg?: Notation.RenderedExpression, macroInvocation?: HLMMacro.HLMMacroInvocation): Notation.RenderedExpression {
     let result: Notation.RenderedExpression | undefined = undefined;
-    let definition = definitions[definitions.length - 1];
-    let options: ArgumentRenderingOptions = {
+    const definition = definitions[definitions.length - 1];
+    const options: ArgumentRenderingOptions = {
       ...parameterOverrides,
       omitArguments: omitArguments,
       replaceAssociativeArg: replaceAssociativeArg,
@@ -1427,8 +1427,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderDefaultDefinitionRef(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], options: ArgumentRenderingOptions = {}, negationCount: number = 0): Notation.RenderedExpression {
-    let definition = definitions[definitions.length - 1];
-    let name = definition.name.split(' ').join('-');
+    const definition = definitions[definitions.length - 1];
+    const name = definition.name.split(' ').join('-');
     let result: Notation.RenderedExpression = new Notation.TextExpression(name);
     if (definition.contents instanceof FmtHLM.ObjectContents_Constructor) {
       result.styleClasses = ['ctor'];
@@ -1440,8 +1440,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                    });
     }
     if (!options.omitArguments) {
-      let args: RenderedTemplateArgument[] = [];
-      let argumentList = argumentLists ? argumentLists[argumentLists.length - 1] : undefined;
+      const args: RenderedTemplateArgument[] = [];
+      const argumentList = argumentLists ? argumentLists[argumentLists.length - 1] : undefined;
       this.fillArguments(definition.parameters, argumentList, options, undefined, args);
       if (args.length) {
         result = this.renderTemplate('Function', {
@@ -1457,27 +1457,27 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderDefinitionNotationExpression(notation: Fmt.Expression, definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], options: ArgumentRenderingOptions = {}, negationCount: number = 0): Notation.RenderedExpression {
-    let args = this.getRenderedTemplateArguments(definitions, argumentLists, options);
-    let result = this.renderNotationExpression(notation, args, options.omitArguments, negationCount);
+    const args = this.getRenderedTemplateArguments(definitions, argumentLists, options);
+    const result = this.renderNotationExpression(notation, args, options.omitArguments, negationCount);
     return this.applyAbbreviations(result, definitions[definitions.length - 1], args, options.omitArguments, negationCount);
   }
 
   private getRenderedTemplateArguments(definitions: Fmt.Definition[], argumentLists?: Fmt.ArgumentList[], options: ArgumentRenderingOptions = {}): RenderedTemplateArguments {
-    let args: RenderedTemplateArguments = {};
+    const args: RenderedTemplateArguments = {};
     let index = 0;
-    for (let curDefinition of definitions) {
-      let curReplacementParameters = index === definitions.length - 1 ? options.replacementParameters : undefined;
-      let curArgumentList = argumentLists && !curReplacementParameters ? argumentLists[index] : undefined;
-      let curOptions: ArgumentRenderingOptions = {
+    for (const curDefinition of definitions) {
+      const curReplacementParameters = index === definitions.length - 1 ? options.replacementParameters : undefined;
+      const curArgumentList = argumentLists && !curReplacementParameters ? argumentLists[index] : undefined;
+      const curOptions: ArgumentRenderingOptions = {
         ...options,
         replacementParameters: curReplacementParameters,
         elementParameterOverrides: index === definitions.length - 1 ? options.elementParameterOverrides : undefined
       };
-      let curParams: Fmt.Parameter[] = [];
-      let curArgs: RenderedTemplateArgument[] = [];
+      const curParams: Fmt.Parameter[] = [];
+      const curArgs: RenderedTemplateArgument[] = [];
       this.fillArguments(curDefinition.parameters, curArgumentList, curOptions, curParams, curArgs);
       for (let paramIndex = 0; paramIndex < curParams.length; paramIndex++) {
-        let curParam = curParams[paramIndex];
+        const curParam = curParams[paramIndex];
         args[curParam.name] = curArgs[paramIndex];
       }
       index++;
@@ -1489,11 +1489,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (style === ArgumentListStyle.Formulas) {
       return this.renderArgumentFormulas(parameters, argumentList);
     } else {
-      let options: ArgumentRenderingOptions = {
+      const options: ArgumentRenderingOptions = {
         indices: indices
       };
-      let params: Fmt.Parameter[] | undefined = style === ArgumentListStyle.Definitions ? [] : undefined;
-      let args: RenderedTemplateArgument[] = [];
+      const params: Fmt.Parameter[] | undefined = style === ArgumentListStyle.Definitions ? [] : undefined;
+      const args: RenderedTemplateArgument[] = [];
       this.fillArguments(parameters, argumentList, options, params, args);
       switch (style) {
       case ArgumentListStyle.Group:
@@ -1516,7 +1516,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderArgumentDefinitionList(params: Fmt.Parameter[], args: RenderedTemplateArgument[]): Notation.RenderedExpression {
     // TODO better handling of binders?
-    let items = params.map((param: Fmt.Parameter, index: number) =>
+    const items = params.map((param: Fmt.Parameter, index: number) =>
       this.renderTemplate('EqualityDefinition', {
         'operands': [
           this.renderVariable(param),
@@ -1532,9 +1532,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       substitutionContext = new HLMSubstitutionContext;
       this.utils.addArgumentListSubstitution(parameters, argumentList, undefined, substitutionContext);
     }
-    let items: Notation.RenderedExpression[] = [];
-    let currentGroup: Fmt.Parameter[] = [];
-    for (let param of parameters) {
+    const items: Notation.RenderedExpression[] = [];
+    const currentGroup: Fmt.Parameter[] = [];
+    for (const param of parameters) {
       if (currentGroup.length && param.type !== currentGroup[0].type) {
         this.addArgumentFormula(currentGroup, substitutionContext, items);
         currentGroup.length = 0;
@@ -1548,13 +1548,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addArgumentFormula(params: Fmt.Parameter[], substitutionContext: HLMSubstitutionContext | undefined, items: Notation.RenderedExpression[]): void {
-    let type = params[0].type;
+    const type = params[0].type;
     if (type instanceof FmtHLM.MetaRefExpression_Subset) {
-      let argValues = params.map((param: Fmt.Parameter) =>
+      const argValues = params.map((param: Fmt.Parameter) =>
         this.utils.applySubstitutionContext(new Fmt.VariableRefExpression(param), substitutionContext));
-      let args = argValues.map((argValue: Fmt.Expression) =>
+      const args = argValues.map((argValue: Fmt.Expression) =>
         this.renderSetTerm(argValue, fullSetTermSelection));
-      let superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
+      const superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
       items.push(this.renderTemplate('SubsetRelation', {
                                        'operands': [
                                          this.renderGroup(args),
@@ -1562,11 +1562,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                        ]
                                      }));
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let argValues = params.map((param: Fmt.Parameter) =>
+      const argValues = params.map((param: Fmt.Parameter) =>
         this.utils.applySubstitutionContext(new Fmt.VariableRefExpression(param), substitutionContext));
-      let args = argValues.map((argValue: Fmt.Expression) =>
+      const args = argValues.map((argValue: Fmt.Expression) =>
         this.renderElementTerm(argValue, fullElementTermSelection));
-      let set = this.utils.applySubstitutionContext(type._set, substitutionContext);
+      const set = this.utils.applySubstitutionContext(type._set, substitutionContext);
       items.push(this.renderTemplate('ElementRelation', {
                                        'operands': [
                                          this.renderGroup(args),
@@ -1574,16 +1574,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                        ]
                                      }));
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-      let formula = this.utils.applySubstitutionContext(type.formula, substitutionContext);
+      const formula = this.utils.applySubstitutionContext(type.formula, substitutionContext);
       items.push(this.renderFormula(formula, fullFormulaSelection));
     }
   }
 
   private fillArguments(parameters: Fmt.ParameterList, argumentList: Fmt.ArgumentList | undefined, options: ArgumentRenderingOptions, resultParams: Fmt.Parameter[] | undefined, resultArgs: RenderedTemplateArgument[]): void {
-    let replacementParams = options.replacementParameters?.parameters;
+    const replacementParams = options.replacementParameters?.parameters;
     let index = 0;
-    for (let param of parameters) {
-      let replacementParam = replacementParams ? replacementParams[index] : undefined;
+    for (const param of parameters) {
+      const replacementParam = replacementParams ? replacementParams[index] : undefined;
       this.fillArgument(param, replacementParam, argumentList, options, resultParams, resultArgs);
       index++;
     }
@@ -1611,7 +1611,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let newIndices = options.indices;
     if (argumentList) {
       try {
-        let arg = this.utils.getArgument(argumentList, param, FmtHLM.ObjectContents_BinderArg);
+        const arg = this.utils.getArgument(argumentList, param, FmtHLM.ObjectContents_BinderArg);
         sourceParameters = arg.sourceParameters;
         targetParameters = type.targetParameters;
         targetArguments = arg.targetArguments;
@@ -1622,7 +1622,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return;
       }
     } else {
-      let replacementType = (replacementParam ?? param).type as FmtHLM.MetaRefExpression_Binder;
+      const replacementType = (replacementParam ?? param).type as FmtHLM.MetaRefExpression_Binder;
       sourceParameters = replacementType.sourceParameters;
       targetParameters = replacementType.targetParameters;
       newIndices = this.addIndices(replacementType, options.indices);
@@ -1634,16 +1634,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
       targetArguments = this.renderUtils.convertBoundStructuralCasesToOverrides(sourceParameters, targetArguments, elementParameterOverrides);
     }
-    let sourceArgs: RenderedTemplateArgument[] = resultParams ? resultArgs : [];
-    let targetArgs: RenderedTemplateArgument[] = resultParams ? resultArgs : [];
-    let sourceOptions: ArgumentRenderingOptions = {
+    const sourceArgs: RenderedTemplateArgument[] = resultParams ? resultArgs : [];
+    const targetArgs: RenderedTemplateArgument[] = resultParams ? resultArgs : [];
+    const sourceOptions: ArgumentRenderingOptions = {
       ...options,
       replacementParameters: {parameters: sourceParameters, isDefinition: argumentList !== undefined},
       elementParameterOverrides: elementParameterOverrides,
       indices: undefined
     };
     this.fillArguments(type.sourceParameters, undefined, sourceOptions, resultParams, sourceArgs);
-    let targetOptions: ArgumentRenderingOptions = {
+    const targetOptions: ArgumentRenderingOptions = {
       ...options,
       replacementParameters: options.replacementParameters ? {...options.replacementParameters, parameters: targetParameters} : undefined,
       elementParameterOverrides: elementParameterOverrides,
@@ -1662,12 +1662,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (resultParams) {
       resultParams.push(param);
     }
-    let paramToDisplay = replacementParam ?? param;
-    let elementParameterOverrides = options.elementParameterOverrides;
+    const paramToDisplay = replacementParam ?? param;
+    const elementParameterOverrides = options.elementParameterOverrides;
     if (elementParameterOverrides) {
-      let variableOverride = elementParameterOverrides.get(paramToDisplay);
+      const variableOverride = elementParameterOverrides.get(paramToDisplay);
       if (variableOverride) {
-        let termPromise = variableOverride.then((term: Fmt.Expression) => this.readOnlyRenderer.renderElementTerm(term, fullElementTermSelection));
+        const termPromise = variableOverride.then((term: Fmt.Expression) => this.readOnlyRenderer.renderElementTerm(term, fullElementTermSelection));
         resultArgs.push(new Notation.PromiseExpression(termPromise));
         return;
       }
@@ -1675,7 +1675,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (argumentList) {
       let rawArg: Fmt.Expression | undefined = undefined;
       let index = 0;
-      for (let curArg of argumentList) {
+      for (const curArg of argumentList) {
         if (curArg.name === param.name) {
           rawArg = curArg.value;
           break;
@@ -1683,13 +1683,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         index++;
       }
       if (rawArg) {
-        let onGetValue = () => this.getRegularArgumentResult(rawArg!, param, param.type, options.replaceAssociativeArg, options.macroInvocation);
+        const onGetValue = () => this.getRegularArgumentResult(rawArg!, param, param.type, options.replaceAssociativeArg, options.macroInvocation);
         resultArgs.push(new ArgumentWithInfo(onGetValue, index));
       } else {
         resultArgs.push(new Notation.ErrorExpression('Undefined argument'));
       }
     } else {
-      let isDefinition = options.replacementParameters?.isDefinition;
+      const isDefinition = options.replacementParameters?.isDefinition;
       resultArgs.push(this.renderVariable(paramToDisplay, options.indices, isDefinition, !!options.omitArguments, undefined, elementParameterOverrides));
     }
   }
@@ -1697,16 +1697,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private getRegularArgumentResult(rawArg: Fmt.Expression, param: Fmt.Parameter, type: Fmt.Expression, replaceAssociativeArg?: Notation.RenderedExpression, macroInvocation?: HLMMacro.HLMMacroInvocation): Notation.ExpressionValue {
     if (type instanceof Fmt.IndexedExpression) {
       if (rawArg instanceof Fmt.ArrayExpression) {
-        let result: Notation.ExpressionValue[] = [];
+        const result: Notation.ExpressionValue[] = [];
         let index = 0;
-        for (let item of rawArg.items) {
+        for (const item of rawArg.items) {
           if (this.options.maxListLength && index >= this.options.maxListLength) {
-            let ellipsis = this.renderTemplate('BottomEllipsis');
+            const ellipsis = this.renderTemplate('BottomEllipsis');
             ellipsis.styleClasses = ['dummy'];
             result.push(ellipsis);
             break;
           }
-          let renderedItem = this.getRegularArgumentResult(item, param, type.body, undefined, macroInvocation);
+          const renderedItem = this.getRegularArgumentResult(item, param, type.body, undefined, macroInvocation);
           if (!(type.body instanceof Fmt.IndexedExpression)) {
             this.addSemanticLink(renderedItem, item);
           }
@@ -1727,10 +1727,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private renderRegularArgument(rawArg: Fmt.Expression, type: Fmt.Expression, replaceAssociativeArg?: Notation.RenderedExpression): Notation.RenderedExpression {
     if (this.utils.isValueParamType(type)) {
-      let arg = this.utils.extractArgValue(rawArg);
+      const arg = this.utils.extractArgValue(rawArg);
       if (arg) {
         if (type instanceof FmtHLM.MetaRefExpression_Prop) {
-          let formulaSelection: FormulaSelection = {
+          const formulaSelection: FormulaSelection = {
             allowTruthValue: true,
             allowEquiv: false,
             allowCases: true
@@ -1760,7 +1760,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         result = this.renderInteger(undefined);
         result.requestTextInput = true;
       } else {
-        let arg = rawArg as Fmt.IntegerExpression;
+        const arg = rawArg as Fmt.IntegerExpression;
         result = this.renderInteger(arg.value);
       }
       if (this.editHandler) {
@@ -1773,7 +1773,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndices(type: FmtHLM.MetaRefExpression_Binder, indices: Notation.RenderedExpression[] | undefined): Notation.RenderedExpression[] {
-    let index = this.renderArgumentList(type.sourceParameters, undefined, undefined, ArgumentListStyle.Group);
+    const index = this.renderArgumentList(type.sourceParameters, undefined, undefined, ArgumentListStyle.Group);
     return indices ? indices.concat(index) : [index];
   }
 
@@ -1782,7 +1782,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       expression = expression.formula;
     }
     if (expression instanceof Fmt.DefinitionRefExpression) {
-      for (let arg of expression.path.arguments) {
+      for (const arg of expression.path.arguments) {
         let argValue = arg.value;
         if (argValue instanceof Fmt.CompoundExpression && argValue.arguments.length) {
           argValue = argValue.arguments[0].value;
@@ -1797,24 +1797,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private applyAbbreviations(expression: Notation.RenderedExpression, definition: Fmt.Definition, args: RenderedTemplateArguments, omitArguments: number = 0, negationCount: number = 0): Notation.RenderedExpression {
     if (!omitArguments) {
-      let innerDefinitionContents = definition.contents;
+      const innerDefinitionContents = definition.contents;
       if (innerDefinitionContents instanceof FmtHLM.ObjectContents_Definition && innerDefinitionContents.abbreviations) {
-        for (let abbreviationExpression of innerDefinitionContents.abbreviations) {
-          let abbreviation = FmtNotation.ObjectContents_NotationAbbreviation.createFromExpression(abbreviationExpression);
-          let [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(abbreviation.originalParameter);
+        for (const abbreviationExpression of innerDefinitionContents.abbreviations) {
+          const abbreviation = FmtNotation.ObjectContents_NotationAbbreviation.createFromExpression(abbreviationExpression);
+          const [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(abbreviation.originalParameter);
           if (variableRefExpression && !indexContext) {
-            let abbreviationArgs: RenderedTemplateArguments = {...args};
-            for (let abbreviationParam of abbreviation.parameters) {
+            const abbreviationArgs: RenderedTemplateArguments = {...args};
+            for (const abbreviationParam of abbreviation.parameters) {
               abbreviationArgs[abbreviationParam.name] = new AbbreviationParamExpression(abbreviationParam);
             }
-            let param = variableRefExpression.variable;
-            let arg = ArgumentWithInfo.getValue(args[param.name]);
-            let notation = this.renderNotationExpression(abbreviation.originalParameterValue, abbreviationArgs, omitArguments, negationCount);
-            let originalExpression = expression;
-            let semanticLinks: Notation.SemanticLink[] = [];
-            let abbreviationPromise = this.renderUtils.matchParameterizedNotation(arg, notation, abbreviationArgs, semanticLinks).then((canAbbreviate: boolean) => {
+            const param = variableRefExpression.variable;
+            const arg = ArgumentWithInfo.getValue(args[param.name]);
+            const notation = this.renderNotationExpression(abbreviation.originalParameterValue, abbreviationArgs, omitArguments, negationCount);
+            const originalExpression = expression;
+            const semanticLinks: Notation.SemanticLink[] = [];
+            const abbreviationPromise = this.renderUtils.matchParameterizedNotation(arg, notation, abbreviationArgs, semanticLinks).then((canAbbreviate: boolean) => {
               if (canAbbreviate) {
-                for (let abbreviationParam of abbreviation.parameters) {
+                for (const abbreviationParam of abbreviation.parameters) {
                   // This check aims to make sure that we never abbreviate to single variables, e.g. that we don't
                   // abbreviate (X -> Y, x |-> f(x)) to f.
                   // We may want to restrict it to the case that abbreviation.abbreviation is a simple reference
@@ -1823,7 +1823,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                     return originalExpression;
                   }
                 }
-                let result = this.renderNotationExpression(abbreviation.abbreviation, abbreviationArgs, omitArguments, negationCount);
+                const result = this.renderNotationExpression(abbreviation.abbreviation, abbreviationArgs, omitArguments, negationCount);
                 result.semanticLinks = semanticLinks;
                 return result;
               } else {
@@ -1839,7 +1839,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addDefinitionContents(paragraphs: Notation.RenderedExpression[], definitionRef: Notation.RenderedExpression, cases: ExtractedStructuralCase[] | undefined, includeExtras: boolean): void {
-    let contents = this.renderDefinitionContents(definitionRef, cases);
+    const contents = this.renderDefinitionContents(definitionRef, cases);
     if (contents) {
       if (!contents.styleClasses) {
         contents.styleClasses = [];
@@ -1854,37 +1854,37 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderDefinitionContents(definitionRef: Notation.RenderedExpression, cases: ExtractedStructuralCase[] | undefined): Notation.RenderedExpression | undefined {
-    let definition = this.definition;
-    let contents = definition.contents;
+    const definition = this.definition;
+    const contents = definition.contents;
     if (contents instanceof FmtHLM.ObjectContents_MacroOperator) {
       return undefined;
     } else if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
-      let formulaSelection: FormulaSelection = {
+      const formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: false,
         allowCases: true
       };
       return this.renderFormula(contents.claim, formulaSelection);
     } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-      let formulaSelection: FormulaSelection = {
+      const formulaSelection: FormulaSelection = {
         allowTruthValue: false,
         allowEquiv: false,
         allowCases: true
       };
-      let conditions = contents.conditions;
-      let items = conditions.map((formula) => this.renderFormula(formula, formulaSelection));
+      const conditions = contents.conditions;
+      const items = conditions.map((formula) => this.renderFormula(formula, formulaSelection));
       let result: Notation.RenderedExpression = new Notation.ListExpression(items, '1.');
       if (this.editHandler) {
-        let onInsertDefinition = () => conditions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
-        let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
+        const onInsertDefinition = () => conditions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+        const insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
         result = new Notation.ParagraphExpression([result, insertButton]);
       }
       return result;
     } else if (contents instanceof FmtHLM.ObjectContents_Definition) {
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
-        let rows = definition.innerDefinitions.map((innerDefinition) => {
-          let constructorDef = this.renderDefinedSymbol([definition, innerDefinition]);
-          let row = [constructorDef];
+        const rows = definition.innerDefinitions.map((innerDefinition) => {
+          const constructorDef = this.renderDefinedSymbol([definition, innerDefinition]);
+          const row = [constructorDef];
           if (innerDefinition.parameters.length || this.editHandler) {
             row.push(this.renderParameterList(innerDefinition.parameters, false, false, false, innerDefinition));
           }
@@ -1893,16 +1893,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (this.editHandler) {
           rows.push([this.editHandler.getConstructorInsertButton(definition.innerDefinitions)]);
         }
-        let construction = this.renderTemplate('Construction', {
+        const construction = this.renderTemplate('Construction', {
                                                  'constructors': rows
                                                });
         return this.renderTemplate('ConstructionDefinition', {
                                      'operands': [definitionRef, construction]
                                    });
       } else {
-        let renderDefinitionRef = (elementParameterOverrides?: ElementParameterOverrides) => {
+        const renderDefinitionRef = (elementParameterOverrides?: ElementParameterOverrides) => {
           if (elementParameterOverrides && elementParameterOverrides.size) {
-            let parameterOverrides: ParameterOverrides = {
+            const parameterOverrides: ParameterOverrides = {
               elementParameterOverrides: elementParameterOverrides
             };
             return this.readOnlyRenderer.renderDefinitionRef([definition], undefined, 0, 0, parameterOverrides);
@@ -1911,39 +1911,39 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         };
         let renderLeftSide = renderDefinitionRef;
         if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
-          let definitions = contents.definition;
-          let renderRightSide = (term: Fmt.Expression) => this.renderSetTerm(term, fullSetTermSelection);
-          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
+          const definitions = contents.definition;
+          const renderRightSide = (term: Fmt.Expression) => this.renderSetTerm(term, fullSetTermSelection);
+          const onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm));
           return this.renderMultiDefinitions('Equality', cases!, renderLeftSide, renderRightSide, -1, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-          let definitions = contents.definition;
-          let renderRightSide = (term: Fmt.Expression) => this.renderElementTerm(term, fullElementTermSelection);
-          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
+          const definitions = contents.definition;
+          const renderRightSide = (term: Fmt.Expression) => this.renderElementTerm(term, fullElementTermSelection);
+          const onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
           return this.renderMultiDefinitionsWithSpecializations('Equality', cases!, renderLeftSide, renderRightSide, -1, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-          let parameter = this.renderVariable(contents.parameter);
-          let definitions = contents.definition;
+          const parameter = this.renderVariable(contents.parameter);
+          const definitions = contents.definition;
           renderLeftSide = (elementParameterOverrides?: ElementParameterOverrides) =>
             this.renderTemplate('EqualityRelation', {
                                   'operands': [renderDefinitionRef(elementParameterOverrides), parameter]
                                 });
-          let formulaSelection: FormulaSelection = {
+          const formulaSelection: FormulaSelection = {
             allowTruthValue: false,
             allowEquiv: false,
             allowCases: true
           };
-          let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
-          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+          const renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
+          const onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
           return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3, onInsertDefinition);
         } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
-          let definitions = contents.definition;
-          let formulaSelection: FormulaSelection = {
+          const definitions = contents.definition;
+          const formulaSelection: FormulaSelection = {
             allowTruthValue: false,
             allowEquiv: false,
             allowCases: true
           };
-          let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
-          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+          const renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, formulaSelection);
+          const onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
           return this.renderMultiDefinitions('Equivalence', cases!, renderLeftSide, renderRightSide, -3, onInsertDefinition);
         } else {
           return new Notation.EmptyExpression;
@@ -1955,15 +1955,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderMultiDefinitions(type: string, cases: ExtractedStructuralCase[], renderLeftSide: (elementParameterOverrides?: ElementParameterOverrides) => Notation.RenderedExpression, renderRightSide: (expression: Fmt.Expression) => Notation.RenderedExpression, parenLevel: number, onInsertDefinition: () => void): Notation.RenderedExpression {
-    let rows: Notation.RenderedExpression[][] = [];
-    for (let currentCase of cases) {
-      let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
+    const rows: Notation.RenderedExpression[][] = [];
+    for (const currentCase of cases) {
+      const elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
       this.renderUtils.fillVariableOverridesFromExtractedCase(currentCase, elementParameterOverrides);
       let first = true;
-      for (let definition of currentCase.definitions) {
+      for (const definition of currentCase.definitions) {
         let leftItem: Notation.RenderedExpression;
         if (first) {
-          let caseDefinition = renderLeftSide(elementParameterOverrides);
+          const caseDefinition = renderLeftSide(elementParameterOverrides);
           leftItem = this.renderTemplate(type + 'Definition', {
                                            'operands': [caseDefinition, new Notation.EmptyExpression]
                                          });
@@ -1975,11 +1975,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
                                            'operands': [new Notation.EmptyExpression, new Notation.EmptyExpression]
                                          });
         }
-        let rightItem = new Notation.InnerParenExpression(renderRightSide(definition));
+        const rightItem = new Notation.InnerParenExpression(renderRightSide(definition));
         rightItem.left = true;
         rightItem.right = false;
         rightItem.maxLevel = parenLevel;
-        let row = [leftItem, rightItem];
+        const row = [leftItem, rightItem];
         if (first && currentCase.caseParameters) {
           this.addCaseParameters(currentCase.caseParameters, elementParameterOverrides, row);
         }
@@ -1988,54 +1988,54 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     if (this.editHandler) {
-      let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
+      const insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
       rows.push([new Notation.RowExpression([insertButton, new Notation.TextExpression(' ')]), new Notation.EmptyExpression]);
     }
-    let result = new Notation.TableExpression(rows);
+    const result = new Notation.TableExpression(rows);
     result.styleClasses = ['aligned', 'definitions'];
     return result;
   }
 
   private renderMultiDefinitionsWithSpecializations(type: string, cases: ExtractedStructuralCase[], renderLeftSide: (elementParameterOverrides?: ElementParameterOverrides) => Notation.RenderedExpression, renderRightSide: (expression: Fmt.Expression) => Notation.RenderedExpression, parenLevel: number, onInsertDefinition: () => void): Notation.RenderedExpression {
     if (cases.length === 1) {
-      let currentCase = cases[0];
+      const currentCase = cases[0];
       if (currentCase.definitions.length === 1) {
-        let expression = currentCase.definitions[0];
+        const expression = currentCase.definitions[0];
         if (expression instanceof Fmt.DefinitionRefExpression) {
-          let definitionRef = expression;
-          let promise = this.utils.getOuterDefinition(definitionRef)
+          const definitionRef = expression;
+          const promise = this.utils.getOuterDefinition(definitionRef)
             .then((outerDefinition: Fmt.Definition) => {
-              let definitions: Fmt.Definition[] = [];
-              let argumentLists: Fmt.ArgumentList[] = [];
+              const definitions: Fmt.Definition[] = [];
+              const argumentLists: Fmt.ArgumentList[] = [];
               this.utils.analyzeDefinitionRef(definitionRef, outerDefinition, definitions, argumentLists);
-              let innerDefinition = definitions[definitions.length - 1];
-              let innerDefinitionNotation = this.renderUtils.getDefinitionNotation(innerDefinition);
+              const innerDefinition = definitions[definitions.length - 1];
+              const innerDefinitionNotation = this.renderUtils.getDefinitionNotation(innerDefinition);
               if (innerDefinitionNotation) {
-                let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
+                const elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
                 this.renderUtils.fillVariableOverridesFromExtractedCase(currentCase, elementParameterOverrides);
-                let options: ArgumentRenderingOptions = {
+                const options: ArgumentRenderingOptions = {
                   elementParameterOverrides: elementParameterOverrides
                 };
-                let args = this.getRenderedTemplateArguments(definitions, argumentLists, options);
+                const args = this.getRenderedTemplateArguments(definitions, argumentLists, options);
                 args[innerDefinitionNotation.parameter.name] = renderLeftSide(elementParameterOverrides);
                 if (innerDefinitionNotation.notation) {
                   let result = this.renderNotationExpression(innerDefinitionNotation.notation, args);
                   this.addSemanticLink(result, definitionRef);
                   if (this.editHandler) {
-                    let insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
+                    const insertButton = this.editHandler.getImmediateInsertButton(onInsertDefinition);
                     result = new Notation.ParagraphExpression([result, insertButton]);
                   }
                   return result;
                 }
               } else if (outerDefinition !== innerDefinition) {
-                let outerDefinitionNotation = this.renderUtils.getDefinitionNotation(outerDefinition);
+                const outerDefinitionNotation = this.renderUtils.getDefinitionNotation(outerDefinition);
                 if (outerDefinitionNotation && outerDefinitionNotation.singularName && !(outerDefinitionNotation.nameOptional instanceof FmtNotation.MetaRefExpression_true)) {
-                  let singular: Notation.RenderedExpression[] = [];
-                  let args = this.getRenderedTemplateArguments(definitions, argumentLists);
+                  const singular: Notation.RenderedExpression[] = [];
+                  const args = this.getRenderedTemplateArguments(definitions, argumentLists);
                   this.applyName(outerDefinitionNotation.singularName, args, definitionRef, singular);
-                  let renderRightSideOrig = renderRightSide;
+                  const renderRightSideOrig = renderRightSide;
                   renderRightSide = (rightSideExpression: Fmt.Expression) => {
-                    let row = [renderRightSideOrig(rightSideExpression)];
+                    const row = [renderRightSideOrig(rightSideExpression)];
                     this.addNounDefinition(singular, undefined, false, false, row);
                     return new Notation.RowExpression(row);
                   };
@@ -2051,11 +2051,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addDefinitionProofs(cases: ExtractedStructuralCase[] | undefined, paragraphs: Notation.RenderedExpression[]): void {
-    let definition = this.definition;
-    let contents = definition.contents;
+    const definition = this.definition;
+    const contents = definition.contents;
     if (contents instanceof FmtHLM.ObjectContents_StandardTheorem) {
-      let standardTheorem = contents;
-      let onInsertProof = (proof: FmtHLM.ObjectContents_Proof) => {
+      const standardTheorem = contents;
+      const onInsertProof = (proof: FmtHLM.ObjectContents_Proof) => {
         if (standardTheorem.proofs) {
           standardTheorem.proofs.push(proof);
         } else {
@@ -2078,11 +2078,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addEquivalenceProofs(contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
       }
     } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
-      let implicitOperator = contents;
+      const implicitOperator = contents;
       if (contents.definition.length > 1) {
         this.addEquivalenceProofs(contents.equivalenceProofs, 'Equivalence', '⇒', paragraphs);
       }
-      let onInsertProof = (proof: FmtHLM.ObjectContents_Proof) => (implicitOperator.wellDefinednessProof = proof);
+      const onInsertProof = (proof: FmtHLM.ObjectContents_Proof) => (implicitOperator.wellDefinednessProof = proof);
       this.addProof(implicitOperator.wellDefinednessProof, 'Well-definedness', undefined, onInsertProof, paragraphs);
     }
     if (cases) {
@@ -2092,17 +2092,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addStructuralCaseProofs(cases: ExtractedStructuralCase[], paragraphs: Notation.RenderedExpression[]): void {
     let nonIsomorphicCasesPromise: CachedPromise<FmtHLM.ObjectContents_StructuralCase[]> = CachedPromise.resolve([]);
-    for (let currentCase of cases) {
+    for (const currentCase of cases) {
       if (currentCase.structuralCases) {
-        for (let structuralCase of currentCase.structuralCases) {
-          let currentStructuralCase = structuralCase;
-          let constructorRef = currentStructuralCase._constructor;
+        for (const structuralCase of currentCase.structuralCases) {
+          const currentStructuralCase = structuralCase;
+          const constructorRef = currentStructuralCase._constructor;
           if (constructorRef instanceof Fmt.DefinitionRefExpression) {
-            let currentConstructorRef = constructorRef;
-            let constructionPromise = this.utils.getOuterDefinition(constructorRef);
+            const currentConstructorRef = constructorRef;
+            const constructionPromise = this.utils.getOuterDefinition(constructorRef);
             nonIsomorphicCasesPromise = nonIsomorphicCasesPromise.then((previousCases: FmtHLM.ObjectContents_StructuralCase[]) => {
               return constructionPromise.then((construction: Fmt.Definition) => {
-                let constructor = construction.innerDefinitions.getDefinition(currentConstructorRef.path.name);
+                const constructor = construction.innerDefinitions.getDefinition(currentConstructorRef.path.name);
                 if (constructor.contents instanceof FmtHLM.ObjectContents_Constructor && constructor.contents.equalityDefinition) {
                   if (!(constructor.contents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
                     return [...previousCases, currentStructuralCase];
@@ -2115,12 +2115,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       }
     }
-    let immediateResult = nonIsomorphicCasesPromise.getImmediateResult();
+    const immediateResult = nonIsomorphicCasesPromise.getImmediateResult();
     if (!immediateResult || immediateResult.length) {
-      let proofPromise = nonIsomorphicCasesPromise.then((nonIsomorphicCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+      const proofPromise = nonIsomorphicCasesPromise.then((nonIsomorphicCases: FmtHLM.ObjectContents_StructuralCase[]) => {
         if (nonIsomorphicCases.length) {
-          let subParagraphs: Notation.RenderedExpression[] = [];
-          let proofs = nonIsomorphicCases.map((nonIsomorphicCase) => nonIsomorphicCase.wellDefinednessProof);
+          const subParagraphs: Notation.RenderedExpression[] = [];
+          const proofs = nonIsomorphicCases.map((nonIsomorphicCase) => nonIsomorphicCase.wellDefinednessProof);
           this.addProofList(proofs, 'Well-definedness', undefined, undefined, subParagraphs);
           return new Notation.ParagraphExpression(subParagraphs);
         } else {
@@ -2133,44 +2133,44 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addExtraDefinitionContents(paragraphs: Notation.RenderedExpression[]): void {
-    let definition = this.definition;
+    const definition = this.definition;
 
     if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
-      let equalityDefinitionParagraphs: Notation.RenderedExpression[] = [];
+      const equalityDefinitionParagraphs: Notation.RenderedExpression[] = [];
       this.addEqualityDefinitions(equalityDefinitionParagraphs);
       if (equalityDefinitionParagraphs.length) {
-        let equalityDefinitions = new Notation.ParagraphExpression(equalityDefinitionParagraphs);
+        const equalityDefinitions = new Notation.ParagraphExpression(equalityDefinitionParagraphs);
         equalityDefinitions.styleClasses = ['display-math'];
         paragraphs.push(equalityDefinitions);
       }
 
-      let embedding = definition.contents.embedding;
+      const embedding = definition.contents.embedding;
       if (embedding) {
-        let source = embedding.parameter.type as FmtHLM.MetaRefExpression_Element;
-        let rows: Notation.RenderedExpression[][] = [];
-        let subset = this.renderSetTerm(source._set, fullSetTermSelection);
-        let superset = this.renderDefinitionRef([definition]);
+        const source = embedding.parameter.type as FmtHLM.MetaRefExpression_Element;
+        const rows: Notation.RenderedExpression[][] = [];
+        const subset = this.renderSetTerm(source._set, fullSetTermSelection);
+        const superset = this.renderDefinitionRef([definition]);
         this.addSemanticLink(superset, definition);
-        let full = (embedding.full instanceof FmtHLM.MetaRefExpression_true);
-        let supersetDefinition = this.renderTemplate(full ? 'FullEmbeddingDefinition' : 'EmbeddingDefinition', {
+        const full = (embedding.full instanceof FmtHLM.MetaRefExpression_true);
+        const supersetDefinition = this.renderTemplate(full ? 'FullEmbeddingDefinition' : 'EmbeddingDefinition', {
                                                        'operands': [new Notation.EmptyExpression, superset]
                                                      });
-        let supersetWithText = new Notation.RowExpression([supersetDefinition, new Notation.TextExpression(' via')]);
+        const supersetWithText = new Notation.RowExpression([supersetDefinition, new Notation.TextExpression(' via')]);
         rows.push([subset, supersetWithText]);
-        let elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
-        let targetTerm = this.renderUtils.convertStructuralCaseToOverride([embedding.parameter], embedding.target, elementParameterOverrides);
-        let subsetElement = this.renderVariable(embedding.parameter, undefined, true, false, undefined, elementParameterOverrides);
-        let target = this.renderElementTerm(targetTerm, fullElementTermSelection);
-        let supersetElement = this.renderTemplate('EqualityRelation', {
+        const elementParameterOverrides: ElementParameterOverrides = new Map<Fmt.Parameter, CachedPromise<Fmt.Expression>>();
+        const targetTerm = this.renderUtils.convertStructuralCaseToOverride([embedding.parameter], embedding.target, elementParameterOverrides);
+        const subsetElement = this.renderVariable(embedding.parameter, undefined, true, false, undefined, elementParameterOverrides);
+        const target = this.renderElementTerm(targetTerm, fullElementTermSelection);
+        const supersetElement = this.renderTemplate('EqualityRelation', {
                                                     'operands': [new Notation.EmptyExpression, target]
                                                   });
         rows.push([subsetElement, supersetElement]);
-        let table = new Notation.TableExpression(rows);
+        const table = new Notation.TableExpression(rows);
         table.styleClasses = ['aligned', 'inline'];
         paragraphs.push(table);
         this.addIndentedProof(embedding.wellDefinednessProof, 'Well-definedness', paragraphs);
       } else if (this.editHandler) {
-        let onRenderEmbedding = (subset: Fmt.Expression, full: boolean) =>
+        const onRenderEmbedding = (subset: Fmt.Expression, full: boolean) =>
           this.renderTemplate(full ? 'FullEmbeddingDefinition' : 'EmbeddingDefinition', {
                                 'operands': [
                                   this.renderSetTerm(subset, fullSetTermSelection),
@@ -2182,10 +2182,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
       this.addSubsetEmbeddings(paragraphs);
     } else if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
-      let notation = definition.contents.notation;
+      const notation = definition.contents.notation;
       if (notation && FmtUtils.containsSubExpression(notation, (subExpression: Fmt.Expression) => (subExpression instanceof FmtNotation.MetaRefExpression_neg && subExpression.items.length > 1))) {
-        let args = this.getRenderedTemplateArguments([definition]);
-        let extraContents = this.renderTemplate('EquivalenceDefinition', {
+        const args = this.getRenderedTemplateArguments([definition]);
+        const extraContents = this.renderTemplate('EquivalenceDefinition', {
                                                   'operands': [
                                                     this.renderNotationExpression(notation, args, 0, 1),
                                                     this.renderNotationExpression(notation, args, 0, 1, 1)
@@ -2200,16 +2200,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
 
     if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
-      let definitionNotation = this.renderUtils.getDefinitionNotation(definition);
+      const definitionNotation = this.renderUtils.getDefinitionNotation(definition);
       if (definitionNotation) {
-        let args = this.utils.getParameterArguments(definition.parameters);
-        let path = new Fmt.Path(definition.name, args);
-        let term = new Fmt.DefinitionRefExpression(path);
-        let type = new FmtHLM.MetaRefExpression_Element(term);
-        let parameter = this.utils.createParameter(type, definitionNotation.parameter.name);
-        let row: Notation.RenderedExpression[] = [];
+        const args = this.utils.getParameterArguments(definition.parameters);
+        const path = new Fmt.Path(definition.name, args);
+        const term = new Fmt.DefinitionRefExpression(path);
+        const type = new FmtHLM.MetaRefExpression_Element(term);
+        const parameter = this.utils.createParameter(type, definitionNotation.parameter.name);
+        const row: Notation.RenderedExpression[] = [];
         row.push(new Notation.TextExpression('We write “'));
-        let initialState: ParameterListState = {
+        const initialState: ParameterListState = {
           fullSentence: false,
           sentence: true,
           abbreviate: false,
@@ -2234,20 +2234,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
 
     if (definition.contents instanceof FmtHLM.ObjectContents_Construction) {
-      for (let constructorDefinition of definition.innerDefinitions) {
-        let constructorDefinitionNotation = this.renderUtils.getDefinitionNotation(constructorDefinition);
+      for (const constructorDefinition of definition.innerDefinitions) {
+        const constructorDefinitionNotation = this.renderUtils.getDefinitionNotation(constructorDefinition);
         if (constructorDefinitionNotation) {
-          let parentArgs = this.utils.getParameterArguments(definition.parameters);
-          let parentPath = new Fmt.Path(definition.name, parentArgs);
-          let args = this.utils.getParameterArguments(constructorDefinition.parameters);
-          let path = new Fmt.Path(constructorDefinition.name, args);
+          const parentArgs = this.utils.getParameterArguments(definition.parameters);
+          const parentPath = new Fmt.Path(definition.name, parentArgs);
+          const args = this.utils.getParameterArguments(constructorDefinition.parameters);
+          const path = new Fmt.Path(constructorDefinition.name, args);
           path.parentPath = parentPath;
-          let term = new Fmt.DefinitionRefExpression(path);
-          let type = new FmtHLM.MetaRefExpression_Def(term);
-          let parameter = this.utils.createParameter(type, constructorDefinitionNotation.parameter.name);
-          let row: Notation.RenderedExpression[] = [];
+          const term = new Fmt.DefinitionRefExpression(path);
+          const type = new FmtHLM.MetaRefExpression_Def(term);
+          const parameter = this.utils.createParameter(type, constructorDefinitionNotation.parameter.name);
+          const row: Notation.RenderedExpression[] = [];
           row.push(new Notation.TextExpression('We write “'));
-          let initialState: ParameterListState = {
+          const initialState: ParameterListState = {
             fullSentence: false,
             sentence: false,
             abbreviate: false,
@@ -2274,41 +2274,41 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addEqualityDefinitions(paragraphs: Notation.RenderedExpression[]): void {
-    let definition = this.definition;
-    for (let innerDefinition of definition.innerDefinitions) {
-      let constructorContents = innerDefinition.contents;
+    const definition = this.definition;
+    for (const innerDefinition of definition.innerDefinitions) {
+      const constructorContents = innerDefinition.contents;
       if (constructorContents instanceof FmtHLM.ObjectContents_Constructor) {
-        let equalityDefinition = constructorContents.equalityDefinition;
+        const equalityDefinition = constructorContents.equalityDefinition;
         if (equalityDefinition) {
-          let leftParameterOverrides: ParameterOverrides = {
+          const leftParameterOverrides: ParameterOverrides = {
             replacementParameters: {
               parameters: equalityDefinition.leftParameters,
               isDefinition: false
             }
           };
-          let rightParameterOverrides: ParameterOverrides = {
+          const rightParameterOverrides: ParameterOverrides = {
             replacementParameters: {
               parameters: equalityDefinition.rightParameters,
               isDefinition: false
             }
           };
-          let leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, 0, 0, leftParameterOverrides);
+          const leftConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, 0, 0, leftParameterOverrides);
           this.addSemanticLink(leftConstructor, innerDefinition);
-          let rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, 0, 0, rightParameterOverrides);
+          const rightConstructor = this.renderDefinitionRef([definition, innerDefinition], undefined, 0, 0, rightParameterOverrides);
           this.addSemanticLink(rightConstructor, innerDefinition);
-          let equality = this.renderTemplate('EqualityRelation', {
+          const equality = this.renderTemplate('EqualityRelation', {
                                                'operands': [leftConstructor, rightConstructor]
                                              });
           this.addSemanticLink(equality, equalityDefinition);
-          let definitions = equalityDefinition.definition;
-          let renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, fullFormulaSelection);
-          let parameters = [...equalityDefinition.leftParameters, ...equalityDefinition.rightParameters];
-          let singleCase: ExtractedStructuralCase = {
+          const definitions = equalityDefinition.definition;
+          const renderRightSide = (formula: Fmt.Expression) => this.renderFormula(formula, fullFormulaSelection);
+          const parameters = [...equalityDefinition.leftParameters, ...equalityDefinition.rightParameters];
+          const singleCase: ExtractedStructuralCase = {
             caseParameters: parameters,
             definitions: definitions
           };
-          let onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
-          let equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide, -3, onInsertDefinition);
+          const onInsertDefinition = () => definitions.push(new Fmt.PlaceholderExpression(HLMExpressionType.Formula));
+          const equivalenceDef = this.renderMultiDefinitions('Equivalence', [singleCase], () => equality, renderRightSide, -3, onInsertDefinition);
           paragraphs.push(equivalenceDef);
           if (!(equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) {
             this.addIndentedProof(equalityDefinition.reflexivityProof, 'Reflexivity', paragraphs);
@@ -2321,24 +2321,24 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addSubsetEmbeddings(paragraphs: Notation.RenderedExpression[]): void {
-    let definition = this.definition;
+    const definition = this.definition;
     let hasSubsetEmbedding = false;
-    for (let param of definition.parameters) {
-      let type = param.type;
+    for (const param of definition.parameters) {
+      const type = param.type;
       if ((type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) && type.embedSubsets) {
         hasSubsetEmbedding = true;
         break;
       }
     }
     if (hasSubsetEmbedding) {
-      let row: Notation.RenderedExpression[] = [];
+      const row: Notation.RenderedExpression[] = [];
       row.push(new Notation.TextExpression('For '));
-      let replacementParams = new Fmt.ParameterList;
+      const replacementParams = new Fmt.ParameterList;
       let hadParameters = false;
-      for (let param of definition.parameters) {
-        let type = param.type;
+      for (const param of definition.parameters) {
+        const type = param.type;
         if ((type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset) && type.embedSubsets) {
-          let replacementParam = param.clone();
+          const replacementParam = param.clone();
           replacementParam.name += '\'';
           replacementParams.push(replacementParam);
           if (hadParameters) {
@@ -2355,7 +2355,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       }
       row.push(new Notation.TextExpression(', we canonically treat elements of '));
-      let parameterOverrides: ParameterOverrides = {
+      const parameterOverrides: ParameterOverrides = {
         replacementParameters: {
           parameters: replacementParams,
           isDefinition: false
@@ -2370,22 +2370,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private buildCaseRow(value: Notation.RenderedExpression, formula: Notation.RenderedExpression): Notation.RenderedExpression[] {
-    let wrappedValue = new Notation.InnerParenExpression(value);
+    const wrappedValue = new Notation.InnerParenExpression(value);
     wrappedValue.left = false;
     wrappedValue.maxLevel = -10;
-    let text = new Notation.TextExpression('if ');
-    let formulaWithText = new Notation.RowExpression([text, formula]);
+    const text = new Notation.TextExpression('if ');
+    const formulaWithText = new Notation.RowExpression([text, formula]);
     formulaWithText.styleClasses = ['case-parameters'];
     return [wrappedValue, formulaWithText];
   }
 
   private addProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, onInsertProof: InsertProofFn | undefined, paragraphs: Notation.RenderedExpression[]): void {
     if (this.options.includeProofs) {
-      let context: HLMProofStepContext = {
+      const context: HLMProofStepContext = {
         goal: externalGoal,
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
-      let state: ProofOutputState = {
+      const state: ProofOutputState = {
         paragraphs: paragraphs,
         isPreview: false,
         onApply: () => {}
@@ -2397,13 +2397,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addProofsInternal(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, context: HLMProofStepContext, indentSteps: boolean, onInsertProof: InsertProofFn | undefined, state: ProofOutputState): void {
     if (proofs && proofs.length) {
       let proofNumber = 1;
-      for (let proof of proofs) {
-        let proofHeading = heading && proofs.length > 1 ? `${heading} ${proofNumber}` : heading;
+      for (const proof of proofs) {
+        const proofHeading = heading && proofs.length > 1 ? `${heading} ${proofNumber}` : heading;
         this.addProofInternal(proof, proofHeading, context, false, indentSteps, false, state);
         proofNumber++;
       }
       if (this.editHandler && onInsertProof) {
-        let editHandler = this.editHandler;
+        const editHandler = this.editHandler;
         state.paragraphs.push(editHandler.createConditionalElement((checkResult: HLMCheckResult) => {
           if (checkResult.rechecker?.hasIncompleteProofs()) {
             return new Notation.EmptyExpression;
@@ -2421,14 +2421,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (proof) {
       this.addProofInternal(proof, heading, context, showExternalGoal, isListItem, indentSteps, state);
     } else if (!this.utils.containsPlaceholders()) {
-      let displayedGoal = showExternalGoal ? this.getDisplayedGoal(context.goal) : undefined;
+      const displayedGoal = showExternalGoal ? this.getDisplayedGoal(context.goal) : undefined;
       if (displayedGoal) {
         if (state.startRow) {
           this.outputStartRowSpacing(state);
         } else {
           state.startRow = [];
         }
-        let renderedGoal = this.readOnlyRenderer.renderFormula(displayedGoal, fullFormulaSelection);
+        const renderedGoal = this.readOnlyRenderer.renderFormula(displayedGoal, fullFormulaSelection);
         state.startRow.push(
           renderedGoal,
           new Notation.TextExpression(':')
@@ -2452,13 +2452,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     let parameters = proof.parameters;
     let steps = proof.steps;
     while (steps.length) {
-      let firstStep = steps[0];
-      let firstStepType = firstStep.type;
+      const firstStep = steps[0];
+      const firstStepType = firstStep.type;
       if (firstStepType instanceof FmtHLM.MetaRefExpression_UseTheorem && this.utils.isSelfReference(firstStepType.theorem) && firstStepType.result) {
-        let inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
+        const inductionHypothesis = new Fmt.Parameter(firstStep.name, new FmtHLM.MetaRefExpression_Constraint(firstStepType.result));
         parameters = parameters ? new Fmt.ParameterList(...parameters, inductionHypothesis) : new Fmt.ParameterList(inductionHypothesis);
-        let newSteps = new Fmt.ParameterList(...steps.slice(1));
-        let substitutionContext = new HLMSubstitutionContext;
+        const newSteps = new Fmt.ParameterList(...steps.slice(1));
+        const substitutionContext = new HLMSubstitutionContext;
         this.utils.addParameterSubstitution(firstStep, inductionHypothesis, substitutionContext);
         steps = this.utils.applySubstitutionContextToParameterList(newSteps, substitutionContext);
       } else {
@@ -2495,7 +2495,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         singleStep = undefined;
       }
     }
-    let hasSingleSource = ((singleStepType instanceof FmtHLM.MetaRefExpression_ProveDef && (!singleStepType.proof || (singleStepType.proof.goal && this.utils.isTrueFormula(singleStepType.proof.goal))))
+    const hasSingleSource = ((singleStepType instanceof FmtHLM.MetaRefExpression_ProveDef && (!singleStepType.proof || (singleStepType.proof.goal && this.utils.isTrueFormula(singleStepType.proof.goal))))
                            || ((singleStepType instanceof FmtHLM.MetaRefExpression_UseTheorem || singleStepType instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) && !(singleStep && singleStepType.result)));
     if (displayedGoal) {
       if (!this.editHandler
@@ -2506,7 +2506,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           state.startRow.push(new Notation.TextExpression('Then:'));
         }
         this.commitStartRow(state);
-        let renderContext: HLMProofStepRenderContext = {
+        const renderContext: HLMProofStepRenderContext = {
           ...context,
           goal: displayedGoal,
           originalParameters: [],
@@ -2521,7 +2521,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return;
       }
       this.outputStartRowSpacing(state);
-      let renderedGoal = this.readOnlyRenderer.renderFormula(displayedGoal, fullFormulaSelection);
+      const renderedGoal = this.readOnlyRenderer.renderFormula(displayedGoal, fullFormulaSelection);
       if (hasContents) {
         state.startRow.push(new Notation.TextExpression('Then '));
       }
@@ -2580,13 +2580,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.commitStartRow(state);
       }
       if (indentSteps) {
-        let indentedState: ProofOutputState = {
+        const indentedState: ProofOutputState = {
           paragraphs: [],
           isPreview: state.isPreview,
           onApply: state.onApply
         };
         this.addProofSteps(proof, steps, context, indentedState);
-        let indentedSteps = new Notation.ParagraphExpression(indentedState.paragraphs);
+        const indentedSteps = new Notation.ParagraphExpression(indentedState.paragraphs);
         indentedSteps.styleClasses = ['indented'];
         state.paragraphs.push(indentedSteps);
       } else {
@@ -2595,7 +2595,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (!state.isPreview) {
       this.outputStartRowSpacing(state);
       if (this.editHandler) {
-        let renderContext: HLMProofStepRenderContext = {
+        const renderContext: HLMProofStepRenderContext = {
           ...context,
           originalParameters: [],
           substitutedParameters: [],
@@ -2614,7 +2614,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (((goal instanceof FmtHLM.MetaRefExpression_setEquals && originalGoal instanceof FmtHLM.MetaRefExpression_setEquals)
            || (goal instanceof FmtHLM.MetaRefExpression_equals && originalGoal instanceof FmtHLM.MetaRefExpression_equals))
           && goal.terms.length >= 2 && originalGoal.terms.length >= 2) {
-        let newTerms = goal.terms.slice();
+        const newTerms = goal.terms.slice();
         if (newTerms[0].isEquivalentTo(newTerms[newTerms.length - 1])) {
           newTerms.pop();
         }
@@ -2641,7 +2641,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (!state.startRow) {
       state.startRow = [];
     }
-    let noProof = new Notation.TextExpression('No proof.');
+    const noProof = new Notation.TextExpression('No proof.');
     noProof.styleClasses = ['proof-placeholder'];
     if (heading && heading !== 'Proof') {
       state.startRow.push(this.renderSubHeading(heading));
@@ -2653,7 +2653,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     }
     state.startRow.push(noProof);
     if (this.editHandler && onInsertProof) {
-      let insertButton = this.editHandler.getProofInsertButton(onInsertProof);
+      const insertButton = this.editHandler.getProofInsertButton(onInsertProof);
       state.startRow.push(new Notation.TextExpression(' '), insertButton);
     }
     state.paragraphs.push(new Notation.RowExpression(state.startRow));
@@ -2662,20 +2662,20 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getTrivialProofPlaceholder(): Notation.RenderedExpression {
-    let trivial = new Notation.TextExpression('Trivial.');
+    const trivial = new Notation.TextExpression('Trivial.');
     trivial.styleClasses = ['proof-placeholder'];
     return trivial;
   }
 
   private addProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, externalGoal: Fmt.Expression | undefined, onInsertProof: InsertProofFn | undefined, paragraphs: Notation.RenderedExpression[]): void {
-    let proofs = proof ? [proof] : undefined;
+    const proofs = proof ? [proof] : undefined;
     this.addProofs(proofs, heading, externalGoal, onInsertProof, paragraphs);
   }
 
   private addSubProof(proof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepContext, indentSteps: boolean, state: ProofOutputState): void {
     this.commitImplications(state, false);
     if (proof || this.editHandler) {
-      let showExternalGoal = !(proof?.steps.length && this.isDependentProofStepType(proof.steps[0].type));
+      const showExternalGoal = !(proof?.steps.length && this.isDependentProofStepType(proof.steps[0].type));
       // TODO set onInsertProof
       this.addOptionalProofInternal(proof, undefined, context, showExternalGoal, false, indentSteps, undefined, state);
     } else if (context.goal) {
@@ -2695,10 +2695,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addIndentedProof(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, paragraphs: Notation.RenderedExpression[]): void {
     if (this.options.includeProofs) {
-      let context: HLMProofStepContext = {
+      const context: HLMProofStepContext = {
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
-      let state: ProofOutputState = {
+      const state: ProofOutputState = {
         paragraphs: paragraphs,
         isPreview: false,
         onApply: () => {}
@@ -2713,25 +2713,25 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addIndentedProofInternal(proof: FmtHLM.ObjectContents_Proof | undefined, heading: string | undefined, context: HLMProofStepContext, state: ProofOutputState): void {
-    let indentedState: ProofOutputState = {
+    const indentedState: ProofOutputState = {
       paragraphs: [],
       isPreview: state.isPreview,
       onApply: state.onApply
     };
     // TODO set onInsertProof
     this.addOptionalProofInternal(proof, heading, context, false, false, false, undefined, indentedState);
-    let indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
+    const indentedProof = new Notation.ParagraphExpression(indentedState.paragraphs);
     indentedProof.styleClasses = ['indented'];
     state.paragraphs.push(indentedProof);
   }
 
   private addProofList(proofs: (FmtHLM.ObjectContents_Proof | undefined)[], heading: string | undefined, labels: string[] | undefined, externalGoal: Fmt.Expression | undefined, paragraphs: Notation.RenderedExpression[]): void {
     if (this.options.includeProofs) {
-      let context: HLMProofStepContext = {
+      const context: HLMProofStepContext = {
         goal: externalGoal,
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>()
       };
-      let state: ProofOutputState = {
+      const state: ProofOutputState = {
         paragraphs: paragraphs,
         isPreview: false,
         onApply: () => {}
@@ -2748,11 +2748,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         state.paragraphs.push(this.renderSubHeading(heading));
       }
       if (state.isPreview && labels) {
-        let labelText = labels.map((label) => `${label}.`).join(' ');
+        const labelText = labels.map((label) => `${label}.`).join(' ');
         state.paragraphs.push(new Notation.TextExpression(labelText));
       } else {
-        let items = proofs.map((proof) => {
-          let itemState: ProofOutputState = {
+        const items = proofs.map((proof) => {
+          const itemState: ProofOutputState = {
             paragraphs: [],
             isPreview: state.isPreview,
             onApply: state.onApply
@@ -2764,7 +2764,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           if (items.length === 1 && !labels) {
             state.paragraphs.push(items[0]);
           } else {
-            let list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
+            const list = new Notation.ListExpression(items, labels ? labels.map((label) => `${label}.`) : '*');
             state.paragraphs.push(list);
           }
         }
@@ -2775,10 +2775,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, heading: string | undefined, symbol: string, paragraphs: Notation.RenderedExpression[]): void {
     if (this.options.includeProofs) {
       if (proofs && proofs.length) {
-        let labels = this.getEquivalenceProofLabels(proofs, symbol);
+        const labels = this.getEquivalenceProofLabels(proofs, symbol);
         this.addProofList(proofs, heading, labels, undefined, paragraphs);
       } else {
-        let state: ProofOutputState = {
+        const state: ProofOutputState = {
           paragraphs: paragraphs,
           isPreview: false,
           onApply: () => {}
@@ -2813,18 +2813,18 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addProofSteps(proof: FmtHLM.ObjectContents_Proof, steps: Fmt.ParameterList, context: HLMProofStepContext, state: ProofOutputState): void {
-    let renderContext: HLMProofStepRenderContext = {
+    const renderContext: HLMProofStepRenderContext = {
       ...context,
       originalParameters: [],
       substitutedParameters: [],
       isLastStep: false
     };
     for (let stepIndex = 0; stepIndex < steps.length; stepIndex++) {
-      let step = steps[stepIndex];
+      const step = steps[stepIndex];
       if (stepIndex === steps.length - 1) {
         renderContext.isLastStep = true;
       } else if (step.type instanceof FmtHLM.MetaRefExpression_Consider) {
-        let nextStep = steps[stepIndex + 1];
+        const nextStep = steps[stepIndex + 1];
         if (nextStep.type instanceof FmtHLM.MetaRefExpression_UseCases) {
           continue;
         }
@@ -2832,11 +2832,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       let renderedStep = step;
       if (renderContext.originalParameters.length && renderContext.substitutedParameters.length) {
         // TODO this breaks the connection between the source code and the rendered version
-        let substitutionContext = new HLMSubstitutionContext;
+        const substitutionContext = new HLMSubstitutionContext;
         this.utils.addParameterListSubstitution(renderContext.originalParameters, renderContext.substitutedParameters, substitutionContext);
         renderedStep = this.utils.applySubstitutionContextToParameter(renderedStep, substitutionContext);
       }
-      let stepResult = this.addProofStep(proof, renderedStep, renderContext, state);
+      const stepResult = this.addProofStep(proof, renderedStep, renderContext, state);
       if (stepResult) {
         renderContext.stepResults.set(step, stepResult);
       }
@@ -2849,10 +2849,10 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private addProofStep(proof: FmtHLM.ObjectContents_Proof, step: Fmt.Parameter, context: HLMProofStepRenderContext, state: ProofOutputState): Fmt.Expression | undefined {
     try {
       let type = step.type;
-      let addImplication = (implication: ProofOutputImplication) => {
+      const addImplication = (implication: ProofOutputImplication) => {
         if (context.isLastStep) {
-          let displayContradiction = (context.goal !== undefined && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
-          let insertionContext = {
+          const displayContradiction = (context.goal !== undefined && this.utils.isFalseFormula(context.goal) && !this.utils.isFalseFormula(implication.result));
+          const insertionContext = {
             ...context,
             previousStep: step,
             previousResult: implication.result
@@ -2874,7 +2874,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
       };
       if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
-        let subProofContext: HLMProofStepContext = {
+        const subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
         this.addSubProof(type.proof, subProofContext, false, state);
@@ -2884,7 +2884,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (context.goal instanceof FmtHLM.MetaRefExpression_forall && type.proof.parameters) {
           goal = this.utils.substituteParameters(context.goal.formula, context.goal.parameters, type.proof.parameters);
         }
-        let subProofContext: HLMProofStepContext = {
+        const subProofContext: HLMProofStepContext = {
           goal: goal,
           stepResults: context.stepResults
         };
@@ -2896,27 +2896,27 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
         let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
         if (context.goal instanceof FmtHLM.MetaRefExpression_or && context.goal.formulas) {
-          let index = this.utils.externalToInternalIndex(type.proof._to);
+          const index = this.utils.externalToInternalIndex(type.proof._to);
           if (index !== undefined && index >= 0 && index < context.goal.formulas.length) {
             newGoal = context.goal.formulas[index];
           }
         }
-        let subProofContext: HLMProofStepContext = {
+        const subProofContext: HLMProofStepContext = {
           goal: newGoal,
           stepResults: context.stepResults
         };
         this.addSubProof(type.proof, subProofContext, false, state);
         return undefined;
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
-        let term = type.term;
-        let hasCases = type.cases.length > 1;
-        let isInduction = hasCases && type.cases.some((structuralCase: FmtHLM.ObjectContents_StructuralCase) => this.utils.referencesSelf(structuralCase.value));
+        const term = type.term;
+        const hasCases = type.cases.length > 1;
+        const isInduction = hasCases && type.cases.some((structuralCase: FmtHLM.ObjectContents_StructuralCase) => this.utils.referencesSelf(structuralCase.value));
         if (isInduction || state.isPreview) {
           if (!state.startRow) {
             state.startRow = [];
           }
           this.outputStartRowSpacing(state);
-          let termSelection: ElementTermSelection = {
+          const termSelection: ElementTermSelection = {
             allowCases: false,
             allowConstructors: false
           };
@@ -2930,17 +2930,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (!state.isPreview) {
           this.commitImplications(state, false);
           if (type.construction instanceof Fmt.DefinitionRefExpression) {
-            let path = type.construction.path;
-            let items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
-              let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
-              let renderedSubProof = this.createInductionSubProofForRendering(structuralCase);
-              let structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
-              let subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
-                let subProofContext: HLMProofStepContext = {
+            const path = type.construction.path;
+            const items = type.cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => {
+              const subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+              const renderedSubProof = this.createInductionSubProofForRendering(structuralCase);
+              const structuralCaseTermPromise = this.utils.getStructuralCaseTerm(path, structuralCase);
+              const subProofPromise = structuralCaseTermPromise.then((structuralCaseTerm: Fmt.Expression) => {
+                const subProofContext: HLMProofStepContext = {
                   goal: context.goal && !subProof.parameters ? this.utils.getInductionProofGoal(context.goal, term, structuralCaseTerm) : context.goal,
                   stepResults: context.stepResults
                 };
-                let subState: ProofOutputState = {
+                const subState: ProofOutputState = {
                   paragraphs: [],
                   isPreview: state.isPreview,
                   onApply: () => {
@@ -2957,7 +2957,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
               });
               return new Notation.PromiseExpression(subProofPromise);
             });
-            let list = new Notation.ListExpression(items, '*');
+            const list = new Notation.ListExpression(items, '*');
             state.paragraphs.push(list);
           }
         }
@@ -2967,9 +2967,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
         this.commitImplications(state, false);
         state.paragraphs.push(this.renderParameter(step, true, false, false));
-        let result = this.utils.getProofStepResult(step, context);
+        const result = this.utils.getProofStepResult(step, context);
         if (context.isLastStep) {
-          let insertionContext = {
+          const insertionContext = {
             ...context,
             previousStep: step,
             previousResult: result
@@ -2978,7 +2978,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_Consider || type instanceof Fmt.VariableRefExpression || type instanceof Fmt.IndexedExpression) {
-        let result = this.utils.getProofStepTypeResult(type, context);
+        const result = this.utils.getProofStepTypeResult(type, context);
         if (result) {
           if (type instanceof FmtHLM.MetaRefExpression_Consider) {
             type = type.variable;
@@ -2995,13 +2995,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         let byDefinition: Fmt.Expression | undefined = undefined;
         let bySubstitution: Fmt.Expression | undefined = undefined;
         let definitionDependency: Fmt.Expression | undefined;
-        let subProof = type.proof;
+        const subProof = type.proof;
         if (subProof?.steps.length === 1) {
-          let subStepType = subProof.steps[0].type;
+          const subStepType = subProof.steps[0].type;
           if (subStepType instanceof FmtHLM.MetaRefExpression_ProveDef) {
             if (subStepType.proof) {
               if (subStepType.proof.steps.length === 1 && subStepType.proof.goal instanceof FmtHLM.MetaRefExpression_exists && subStepType.proof.goal.formula) {
-                let subSubStepType = subStepType.proof.steps[0].type;
+                const subSubStepType = subStepType.proof.steps[0].type;
                 if (subSubStepType instanceof FmtHLM.MetaRefExpression_ProveExists && !subSubStepType.proof) {
                   byDefinition = subStepType;
                   definitionDependency = this.utils.substituteArguments(subStepType.proof.goal.formula, subStepType.proof.goal.parameters, subSubStepType.arguments, undefined);
@@ -3014,7 +3014,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             bySubstitution = subStepType;
           }
         }
-        let implication: ProofOutputImplication = {
+        const implication: ProofOutputImplication = {
           dependsOnPrevious: false,
           result: type.statement,
           resultIsEditable: true
@@ -3049,7 +3049,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         addImplication(implication);
         if (showSubProof) {
-          let subProofContext: HLMProofStepContext = {
+          const subProofContext: HLMProofStepContext = {
             goal: type.statement,
             stepResults: context.stepResults
           };
@@ -3057,7 +3057,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         }
         return type.statement;
       } else if (this.isDependentProofStepType(type) || type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
-        let result = this.utils.getProofStepTypeResult(type, context);
+        const result = this.utils.getProofStepTypeResult(type, context);
         if (!result) {
           return undefined;
         }
@@ -3096,7 +3096,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         // TODO add sub-proofs (maybe inline like in expressions, or maybe expandable)
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) {
-        let result = this.utils.getProofStepTypeResult(type, context);
+        const result = this.utils.getProofStepTypeResult(type, context);
         if (!result) {
           return undefined;
         }
@@ -3112,7 +3112,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         return result;
       } else if (type instanceof FmtHLM.MetaRefExpression_UseCases
                  || type instanceof FmtHLM.MetaRefExpression_ProveCases) {
-        let subProofContext: HLMProofStepContext = {
+        const subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
         if (type instanceof FmtHLM.MetaRefExpression_UseCases) {
@@ -3123,8 +3123,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         if (context.previousResult instanceof FmtHLM.MetaRefExpression_exists || context.previousResult instanceof FmtHLM.MetaRefExpression_existsUnique) {
           context.originalParameters.push(...type.parameters);
           context.substitutedParameters.push(...context.previousResult.parameters);
-          let result = context.previousResult.formula;
-          let insertionContext: HLMProofStepRenderContext = {
+          const result = context.previousResult.formula;
+          const insertionContext: HLMProofStepRenderContext = {
             ...context,
             previousStep: step,
             previousResult: result
@@ -3138,7 +3138,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       } else if (type instanceof FmtHLM.MetaRefExpression_ProveExists) {
         this.commitImplications(state, false);
         if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
-          let argumentList = this.renderArgumentList(context.goal.parameters, type.arguments, undefined, ArgumentListStyle.Definitions);
+          const argumentList = this.renderArgumentList(context.goal.parameters, type.arguments, undefined, ArgumentListStyle.Definitions);
           state.startRow = [
             new Notation.TextExpression('Take '),
             argumentList,
@@ -3146,7 +3146,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           ];
           state.startRowSpacing = ' ';
           if (type.proof && !(type.proof.steps.length === 1 && type.proof.steps[0].type instanceof FmtHLM.MetaRefExpression_Consider)) {
-            let subProofContext: HLMProofStepContext = {
+            const subProofContext: HLMProofStepContext = {
               stepResults: context.stepResults,
               goal: context.goal.formula ? this.utils.substituteArguments(context.goal.formula, context.goal.parameters, type.arguments, undefined) : undefined
             };
@@ -3164,7 +3164,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         } else if (context.goal instanceof FmtHLM.MetaRefExpression_equiv) {
           labels = this.getEquivalenceProofLabels(type.proofs, '⇒', context.goal.formulas.length === 2 ? '⇐' : undefined);
         }
-        let subProofContext: HLMProofStepContext = {
+        const subProofContext: HLMProofStepContext = {
           stepResults: context.stepResults
         };
         this.addSubProofList(type.proofs, labels, subProofContext, state);
@@ -3193,7 +3193,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem && type.theorem instanceof Fmt.DefinitionRefExpression) {
       return this.readOnlyRenderer.renderItemNumber(type.theorem);
     } else if (type instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) {
-      let result = new Notation.RowExpression([
+      const result = new Notation.RowExpression([
         new Notation.TextExpression('definition of '),
         this.readOnlyRenderer.renderElementTerm(type.operator, fullElementTermSelection)
       ]);
@@ -3205,8 +3205,8 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private renderProofBySubstitution(proof: FmtHLM.ObjectContents_Proof, type: FmtHLM.MetaRefExpression_ProveBySubstitution, context: HLMProofStepRenderContext, originalLeftTerm: Fmt.Expression | undefined, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): void {
-    let goal = context.goal;
-    let sourceContext: HLMProofStepRenderContext = {
+    const goal = context.goal;
+    const sourceContext: HLMProofStepRenderContext = {
       ...context,
       goal: undefined,
       isLastStep: false,
@@ -3214,7 +3214,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       previousResult: undefined,
       previousStep: undefined
     };
-    let subProofContext: HLMProofStepRenderContext = {
+    const subProofContext: HLMProofStepRenderContext = {
       ...sourceContext,
       goal: type.goal
     };
@@ -3223,14 +3223,14 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
            || (goal instanceof FmtHLM.MetaRefExpression_equals && type.goal instanceof FmtHLM.MetaRefExpression_equals))
           && goal.terms.length >= 2
           && type.goal.terms.length === 2) {
-        let targetTerm = type.goal.terms[1];
+        const targetTerm = type.goal.terms[1];
         if (goal.terms[1].isEquivalentTo(targetTerm)
             && (originalLeftTerm || !type.goal.terms[0].isEquivalentTo(targetTerm))) {
-          let leftTerm = originalLeftTerm ?? goal.terms[0];
-          let rightTerm = type.goal.terms[0];
-          let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+          const leftTerm = originalLeftTerm ?? goal.terms[0];
+          const rightTerm = type.goal.terms[0];
+          const equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
           let source: Notation.RenderedExpression | undefined = undefined;
-          let sourceType = type.source;
+          const sourceType = type.source;
           if (sourceType instanceof FmtHLM.MetaRefExpression_UseTheorem && sourceType.theorem instanceof Fmt.DefinitionRefExpression) {
             source = this.renderItemNumber(sourceType.theorem);
           }
@@ -3241,12 +3241,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             source: source,
             sourceFormula: this.getSourceFormula(type.source, context)
           });
-          let targetReached = this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
-          let addProof = type.proof?.steps.length && !targetReached;
+          const targetReached = this.continueCalculation(type.proof, subProofContext, leftTerm, rightTerm, state, addImplication);
+          const addProof = type.proof?.steps.length && !targetReached;
           for (let additionalRightTermIndex = targetReached || rightTerm.isEquivalentTo(targetTerm) ? 2 : 1; additionalRightTermIndex < goal.terms.length; additionalRightTermIndex++) {
-            let additionalRightTerm = goal.terms[additionalRightTermIndex];
-            let additionalEquality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, additionalRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, additionalRightTerm);
-            let punctuation = additionalRightTermIndex === goal.terms.length - 1 && addProof ? [new Notation.TextExpression(':')] : undefined;
+            const additionalRightTerm = goal.terms[additionalRightTermIndex];
+            const additionalEquality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, additionalRightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, additionalRightTerm);
+            const punctuation = additionalRightTermIndex === goal.terms.length - 1 && addProof ? [new Notation.TextExpression(':')] : undefined;
             addImplication({
               dependsOnPrevious: true,
               result: additionalEquality,
@@ -3259,16 +3259,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           }
         } else if (goal.terms.length > 2
                    && goal.terms.slice(2).some((term: Fmt.Expression) => term.isEquivalentTo(targetTerm))) {
-          let leftTerm = originalLeftTerm ?? goal.terms[0];
-          let rightTerm = goal.terms[1];
-          let equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+          const leftTerm = originalLeftTerm ?? goal.terms[0];
+          const rightTerm = goal.terms[1];
+          const equality = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
           addImplication({
             dependsOnPrevious: originalLeftTerm !== undefined,
             result: equality,
             resultIsEditable: false
           });
-          let newGoal = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(...goal.terms.slice(1)) : new FmtHLM.MetaRefExpression_equals(...goal.terms.slice(1));
-          let newContext = {
+          const newGoal = goal instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(...goal.terms.slice(1)) : new FmtHLM.MetaRefExpression_equals(...goal.terms.slice(1));
+          const newContext = {
             ...context,
             goal: newGoal
           };
@@ -3278,7 +3278,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       }
     }
     if (!(type.source instanceof Fmt.VariableRefExpression || type.source instanceof Fmt.IndexedExpression || type.source instanceof FmtHLM.MetaRefExpression_Consider)) {
-      let step = new Fmt.Parameter('_', type.source);
+      const step = new Fmt.Parameter('_', type.source);
       this.addProofStep(proof, step, sourceContext, state);
     }
     this.addSubProof(type.proof, subProofContext, false, state);
@@ -3294,13 +3294,13 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private continueCalculation(subProof: FmtHLM.ObjectContents_Proof | undefined, context: HLMProofStepRenderContext, leftTerm: Fmt.Expression, previousRightTerm: Fmt.Expression, state: ProofOutputState, addImplication: (implication: ProofOutputImplication) => void): boolean {
     if (subProof?.steps.length === 1) {
-      let firstStep = subProof.steps[0];
-      let type = firstStep.type;
+      const firstStep = subProof.steps[0];
+      const type = firstStep.type;
       if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
         this.renderProofBySubstitution(subProof, type, context, leftTerm, state, addImplication);
         return true;
       } else {
-        let firstStepResult = this.utils.getProofStepResult(firstStep, context);
+        const firstStepResult = this.utils.getProofStepResult(firstStep, context);
         if ((firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals || firstStepResult instanceof FmtHLM.MetaRefExpression_equals)
             && firstStepResult.terms.length === 2) {
           let rightTerm: Fmt.Expression;
@@ -3311,7 +3311,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           } else {
             return false;
           }
-          let finalEquality = firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+          const finalEquality = firstStepResult instanceof FmtHLM.MetaRefExpression_setEquals ? new FmtHLM.MetaRefExpression_setEquals(leftTerm, rightTerm) : new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
           let source: Notation.RenderedExpression | undefined = undefined;
           if (firstStep.type instanceof FmtHLM.MetaRefExpression_UseTheorem && firstStep.type.theorem instanceof Fmt.DefinitionRefExpression) {
             source = this.renderItemNumber(firstStep.type.theorem);
@@ -3330,12 +3330,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getSourceFormula(source: Fmt.Expression, context: HLMProofStepContext): Notation.RenderedExpression | undefined {
-    let sourceContext: HLMProofStepContext = {
+    const sourceContext: HLMProofStepContext = {
       stepResults: context.stepResults
     };
-    let sourceResult = this.utils.getProofStepTypeResult(source, sourceContext);
+    const sourceResult = this.utils.getProofStepTypeResult(source, sourceContext);
     if (sourceResult) {
-      let sourceFormula = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
+      const sourceFormula = this.readOnlyRenderer.renderFormula(sourceResult, fullFormulaSelection);
       if (!sourceFormula.styleClasses) {
         sourceFormula.styleClasses = [];
       }
@@ -3347,11 +3347,11 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private getConditionalProofStepInsertButton(proof: FmtHLM.ObjectContents_Proof, context: HLMProofStepRenderContext, displayContradiction: boolean, state: ProofOutputState): Notation.RenderedExpression {
-    let onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
-    let onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
-    let onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
-    let onRenderArgumentList = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList, innerEditHandler: HLMEditHandler) => {
-      let innerRenderer = new HLMRenderer(this.definition, this.libraryDataAccessor, this.utils, this.renderUtils, this.templates, this.options, innerEditHandler);
+    const onRenderTrivialProof = () => (displayContradiction ? this.renderTemplate('Contradiction') : new Notation.EmptyExpression);
+    const onRenderProofStep = (renderedStep: Fmt.Parameter) => this.readOnlyRenderer.renderProofStepPreview(proof, renderedStep, context);
+    const onRenderFormula = (expression: Fmt.Expression) => this.readOnlyRenderer.renderFormulaInternal(expression)[0]!;
+    const onRenderArgumentList = (parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList, innerEditHandler: HLMEditHandler) => {
+      const innerRenderer = new HLMRenderer(this.definition, this.libraryDataAccessor, this.utils, this.renderUtils, this.templates, this.options, innerEditHandler);
       return innerRenderer.renderArgumentList(parameterList, argumentList, undefined, ArgumentListStyle.Definitions);
     };
     return this.editHandler!.getConditionalProofStepInsertButton(proof, state.onApply, onRenderTrivialProof, onRenderProofStep, onRenderFormula, onRenderArgumentList);
@@ -3373,7 +3373,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       ...context,
       isLastStep: false
     };
-    let state: ProofOutputState = {
+    const state: ProofOutputState = {
       paragraphs: [],
       isPreview: true,
       onApply: () => {}
@@ -3388,7 +3388,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private createInductionSubProofForRendering(structuralCase: FmtHLM.ObjectContents_StructuralCase): FmtHLM.ObjectContents_Proof {
-    let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+    const subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
     if (structuralCase.parameters) {
       if (subProof.parameters) {
         subProof.parameters = new Fmt.ParameterList(...structuralCase.parameters, ...subProof.parameters);
@@ -3419,25 +3419,25 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private commitImplications(state: ProofOutputState, forceLeftAlignment: boolean, commitAdditionalRow: boolean = false): void {
     if (state.implications || (commitAdditionalRow && state.additionalRow)) {
       this.commitStartRow(state);
-      let gridState: ProofGridState = {
+      const gridState: ProofGridState = {
         rows: []
       };
       if (state.implications) {
         for (let index = 0; index < state.implications.length; index++) {
-          let implication = state.implications[index];
-          let nextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
+          const implication = state.implications[index];
+          const nextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
           let mergeEquality = nextImplication !== undefined && nextImplication.dependsOnPrevious && this.canMergeEquality(implication.result, nextImplication.result);
           if (!implication.dependsOnPrevious || (mergeEquality && gridState.equalitySymbolColumn === undefined)) {
             this.commitProofGrid(gridState, state.paragraphs);
           }
-          let row: Notation.RenderedExpression[] = [];
+          const row: Notation.RenderedExpression[] = [];
           this.outputImplication(implication, gridState, mergeEquality, row);
           if (gridState.implicationSymbolColumn === undefined
               && gridState.equalitySymbolColumn === undefined
               && nextImplication?.dependsOnPrevious
               && (!forceLeftAlignment || state.implications.length === index + 2)) {
             index++;
-            let nextNextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
+            const nextNextImplication = index + 1 < state.implications.length ? state.implications[index + 1] : undefined;
             mergeEquality = nextNextImplication !== undefined && nextNextImplication.dependsOnPrevious && this.canMergeEquality(nextImplication.result, nextNextImplication.result);
             this.outputImplication(nextImplication, gridState, mergeEquality, row);
           }
@@ -3451,7 +3451,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         state.implications = undefined;
       }
       if (commitAdditionalRow && state.additionalRow) {
-        let row: Notation.RenderedExpression[] = [];
+        const row: Notation.RenderedExpression[] = [];
         if (gridState.implicationSymbolColumn !== undefined) {
           while (!row.length || row.length < gridState.implicationSymbolColumn) {
             row.push(new Notation.EmptyExpression);
@@ -3495,12 +3495,12 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     if (gridState.implicationSymbolColumn === undefined) {
       gridState.implicationSymbolColumn = row.length;
     }
-    let leftAligned = !gridState.implicationSymbolColumn;
+    const leftAligned = !gridState.implicationSymbolColumn;
     // Implication symbol cannot be in the first column because only odd columns are center-aligned.
     while (!row.length || row.length < gridState.implicationSymbolColumn) {
       row.push(new Notation.EmptyExpression);
     }
-    let implicationRow: Notation.RenderedExpression[] = [
+    const implicationRow: Notation.RenderedExpression[] = [
       this.renderTemplate('ProofImplication', {
                             'source': implication.source,
                             'formula': implication.sourceFormula
@@ -3516,22 +3516,22 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private outputImplicationResult(implication: ProofOutputImplication, row: Notation.RenderedExpression[]): void {
-    let renderer = implication.resultIsEditable ? this : this.readOnlyRenderer;
-    let formulaSelection: FormulaSelection = {
+    const renderer = implication.resultIsEditable ? this : this.readOnlyRenderer;
+    const formulaSelection: FormulaSelection = {
       allowTruthValue: false,
       allowEquiv: false,
       allowCases: true
     };
-    let result = (this.utils.isFalseFormula(implication.result)
+    const result = (this.utils.isFalseFormula(implication.result)
                   ? renderer.renderTemplate('Contradiction')
                   : renderer.renderFormula(implication.result, formulaSelection));
     if (implication.resultLink) {
       renderer.addSemanticLink(result, implication.result);
     }
-    let resultWithParens = new Notation.InnerParenExpression(result);
+    const resultWithParens = new Notation.InnerParenExpression(result);
     resultWithParens.maxLevel = -3;
     if (implication.resultPrefixes || implication.resultSuffixes) {
-      let resultRow: Notation.RenderedExpression[] = [];
+      const resultRow: Notation.RenderedExpression[] = [];
       if (implication.resultPrefixes) {
         resultRow.push(...implication.resultPrefixes);
       }
@@ -3546,7 +3546,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private outputEquality(implication: ProofOutputImplication, gridState: ProofGridState, row: Notation.RenderedExpression[]): void {
-    let result = implication.result;
+    const result = implication.result;
     let left: Notation.RenderedExpression;
     let right: Notation.RenderedExpression;
     if (result instanceof FmtHLM.MetaRefExpression_setEquals && result.terms.length === 2) {
@@ -3589,7 +3589,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   private commitProofGrid(gridState: ProofGridState, paragraphs: Notation.RenderedExpression[]): void {
     this.commitPunctuation(gridState);
     if (gridState.rows.length) {
-      let table = new Notation.TableExpression(gridState.rows);
+      const table = new Notation.TableExpression(gridState.rows);
       table.styleClasses = ['proof-grid'];
       paragraphs.push(table);
     }
@@ -3600,7 +3600,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private commitPunctuation(gridState: ProofGridState): void {
     if (gridState.pendingPunctuation && gridState.rows.length) {
-      let lastRow = gridState.rows[gridState.rows.length - 1];
+      const lastRow = gridState.rows[gridState.rows.length - 1];
       if (lastRow.length) {
         lastRow[lastRow.length - 1] = new Notation.RowExpression([
           lastRow[lastRow.length - 1],
@@ -3618,19 +3618,19 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       switch (placeholder.placeholderType) {
       case HLMExpressionType.SetTerm:
         {
-          let onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, false)!;
+          const onRenderTerm = (expression: Fmt.Expression) => this.renderSetTermInternal(expression, false)!;
           this.editHandler.addSetTermMenu(semanticLink, placeholder, onRenderTerm, fullSetTermSelection);
         }
         break;
       case HLMExpressionType.ElementTerm:
         {
-          let onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
+          const onRenderTerm = (expression: Fmt.Expression) => this.renderElementTermInternal(expression)!;
           this.editHandler.addElementTermMenu(semanticLink, placeholder, onRenderTerm, fullElementTermSelection);
         }
         break;
       case HLMExpressionType.Formula:
         {
-          let onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
+          const onRenderFormula = (expression: Fmt.Expression) => this.renderFormulaInternal(expression)[0]!;
           this.editHandler.addFormulaMenu(semanticLink, placeholder, onRenderFormula, fullFormulaSelection);
         }
         break;
@@ -3639,37 +3639,37 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   getDefinitionParts(): Logic.ObjectRenderFns {
-    let result = new Map<Object, Logic.RenderFn>();
+    const result = new Map<Object, Logic.RenderFn>();
     this.addDefinitionParts([this.definition], result);
     return result;
   }
 
   private addDefinitionParts(definitions: Fmt.Definition[], result: Logic.ObjectRenderFns): void {
-    let definition = definitions[definitions.length - 1];
-    let contents = definition.contents;
+    const definition = definitions[definitions.length - 1];
+    const contents = definition.contents;
     if (!(contents instanceof FmtHLM.ObjectContents_MacroOperator)) {
       this.addParameterListParts(definition.parameters, definition, result);
-      for (let innerDefinition of definition.innerDefinitions) {
+      for (const innerDefinition of definition.innerDefinitions) {
         this.addDefinitionParts(definitions.concat(innerDefinition), result);
       }
       if (contents instanceof FmtHLM.ObjectContents_Definition) {
         if (contents.notation) {
-          let notation = contents.notation;
+          const notation = contents.notation;
           result.set(notation, () => this.renderDefinitionNotationExpression(notation, definitions));
         }
         if (contents instanceof FmtHLM.ObjectContents_Construction) {
           if (contents.embedding) {
-            let embedding = contents.embedding;
+            const embedding = contents.embedding;
             result.set(embedding.parameter, () => this.renderParameter(embedding.parameter, false, false, false));
             result.set(embedding.target, () => this.renderElementTerm(embedding.target, fullElementTermSelection));
             this.addProofParts(embedding.wellDefinednessProof, result);
           }
         } else if (contents instanceof FmtHLM.ObjectContents_Constructor) {
           if (contents.equalityDefinition) {
-            let equalityDefinition = contents.equalityDefinition;
+            const equalityDefinition = contents.equalityDefinition;
             this.addParameterListParts(equalityDefinition.leftParameters, undefined, result);
             this.addParameterListParts(equalityDefinition.rightParameters, undefined, result);
-            for (let item of equalityDefinition.definition) {
+            for (const item of equalityDefinition.definition) {
               this.addFormulaParts(item, result);
             }
             this.addProofListParts(equalityDefinition.equivalenceProofs, result);
@@ -3678,31 +3678,31 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
             this.addProofParts(equalityDefinition.transitivityProof, result);
           }
           if (contents.rewrite) {
-            let rewrite = contents.rewrite;
+            const rewrite = contents.rewrite;
             this.addElementTermParts(rewrite.value, result);
             if (rewrite.theorem) {
               this.addGenericExpressionParts(rewrite.theorem, result);
             }
           }
         } else if (contents instanceof FmtHLM.ObjectContents_SetOperator) {
-          for (let item of contents.definition) {
+          for (const item of contents.definition) {
             this.addSetTermParts(item, result);
           }
           this.addProofListParts(contents.equalityProofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_ExplicitOperator) {
-          for (let item of contents.definition) {
+          for (const item of contents.definition) {
             this.addElementTermParts(item, result);
           }
           this.addProofListParts(contents.equalityProofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
           this.addParameterParts(contents.parameter, result);
-          for (let item of contents.definition) {
+          for (const item of contents.definition) {
             this.addFormulaParts(item, result);
           }
           this.addProofParts(contents.wellDefinednessProof, result);
           this.addProofListParts(contents.equivalenceProofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_Predicate) {
-          for (let item of contents.definition) {
+          for (const item of contents.definition) {
             this.addFormulaParts(item, result);
           }
           this.addProofListParts(contents.equivalenceProofs, result);
@@ -3712,7 +3712,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
           this.addFormulaParts(contents.claim, result);
           this.addProofListParts(contents.proofs, result);
         } else if (contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-          for (let item of contents.conditions) {
+          for (const item of contents.conditions) {
             this.addFormulaParts(item, result);
           }
           this.addProofListParts(contents.equivalenceProofs, result);
@@ -3750,7 +3750,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addParameterListParts(parameters: Fmt.ParameterList, associatedDefinition: Fmt.Definition | undefined, result: Logic.ObjectRenderFns): void {
-    let initialState: ParameterListState = {
+    const initialState: ParameterListState = {
       fullSentence: true,
       sentence: true,
       abbreviate: false,
@@ -3767,16 +3767,16 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
       associatedDefinition: associatedDefinition
     };
     let currentGroup: Fmt.Parameter[] = [];
-    for (let param of parameters) {
+    for (const param of parameters) {
       if (currentGroup.length && param.type !== currentGroup[0].type) {
-        let group = currentGroup;
+        const group = currentGroup;
         result.set(group[0], () => this.renderParametersWithInitialState(group, initialState));
         currentGroup = [];
       }
       currentGroup.push(param);
     }
     if (currentGroup.length) {
-      let group = currentGroup;
+      const group = currentGroup;
       result.set(group[0], () => this.renderParametersWithInitialState(group, initialState));
     }
   }
@@ -3786,15 +3786,15 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addArgumentListParts(args: Fmt.ArgumentList, result: Logic.ObjectRenderFns): void {
-    for (let arg of args) {
+    for (const arg of args) {
       if (arg.value instanceof Fmt.CompoundExpression) {
         let index = 0;
-        for (let item of arg.value.arguments) {
+        for (const item of arg.value.arguments) {
           if (item.name === 'proof' || (item.name && item.name.endsWith('Proof'))) {
-            let proof = FmtHLM.ObjectContents_Proof.createFromExpression(item.value);
+            const proof = FmtHLM.ObjectContents_Proof.createFromExpression(item.value);
             this.addProofParts(proof, result);
           } else if (item.name === 'arguments') {
-            let value = item.value as Fmt.CompoundExpression;
+            const value = item.value as Fmt.CompoundExpression;
             this.addArgumentListParts(value.arguments, result);
           } else if (!index) {
             this.addGenericExpressionParts(item.value, result);
@@ -3809,7 +3809,7 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
 
   private addProofListParts(proofs: FmtHLM.ObjectContents_Proof[] | undefined, result: Logic.ObjectRenderFns): void {
     if (proofs && this.options.includeProofs) {
-      for (let proof of proofs) {
+      for (const proof of proofs) {
         this.addProofParts(proof, result);
       }
     }
@@ -3821,17 +3821,17 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
         this.addParameterListParts(proof.parameters, undefined, result);
       }
       if (proof.goal) {
-        let goal = proof.goal;
+        const goal = proof.goal;
         result.set(goal, () => this.renderFormula(goal, fullFormulaSelection));
       }
-      for (let step of proof.steps) {
+      for (const step of proof.steps) {
         this.addProofStepParts(step, result);
       }
     }
   }
 
   private addProofStepParts(step: Fmt.Parameter, result: Logic.ObjectRenderFns): void {
-    let type = step.type;
+    const type = step.type;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
       this.addParameterParts(step, result);
     } else {
@@ -3882,9 +3882,9 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
       this.addElementTermParts(type.term, result);
       this.addGenericExpressionParts(type.construction, result);
-      for (let structuralCase of type.cases) {
+      for (const structuralCase of type.cases) {
         this.addGenericExpressionParts(structuralCase._constructor, result);
-        let proof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+        const proof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
         this.addProofParts(proof, result);
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveBySubstitution) {
@@ -3895,21 +3895,21 @@ export class HLMRenderer extends GenericRenderer implements Logic.LogicRenderer 
   }
 
   private addRenderedVariables(parameters: Fmt.Parameter[], variables: RenderedVariable[], indices?: Notation.RenderedExpression[]): void {
-    let remainingParameters = [...parameters];
+    const remainingParameters = [...parameters];
     while (remainingParameters.length) {
-      let param = remainingParameters.shift()!;
-      let paramType = param.type;
+      const param = remainingParameters.shift()!;
+      const paramType = param.type;
       if (this.utils.isValueParamType(paramType)) {
-        let renderedVariable = this.renderVariable(param, indices);
+        const renderedVariable = this.renderVariable(param, indices);
         variables.push({
           param: param,
           notation: renderedVariable,
           canAutoFill: this.utils.canAutoFillParameter(param, remainingParameters)
         });
       } else if (paramType instanceof FmtHLM.MetaRefExpression_Binder) {
-        let newIndices: Notation.RenderedExpression[] = indices ? indices.slice() : [];
-        for (let sourceParam of paramType.sourceParameters) {
-          let renderedVariable = this.renderVariable(sourceParam);
+        const newIndices: Notation.RenderedExpression[] = indices ? indices.slice() : [];
+        for (const sourceParam of paramType.sourceParameters) {
+          const renderedVariable = this.renderVariable(sourceParam);
           variables.push({
             param: sourceParam,
             notation: renderedVariable,

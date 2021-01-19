@@ -12,14 +12,14 @@ export interface UnicodeConversionOptions {
 export function convertUnicode(text: string, renderer: UnicodeConverter, options: UnicodeConversionOptions): void {
   let curText = '';
   let curStyle: string | undefined = undefined;
-  let flush = () => {
+  const flush = () => {
     if (curText) {
       renderer.outputText(curText, curStyle);
       curText = '';
     }
     curStyle = undefined;
   };
-  let setStyle = (style: string | undefined) => {
+  const setStyle = (style: string | undefined) => {
     if (curStyle !== style) {
       flush();
       curStyle = style;
@@ -51,9 +51,9 @@ export function convertUnicode(text: string, renderer: UnicodeConverter, options
       break;
     default:
       {
-        let cp = c.codePointAt(0)!;
+        const cp = c.codePointAt(0)!;
         if (options.convertStandardCharacters) {
-          let standardCharacter = getStandardCharacter(cp);
+          const standardCharacter = getStandardCharacter(cp);
           if (standardCharacter) {
             setStyle(standardCharacter[1]);
             curText += standardCharacter[0];
@@ -247,7 +247,7 @@ export function shrinkMathSpace(c: string): string {
 
 export function shrinkMathSpaces(text: string): string {
   let result = '';
-  for (let c of text) {
+  for (const c of text) {
     result += shrinkMathSpace(c);
   }
   return result;
@@ -258,7 +258,7 @@ export function useItalicsForVariable(text: string): boolean {
     text = text.substring(0, text.length - 1);
   }
   if (text.length === 1) {
-    let cp = text.charCodeAt(0)!;
+    const cp = text.charCodeAt(0)!;
     return ((cp >= 0x41 && cp < 0x5b)
             || (cp >= 0x61 && cp < 0x7b)
             || (cp >= 0xc0 && cp < 0x2b0)

@@ -6,10 +6,10 @@ export class SlateHighlightProvider implements vscode.DocumentHighlightProvider 
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideDocumentHighlights(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.DocumentHighlight[]> {
-        let parsedDocument = this.parsedDocuments.get(document);
+        const parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
             let variable: Fmt.Parameter | undefined = undefined;
-            for (let rangeInfo of parsedDocument.rangeList) {
+            for (const rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
                 }
@@ -27,8 +27,8 @@ export class SlateHighlightProvider implements vscode.DocumentHighlightProvider 
                 }
             }
             if (variable) {
-                let highlights: vscode.DocumentHighlight[] = [];
-                for (let rangeInfo of parsedDocument.rangeList) {
+                const highlights: vscode.DocumentHighlight[] = [];
+                for (const rangeInfo of parsedDocument.rangeList) {
                     if (token.isCancellationRequested) {
                         break;
                     }

@@ -16,9 +16,9 @@ class LinkExtractor {
   constructor(private fileName: string) {}
 
   render(tokens: any[] = []): void {
-    for (let token of tokens) {
+    for (const token of tokens) {
       if (token.type === 'link_open') {
-        let uri: string = token.href;
+        const uri: string = token.href;
         if (uri.startsWith('http://') || uri.startsWith('https://')) {
           linksFound++;
           this.triggerLinkCheck(uri);
@@ -52,30 +52,30 @@ class LinkExtractor {
 
 function checkDefinitionLinks(fileName: string, definition: Fmt.Definition): void {
   if (definition.documentation) {
-    for (let documentationItem of definition.documentation.items) {
-      let md = new Remarkable;
+    for (const documentationItem of definition.documentation.items) {
+      const md = new Remarkable;
       md.use(linkify);
       md.renderer = new LinkExtractor(fileName);
       md.render(documentationItem.text);
     }
   }
 
-  for (let innerDefinition of definition.innerDefinitions) {
+  for (const innerDefinition of definition.innerDefinitions) {
     checkDefinitionLinks(fileName, innerDefinition);
   }
 }
 
 function checkLinks(fileName: string): void {
-  let fileStr = fs.readFileSync(fileName, 'utf8');
-  let getMetaModel = (path: Fmt.Path) => {
-    let logic = Logics.findLogic(path.name);
+  const fileStr = fs.readFileSync(fileName, 'utf8');
+  const getMetaModel = (path: Fmt.Path) => {
+    const logic = Logics.findLogic(path.name);
     if (logic) {
       return logic.getMetaModel(path);
     }
     return getMetaModelWithFallback(fileName, path);
   };
-  let file = FmtReader.readString(fileStr, fileName, getMetaModel);
-  for (let definition of file.definitions) {
+  const file = FmtReader.readString(fileStr, fileName, getMetaModel);
+  for (const definition of file.definitions) {
     checkDefinitionLinks(fileName, definition);
   }
 }
@@ -85,7 +85,7 @@ if (process.argv.length < 3) {
   process.exit(2);
 }
 
-for (let fileName of process.argv.slice(2)) {
+for (const fileName of process.argv.slice(2)) {
   checkLinks(fileName);
 }
 

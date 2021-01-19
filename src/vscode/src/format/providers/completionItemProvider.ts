@@ -21,18 +21,18 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
-        let parsedDocument = this.parsedDocuments.get(document);
+        const parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            let result: vscode.CompletionItem[] = [];
-            let variableNames = new Set<string>();
-            let rangeList = parsedDocument.rangeList;
+            const result: vscode.CompletionItem[] = [];
+            const variableNames = new Set<string>();
+            const rangeList = parsedDocument.rangeList;
             for (let rangeInfoIndex = 0; rangeInfoIndex < rangeList.length; rangeInfoIndex++) {
-                let rangeInfo = rangeList[rangeInfoIndex];
+                const rangeInfo = rangeList[rangeInfoIndex];
                 if (rangeInfo.range.contains(position)) {
                     if (token.isCancellationRequested) {
                         break;
                     }
-                    let finished = this.appendCompletionItems(document, parsedDocument, position, rangeInfo, rangeInfoIndex, variableNames, context, result);
+                    const finished = this.appendCompletionItems(document, parsedDocument, position, rangeInfo, rangeInfoIndex, variableNames, context, result);
                     if (finished || (rangeInfo.object instanceof Fmt.Expression && !(rangeInfo.object instanceof Fmt.VariableRefExpression))) {
                         break;
                     }
@@ -58,7 +58,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 signatureInfo = undefined;
             }
             if (signatureInfo && signatureInfo.parameters) {
-                let filledParameters = new Set<Fmt.Parameter>();
+                const filledParameters = new Set<Fmt.Parameter>();
                 if (signatureInfo.arguments) {
                     argNameRange = this.determineArgNameRangeAndFilledParameters(parsedDocument, position, signatureInfo.parameters, signatureInfo.arguments, filledParameters);
                     if (argNameRange === null) {
@@ -92,14 +92,14 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
 
     private appendMetaDefinitions(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, isEmptyExpression: boolean, result: vscode.CompletionItem[]): void {
         if (rangeInfo.metaDefinitions instanceof FmtDynamic.DynamicMetaDefinitionFactory && parsedDocument.metaModelDocuments) {
-            let metaModelDocument = parsedDocument.metaModelDocuments.get(rangeInfo.metaDefinitions.metaModel);
+            const metaModelDocument = parsedDocument.metaModelDocuments.get(rangeInfo.metaDefinitions.metaModel);
             if (metaModelDocument) {
-                let prefix = isEmptyExpression ? '%' : '';
+                const prefix = isEmptyExpression ? '%' : '';
                 let range: vscode.Range | undefined = undefined;
                 if (rangeInfo.object instanceof FmtDynamic.DynamicMetaRefExpression && rangeInfo.object.name && rangeInfo.nameRange && !isEmptyExpression) {
                     range = rangeInfo.nameRange;
                 }
-                for (let definition of rangeInfo.metaDefinitions.metaDefinitions.values()) {
+                for (const definition of rangeInfo.metaDefinitions.metaDefinitions.values()) {
                     this.appendDefinition(document, metaModelDocument, definition, prefix, range, vscode.CompletionItemKind.Keyword, result);
                 }
             }
@@ -112,7 +112,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
             range = rangeInfo.nameRange;
         }
         if (rangeInfo.object instanceof Fmt.Path && rangeInfo.object.parentPath instanceof Fmt.Path) {
-            let parentDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object.parentPath, rangeInfo.context, document);
+            const parentDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object.parentPath, rangeInfo.context, document);
             if (parentDefinition) {
                 this.appendInnerDefinitions(document, range, parentDefinition, result);
             }
@@ -124,7 +124,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     private appendOuterPaths(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, range: vscode.Range | undefined, result: vscode.CompletionItem[]): void {
         let prefix = rangeInfo.object instanceof Fmt.NamedPathItem ? '' : '$';
         if (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.object.parentPath) {
-            let parentPathRange = parsedDocument.rangeMap.get(rangeInfo.object.parentPath);
+            const parentPathRange = parsedDocument.rangeMap.get(rangeInfo.object.parentPath);
             if (parentPathRange && parentPathRange.range.isEqual(rangeInfo.range)) {
                 prefix = '/';
             }
@@ -148,8 +148,8 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendPathAliases(parsedDocument: ParsedDocument, range: vscode.Range | undefined, prefix: string, result: vscode.CompletionItem[]): void {
-        for (let pathAlias of parsedDocument.pathAliases) {
-            let documentation = new vscode.MarkdownString;
+        for (const pathAlias of parsedDocument.pathAliases) {
+            const documentation = new vscode.MarkdownString;
             documentation.appendCodeblock('$' + pathAlias.path.toString());
             result.push({
                 label: prefix + '~' + escapeIdentifier(pathAlias.name),
@@ -161,11 +161,11 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendMetaModelPaths(parsedDocument: ParsedDocument, parentPath: Fmt.Path, range: vscode.Range | undefined, prefix: string, result: vscode.CompletionItem[]): void {
-        let currentPath = getFileNameFromPath(parsedDocument.uri.fsPath, parentPath, true, false);
+        const currentPath = getFileNameFromPath(parsedDocument.uri.fsPath, parentPath, true, false);
         try {
-            for (let fileName of fs.readdirSync(currentPath)) {
-                let fullPath = path.join(currentPath, fileName);
-                let stat = fs.statSync(fullPath);
+            for (const fileName of fs.readdirSync(currentPath)) {
+                const fullPath = path.join(currentPath, fileName);
+                const stat = fs.statSync(fullPath);
                 if (stat.isDirectory()) {
                     result.push({
                         label: prefix + escapeIdentifier(fileName),
@@ -187,11 +187,11 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendDefinitionPaths(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, range: vscode.Range | undefined, prefix: string, result: vscode.CompletionItem[]): boolean {
-        let metaModel = rangeInfo.context?.metaModel;
+        const metaModel = rangeInfo.context?.metaModel;
         if (metaModel instanceof FmtDynamic.DynamicMetaModel && metaModel.definitions.length) {
-            let metaModelDefinition = metaModel.definitions[0];
+            const metaModelDefinition = metaModel.definitions[0];
             if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-                let lookup = metaModelDefinition.contents.lookup;
+                const lookup = metaModelDefinition.contents.lookup;
                 return this.appendValidDefinitionPaths(document, parsedDocument, rangeInfo, range, prefix, metaModel, lookup, result);
             }
         }
@@ -205,7 +205,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
         let referencedDocument: ParsedDocument | undefined = undefined;
         if (lookup instanceof FmtMeta.MetaRefExpression_self) {
             if (rangeInfo.object instanceof Fmt.NamedPathItem && rangeInfo.object.parentPath) {
-                let fileName = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, true);
+                const fileName = getFileNameFromPath(parsedDocument.uri.fsPath, rangeInfo.object, true);
                 if (fileName && fs.existsSync(fileName)) {
                     currentFile = fileName;
                 }
@@ -239,15 +239,15 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 referencedDocument = parseFile(vscode.Uri.file(currentFile));
             }
             if (currentDirectory) {
-                let dirStat = fs.statSync(currentDirectory);
+                const dirStat = fs.statSync(currentDirectory);
                 if (!dirStat.isDirectory()) {
                     currentDirectory = undefined;
                 }
             }
             if (currentDirectory) {
-                for (let fileName of fs.readdirSync(currentDirectory)) {
-                    let fullPath = path.join(currentDirectory, fileName);
-                    let fileStat = fs.statSync(fullPath);
+                for (const fileName of fs.readdirSync(currentDirectory)) {
+                    const fullPath = path.join(currentDirectory, fileName);
+                    const fileStat = fs.statSync(fullPath);
                     if (fileStat.isDirectory()) {
                         result.push({
                             label: prefix + escapeIdentifier(fileName),
@@ -258,9 +258,9 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                     else if (fileStat.isFile() && fileName.endsWith(fileExtension)) {
                         if (lookup instanceof FmtMeta.MetaRefExpression_Any) {
                             try {
-                                let fileDocument = parseFile(vscode.Uri.file(fullPath));
+                                const fileDocument = parseFile(vscode.Uri.file(fullPath));
                                 if (fileDocument && fileDocument.file && fileDocument.file.definitions.length) {
-                                    let definition = fileDocument.file.definitions[0];
+                                    const definition = fileDocument.file.definitions[0];
                                     if (definition.name + fileExtension === fileName) {
                                         this.appendDefinition(document, fileDocument, definition, prefix, range, vscode.CompletionItemKind.Reference, result);
                                     }
@@ -286,7 +286,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
             addParent = false;
         }
         if (referencedDocument && referencedDocument.file) {
-            for (let definition of referencedDocument.file.definitions) {
+            for (const definition of referencedDocument.file.definitions) {
                 this.appendDefinition(document, referencedDocument, definition, prefix, range, vscode.CompletionItemKind.Reference, result);
             }
         }
@@ -294,14 +294,14 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendInnerDefinitions(document: vscode.TextDocument, range: vscode.Range | undefined, parentDefinition: ReferencedDefinition, result: vscode.CompletionItem[]): void {
-        for (let definition of parentDefinition.definition.innerDefinitions) {
+        for (const definition of parentDefinition.definition.innerDefinitions) {
             this.appendDefinition(document, parentDefinition.parsedDocument, definition, '', range, vscode.CompletionItemKind.Reference, result);
         }
     }
 
     private appendDefinition(document: vscode.TextDocument, referencedDocument: ParsedDocument, definition: Fmt.Definition, prefix: string, range: vscode.Range | undefined, completionItemKind: vscode.CompletionItemKind, result: vscode.CompletionItem[]): void {
-        let definitionRangeInfo = referencedDocument.rangeMap.get(definition);
-        let signature = definitionRangeInfo ? readRange(referencedDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
+        const definitionRangeInfo = referencedDocument.rangeMap.get(definition);
+        const signature = definitionRangeInfo ? readRange(referencedDocument.uri, definitionRangeInfo.signatureRange, true, document) : undefined;
         let documentation: vscode.MarkdownString | undefined = undefined;
         if (signature) {
             documentation = new vscode.MarkdownString;
@@ -320,8 +320,8 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
 
     private determineArgNameRangeAndFilledParameters(parsedDocument: ParsedDocument, position: vscode.Position, params: Fmt.Parameter[], args: Fmt.Argument[], filledParameters: Set<Fmt.Parameter>): vscode.Range | null | undefined {
         let argIndex = 0;
-        for (let arg of args) {
-            let argRangeInfo = parsedDocument.rangeMap.get(arg);
+        for (const arg of args) {
+            const argRangeInfo = parsedDocument.rangeMap.get(arg);
             if (argRangeInfo && !argRangeInfo.range.isEmpty) {
                 if (argRangeInfo.range.contains(position)) {
                     if (!arg.name && arg.value instanceof Fmt.VariableRefExpression) {
@@ -333,8 +333,8 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                 }
                 if (arg.name || argRangeInfo.range.end.isBefore(position)) {
                     let paramIndex = 0;
-                    for (let param of params) {
-                        let paramIsList = param.list;
+                    for (const param of params) {
+                        const paramIsList = param.list;
                         if (arg.name ? arg.name === param.name : paramIsList ? argIndex >= paramIndex : argIndex === paramIndex) {
                             filledParameters.add(param);
                             break;
@@ -349,7 +349,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendArguments(document: vscode.TextDocument, rangeInfo: RangeInfo, signatureInfo: SignatureInfo, params: Fmt.Parameter[], filledParameters: Set<Fmt.Parameter>, argNameRange: vscode.Range | undefined, result: vscode.CompletionItem[]): void {
-        for (let param of params) {
+        for (const param of params) {
             if (!filledParameters.has(param)) {
                 this.appendArgument(document, rangeInfo, signatureInfo, param, argNameRange, result);
             }
@@ -357,21 +357,21 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendArgument(document: vscode.TextDocument, rangeInfo: RangeInfo, signatureInfo: SignatureInfo, param: Fmt.Parameter, argNameRange: vscode.Range | undefined, result: vscode.CompletionItem[]): void {
-        let paramRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
+        const paramRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
         if (paramRangeInfo && paramRangeInfo.nameRange) {
-            let paramCode = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.nameRange, false, document);
+            const paramCode = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.nameRange, false, document);
             if (paramCode) {
-                let assignment = paramCode + ' = ';
+                const assignment = paramCode + ' = ';
                 let insertText: vscode.SnippetString | undefined = undefined;
-                let type = signatureInfo.isMetaModel ? param.type : getArgumentType(param);
+                const type = signatureInfo.isMetaModel ? param.type : getArgumentType(param);
                 if (type) {
                     if (type instanceof Fmt.IndexedExpression) {
                         insertText = new vscode.SnippetString(assignment + '[$0]');
                     } else if (type instanceof Fmt.DefinitionRefExpression) {
                         if (!type.path.parentPath && rangeInfo.context && rangeInfo.context.metaModel instanceof FmtDynamic.DynamicMetaModel) {
-                            let metaModel = rangeInfo.context.metaModel;
+                            const metaModel = rangeInfo.context.metaModel;
                             try {
-                                let metaDefinition = metaModel.definitions.getDefinition(type.path.name);
+                                const metaDefinition = metaModel.definitions.getDefinition(type.path.name);
                                 if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition) && !metaModel.canOmitBraces(metaDefinition)) {
                                     insertText = new vscode.SnippetString(assignment + '{$0}');
                                 }
@@ -386,12 +386,12 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
                         insertText = new vscode.SnippetString(assignment + '\'$0\'');
                     }
                 }
-                let paramDefinition = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.range, true, document);
+                const paramDefinition = readRange(signatureInfo.parsedDocument.uri, paramRangeInfo.range, true, document);
                 let documentation: vscode.MarkdownString | undefined = undefined;
                 if (paramDefinition) {
                     documentation = new vscode.MarkdownString;
                     documentation.appendCodeblock(paramDefinition);
-                    let definitionDocumentation = signatureInfo.referencedDefinition?.definition.documentation;
+                    const definitionDocumentation = signatureInfo.referencedDefinition?.definition.documentation;
                     if (definitionDocumentation) {
                         appendDocumentation(definitionDocumentation, false, param, documentation);
                     }
@@ -409,7 +409,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
 
     private appendVariables(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, variableNames: Set<string>, result: vscode.CompletionItem[]): void {
         if (rangeInfo.context) {
-            for (let variableInfo of rangeInfo.context.getVariables()) {
+            for (const variableInfo of rangeInfo.context.getVariables()) {
                 if (variableInfo.parameter.name !== '_') {
                     this.appendVariable(document, parsedDocument, rangeInfo, variableInfo.parameter, result);
                 }
@@ -418,11 +418,11 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     }
 
     private appendVariable(document: vscode.TextDocument, parsedDocument: ParsedDocument, rangeInfo: RangeInfo, param: Fmt.Parameter, result: vscode.CompletionItem[]): void {
-        let paramRangeInfo = parsedDocument.rangeMap.get(param);
+        const paramRangeInfo = parsedDocument.rangeMap.get(param);
         if (paramRangeInfo && paramRangeInfo.nameRange) {
-            let paramCode = readRange(parsedDocument.uri, paramRangeInfo.nameRange, false, document);
+            const paramCode = readRange(parsedDocument.uri, paramRangeInfo.nameRange, false, document);
             if (paramCode) {
-                let paramDefinition = readRange(parsedDocument.uri, paramRangeInfo.range, true, document);
+                const paramDefinition = readRange(parsedDocument.uri, paramRangeInfo.range, true, document);
                 let documentation: vscode.MarkdownString | undefined = undefined;
                 if (paramDefinition) {
                     documentation = new vscode.MarkdownString;
@@ -440,25 +440,25 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
 
     private appendDocumentationItems(parsedDocument: ParsedDocument, rangeInfoIndex: number, context: vscode.CompletionContext, result: vscode.CompletionItem[]): void {
         if (context.triggerKind === vscode.CompletionTriggerKind.Invoke || context.triggerCharacter === '@') {
-            let prefix = context.triggerKind === vscode.CompletionTriggerKind.Invoke ? '@' : '';
-            for (let kind of SlateCompletionItemProvider.knownDocumentationItemKinds) {
+            const prefix = context.triggerKind === vscode.CompletionTriggerKind.Invoke ? '@' : '';
+            for (const kind of SlateCompletionItemProvider.knownDocumentationItemKinds) {
                 this.appendDocumentationItem(parsedDocument, rangeInfoIndex, prefix, kind, result);
             }
         }
     }
 
     private appendDocumentationItem(parsedDocument: ParsedDocument, rangeInfoIndex: number, prefix: string, kind: string, result: vscode.CompletionItem[]): void {
-        let itemCode = prefix + kind + ' ';
+        const itemCode = prefix + kind + ' ';
         if (kind === 'param') {
-            let rangeList = parsedDocument.rangeList;
+            const rangeList = parsedDocument.rangeList;
             let documentationComment: Fmt.DocumentationComment | undefined = undefined;
             for (let currentIndex = rangeInfoIndex; currentIndex < rangeList.length; currentIndex++) {
-                let currentRangeInfo = rangeList[currentIndex];
+                const currentRangeInfo = rangeList[currentIndex];
                 if (currentRangeInfo.object instanceof Fmt.DocumentationComment) {
                     documentationComment = currentRangeInfo.object;
                 } else if (currentRangeInfo.object instanceof Fmt.Definition) {
                     if (documentationComment && currentRangeInfo.object.documentation === documentationComment) {
-                        for (let param of currentRangeInfo.object.parameters) {
+                        for (const param of currentRangeInfo.object.parameters) {
                             result.push({
                                 label: itemCode + escapeIdentifier(param.name) + ' ',
                                 kind: vscode.CompletionItemKind.Keyword
@@ -479,7 +479,7 @@ export class SlateCompletionItemProvider implements vscode.CompletionItemProvide
     private setSortTexts(items: vscode.CompletionItem[]): void {
         // Make VSCode keep the order of items by using the indices as sort texts.
         let index = 0;
-        for (let item of items) {
+        for (const item of items) {
             let sortText = index.toString();
             while (sortText.length < 10) {
                 sortText = '0' + sortText;

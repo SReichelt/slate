@@ -8,9 +8,9 @@ import { config } from 'slate-server-generic/config';
 
 express.static.mime.define({'text/plain': ['slate']});
 
-let app = express();
+const app = express();
 
-let rootPath = path.join('..', '..', '..');
+const rootPath = path.join('..', '..', '..');
 
 app.use(preloadRouter(rootPath));
 app.use(authRouter());

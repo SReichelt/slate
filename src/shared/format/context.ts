@@ -46,7 +46,7 @@ export class ParameterContext extends DerivedContext implements VariableInfo {
 
   getVariables(): VariableInfo[] {
     let parentVariables = this.parentContext.getVariables();
-    let name = this.parameter.name;
+    const name = this.parameter.name;
     if (name !== '_') {
       parentVariables = parentVariables.filter((variableInfo: VariableInfo) => variableInfo.parameter.name !== name);
     }

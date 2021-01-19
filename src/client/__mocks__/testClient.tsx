@@ -9,7 +9,7 @@ import App, { AppTest, AppTestProps } from '../App';
 
 // Temporarily work around jest module loading incompatibility.
 function fixModuleDefaultExport(moduleName: string): void {
-  let module = require(moduleName);
+  const module = require(moduleName);
   module.default = module;
 }
 
@@ -22,14 +22,14 @@ export async function runClientTest(getTestProps: (appTest: AppTest) => AppTestP
   config.runningLocally = true;
   config.useMarkdownEditor = false;
 
-  let origSetTimeout = window.setTimeout;
-  let newSetTimeout = (handler: () => void, timeout: number, ...rest: any) => origSetTimeout(handler, 0, ...rest);
+  const origSetTimeout = window.setTimeout;
+  const newSetTimeout = (handler: () => void, timeout: number, ...rest: any) => origSetTimeout(handler, 0, ...rest);
   window.setTimeout = newSetTimeout as any;
 
-  let container = document.createElement('div');
+  const container = document.createElement('div');
   document.body.appendChild(container);
 
-  let fileAccessor = new PhysicalFileAccessor;
+  const fileAccessor = new PhysicalFileAccessor;
 
   await new Promise<void>((resolve, reject) => {
     const testProps = getTestProps({

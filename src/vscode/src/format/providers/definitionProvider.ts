@@ -11,7 +11,7 @@ export class SlateDefinitionProvider implements vscode.DefinitionProvider, vscod
     constructor(private parsedDocuments: ParsedDocumentMap, private hoverEventEmitter: vscode.EventEmitter<HoverEvent>) {}
 
     provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
-        let definitionLink = this.getDefinitionLink(document, position, token, false);
+        const definitionLink = this.getDefinitionLink(document, position, token, false);
         if (definitionLink !== undefined) {
             return [definitionLink];
         }
@@ -19,19 +19,19 @@ export class SlateDefinitionProvider implements vscode.DefinitionProvider, vscod
     }
 
     provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
-        let definitionLink = this.getDefinitionLink(document, position, token, true);
+        const definitionLink = this.getDefinitionLink(document, position, token, true);
         if (definitionLink !== undefined && !token.isCancellationRequested) {
-            let hoverTexts: vscode.MarkdownString[] = [];
-            let hoverCode: string | undefined = readRange(definitionLink.targetUri, definitionLink.targetRange, false, document);
+            const hoverTexts: vscode.MarkdownString[] = [];
+            const hoverCode: string | undefined = readRange(definitionLink.targetUri, definitionLink.targetRange, false, document);
             if (hoverCode) {
-                let hoverText = new vscode.MarkdownString;
+                const hoverText = new vscode.MarkdownString;
                 hoverText.appendCodeblock(hoverCode);
                 hoverTexts.push(hoverText);
             }
             let intermediateHoverTexts: Thenable<vscode.MarkdownString[]> = CachedPromise.resolve(hoverTexts);
-            let referencedDefinition = definitionLink.referencedDefinition;
+            const referencedDefinition = definitionLink.referencedDefinition;
             if (referencedDefinition && referencedDefinition.parsedDocument.file) {
-                let hoverEvent: HoverEvent = {
+                const hoverEvent: HoverEvent = {
                     document: document,
                     object: definitionLink.originObject,
                     targetMetaModelName: referencedDefinition.parsedDocument.file.metaModelPath.name,
@@ -40,12 +40,12 @@ export class SlateDefinitionProvider implements vscode.DefinitionProvider, vscod
                 this.hoverEventEmitter.fire(hoverEvent);
                 intermediateHoverTexts = hoverEvent.hoverTexts;
             }
-            let targetObject = definitionLink.targetObject;
+            const targetObject = definitionLink.targetObject;
             return intermediateHoverTexts.then((finalHoverTexts: vscode.MarkdownString[]) => {
                 if (referencedDefinition && referencedDefinition.definition.documentation) {
-                    let hoverText = new vscode.MarkdownString;
-                    let includeAll = (targetObject === referencedDefinition.definition);
-                    let specificParameter = targetObject instanceof Fmt.Parameter ? targetObject : undefined;
+                    const hoverText = new vscode.MarkdownString;
+                    const includeAll = (targetObject === referencedDefinition.definition);
+                    const specificParameter = targetObject instanceof Fmt.Parameter ? targetObject : undefined;
                     appendDocumentation(referencedDefinition.definition.documentation, includeAll, specificParameter, hoverText);
                     finalHoverTexts.push(hoverText);
                 }
@@ -60,14 +60,14 @@ export class SlateDefinitionProvider implements vscode.DefinitionProvider, vscod
     }
 
     private getDefinitionLink(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, preferSignature: boolean): DefinitionLink | undefined {
-        let parsedDocument = this.parsedDocuments.get(document);
+        const parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            for (let rangeInfo of parsedDocument.rangeList) {
+            for (const rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
                 }
                 if (rangeInfo.range.contains(position)) {
-                    let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, preferSignature, document);
+                    const definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, preferSignature, document);
                     if (definitionLinks.length) {
                         return definitionLinks[0];
                     }

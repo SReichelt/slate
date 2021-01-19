@@ -12,7 +12,7 @@ interface OverUnderProps {
 }
 
 export function renderOverUnder(props: React.PropsWithChildren<OverUnderProps>): RenderedContents {
-  let rows: React.ReactNode[] = [
+  const rows: React.ReactNode[] = [
     <span className={'overunder-body-row'} key="body">
       <span className={'overunder-body'}>
         {props.children}

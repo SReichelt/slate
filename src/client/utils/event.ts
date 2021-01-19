@@ -26,7 +26,7 @@ export function disableOwnDefaultBehavior(event: React.SyntheticEvent<HTMLElemen
 }
 
 function blurActiveElement(): void {
-  let activeElement = document.activeElement;
+  const activeElement = document.activeElement;
   if (activeElement instanceof HTMLElement && activeElement.tagName !== 'BODY') {
     activeElement.blur();
   }

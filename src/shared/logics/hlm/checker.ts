@@ -14,7 +14,7 @@ const debugRecheck = true;
 
 export class HLMChecker implements Logic.LogicChecker {
   checkDefinition(definition: Fmt.Definition, libraryDataAccessor: LibraryDataAccessor, options: Logic.LogicCheckerOptions): CachedPromise<Logic.LogicCheckResult> {
-    let utils = new HLMUtils(definition, libraryDataAccessor, options.supportPlaceholders);
+    const utils = new HLMUtils(definition, libraryDataAccessor, options.supportPlaceholders);
     return HLMChecker.checkDefinitionWithUtils(definition, utils, options);
   }
 
@@ -156,8 +156,8 @@ class HLMCheckerState {
   }
 
   static checkDefinition(definition: Fmt.Definition, utils: HLMUtils, options: Logic.LogicCheckerOptions): CachedPromise<HLMCheckResult> {
-    let checkFn = (checkerState: HLMCheckerState) => {
-      let rootContext: HLMCheckerContext = {
+    const checkFn = (checkerState: HLMCheckerState) => {
+      const rootContext: HLMCheckerContext = {
         context: new Ctx.EmptyContext(FmtHLM.metaModel),
         binderSourceParameters: [],
         temporaryParameters: [],
@@ -172,7 +172,7 @@ class HLMCheckerState {
   }
 
   private static check(utils: HLMUtils, options: Logic.LogicCheckerOptions, object: Object, checkFn: (checkerState: HLMCheckerState) => void): CachedPromise<HLMCheckResult> {
-    let checkerState = new HLMCheckerState(utils, options);
+    const checkerState = new HLMCheckerState(utils, options);
     try {
       checkFn(checkerState);
     } catch (error) {
@@ -183,11 +183,11 @@ class HLMCheckerState {
 
   private getResultPromise(): CachedPromise<HLMCheckResult> {
     for (;;) {
-      let nextCheck = this.pendingChecks.shift();
+      const nextCheck = this.pendingChecks.shift();
       if (!nextCheck) {
         break;
       }
-      let nextCheckResult = nextCheck();
+      const nextCheckResult = nextCheck();
       if (nextCheckResult.isResolved()) {
         continue;
       }
@@ -208,15 +208,15 @@ class HLMCheckerState {
   }
 
   private checkTopLevelDefinition(definition: Fmt.Definition, context: HLMCheckerContext): void {
-    let contents = definition.contents;
+    const contents = definition.contents;
     if (contents instanceof FmtHLM.ObjectContents_MacroOperator) {
       this.checkMacroOperator(definition, contents, context);
     } else {
-      let innerContext = this.checkParameterList(definition.parameters, context);
+      const innerContext = this.checkParameterList(definition.parameters, context);
       if (contents instanceof FmtHLM.ObjectContents_Construction) {
         this.checkConstruction(definition, contents, innerContext);
       } else {
-        for (let innerDefinition of definition.innerDefinitions) {
+        for (const innerDefinition of definition.innerDefinitions) {
           this.error(innerDefinition, 'This type of object does not support inner definitions.');
         }
         // TODO check properties (currently: negation)
@@ -240,9 +240,9 @@ class HLMCheckerState {
   }
 
   private checkConstruction(definition: Fmt.Definition, contents: FmtHLM.ObjectContents_Construction, context: HLMCheckerContext): void {
-    for (let innerDefinition of definition.innerDefinitions) {
-      let innerContext = this.checkParameterList(innerDefinition.parameters, context);
-      let innerContents = innerDefinition.contents;
+    for (const innerDefinition of definition.innerDefinitions) {
+      const innerContext = this.checkParameterList(innerDefinition.parameters, context);
+      const innerContents = innerDefinition.contents;
       if (innerContents instanceof FmtHLM.ObjectContents_Constructor) {
         this.checkConstructor(definition, innerDefinition, innerContents, context, innerContext);
       } else {
@@ -269,7 +269,7 @@ class HLMCheckerState {
   }
 
   private checkEqualityDefinition(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_ConstructorEqualityDefinition, context: HLMCheckerContext): void {
-    let constructorParameters = innerDefinition.parameters;
+    const constructorParameters = innerDefinition.parameters;
     if (!this.checkEquivalenceWithPlaceholders(equalityDefinition.leftParameters, constructorParameters, context)) {
       this.error(equalityDefinition.leftParameters, 'Parameters of equality definition must match constructor parameters');
     }
@@ -283,31 +283,31 @@ class HLMCheckerState {
   }
 
   private checkEqualityDefinitionProofs(innerDefinition: Fmt.Definition, equalityDefinition: FmtHLM.ObjectContents_ConstructorEqualityDefinition, context: HLMCheckerContext): void {
-    let isomorphic = (equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true);
+    const isomorphic = (equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true);
     if (isomorphic) {
       this.checkIsomorphicProperty(equalityDefinition.leftParameters, equalityDefinition.rightParameters, equalityDefinition.definition[0], context);
     }
     if (!isomorphic || equalityDefinition.reflexivityProof) {
-      let parameters = innerDefinition.parameters.clone();
-      let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters, parameters);
+      const parameters = innerDefinition.parameters.clone();
+      const goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters, parameters);
       this.checkProof(equalityDefinition, equalityDefinition.reflexivityProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.symmetryProof) {
-      let parameters1 = innerDefinition.parameters.clone();
-      let parameters2 = innerDefinition.parameters.clone();
-      let parameters = new Fmt.ParameterList(...parameters1, ...parameters2);
+      const parameters1 = innerDefinition.parameters.clone();
+      const parameters2 = innerDefinition.parameters.clone();
+      const parameters = new Fmt.ParameterList(...parameters1, ...parameters2);
       this.utils.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
-      let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
+      const goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters1);
       this.checkProof(equalityDefinition, equalityDefinition.symmetryProof, parameters, goal, context);
     }
     if (!isomorphic || equalityDefinition.transitivityProof) {
-      let parameters1 = innerDefinition.parameters.clone();
-      let parameters2 = innerDefinition.parameters.clone();
-      let parameters3 = innerDefinition.parameters.clone();
-      let parameters = new Fmt.ParameterList(...parameters1, ...parameters2, ...parameters3);
+      const parameters1 = innerDefinition.parameters.clone();
+      const parameters2 = innerDefinition.parameters.clone();
+      const parameters3 = innerDefinition.parameters.clone();
+      const parameters = new Fmt.ParameterList(...parameters1, ...parameters2, ...parameters3);
       this.utils.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters2));
       this.utils.addProofConstraint(parameters, this.getSubstitutedEqualityDefinition(equalityDefinition, parameters2, parameters3));
-      let goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters3);
+      const goal = this.getSubstitutedEqualityDefinition(equalityDefinition, parameters1, parameters3);
       this.checkProof(equalityDefinition, equalityDefinition.transitivityProof, parameters, goal, context);
     }
   }
@@ -320,33 +320,33 @@ class HLMCheckerState {
 
   private checkConstructorRewriteDefinition(definition: Fmt.Definition, innerDefinition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_ConstructorRewriteDefinition, context: HLMCheckerContext): void {
     this.checkElementTerm(rewriteDefinition.value, context);
-    let substitutionContext = new HLMSubstitutionContext;
-    let constructionArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
-    let constructionPath = new Fmt.Path(definition.name, constructionArgs);
-    let constructorArgs = this.utils.getParameterArguments(innerDefinition.parameters, substitutionContext);
-    let constructorPath = new Fmt.Path(innerDefinition.name, constructorArgs, constructionPath);
-    let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
+    const substitutionContext = new HLMSubstitutionContext;
+    const constructionArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+    const constructionPath = new Fmt.Path(definition.name, constructionArgs);
+    const constructorArgs = this.utils.getParameterArguments(innerDefinition.parameters, substitutionContext);
+    const constructorPath = new Fmt.Path(innerDefinition.name, constructorArgs, constructionPath);
+    const constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
     this.checkElementCompatibility(rewriteDefinition.value, [constructorExpression, rewriteDefinition.value], context);
     // TODO check whether rewrite definition matches referenced theorem
   }
 
   private checkEmbedding(definition: Fmt.Definition, embedding: FmtHLM.ObjectContents_Embedding, context: HLMCheckerContext): void {
     // TODO make sure that embedding does not implicitly reference itself (e.g. in the well-definedness proof)
-    let [subset, innerContext] = this.checkElementParameter(embedding.parameter, context);
+    const [subset, innerContext] = this.checkElementParameter(embedding.parameter, context);
     if (subset) {
       this.checkEmbeddability(subset);
     }
     this.checkElementTerm(embedding.target, innerContext);
-    let substitutionContext = new HLMSubstitutionContext;
-    let constructionArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
-    let constructionPath = new Fmt.Path(definition.name, constructionArgs);
-    let constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
+    const substitutionContext = new HLMSubstitutionContext;
+    const constructionArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+    const constructionPath = new Fmt.Path(definition.name, constructionArgs);
+    const constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
     this.checkCompatibility(embedding.target, [embedding.target], [constructionExpression], innerContext);
     this.checkEmbeddingWellDefinednessProof(embedding, context);
   }
 
   private checkEmbeddability(subset: Fmt.Expression): void {
-    let checkSubset = this.utils.getFinalSuperset(subset, followSupersetsAndEmbeddings).then((superset: Fmt.Expression) => {
+    const checkSubset = this.utils.getFinalSuperset(subset, followSupersetsAndEmbeddings).then((superset: Fmt.Expression) => {
       if (this.utils.isWildcardFinalSet(superset)) {
         this.error(subset!, 'The given set cannot be embedded');
       }
@@ -356,26 +356,26 @@ class HLMCheckerState {
 
   private checkEmbeddingWellDefinednessProof(embedding: FmtHLM.ObjectContents_Embedding, context: HLMCheckerContext): void {
     // TODO check "full" property of embedding
-    let leftParam = embedding.parameter.clone();
-    let rightParam = leftParam.shallowClone();
-    let leftTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, leftParam);
-    let rightTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, rightParam);
-    let parameters = new Fmt.ParameterList;
+    const leftParam = embedding.parameter.clone();
+    const rightParam = leftParam.shallowClone();
+    const leftTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, leftParam);
+    const rightTerm = this.utils.substituteParameter(embedding.target, embedding.parameter, rightParam);
+    const parameters = new Fmt.ParameterList;
     parameters.push(leftParam, rightParam);
-    let constraint = new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
+    const constraint = new FmtHLM.MetaRefExpression_equals(leftTerm, rightTerm);
     this.utils.addProofConstraint(parameters, constraint);
-    let leftVariableRef = new Fmt.VariableRefExpression(leftParam);
-    let rightVariableRef = new Fmt.VariableRefExpression(rightParam);
-    let goal = new FmtHLM.MetaRefExpression_equals(leftVariableRef, rightVariableRef);
+    const leftVariableRef = new Fmt.VariableRefExpression(leftParam);
+    const rightVariableRef = new Fmt.VariableRefExpression(rightParam);
+    const goal = new FmtHLM.MetaRefExpression_equals(leftVariableRef, rightVariableRef);
     this.checkProof(embedding, embedding.wellDefinednessProof, parameters, goal, context);
   }
 
   private checkConstructionRewriteDefinition(definition: Fmt.Definition, rewriteDefinition: FmtHLM.ObjectContents_ConstructionRewriteDefinition, context: HLMCheckerContext): void {
-    let substitutionContext = new HLMSubstitutionContext;
-    let constructionArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
-    let constructionPath = new Fmt.Path(definition.name, constructionArgs);
-    let constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
-    let [set, innerContext] = this.checkElementParameter(rewriteDefinition.parameter, context);
+    const substitutionContext = new HLMSubstitutionContext;
+    const constructionArgs = this.utils.getParameterArguments(definition.parameters, substitutionContext);
+    const constructionPath = new Fmt.Path(definition.name, constructionArgs);
+    const constructionExpression = new Fmt.DefinitionRefExpression(constructionPath);
+    const [set, innerContext] = this.checkElementParameter(rewriteDefinition.parameter, context);
     if (set && !this.utils.areExpressionsSyntacticallyEquivalent(set, constructionExpression)) {
       this.error(set, 'Rewrite parameter must match construction');
     }
@@ -393,7 +393,7 @@ class HLMCheckerState {
   }
 
   private checkImplicitOperator(definition: Fmt.Definition, contents: FmtHLM.ObjectContents_ImplicitOperator, context: HLMCheckerContext): void {
-    let [set, innerContext] = this.checkElementParameter(contents.parameter, context);
+    const [set, innerContext] = this.checkElementParameter(contents.parameter, context);
     this.checkFormulaEquivalenceList(definition, contents.definition, contents.equivalenceProofs, innerContext);
     if (contents.definition.length) {
       this.checkImplicitOperatorWellDefinednessProof(contents, context);
@@ -401,10 +401,10 @@ class HLMCheckerState {
   }
 
   private checkImplicitOperatorWellDefinednessProof(contents: FmtHLM.ObjectContents_ImplicitOperator, context: HLMCheckerContext): void {
-    let param = contents.parameter.clone();
-    let parameters = new Fmt.ParameterList(param);
-    let formula = this.utils.substituteParameter(contents.definition[0], contents.parameter, param);
-    let goal = new FmtHLM.MetaRefExpression_existsUnique(parameters, formula);
+    const param = contents.parameter.clone();
+    const parameters = new Fmt.ParameterList(param);
+    const formula = this.utils.substituteParameter(contents.definition[0], contents.parameter, param);
+    const goal = new FmtHLM.MetaRefExpression_existsUnique(parameters, formula);
     this.checkProof(contents, contents.wellDefinednessProof, undefined, goal, context);
   }
 
@@ -423,8 +423,8 @@ class HLMCheckerState {
 
   private checkMacroOperator(definition: Fmt.Definition, contents: FmtHLM.ObjectContents_MacroOperator, context: HLMCheckerContext): void {
     try {
-      let macroInstance = HLMMacros.instantiateMacro(this.utils.libraryDataAccessor, definition);
-      let checkMacro = macroInstance.check().then((diagnostics: Logic.LogicCheckDiagnostic[]) => {
+      const macroInstance = HLMMacros.instantiateMacro(this.utils.libraryDataAccessor, definition);
+      const checkMacro = macroInstance.check().then((diagnostics: Logic.LogicCheckDiagnostic[]) => {
         this.result.diagnostics.push(...diagnostics);
         if (diagnostics.some((diagnostic: Logic.LogicCheckDiagnostic) => diagnostic.severity === Logic.DiagnosticSeverity.Error)) {
           this.result.hasErrors = true;
@@ -438,11 +438,11 @@ class HLMCheckerState {
 
   private setCurrentRecheckFn(expression: Fmt.Expression, checkFn: CheckFn, autoFillFn: AutoFillFn | undefined, context: HLMCheckerContext): HLMCheckerContext {
     if (this.recheckData || context.currentPlaceholderCollection) {
-      let newContext: HLMCheckerContext = {...context};
+      const newContext: HLMCheckerContext = {...context};
       if (this.recheckData) {
         newContext.currentCheckSubstitutionFn = (originalExpression: Fmt.Expression, substitutedExpression: Fmt.Expression, options: Logic.LogicCheckerOptions) => {
-          let substituted = FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
-          let fn = (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => {
+          const substituted = FmtUtils.substituteExpression(expression, originalExpression, substitutedExpression);
+          const fn = (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => {
             checkFn(recheckState, substituted, recheckContext);
             if (this.restrictions && originalExpression instanceof Fmt.PlaceholderExpression) {
               recheckState.checkAdditionalRestrictions(substitutedExpression, this.restrictions, recheckContext);
@@ -471,7 +471,7 @@ class HLMCheckerState {
 
   private recheck(object: Object, fn: (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => void, options: Logic.LogicCheckerOptions, context: HLMCheckerContext): CachedPromise<HLMCheckResult> {
     return HLMCheckerState.check(this.utils, options, object, (checkerState: HLMCheckerState) => {
-      let recheckContext: HLMCheckerContext = {
+      const recheckContext: HLMCheckerContext = {
         ...context,
         stepResults: new Map<Fmt.Parameter, Fmt.Expression>(context.stepResults),
         currentCheckSubstitutionFn: undefined,
@@ -483,18 +483,18 @@ class HLMCheckerState {
 
   private checkAdditionalRestrictions(object: Object, restrictions: HLMCheckerPlaceholderRestrictions, context: HLMCheckerContext): void {
     let lastSetsToCheckLength = 0;
-    let checkRestrictions = () => {
-      let setsToCheck: Fmt.Expression[][] = [];
-      for (let [placeholder, restriction] of restrictions) {
+    const checkRestrictions = () => {
+      const setsToCheck: Fmt.Expression[][] = [];
+      for (const [placeholder, restriction] of restrictions) {
         if (placeholder.specialRole !== Fmt.SpecialPlaceholderRole.Temporary) {
-          let sets = restriction.compatibleSets.concat(restriction.declaredSets);
+          const sets = restriction.compatibleSets.concat(restriction.declaredSets);
           if (sets.length > 1) {
             setsToCheck.push(sets);
           }
         }
       }
       if (setsToCheck.length > lastSetsToCheckLength) {
-        for (let sets of setsToCheck) {
+        for (const sets of setsToCheck) {
           this.checkSetCompatibility(object, sets, context);
         }
         lastSetsToCheckLength = setsToCheck.length;
@@ -507,12 +507,12 @@ class HLMCheckerState {
 
   private checkParameterList<ContextType extends HLMCheckerContext>(parameterList: Fmt.ParameterList, context: ContextType): ContextType {
     let currentContext = context;
-    for (let param of parameterList) {
+    for (const param of parameterList) {
       currentContext = this.checkParameter(param, currentContext);
     }
     if (this.recheckData) {
-      let constraintCheckFn = (formula: Fmt.Expression, options: Logic.LogicCheckerOptions) => {
-        let fn = (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => recheckState.checkFormula(formula, recheckContext);
+      const constraintCheckFn = (formula: Fmt.Expression, options: Logic.LogicCheckerOptions) => {
+        const fn = (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => recheckState.checkFormula(formula, recheckContext);
         return this.recheck(formula, fn, options, context);
       };
       this.recheckData.checkConstraintFns.set(parameterList, constraintCheckFn);
@@ -537,8 +537,8 @@ class HLMCheckerState {
   }
 
   private checkParameterType<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, type: Fmt.Expression, context: ContextType): ContextType {
-    let recheckFn = (recheckState: HLMCheckerState, substitutedType: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkParameterType(param, substitutedType, recheckContext);
-    let typeContext = this.setCurrentRecheckFn(type, recheckFn, undefined, context);
+    const recheckFn = (recheckState: HLMCheckerState, substitutedType: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkParameterType(param, substitutedType, recheckContext);
+    const typeContext = this.setCurrentRecheckFn(type, recheckFn, undefined, context);
     if (type instanceof FmtHLM.MetaRefExpression_Prop) {
       this.checkBoolConstant(type.auto);
     } else if (type instanceof FmtHLM.MetaRefExpression_Set) {
@@ -558,8 +558,8 @@ class HLMCheckerState {
     } else if (type instanceof FmtHLM.MetaRefExpression_Def) {
       this.checkElementTerm(type.element, typeContext);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-      let sourceContext = this.checkParameterList(type.sourceParameters, context);
-      let resultContext = this.checkParameterList(type.targetParameters, sourceContext);
+      const sourceContext = this.checkParameterList(type.sourceParameters, context);
+      const resultContext = this.checkParameterList(type.targetParameters, sourceContext);
       return {
         ...resultContext,
         binderSourceParameters: [...resultContext.binderSourceParameters, ...type.sourceParameters]
@@ -574,9 +574,9 @@ class HLMCheckerState {
   }
 
   private checkElementParameter<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): [Fmt.Expression | undefined, ContextType] {
-    let type = param.type;
+    const type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Element) {
-      let resultContext = this.checkParameter(param, context);
+      const resultContext = this.checkParameter(param, context);
       return [type._set, resultContext];
     } else {
       this.error(type, 'Element parameter expected');
@@ -585,7 +585,7 @@ class HLMCheckerState {
   }
 
   private checkArgumentLists(argumentLists: Fmt.ArgumentList[], parameterLists: Fmt.ParameterList[], targetPath: Fmt.PathItem | undefined, context: HLMCheckerContext): void {
-    let substitutionContext = new HLMSubstitutionContext;
+    const substitutionContext = new HLMSubstitutionContext;
     this.utils.addTargetPathSubstitution(targetPath, substitutionContext);
     for (let listIndex = 0; listIndex < argumentLists.length; listIndex++) {
       this.addAndCheckArgumentList(parameterLists[listIndex], argumentLists[listIndex], targetPath, context, substitutionContext);
@@ -594,20 +594,20 @@ class HLMCheckerState {
 
   private addAndCheckArgumentList(parameterList: Fmt.ParameterList, argumentList: Fmt.ArgumentList, targetPath: Fmt.PathItem | undefined, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     this.utils.addArgumentListSubstitution(parameterList, argumentList, targetPath, substitutionContext);
-    for (let param of parameterList) {
+    for (const param of parameterList) {
       this.checkArgument(param, argumentList, context, substitutionContext);
     }
   }
 
   private checkArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
-    let rawArg = argumentList.getOptionalValue(param.name);
+    const rawArg = argumentList.getOptionalValue(param.name);
     this.checkRawArgument(param, argumentList, rawArg, param.type, context, substitutionContext);
   }
 
   private checkRawArgument(param: Fmt.Parameter, argumentList: Fmt.ArgumentList, rawArg: Fmt.Expression | undefined, type: Fmt.Expression, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     if (type instanceof Fmt.IndexedExpression && rawArg) {
       if (rawArg instanceof Fmt.ArrayExpression) {
-        for (let item of rawArg.items) {
+        for (const item of rawArg.items) {
           this.checkRawArgument(param, argumentList, item, type.body, context, substitutionContext);
         }
       } else {
@@ -620,22 +620,22 @@ class HLMCheckerState {
 
   private checkArgumentValue(object: Object, param: Fmt.Parameter, rawArg: Fmt.Expression | undefined, context: HLMCheckerContext, substitutionContext: HLMSubstitutionContext): void {
     let missingArgument = false;
-    let type = param.type;
+    const type = param.type;
     if (type instanceof FmtHLM.MetaRefExpression_Set) {
       if (rawArg) {
-        let setArg = FmtHLM.ObjectContents_SetArg.createFromExpression(rawArg);
+        const setArg = FmtHLM.ObjectContents_SetArg.createFromExpression(rawArg);
         this.checkSetTerm(setArg._set, this.getAutoArgumentContext(type.auto, context));
       } else {
         missingArgument = true;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Subset) {
       if (rawArg) {
-        let superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
-        let subsetArg = FmtHLM.ObjectContents_SubsetArg.createFromExpression(rawArg);
+        const superset = this.utils.applySubstitutionContext(type.superset, substitutionContext);
+        const subsetArg = FmtHLM.ObjectContents_SubsetArg.createFromExpression(rawArg);
         this.checkSetTerm(subsetArg._set, this.getAutoArgumentContext(type.auto, context));
-        let checkSubset = this.checkSubset(subsetArg._set, superset, context).then((isTrivialSubset: boolean) => {
+        const checkSubset = this.checkSubset(subsetArg._set, superset, context).then((isTrivialSubset: boolean) => {
           if (!isTrivialSubset || subsetArg.subsetProof) {
-            let subsetFormula = new FmtHLM.MetaRefExpression_sub(subsetArg._set, superset);
+            const subsetFormula = new FmtHLM.MetaRefExpression_sub(subsetArg._set, superset);
             this.checkProof(object, subsetArg.subsetProof, undefined, subsetFormula, context);
           }
         });
@@ -645,12 +645,12 @@ class HLMCheckerState {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Element) {
       if (rawArg) {
-        let set = this.utils.applySubstitutionContext(type._set, substitutionContext);
-        let elementArg = FmtHLM.ObjectContents_ElementArg.createFromExpression(rawArg);
+        const set = this.utils.applySubstitutionContext(type._set, substitutionContext);
+        const elementArg = FmtHLM.ObjectContents_ElementArg.createFromExpression(rawArg);
         this.checkElementTerm(elementArg.element, this.getAutoArgumentContext(type.auto, context));
-        let checkElement = this.checkElement(elementArg.element, set, context).then((isTrivialElement: boolean) => {
+        const checkElement = this.checkElement(elementArg.element, set, context).then((isTrivialElement: boolean) => {
           if (!isTrivialElement || elementArg.elementProof) {
-            let elementFormula = new FmtHLM.MetaRefExpression_in(elementArg.element, set);
+            const elementFormula = new FmtHLM.MetaRefExpression_in(elementArg.element, set);
             this.checkProof(object, elementArg.elementProof, undefined, elementFormula, context);
           }
         });
@@ -660,23 +660,23 @@ class HLMCheckerState {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Prop) {
       if (rawArg) {
-        let propArg = FmtHLM.ObjectContents_PropArg.createFromExpression(rawArg);
+        const propArg = FmtHLM.ObjectContents_PropArg.createFromExpression(rawArg);
         this.checkFormula(propArg.formula, this.getAutoArgumentContext(type.auto, context));
       } else {
         missingArgument = true;
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_Constraint) {
-      let constraint = this.utils.applySubstitutionContext(type.formula, substitutionContext);
-      let constraintArg = rawArg ? FmtHLM.ObjectContents_ConstraintArg.createFromExpression(rawArg) : undefined;
+      const constraint = this.utils.applySubstitutionContext(type.formula, substitutionContext);
+      const constraintArg = rawArg ? FmtHLM.ObjectContents_ConstraintArg.createFromExpression(rawArg) : undefined;
       this.checkProof(object, constraintArg?.proof, undefined, constraint, context);
     } else if (type instanceof FmtHLM.MetaRefExpression_Binder) {
       if (rawArg) {
-        let binderArg = FmtHLM.ObjectContents_BinderArg.createFromExpression(rawArg);
-        let expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
+        const binderArg = FmtHLM.ObjectContents_BinderArg.createFromExpression(rawArg);
+        const expectedSourceParameters = this.utils.applySubstitutionContextToParameterList(type.sourceParameters, substitutionContext);
         if (!this.checkEquivalenceWithPlaceholders(binderArg.sourceParameters, expectedSourceParameters, context)) {
           this.error(binderArg.sourceParameters, 'Parameter list must match binder');
         }
-        let innerSubstitutionContext = new HLMSubstitutionContext(substitutionContext);
+        const innerSubstitutionContext = new HLMSubstitutionContext(substitutionContext);
         this.utils.addParameterListSubstitution(type.sourceParameters, binderArg.sourceParameters, innerSubstitutionContext);
         this.addAndCheckArgumentList(type.targetParameters, binderArg.targetArguments, undefined, context, innerSubstitutionContext);
       } else {
@@ -712,10 +712,10 @@ class HLMCheckerState {
   private checkSetTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
     this.handleExpression(term, context);
     if (term instanceof Fmt.VariableRefExpression || term instanceof Fmt.IndexedExpression) {
-      let checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef);
+      const checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Set || type instanceof FmtHLM.MetaRefExpression_Subset || type instanceof FmtHLM.MetaRefExpression_SetDef);
       this.checkVariableRefExpression(term, checkType, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      let checkDefinitionRef = this.utils.getOuterDefinition(term).then((definition: Fmt.Definition) => {
+      const checkDefinitionRef = this.utils.getOuterDefinition(term).then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction || definition.contents instanceof FmtHLM.ObjectContents_SetOperator) {
           this.checkDefinitionRefExpression(term, [definition], context);
         } else {
@@ -728,26 +728,26 @@ class HLMCheckerState {
         this.checkElementTerms(term, term.terms, context);
       }
     } else if (term instanceof FmtHLM.MetaRefExpression_subset) {
-      let [set, innerContext] = this.checkElementParameter(term.parameter, context);
+      const [set, innerContext] = this.checkElementParameter(term.parameter, context);
       this.checkFormula(term.formula, innerContext);
     } else if (term instanceof FmtHLM.MetaRefExpression_extendedSubset) {
-      let innerContext = this.checkParameterList(term.parameters, context);
+      const innerContext = this.checkParameterList(term.parameters, context);
       this.checkElementTerm(term.term, innerContext);
     } else if (term instanceof FmtHLM.MetaRefExpression_setStructuralCases) {
-      let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkSetTerm(value, caseContext);
-      let checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(term, values, context);
-      let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
-        for (let newCase of newCases) {
+      const checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkSetTerm(value, caseContext);
+      const checkCompatibility = (values: Fmt.Expression[]) => this.checkSetCompatibility(term, values, context);
+      const replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+        for (const newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
         }
-        let newTerm = new FmtHLM.MetaRefExpression_setStructuralCases(term.term, term.construction, newCases);
+        const newTerm = new FmtHLM.MetaRefExpression_setStructuralCases(term.term, term.construction, newCases);
         return {
           originalExpression: term,
           filledExpression: newTerm
         };
       };
-      let getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext) => {
-        let result = new FmtHLM.MetaRefExpression_sub(leftValue, rightValue);
+      const getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext) => {
+        const result = new FmtHLM.MetaRefExpression_sub(leftValue, rightValue);
         // TODO support well-definedness proofs in cases where the goal can be written as an isomorphism condition
         this.checkFormula(result, wellDefinednessContext);
         return result;
@@ -764,7 +764,7 @@ class HLMCheckerState {
   }
 
   private checkSetTerms(object: Object, terms: Fmt.Expression[], context: HLMCheckerContext): void {
-    for (let item of terms) {
+    for (const item of terms) {
       this.checkSetTerm(item, context);
     }
     this.checkSetCompatibility(object, terms, context);
@@ -773,12 +773,12 @@ class HLMCheckerState {
   private checkElementTerm(term: Fmt.Expression, context: HLMCheckerContext): void {
     this.handleExpression(term, context);
     if (term instanceof Fmt.VariableRefExpression || term instanceof Fmt.IndexedExpression) {
-      let checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def);
+      const checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Element || type instanceof FmtHLM.MetaRefExpression_Def);
       this.checkVariableRefExpression(term, checkType, context);
     } else if (term instanceof Fmt.DefinitionRefExpression) {
-      let checkDefinitionRef = this.utils.getOuterDefinition(term).then((definition: Fmt.Definition) => {
+      const checkDefinitionRef = this.utils.getOuterDefinition(term).then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Construction && term.path.parentPath instanceof Fmt.Path && !(term.path.parentPath.parentPath instanceof Fmt.Path)) {
-          let innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
+          const innerDefinition = definition.innerDefinitions.getDefinition(term.path.name);
           this.checkDefinitionRefExpression(term, [definition, innerDefinition], context);
         } else if (definition.contents instanceof FmtHLM.ObjectContents_Operator) {
           this.checkDefinitionRefExpression(term, [definition], context);
@@ -788,39 +788,39 @@ class HLMCheckerState {
       });
       this.addPendingCheck(term, checkDefinitionRef);
     } else if (term instanceof FmtHLM.MetaRefExpression_cases) {
-      let formulas: Fmt.Expression[] = [];
-      let values: Fmt.Expression[] = [];
-      for (let item of term.cases) {
+      const formulas: Fmt.Expression[] = [];
+      const values: Fmt.Expression[] = [];
+      for (const item of term.cases) {
         this.checkFormula(item.formula, context);
         this.checkElementTerm(item.value, context);
-        let exclusivityParameters = new Fmt.ParameterList;
-        let exclusivityConstraint = this.utils.createDisjunction(formulas);
+        const exclusivityParameters = new Fmt.ParameterList;
+        const exclusivityConstraint = this.utils.createDisjunction(formulas);
         this.utils.addProofConstraint(exclusivityParameters, exclusivityConstraint);
-        let exclusivityGoalPromise = this.utils.negateFormula(item.formula, true);
-        let checkProof = exclusivityGoalPromise.then((exclusivityGoal: Fmt.Expression) =>
+        const exclusivityGoalPromise = this.utils.negateFormula(item.formula, true);
+        const checkProof = exclusivityGoalPromise.then((exclusivityGoal: Fmt.Expression) =>
           this.checkProof(term, item.exclusivityProof, exclusivityParameters, exclusivityGoal, context));
         this.addPendingCheck(term, checkProof);
         formulas.push(item.formula);
         values.push(item.value);
       }
-      let totalityGoal = this.utils.createDisjunction(formulas);
+      const totalityGoal = this.utils.createDisjunction(formulas);
       this.checkProof(term, term.totalityProof, undefined, totalityGoal, context);
       this.checkElementCompatibility(term, values, context);
     } else if (term instanceof FmtHLM.MetaRefExpression_structuralCases) {
-      let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkElementTerm(value, caseContext);
-      let checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(term, values, context);
-      let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
-        for (let newCase of newCases) {
+      const checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkElementTerm(value, caseContext);
+      const checkCompatibility = (values: Fmt.Expression[]) => this.checkElementCompatibility(term, values, context);
+      const replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+        for (const newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm);
         }
-        let newTerm = new FmtHLM.MetaRefExpression_structuralCases(term.term, term.construction, newCases);
+        const newTerm = new FmtHLM.MetaRefExpression_structuralCases(term.term, term.construction, newCases);
         return {
           originalExpression: term,
           filledExpression: newTerm
         };
       };
-      let getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext) => {
-        let result = new FmtHLM.MetaRefExpression_equals(leftValue, rightValue);
+      const getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext) => {
+        const result = new FmtHLM.MetaRefExpression_equals(leftValue, rightValue);
         // TODO support well-definedness proofs in cases where the goal can be written as an isomorphism condition
         this.checkFormula(result, wellDefinednessContext);
         return result;
@@ -829,9 +829,9 @@ class HLMCheckerState {
     } else if (term instanceof FmtHLM.MetaRefExpression_asElementOf) {
       this.checkElementTerm(term.term, context);
       this.checkSetTerm(term._set, context);
-      let checkElement = this.checkElement(term.term, term._set, context).then((isTrivialElement: boolean) => {
+      const checkElement = this.checkElement(term.term, term._set, context).then((isTrivialElement: boolean) => {
         if (!isTrivialElement || term.proof) {
-          let elementFormula = new FmtHLM.MetaRefExpression_in(term.term, term._set);
+          const elementFormula = new FmtHLM.MetaRefExpression_in(term.term, term._set);
           this.checkProof(term, term.proof, undefined, elementFormula, context);
         }
       });
@@ -847,21 +847,21 @@ class HLMCheckerState {
   }
 
   private checkElementTerms(object: Object, terms: Fmt.Expression[], context: HLMCheckerContext): void {
-    for (let item of terms) {
+    for (const item of terms) {
       this.checkElementTerm(item, context);
     }
     this.checkElementCompatibility(object, terms, context);
   }
 
   private checkFormula(formula: Fmt.Expression, context: HLMCheckerContext): void {
-    let recheckFn = (recheckState: HLMCheckerState, substitutedFormula: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkFormula(substitutedFormula, recheckContext);
+    const recheckFn = (recheckState: HLMCheckerState, substitutedFormula: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkFormula(substitutedFormula, recheckContext);
     context = this.setCurrentRecheckFn(formula, recheckFn, undefined, context);
     this.handleExpression(formula, context);
     if (formula instanceof Fmt.VariableRefExpression || formula instanceof Fmt.IndexedExpression) {
-      let checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Prop);
+      const checkType = (type: Fmt.Expression) => (type instanceof FmtHLM.MetaRefExpression_Prop);
       this.checkVariableRefExpression(formula, checkType, context);
     } else if (formula instanceof Fmt.DefinitionRefExpression) {
-      let checkDefinitionRef = this.utils.getOuterDefinition(formula).then((definition: Fmt.Definition) => {
+      const checkDefinitionRef = this.utils.getOuterDefinition(formula).then((definition: Fmt.Definition) => {
         if (definition.contents instanceof FmtHLM.ObjectContents_Predicate) {
           this.checkDefinitionRefExpression(formula, [definition], context);
         } else {
@@ -874,11 +874,11 @@ class HLMCheckerState {
     } else if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or || formula instanceof FmtHLM.MetaRefExpression_equiv) {
       if (formula.formulas) {
         let checkContext = context;
-        for (let item of formula.formulas) {
+        for (const item of formula.formulas) {
           this.checkFormula(item, checkContext);
           if (formula instanceof FmtHLM.MetaRefExpression_and || formula instanceof FmtHLM.MetaRefExpression_or) {
-            let constraintFormula = formula instanceof FmtHLM.MetaRefExpression_or ? this.utils.negateFormula(item, false).getImmediateResult()! : item;
-            let constraintParam = this.utils.createConstraintParameter(constraintFormula, '_');
+            const constraintFormula = formula instanceof FmtHLM.MetaRefExpression_or ? this.utils.negateFormula(item, false).getImmediateResult()! : item;
+            const constraintParam = this.utils.createConstraintParameter(constraintFormula, '_');
             checkContext = {
               ...checkContext,
               temporaryParameters: checkContext.temporaryParameters.concat(constraintParam)
@@ -889,13 +889,13 @@ class HLMCheckerState {
       }
     } else if (formula instanceof FmtHLM.MetaRefExpression_forall || formula instanceof FmtHLM.MetaRefExpression_exists || formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
       if (formula instanceof FmtHLM.MetaRefExpression_existsUnique) {
-        for (let param of formula.parameters) {
+        for (const param of formula.parameters) {
           if (!(param.type instanceof FmtHLM.MetaRefExpression_Element || param.type instanceof FmtHLM.MetaRefExpression_Constraint)) {
             this.error(param.type, 'Element or constraint parameter expected');
           }
         }
       }
-      let innerContext = this.checkParameterList(formula.parameters, context);
+      const innerContext = this.checkParameterList(formula.parameters, context);
       if (formula.formula) {
         this.checkFormula(formula.formula, innerContext);
       }
@@ -912,18 +912,18 @@ class HLMCheckerState {
     } else if (formula instanceof FmtHLM.MetaRefExpression_equals) {
       this.checkElementTerms(formula, formula.terms, context);
     } else if (formula instanceof FmtHLM.MetaRefExpression_structural) {
-      let checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkFormula(value, caseContext);
-      let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
-        for (let newCase of newCases) {
+      const checkCase = (value: Fmt.Expression, caseContext: HLMCheckerContext) => this.checkFormula(value, caseContext);
+      const replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+        for (const newCase of newCases) {
           newCase.value = new Fmt.PlaceholderExpression(HLMExpressionType.Formula);
         }
-        let newFormula = new FmtHLM.MetaRefExpression_structural(formula.term, formula.construction, newCases);
+        const newFormula = new FmtHLM.MetaRefExpression_structural(formula.term, formula.construction, newCases);
         return {
           originalExpression: formula,
           filledExpression: newFormula
         };
       };
-      let getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => {
+      const getWellDefinednessProofGoal = (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => {
         this.utils.addProofConstraint(proofParameters, leftValue);
         return rightValue;
       };
@@ -960,8 +960,8 @@ class HLMCheckerState {
 
   private checkDefinitionRefExpression(expression: Fmt.DefinitionRefExpression, definitions: Fmt.Definition[], context: HLMCheckerContext): void {
     this.checkPath(expression.path);
-    let parameterLists: Fmt.ParameterList[] = [];
-    let argumentLists: Fmt.ArgumentList[] = [];
+    const parameterLists: Fmt.ParameterList[] = [];
+    const argumentLists: Fmt.ArgumentList[] = [];
     let path: Fmt.PathItem | undefined = expression.path;
     for (let index = definitions.length - 1; index >= 0; index--) {
       if (path instanceof Fmt.Path) {
@@ -981,19 +981,19 @@ class HLMCheckerState {
   }
 
   private checkPath(path: Fmt.Path): void {
-    let simplifiedPath = this.utils.libraryDataAccessor.simplifyPath(path);
+    const simplifiedPath = this.utils.libraryDataAccessor.simplifyPath(path);
     if (simplifiedPath !== path) {
       this.message(path, `Path can be simplified to ${simplifiedPath.toString()}`, Logic.DiagnosticSeverity.Hint);
     }
   }
 
   private checkStructuralCases(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCase: (value: Fmt.Expression, caseContext: HLMCheckerContext) => void, checkCompatibility: ((values: Fmt.Expression[]) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, getWellDefinednessProofGoal: (leftValue: Fmt.Expression, rightValue: Fmt.Expression, wellDefinednessContext: HLMCheckerContext, proofParameters: Fmt.ParameterList) => Fmt.Expression, context: HLMCheckerContext): void {
-    let checkCaseInternal = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
+    const checkCaseInternal = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
       caseContext = getParameterContext(constraintParam, caseContext);
       checkCase(structuralCase.value, caseContext);
       if ((getWellDefinednessProofGoal && constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
         let clonedParameters: Fmt.ParameterList;
-        let replacedParameters: Fmt.ReplacedParameter[] = [];
+        const replacedParameters: Fmt.ReplacedParameter[] = [];
         let clonedValue = structuralCase.value;
         if (structuralCase.parameters) {
           clonedParameters = structuralCase.parameters.clone(replacedParameters);
@@ -1002,15 +1002,15 @@ class HLMCheckerState {
           clonedParameters = new Fmt.ParameterList;
         }
         clonedParameters.push(constraintParam.clone(replacedParameters));
-        let goalContext = getParameterListContext(clonedParameters, caseContext);
-        let goal = getWellDefinednessProofGoal ? getWellDefinednessProofGoal(structuralCase.value, clonedValue, goalContext, clonedParameters) : new FmtHLM.MetaRefExpression_and;
+        const goalContext = getParameterListContext(clonedParameters, caseContext);
+        const goal = getWellDefinednessProofGoal ? getWellDefinednessProofGoal(structuralCase.value, clonedValue, goalContext, clonedParameters) : new FmtHLM.MetaRefExpression_and;
         this.checkProof(structuralCase.value, structuralCase.wellDefinednessProof, clonedParameters, goal, caseContext);
       }
     };
     this.checkStructuralCasesInternal(term, construction, cases, checkCaseInternal, undefined, replaceCases, context);
 
     if (checkCompatibility) {
-      let values = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => structuralCase.value);
+      const values = cases.map((structuralCase: FmtHLM.ObjectContents_StructuralCase) => structuralCase.value);
       checkCompatibility(values);
     }
   }
@@ -1018,14 +1018,14 @@ class HLMCheckerState {
   private checkStructuralCasesInternal(term: Fmt.Expression, construction: Fmt.Expression, cases: FmtHLM.ObjectContents_StructuralCase[], checkCaseInternal: (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => void, prepareCaseInternal: ((structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
     this.checkStructuralCaseTerm(term, construction, prepareCaseInternal, replaceCases, context);
     if (construction instanceof Fmt.DefinitionRefExpression) {
-      let constructionPath = construction.path;
-      let constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
+      const constructionPath = construction.path;
+      const constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
       let index = 0;
-      let checkConstructor = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
+      const checkConstructor = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
         if (index < cases.length) {
-          let structuralCase = cases[index];
+          const structuralCase = cases[index];
           if (structuralCase._constructor instanceof Fmt.DefinitionRefExpression) {
-            let constructorPath = structuralCase._constructor.path;
+            const constructorPath = structuralCase._constructor.path;
             if (!(constructorPath.parentPath instanceof Fmt.Path && constructorPath.parentPath.isEquivalentTo(constructionPathWithoutArguments))) {
               this.error(structuralCase._constructor, 'Constructor path must match construction path (without arguments)');
             }
@@ -1049,8 +1049,8 @@ class HLMCheckerState {
               if (structuralCase.parameters) {
                 caseContext = getParameterListContext(structuralCase.parameters, caseContext);
               }
-              let structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
-              let constraintParam = this.utils.getStructuralCaseConstraintParameter(term, structuralCaseTerm);
+              const structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
+              const constraintParam = this.utils.getStructuralCaseConstraintParameter(term, structuralCaseTerm);
               checkCaseInternal(structuralCase, constructorContents, structuralCaseTerm, constraintParam, caseContext);
             } else {
               this.error(structuralCase._constructor, `Expected reference to constructor "${constructorDefinition.name}"`);
@@ -1063,7 +1063,7 @@ class HLMCheckerState {
         }
         index++;
       };
-      let checkCases = this.forAllConstructors(construction, checkConstructor).then(() => {
+      const checkCases = this.forAllConstructors(construction, checkConstructor).then(() => {
         if (index < cases.length) {
           this.error(term, 'Too many cases');
         }
@@ -1075,39 +1075,39 @@ class HLMCheckerState {
   }
 
   private checkStructuralCaseTerm(term: Fmt.Expression, construction: Fmt.Expression, prepareCaseInternal: ((structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => void) | undefined, replaceCases: (newCases: FmtHLM.ObjectContents_StructuralCase[]) => HLMCheckerFillExpressionArgs, context: HLMCheckerContext): void {
-    let recheckFn = (recheckState: HLMCheckerState, substitutedTerm: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkStructuralCaseTerm(substitutedTerm, construction, prepareCaseInternal, replaceCases, recheckContext);
+    const recheckFn = (recheckState: HLMCheckerState, substitutedTerm: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkStructuralCaseTerm(substitutedTerm, construction, prepareCaseInternal, replaceCases, recheckContext);
     let autoFillFn = undefined;
     if (context.currentPlaceholderCollection && construction instanceof Fmt.PlaceholderExpression) {
       autoFillFn = (placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn) => {
-        let filledConstruction = placeholderValues.get(construction);
+        const filledConstruction = placeholderValues.get(construction);
         if (filledConstruction instanceof Fmt.DefinitionRefExpression) {
-          let constructionPath = filledConstruction.path;
-          let constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
-          let newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
-          let newParameterLists: Fmt.ParameterList[] = [];
-          let addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
+          const constructionPath = filledConstruction.path;
+          const constructionPathWithoutArguments = new Fmt.Path(constructionPath.name, undefined, constructionPath.parentPath);
+          const newCases: FmtHLM.ObjectContents_StructuralCase[] = [];
+          const newParameterLists: Fmt.ParameterList[] = [];
+          const addCase = (constructionDefinition: Fmt.Definition, constructionContents: FmtHLM.ObjectContents_Construction, constructorDefinition: Fmt.Definition, constructorContents: FmtHLM.ObjectContents_Constructor, substitutedParameters: Fmt.ParameterList) => {
             if (constructionContents.rewrite && construction.specialRole === Fmt.SpecialPlaceholderRole.Preview) {
               return;
             }
-            let constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
-            let constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
+            const constructorPath = new Fmt.Path(constructorDefinition.name, undefined, constructionPathWithoutArguments);
+            const constructorExpression = new Fmt.DefinitionRefExpression(constructorPath);
             let clonedParameters: Fmt.ParameterList | undefined = undefined;
             if (substitutedParameters.length) {
               clonedParameters = substitutedParameters.clone();
               newParameterLists.push(clonedParameters);
             }
-            let rewrite = constructorContents.rewrite ? new FmtHLM.MetaRefExpression_true : undefined;
-            let structuralCase = new FmtHLM.ObjectContents_StructuralCase(constructorExpression, clonedParameters, new Fmt.PlaceholderExpression(undefined), rewrite);
+            const rewrite = constructorContents.rewrite ? new FmtHLM.MetaRefExpression_true : undefined;
+            const structuralCase = new FmtHLM.ObjectContents_StructuralCase(constructorExpression, clonedParameters, new Fmt.PlaceholderExpression(undefined), rewrite);
             if (prepareCaseInternal) {
-              let structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
-              let constraintParam = this.utils.getStructuralCaseConstraintParameter(term, structuralCaseTerm);
+              const structuralCaseTerm = this.utils.getResolvedStructuralCaseTerm(constructionPath, constructionDefinition, structuralCase, constructorPath, constructorDefinition, constructorContents);
+              const constraintParam = this.utils.getStructuralCaseConstraintParameter(term, structuralCaseTerm);
               prepareCaseInternal(structuralCase, constructorContents, structuralCaseTerm, constraintParam);
             }
             newCases.push(structuralCase);
           };
           return this.forAllConstructors(filledConstruction, addCase)
             .then(() => {
-              let substitution = replaceCases(newCases);
+              const substitution = replaceCases(newCases);
               onFillExpression(substitution.originalExpression, substitution.filledExpression, newParameterLists);
             });
         }
@@ -1117,7 +1117,7 @@ class HLMCheckerState {
     context = this.setCurrentRecheckFn(term, recheckFn, autoFillFn, context);
     this.checkElementTerm(term, context);
     this.checkSetTerm(construction, this.getAutoFillContext(context));
-    let checkConstructionRef = this.utils.getFinalSet(term, findConstruction).then((finalSet: Fmt.Expression) => {
+    const checkConstructionRef = this.utils.getFinalSet(term, findConstruction).then((finalSet: Fmt.Expression) => {
       if (!((finalSet instanceof Fmt.DefinitionRefExpression || finalSet instanceof Fmt.PlaceholderExpression)
             && this.checkEquivalenceOfTemporarySetTerms(construction, finalSet, context))) {
         this.error(term, 'Term must be an element of the specified construction');
@@ -1130,11 +1130,11 @@ class HLMCheckerState {
     return this.utils.getOuterDefinition(construction)
       .then((constructionDefinition: Fmt.Definition) => {
         if (constructionDefinition.contents instanceof FmtHLM.ObjectContents_Construction) {
-          for (let constructorDefinition of constructionDefinition.innerDefinitions) {
+          for (const constructorDefinition of constructionDefinition.innerDefinitions) {
             if (constructorDefinition.contents instanceof FmtHLM.ObjectContents_Constructor) {
-              let substitutionContext = new HLMSubstitutionContext;
+              const substitutionContext = new HLMSubstitutionContext;
               this.utils.addPathSubstitution(construction.path, [constructionDefinition], substitutionContext);
-              let substitutedParameters = this.utils.applySubstitutionContextToParameterList(constructorDefinition.parameters, substitutionContext);
+              const substitutedParameters = this.utils.applySubstitutionContextToParameterList(constructorDefinition.parameters, substitutionContext);
               callbackFn(constructionDefinition, constructionDefinition.contents, constructorDefinition, constructorDefinition.contents, substitutedParameters);
             }
           }
@@ -1176,14 +1176,14 @@ class HLMCheckerState {
 
   private checkEquivalenceList(object: Object, list: HLMEquivalenceListInfo, equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, checkItem: (checkerState: HLMCheckerState, expression: Fmt.Expression, context: HLMCheckerContext) => void, checkCompatibility: ((checkerState: HLMCheckerState, expressions: Fmt.Expression[], context: HLMCheckerContext) => void) | undefined, context: HLMCheckerContext): void {
     if (list.items.length) {
-      for (let item of list.items) {
+      for (const item of list.items) {
         if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath && item.path.name === this.utils.definition.name) {
           this.error(item, 'Invalid circular reference');
         }
         let currentContext = context;
         if (checkCompatibility) {
-          let recheckFn = (recheckState: HLMCheckerState, substitutedItem: Fmt.Expression, recheckContext: HLMCheckerContext) => {
-            let substitutedList: HLMEquivalenceListInfo = {
+          const recheckFn = (recheckState: HLMCheckerState, substitutedItem: Fmt.Expression, recheckContext: HLMCheckerContext) => {
+            const substitutedList: HLMEquivalenceListInfo = {
               ...list,
               items: list.items.map((originalItem: Fmt.Expression) => originalItem === item ? substitutedItem : originalItem)
             };
@@ -1203,22 +1203,22 @@ class HLMCheckerState {
   }
 
   private checkSetTermEquivalenceList(object: Object, items: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
-    let list = this.utils.getSetTermEquivalenceListInfo(items);
-    let checkCompatibility = (checkerState: HLMCheckerState, terms: Fmt.Expression[], checkContext: HLMCheckerContext) => checkerState.checkSetCompatibility(object, terms, checkContext);
-    let checkItem = (checkerState: HLMCheckerState, term: Fmt.Expression, termContext: HLMCheckerContext) => checkerState.checkSetTerm(term, termContext);
+    const list = this.utils.getSetTermEquivalenceListInfo(items);
+    const checkCompatibility = (checkerState: HLMCheckerState, terms: Fmt.Expression[], checkContext: HLMCheckerContext) => checkerState.checkSetCompatibility(object, terms, checkContext);
+    const checkItem = (checkerState: HLMCheckerState, term: Fmt.Expression, termContext: HLMCheckerContext) => checkerState.checkSetTerm(term, termContext);
     this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, context);
   }
 
   private checkElementTermEquivalenceList(object: Object, items: Fmt.Expression[], equalityProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
-    let list = this.utils.getElementTermEquivalenceListInfo(items);
-    let checkCompatibility = (checkerState: HLMCheckerState, terms: Fmt.Expression[], checkContext: HLMCheckerContext) => checkerState.checkElementCompatibility(object, terms, checkContext);
-    let checkItem = (checkerState: HLMCheckerState, term: Fmt.Expression, termContext: HLMCheckerContext) => checkerState.checkElementTerm(term, termContext);
+    const list = this.utils.getElementTermEquivalenceListInfo(items);
+    const checkCompatibility = (checkerState: HLMCheckerState, terms: Fmt.Expression[], checkContext: HLMCheckerContext) => checkerState.checkElementCompatibility(object, terms, checkContext);
+    const checkItem = (checkerState: HLMCheckerState, term: Fmt.Expression, termContext: HLMCheckerContext) => checkerState.checkElementTerm(term, termContext);
     this.checkEquivalenceList(object, list, equalityProofs, checkItem, checkCompatibility, context);
   }
 
   private checkFormulaEquivalenceList(object: Object, items: Fmt.Expression[], equivalenceProofs: FmtHLM.ObjectContents_Proof[] | undefined, context: HLMCheckerContext): void {
-    let list = this.utils.getFormulaEquivalenceListInfo(items);
-    let checkItem = (checkerState: HLMCheckerState, formula: Fmt.Expression, itemContext: HLMCheckerContext) => checkerState.checkFormula(formula, itemContext);
+    const list = this.utils.getFormulaEquivalenceListInfo(items);
+    const checkItem = (checkerState: HLMCheckerState, formula: Fmt.Expression, itemContext: HLMCheckerContext) => checkerState.checkFormula(formula, itemContext);
     this.checkEquivalenceList(object, list, equivalenceProofs, checkItem, undefined, context);
   }
 
@@ -1248,7 +1248,7 @@ class HLMCheckerState {
       this.error(proof.parameters, 'Superfluous proof parameters');
       return;
     }
-    let checkProof = this.getContextUtils(context).stripConstraintsFromFormulas(goals, true, true, !proof, !proof).then((newGoals: Fmt.Expression[]) => {
+    const checkProof = this.getContextUtils(context).stripConstraintsFromFormulas(goals, true, true, !proof, !proof).then((newGoals: Fmt.Expression[]) => {
       if (proof) {
         // Report errors as locally as possible, but not on temporarily converted objects inside expressions.
         if (!(object instanceof Fmt.Expression)) {
@@ -1267,7 +1267,7 @@ class HLMCheckerState {
       this.checkFormula(proof.goal, context);
       this.checkUnfolding(proof.goal, goals, proof.goal, true);
     }
-    let originalGoal = goals.length ? goals[0] : undefined;
+    const originalGoal = goals.length ? goals[0] : undefined;
     let stepContext: HLMCheckerProofStepContext | undefined = {
       ...context,
       originalGoal: originalGoal,
@@ -1278,7 +1278,7 @@ class HLMCheckerState {
     stepContext = this.checkProofSteps(proof.steps, stepContext);
     if (stepContext) {
       if (stepContext.goal) {
-        let check = this.getContextUtils(stepContext).isTriviallyProvable(stepContext.goal).then((result: boolean) => {
+        const check = this.getContextUtils(stepContext).isTriviallyProvable(stepContext.goal).then((result: boolean) => {
           if (!result) {
             this.setIncompleteProof(proof, stepContext!);
             this.message(object, `Proof of ${stepContext!.goal} is incomplete`, Logic.DiagnosticSeverity.Warning);
@@ -1294,7 +1294,7 @@ class HLMCheckerState {
 
   private checkProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, goal: Fmt.Expression, context: HLMCheckerContext): void {
     if (proofs) {
-      for (let proof of proofs) {
+      for (const proof of proofs) {
         this.checkProof(proof, proof, undefined, goal, context);
       }
     }
@@ -1302,9 +1302,9 @@ class HLMCheckerState {
 
   private checkEquivalenceProofs(proofs: FmtHLM.ObjectContents_Proof[] | undefined, list: HLMEquivalenceListInfo, context: HLMCheckerContext): void {
     if (proofs) {
-      for (let proof of proofs) {
-        let fromIndex = this.utils.externalToInternalIndex(proof._from);
-        let toIndex = this.utils.externalToInternalIndex(proof._to);
+      for (const proof of proofs) {
+        const fromIndex = this.utils.externalToInternalIndex(proof._from);
+        const toIndex = this.utils.externalToInternalIndex(proof._to);
         if (fromIndex === undefined || toIndex === undefined) {
           this.error(proof, 'From/to required');
         } else if (fromIndex < 0 || fromIndex >= list.items.length) {
@@ -1313,7 +1313,7 @@ class HLMCheckerState {
           this.error(proof, 'Invalid to index');
         } else {
           let proofParameters: Fmt.ParameterList | undefined = new Fmt.ParameterList;
-          let goal = list.getEquivalenceGoal(list.items[fromIndex], list.items[toIndex], proofParameters!);
+          const goal = list.getEquivalenceGoal(list.items[fromIndex], list.items[toIndex], proofParameters!);
           if (!proofParameters!.length) {
             proofParameters = undefined;
           }
@@ -1325,8 +1325,8 @@ class HLMCheckerState {
 
   private setIncompleteProof(proof: FmtHLM.ObjectContents_Proof, context: HLMCheckerProofStepContext): void {
     if (this.recheckData) {
-      let checkProofStepFn = (step: Fmt.Parameter, options: Logic.LogicCheckerOptions) => {
-        let fn = (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => recheckState.checkProofStep(step, recheckContext);
+      const checkProofStepFn = (step: Fmt.Parameter, options: Logic.LogicCheckerOptions) => {
+        const fn = (recheckState: HLMCheckerState, recheckContext: HLMCheckerContext) => recheckState.checkProofStep(step, recheckContext);
         return this.recheck(step, fn, options, context);
       };
       // Use proof.steps as the key because proof objects are created temporarily via ObjectContents.fromExpression.
@@ -1338,9 +1338,9 @@ class HLMCheckerState {
   }
 
   private checkProofSteps(steps: Fmt.ParameterList, context: HLMCheckerProofStepContext | undefined): HLMCheckerProofStepContext | undefined {
-    for (let step of steps) {
+    for (const step of steps) {
       if (context) {
-        let stepResult = this.checkProofStep(step, context);
+        const stepResult = this.checkProofStep(step, context);
         if (stepResult?.previousResult
             && !(step.type instanceof FmtHLM.MetaRefExpression_Consider && !step.type.result)) {
           context.stepResults.set(step, stepResult.previousResult);
@@ -1354,14 +1354,14 @@ class HLMCheckerState {
   }
 
   private checkProofStep(step: Fmt.Parameter, context: HLMCheckerProofStepContext): HLMCheckerProofStepContext | undefined {
-    let type = step.type;
+    const type = step.type;
     if (type instanceof FmtHLM.MetaRefExpression_SetDef || type instanceof FmtHLM.MetaRefExpression_Def) {
       return {
         ...this.checkParameter(step, context),
         previousResult: undefined
       };
     } else {
-      let result = this.checkProofStepType(type, context);
+      const result = this.checkProofStepType(type, context);
       if (result !== null) {
         try {
           return {
@@ -1379,18 +1379,18 @@ class HLMCheckerState {
   }
 
   private checkProofStepType(type: Fmt.Expression, context: HLMCheckerProofStepContext): Fmt.Expression | null | undefined {
-    let recheckFn = (recheckState: HLMCheckerState, substitutedType: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkProofStepType(substitutedType, recheckContext);
-    let typeContext = this.setCurrentRecheckFn(type, recheckFn, undefined, context);
+    const recheckFn = (recheckState: HLMCheckerState, substitutedType: Fmt.Expression, recheckContext: HLMCheckerContext) => recheckState.checkProofStepType(substitutedType, recheckContext);
+    const typeContext = this.setCurrentRecheckFn(type, recheckFn, undefined, context);
     if (type instanceof Fmt.VariableRefExpression || type instanceof Fmt.IndexedExpression) {
-      let checkType = () => true;
+      const checkType = () => true;
       this.checkVariableRefExpression(type, checkType, typeContext);
     } else if (type instanceof FmtHLM.MetaRefExpression_Consider) {
-      let checkType = () => true;
+      const checkType = () => true;
       this.checkVariableRefExpression(type.variable, checkType, typeContext);
       if (type.result) {
-        let [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(type.variable);
+        const [variableRefExpression, indexContext] = this.utils.extractVariableRefExpression(type.variable);
         if (variableRefExpression) {
-          let constraint = this.utils.getParameterConstraint(variableRefExpression.variable, typeContext, variableRefExpression, indexContext);
+          const constraint = this.utils.getParameterConstraint(variableRefExpression.variable, typeContext, variableRefExpression, indexContext);
           if (constraint) {
             this.checkUnfolding(type.result, [constraint], type.result, false);
           } else {
@@ -1404,12 +1404,12 @@ class HLMCheckerState {
     } else if (type instanceof FmtHLM.MetaRefExpression_UseDef) {
       if (context.goal) {
         if (context.previousResult) {
-          let useDef = type;
-          let previousResultDefinitionsPromise = this.utils.getFormulaDefinitions(context.previousResult, this.utils.externalToInternalIndex(useDef.side));
+          const useDef = type;
+          const previousResultDefinitionsPromise = this.utils.getFormulaDefinitions(context.previousResult, this.utils.externalToInternalIndex(useDef.side));
           if (previousResultDefinitionsPromise) {
-            let checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
+            const checkDefinition = previousResultDefinitionsPromise.then((previousResultDefinitions: HLMFormulaDefinition[]) => {
               if (previousResultDefinitions.length) {
-                let sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
+                const sources = previousResultDefinitions.map((previousResultDefinition: HLMFormulaDefinition) => previousResultDefinition.formula);
                 this.checkDeclaredResult(type, useDef.result, sources, context);
               } else {
                 this.error(type, `${context.previousResult} does not have any definition`);
@@ -1428,17 +1428,17 @@ class HLMCheckerState {
     } else if (type instanceof FmtHLM.MetaRefExpression_UseCases) {
       if (context.goal) {
         if (context.previousResult) {
-          let goal = context.goal;
-          let previousResultCasesPromise = this.utils.getFormulaCases(context.previousResult, this.utils.externalToInternalIndex(type.side), false);
+          const goal = context.goal;
+          const previousResultCasesPromise = this.utils.getFormulaCases(context.previousResult, this.utils.externalToInternalIndex(type.side), false);
           if (previousResultCasesPromise) {
-            let caseProofs = type.caseProofs;
-            let checkCases = previousResultCasesPromise.then((previousResultCases: HLMFormulaCase[] | undefined) => {
+            const caseProofs = type.caseProofs;
+            const checkCases = previousResultCasesPromise.then((previousResultCases: HLMFormulaCase[] | undefined) => {
               if (previousResultCases) {
                 let index = 0;
-                for (let previousResultCase of previousResultCases) {
+                for (const previousResultCase of previousResultCases) {
                   if (index < caseProofs.length) {
-                    let caseProof = caseProofs[index];
-                    let parameters = this.utils.getUseCasesProofParameters(previousResultCase);
+                    const caseProof = caseProofs[index];
+                    const parameters = this.utils.getUseCasesProofParameters(previousResultCase);
                     this.checkProof(caseProof, caseProof, parameters, goal, typeContext);
                   } else {
                     this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
@@ -1486,7 +1486,7 @@ class HLMCheckerState {
         if (type.result) {
           this.checkFormula(type.result, typeContext);
         }
-        let implicationResult = this.utils.getImplicationResult(type.result, context);
+        const implicationResult = this.utils.getImplicationResult(type.result, context);
         this.checkSubstitution(type, type.source, type.sourceSide, context.previousResult, implicationResult, context);
       } else {
         this.error(type, 'Previous result not set');
@@ -1498,18 +1498,18 @@ class HLMCheckerState {
         this.error(type, 'Previous result not set');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseTheorem) {
-      let useTheorem = type;
+      const useTheorem = type;
       if (useTheorem.theorem instanceof Fmt.DefinitionRefExpression) {
-        let theorem = useTheorem.theorem;
-        let checkDefinitionRef = this.utils.getOuterDefinition(theorem).then((definition: Fmt.Definition) => {
+        const theorem = useTheorem.theorem;
+        const checkDefinitionRef = this.utils.getOuterDefinition(theorem).then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_StandardTheorem || definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
             this.checkDefinitionRefExpression(theorem, [definition], typeContext);
             if (definition.contents instanceof FmtHLM.ObjectContents_EquivalenceTheorem) {
-              let conditions = definition.contents.conditions.map((condition: Fmt.Expression) => this.utils.substitutePath(condition, theorem.path, [definition]));
+              const conditions = definition.contents.conditions.map((condition: Fmt.Expression) => this.utils.substitutePath(condition, theorem.path, [definition]));
               this.checkDeclaredResult(type, useTheorem.result, conditions, context);
               if (useTheorem.input) {
                 if (!(useTheorem.input instanceof Fmt.PlaceholderExpression)) {
-                  let inputContext: HLMCheckerProofStepContext = {
+                  const inputContext: HLMCheckerProofStepContext = {
                     ...context,
                     originalGoal: undefined,
                     goal: undefined,
@@ -1527,7 +1527,7 @@ class HLMCheckerState {
                 this.error(type, 'Theorem input required');
               }
             } else {
-              let claim = this.utils.substitutePath(definition.contents.claim, theorem.path, [definition]);
+              const claim = this.utils.substitutePath(definition.contents.claim, theorem.path, [definition]);
               this.checkDeclaredResult(type, useTheorem.result, [claim], context);
             }
           } else {
@@ -1540,13 +1540,13 @@ class HLMCheckerState {
         this.error(type, 'Definition reference required');
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_UseImplicitOperator) {
-      let useImplicitOperator = type;
+      const useImplicitOperator = type;
       if (useImplicitOperator.operator instanceof Fmt.DefinitionRefExpression) {
-        let operator = useImplicitOperator.operator;
-        let checkDefinitionRef = this.utils.getOuterDefinition(operator).then((definition: Fmt.Definition) => {
+        const operator = useImplicitOperator.operator;
+        const checkDefinitionRef = this.utils.getOuterDefinition(operator).then((definition: Fmt.Definition) => {
           if (definition.contents instanceof FmtHLM.ObjectContents_ImplicitOperator) {
             this.checkDefinitionRefExpression(operator, [definition], typeContext);
-            let conditions = this.utils.getImplicitOperatorDefinitionResults(operator, definition, definition.contents);
+            const conditions = this.utils.getImplicitOperatorDefinitionResults(operator, definition, definition.contents);
             this.checkDeclaredResult(type, useImplicitOperator.result, conditions, context);
           } else {
             this.error(type, 'Referenced definition must be an implicitly defined operator');
@@ -1559,12 +1559,12 @@ class HLMCheckerState {
       }
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveDef) {
       if (context.goal) {
-        let proveDef = type;
-        let goalDefinitionsPromise = this.utils.getFormulaDefinitions(context.goal, this.utils.externalToInternalIndex(proveDef.side));
+        const proveDef = type;
+        const goalDefinitionsPromise = this.utils.getFormulaDefinitions(context.goal, this.utils.externalToInternalIndex(proveDef.side));
         if (goalDefinitionsPromise) {
-          let checkDefinition = goalDefinitionsPromise.then((goalDefinitions: HLMFormulaDefinition[]) => {
+          const checkDefinition = goalDefinitionsPromise.then((goalDefinitions: HLMFormulaDefinition[]) => {
             if (goalDefinitions.length) {
-              let goals = goalDefinitions.map((goalDefinition: HLMFormulaDefinition) => goalDefinition.formula);
+              const goals = goalDefinitions.map((goalDefinition: HLMFormulaDefinition) => goalDefinition.formula);
               this.checkMultiGoalProof(type, proveDef.proof, undefined, goals, typeContext);
             } else {
               this.error(type, `${context.goal} cannot be proved by definition`);
@@ -1580,17 +1580,17 @@ class HLMCheckerState {
       return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByContradiction) {
       if (context.goal) {
-        let proveByContradiction = type;
+        const proveByContradiction = type;
         let goalToNegate = context.goal;
         let newGoal: Fmt.Expression = new FmtHLM.MetaRefExpression_or;
         if (goalToNegate instanceof FmtHLM.MetaRefExpression_or && goalToNegate.formulas && proveByContradiction.proof._to !== undefined) {
-          let index = this.utils.externalToInternalIndex(proveByContradiction.proof._to);
+          const index = this.utils.externalToInternalIndex(proveByContradiction.proof._to);
           if (index !== undefined && index >= 0 && index < goalToNegate.formulas.length) {
             [goalToNegate, newGoal] = this.utils.getProveByContradictionVariant(goalToNegate.formulas, index);
           }
         }
-        let check = this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
-          let parameters = new Fmt.ParameterList;
+        const check = this.utils.negateFormula(goalToNegate, true).then((negatedGoal: Fmt.Expression) => {
+          const parameters = new Fmt.ParameterList;
           this.utils.addProofConstraint(parameters, negatedGoal);
           this.checkProof(type, proveByContradiction.proof, parameters, newGoal, typeContext);
         });
@@ -1610,7 +1610,7 @@ class HLMCheckerState {
       if (context.goal instanceof FmtHLM.MetaRefExpression_exists) {
         this.checkArgumentLists([type.arguments], [context.goal.parameters], undefined, typeContext);
         if (context.goal.formula) {
-          let substitutedFormula = this.utils.substituteArguments(context.goal.formula, context.goal.parameters, type.arguments);
+          const substitutedFormula = this.utils.substituteArguments(context.goal.formula, context.goal.parameters, type.arguments);
           this.checkProof(type, type.proof, undefined, substitutedFormula, typeContext);
         }
       } else {
@@ -1618,7 +1618,7 @@ class HLMCheckerState {
       }
       return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveEquivalence) {
-      let list = this.utils.getEquivalenceListInfo(context.goal);
+      const list = this.utils.getEquivalenceListInfo(context.goal);
       if (list) {
         this.checkEquivalenceProofs(type.proofs, list, context);
       } else {
@@ -1627,15 +1627,15 @@ class HLMCheckerState {
       return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveCases) {
       if (context.goal) {
-        let goalCasesPromise = this.utils.getFormulaCases(context.goal, this.utils.externalToInternalIndex(type.side), true);
+        const goalCasesPromise = this.utils.getFormulaCases(context.goal, this.utils.externalToInternalIndex(type.side), true);
         if (goalCasesPromise) {
-          let caseProofs = type.caseProofs;
-          let checkCases = goalCasesPromise.then((goalCases: HLMFormulaCase[] | undefined) => {
+          const caseProofs = type.caseProofs;
+          const checkCases = goalCasesPromise.then((goalCases: HLMFormulaCase[] | undefined) => {
             if (goalCases) {
               let index = 0;
-              for (let goalCase of goalCases) {
+              for (const goalCase of goalCases) {
                 if (index < caseProofs.length) {
-                  let caseProof = caseProofs[index];
+                  const caseProof = caseProofs[index];
                   this.checkProof(caseProof, caseProof, goalCase.parameters, goalCase.formula, typeContext);
                 } else {
                   this.message(type, 'Missing case proof', Logic.DiagnosticSeverity.Warning);
@@ -1659,10 +1659,10 @@ class HLMCheckerState {
       return null;
     } else if (type instanceof FmtHLM.MetaRefExpression_ProveByInduction) {
       if (context.goal) {
-        let proveByInduction = type;
-        let goal = context.goal;
-        let checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
-          let subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
+        const proveByInduction = type;
+        const goal = context.goal;
+        const checkCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
+          const subProof = FmtHLM.ObjectContents_Proof.createFromExpression(structuralCase.value);
           let parameters: Fmt.ParameterList | undefined = undefined;
           let caseGoal = goal;
           if (subProof.parameters) {
@@ -1675,12 +1675,12 @@ class HLMCheckerState {
             this.error(structuralCase.wellDefinednessProof, 'Superfluous well-definedness proof');
           }
         };
-        let prepareCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => {
-          let subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, new Fmt.ParameterList(constraintParam), undefined, new Fmt.ParameterList);
+        const prepareCase = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter) => {
+          const subProof = new FmtHLM.ObjectContents_Proof(undefined, undefined, new Fmt.ParameterList(constraintParam), undefined, new Fmt.ParameterList);
           structuralCase.value = subProof.toExpression(true);
         };
-        let replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
-          let newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction(proveByInduction.term, proveByInduction.construction, newCases);
+        const replaceCases = (newCases: FmtHLM.ObjectContents_StructuralCase[]) => {
+          const newProveByInduction = new FmtHLM.MetaRefExpression_ProveByInduction(proveByInduction.term, proveByInduction.construction, newCases);
           return {
             originalExpression: proveByInduction,
             filledExpression: newProveByInduction
@@ -1710,16 +1710,16 @@ class HLMCheckerState {
   private checkUnfolding(object: Object, sources: Fmt.Expression[], target: Fmt.Expression, sourceIsResult: boolean): void {
     if (target instanceof (sourceIsResult ? FmtHLM.MetaRefExpression_or : FmtHLM.MetaRefExpression_and)) {
       if (target.formulas) {
-        for (let innerTarget of target.formulas) {
+        for (const innerTarget of target.formulas) {
           this.checkUnfolding(object, sources, innerTarget, sourceIsResult);
         }
       }
     } else {
       let resultPromise = CachedPromise.resolve(false);
-      for (let source of sources) {
+      for (const source of sources) {
         resultPromise = resultPromise.or(() => this.getUnfoldResult(source, target, sourceIsResult));
       }
-      let check = resultPromise.then((result: boolean) => {
+      const check = resultPromise.then((result: boolean) => {
         if (!result) {
           let message: string;
           if (sources.length === 1) {
@@ -1740,7 +1740,7 @@ class HLMCheckerState {
     if (source instanceof (sourceIsResult ? FmtHLM.MetaRefExpression_or : FmtHLM.MetaRefExpression_and)) {
       let resultPromise = CachedPromise.resolve(false);
       if (source.formulas) {
-        for (let innerSource of source.formulas) {
+        for (const innerSource of source.formulas) {
           resultPromise = resultPromise.or(() => this.getUnfoldResult(innerSource, target, sourceIsResult));
         }
       }
@@ -1752,10 +1752,10 @@ class HLMCheckerState {
 
   private checkImplication(object: Object, source: Fmt.Expression, targets: Fmt.Expression[]): void {
     let resultPromise = CachedPromise.resolve(false);
-    for (let target of targets) {
+    for (const target of targets) {
       resultPromise = resultPromise.or(() => this.utils.triviallyImplies(source, target, true));
     }
-    let check = resultPromise.then((result: boolean) => {
+    const check = resultPromise.then((result: boolean) => {
       if (!result) {
         this.error(object, `${source} does not trivially imply ${targets.join(' or ')}`);
       }
@@ -1768,15 +1768,15 @@ class HLMCheckerState {
       this.checkFormula(result, context);
     }
     if (!(result instanceof Fmt.PlaceholderExpression)) {
-      let check = this.getContextUtils(context).stripConstraintsFromFormulas(sources, false, false, true, true).then((strippedSources: Fmt.Expression[]) =>
+      const check = this.getContextUtils(context).stripConstraintsFromFormulas(sources, false, false, true, true).then((strippedSources: Fmt.Expression[]) =>
         this.checkUnfolding(result ?? object, strippedSources, this.utils.getImplicationResult(result, context), false));
       this.addPendingCheck(object, check);
     }
   }
 
   private checkSubstitutionSource(source: Fmt.Expression, sourceSide: BigInt, context: HLMCheckerProofStepContext): HLMSubstitutionSourceInfo | undefined {
-    let equivalence = this.checkProofStepType(source, context);
-    let sourceIndex = this.utils.externalToInternalIndex(sourceSide);
+    const equivalence = this.checkProofStepType(source, context);
+    const sourceIndex = this.utils.externalToInternalIndex(sourceSide);
     if (equivalence && sourceIndex !== undefined) {
       return this.utils.getSubstitutionSourceInfo(equivalence, sourceIndex);
     } else {
@@ -1785,13 +1785,13 @@ class HLMCheckerState {
   }
 
   private checkSubstitution(object: Object, source: Fmt.Expression, sourceSide: BigInt, input: Fmt.Expression, output: Fmt.Expression, context: HLMCheckerProofStepContext): boolean {
-    let sourceContext: HLMCheckerProofStepContext = {
+    const sourceContext: HLMCheckerProofStepContext = {
       ...context,
       originalGoal: undefined,
       goal: undefined,
       previousResult: undefined
     };
-    let sourceInfo = this.checkSubstitutionSource(source, sourceSide, sourceContext);
+    const sourceInfo = this.checkSubstitutionSource(source, sourceSide, sourceContext);
     if (sourceInfo) {
       // TODO check restrictions on rewriting (see equality.md)
       if (this.utils.substitutesTo(input, output, sourceInfo)) {
@@ -1815,12 +1815,12 @@ class HLMCheckerState {
 
   private checkCompatibility(object: Object, elementTerms: Fmt.Expression[], setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
     let declaredSetsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-    for (let elementTerm of elementTerms) {
+    for (const elementTerm of elementTerms) {
       declaredSetsPromise = declaredSetsPromise.then((declaredSets: Fmt.Expression[]) =>
         this.utils.getDeclaredSet(elementTerm).then((declaredSet: Fmt.Expression) => declaredSets.concat(declaredSet))
       );
     }
-    let checkDeclaredSets = declaredSetsPromise.then((declaredSets: Fmt.Expression[]) => {
+    const checkDeclaredSets = declaredSetsPromise.then((declaredSets: Fmt.Expression[]) => {
       declaredSets = declaredSets.concat(setTerms);
       return this.checkSetCompatibilityInternal(object, declaredSets, false, context, initialCompatibilityStatus).then((result: Fmt.Expression | undefined) => {
         if (!result) {
@@ -1832,7 +1832,7 @@ class HLMCheckerState {
   }
 
   private checkSetCompatibility(object: Object, setTerms: Fmt.Expression[], context: HLMCheckerContext): void {
-    let check = this.checkSetCompatibilityInternal(object, setTerms, false, context, initialCompatibilityStatusWithoutElements).then((result: Fmt.Expression | undefined) => {
+    const check = this.checkSetCompatibilityInternal(object, setTerms, false, context, initialCompatibilityStatusWithoutElements).then((result: Fmt.Expression | undefined) => {
       if (!result) {
         this.error(object, `Type mismatch: ${setTerms.join(' and ')} are incompatible`);
       }
@@ -1892,18 +1892,18 @@ class HLMCheckerState {
       return CachedPromise.resolve(setTerms[0]);
     } else {
       if (status.obtainedFinalSets && status.followedEmbeddings && status.addedStructuralCases) {
-        let firstTerm = setTerms[0];
+        const firstTerm = setTerms[0];
         for (let index = 1; index < setTerms.length; index++) {
-          let term = setTerms[index];
+          const term = setTerms[index];
           if (status.checkedForDirectEquivalence || !this.checkEquivalenceOfTemporarySetTerms(firstTerm, term, context)) {
             return CachedPromise.resolve(undefined);
           }
         }
         return CachedPromise.resolve(firstTerm);
       } else {
-        let checkForDirectEquivalence = !status.directEquivalenceUnlikely && !status.checkedForDirectEquivalence && !this.options.supportPlaceholders;
+        const checkForDirectEquivalence = !status.directEquivalenceUnlikely && !status.checkedForDirectEquivalence && !this.options.supportPlaceholders;
         let nextSetTermsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-        let nextStatus: HLMCheckerCompatibilityStatus = {
+        const nextStatus: HLMCheckerCompatibilityStatus = {
           directEquivalenceUnlikely: false,
           checkedForDirectEquivalence: status.checkedForDirectEquivalence || checkForDirectEquivalence,
           obtainedFinalSets: true,
@@ -1926,15 +1926,15 @@ class HLMCheckerState {
         if (nextStatus.addedStructuralCases && context.parentStructuralCases.length) {
           for (let index = 0; index < setTerms.length; index++) {
             let term = setTerms[index];
-            for (let structuralCaseRef of context.parentStructuralCases) {
+            for (const structuralCaseRef of context.parentStructuralCases) {
               term = this.utils.buildSingleStructuralCaseTerm(structuralCaseRef.term, structuralCaseRef.construction, structuralCaseRef._constructor, structuralCaseRef.parameters, term, HLMExpressionType.SetTerm);
             }
             setTerms[index] = term;
           }
         }
-        let firstTerm = setTerms[0];
+        const firstTerm = setTerms[0];
         for (let index = 1; index < setTerms.length; index++) {
-          let term = setTerms[index];
+          const term = setTerms[index];
           if (!checkForDirectEquivalence || !this.checkEquivalenceOfTemporarySetTerms(firstTerm, term, context)) {
             nextSetTermsPromise = nextSetTermsPromise.then((nextSetTerms: Fmt.Expression[]) =>
               this.utils.getFinalSuperset(term, typeSearchParameters).then((finalSuperset: Fmt.Expression) => {
@@ -1980,7 +1980,7 @@ class HLMCheckerState {
   }
 
   private checkEquivalenceWithPlaceholders<T extends Fmt.Comparable<T>>(left: T, right: T, context: HLMCheckerContext): boolean {
-    let state: HLMCheckerPlaceholderRestrictionState = {
+    const state: HLMCheckerPlaceholderRestrictionState = {
       exactValueRequired: true,
       context: context
     };
@@ -1990,8 +1990,8 @@ class HLMCheckerState {
         let recheck = false;
         while (leftExpression instanceof Fmt.PlaceholderExpression) {
           this.addPlaceholderToCurrentCollection(leftExpression, context);
-          let replacedRightExpression = rightExpression.substitute(undefined, Fmt.reverseReplacedParameters(replacedParameters));
-          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedRightExpression);
+          const replacedRightExpression = rightExpression.substitute(undefined, Fmt.reverseReplacedParameters(replacedParameters));
+          const newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedRightExpression);
           if (newLeftExpression) {
             leftExpression = newLeftExpression;
             recheck = true;
@@ -2001,8 +2001,8 @@ class HLMCheckerState {
         }
         while (rightExpression instanceof Fmt.PlaceholderExpression) {
           this.addPlaceholderToCurrentCollection(rightExpression, context);
-          let replacedLeftExpression = leftExpression.substitute(undefined, replacedParameters);
-          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedLeftExpression);
+          const replacedLeftExpression = leftExpression.substitute(undefined, replacedParameters);
+          const newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedLeftExpression);
           if (newRightExpression) {
             rightExpression = newRightExpression;
             recheck = true;
@@ -2029,30 +2029,30 @@ class HLMCheckerState {
   }
 
   private checkEquivalenceOfTemporarySetTerms(left: Fmt.Expression, right: Fmt.Expression, context: HLMCheckerContext): boolean {
-    let state: HLMCheckerPlaceholderRestrictionState = {
+    const state: HLMCheckerPlaceholderRestrictionState = {
       exactValueRequired: left instanceof Fmt.DefinitionRefExpression && right instanceof Fmt.DefinitionRefExpression,
       context: context
     };
     let unificationFn: Fmt.ExpressionUnificationFn | undefined = undefined;
-    let defaultUnificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
+    const defaultUnificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
       // Make structural cases commute. I.e. when finding a nested structural case term on the right, also check other nesting possibilities.
       // Of course, this only works for inner cases that do not depend on parameters of outer cases.
       if (rightExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases && rightExpression.cases.length === 1) {
-        let structuralCase = rightExpression.cases[0];
-        let innerExpression = structuralCase.value;
+        const structuralCase = rightExpression.cases[0];
+        const innerExpression = structuralCase.value;
         if (innerExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases && innerExpression.cases.length === 1) {
           let clonedExpression = rightExpression.clone() as FmtHLM.MetaRefExpression_setStructuralCases;
-          let clonedCase = clonedExpression.cases[0];
+          const clonedCase = clonedExpression.cases[0];
           let currentInnerExpression = clonedCase.value;
           while (currentInnerExpression instanceof FmtHLM.MetaRefExpression_setStructuralCases && currentInnerExpression.cases.length === 1) {
             // Cut out the current inner expression.
-            let nextInnerExpression = currentInnerExpression.cases[0].value;
+            const nextInnerExpression = currentInnerExpression.cases[0].value;
             clonedCase.value = nextInnerExpression;
             // Attach it to the front.
             currentInnerExpression.cases[0].value = clonedExpression;
             clonedExpression = currentInnerExpression;
             // Check it.
-            let innerUnificationFn = (innerLeftExpression: Fmt.Expression, innerRightExpression: Fmt.Expression, innerReplacedParameters: Fmt.ReplacedParameter[]): boolean => {
+            const innerUnificationFn = (innerLeftExpression: Fmt.Expression, innerRightExpression: Fmt.Expression, innerReplacedParameters: Fmt.ReplacedParameter[]): boolean => {
               // Avoid infinite recursion.
               if (unificationFn && innerLeftExpression !== leftExpression) {
                 return unificationFn(innerLeftExpression, innerRightExpression, innerReplacedParameters);
@@ -2074,7 +2074,7 @@ class HLMCheckerState {
       unificationFn = (leftExpression: Fmt.Expression, rightExpression: Fmt.Expression, replacedParameters: Fmt.ReplacedParameter[]): boolean => {
         // TODO the order of handling left and right currently matters a lot, in fact the tutorial breaks if it is reversed -- this indicates some deeper problem
         if (rightExpression instanceof FmtHLM.MetaRefExpression_enumeration && rightExpression.terms && rightExpression.terms.length === 1) {
-          let rightElement = rightExpression.terms[0];
+          const rightElement = rightExpression.terms[0];
           if (rightElement instanceof Fmt.PlaceholderExpression) {
             if (!replacedParameters.length) {
               this.addDeclaredSetRestriction(state, rightElement, leftExpression);
@@ -2083,7 +2083,7 @@ class HLMCheckerState {
           }
         }
         if (leftExpression instanceof FmtHLM.MetaRefExpression_enumeration && leftExpression.terms && leftExpression.terms.length === 1) {
-          let leftElement = leftExpression.terms[0];
+          const leftElement = leftExpression.terms[0];
           if (leftElement instanceof Fmt.PlaceholderExpression) {
             if (!replacedParameters.length) {
               this.addDeclaredSetRestriction(state, leftElement, rightExpression);
@@ -2092,11 +2092,11 @@ class HLMCheckerState {
           }
         }
         let recheck = false;
-        let isRoot = leftExpression === left && rightExpression === right;
+        const isRoot = leftExpression === left && rightExpression === right;
         while (rightExpression instanceof Fmt.PlaceholderExpression) {
           // Note: If replacedParameters is nonempty, those parameters are temporary if the original expression is a temporary object.
           // We currently give up in that case, but we could also check whether leftExpression actually references one of the parameters.
-          let newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedParameters.length ? undefined : leftExpression);
+          const newRightExpression = this.addCompatibleTermRestriction(state, rightExpression, replacedParameters.length ? undefined : leftExpression);
           if (newRightExpression) {
             rightExpression = newRightExpression;
             recheck = true;
@@ -2107,7 +2107,7 @@ class HLMCheckerState {
         while (leftExpression instanceof Fmt.PlaceholderExpression) {
           // Note: If replacedParameters is nonempty, those parameters are temporary if the original expression is a temporary object.
           // We currently give up in that case, but we could also check whether rightExpression actually references one of the parameters.
-          let newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedParameters.length ? undefined : rightExpression);
+          const newLeftExpression = this.addCompatibleTermRestriction(state, leftExpression, replacedParameters.length ? undefined : rightExpression);
           if (newLeftExpression) {
             leftExpression = newLeftExpression;
             recheck = true;
@@ -2137,7 +2137,7 @@ class HLMCheckerState {
   }
 
   private addCompatibleTermRestriction(state: HLMCheckerPlaceholderRestrictionState, placeholder: Fmt.PlaceholderExpression, expression: Fmt.Expression | undefined): Fmt.Expression | undefined {
-    let currentRestrictions = state.newRestrictions ?? this.restrictions!;
+    const currentRestrictions = state.newRestrictions ?? this.restrictions!;
     let restriction = currentRestrictions.get(placeholder);
     if (restriction && restriction.exactValue) {
       return restriction.exactValue;
@@ -2145,8 +2145,8 @@ class HLMCheckerState {
     if (!expression) {
       return undefined;
     }
-    let addToCompatibleSets = placeholder.placeholderType === HLMExpressionType.SetTerm && !(restriction && HLMCheckerState.containsEquivalentItem(restriction.compatibleSets, expression));
-    let setExactValueSuggestion = !(expression instanceof Fmt.PlaceholderExpression);
+    const addToCompatibleSets = placeholder.placeholderType === HLMExpressionType.SetTerm && !(restriction && HLMCheckerState.containsEquivalentItem(restriction.compatibleSets, expression));
+    const setExactValueSuggestion = !(expression instanceof Fmt.PlaceholderExpression);
     if (addToCompatibleSets || setExactValueSuggestion) {
       if (restriction) {
         restriction = {...restriction};
@@ -2186,7 +2186,7 @@ class HLMCheckerState {
     if (placeholder.placeholderType === undefined) {
       return;
     }
-    let currentRestrictions = state.newRestrictions ?? this.restrictions!;
+    const currentRestrictions = state.newRestrictions ?? this.restrictions!;
     let restriction = currentRestrictions.get(placeholder);
     if (restriction && HLMCheckerState.containsEquivalentItem(restriction.declaredSets, declaredSet)) {
       return;
@@ -2250,17 +2250,17 @@ class HLMCheckerState {
 }
 
 function getParameterListContext<ContextType extends HLMCheckerContext>(parameterList: Fmt.ParameterList, context: ContextType): ContextType {
-  for (let param of parameterList) {
+  for (const param of parameterList) {
     context = getParameterContext(param, context);
   }
   return context;
 }
 
 function getParameterContext<ContextType extends HLMCheckerContext>(param: Fmt.Parameter, context: ContextType): ContextType {
-  let type = param.type;
+  const type = param.type;
   if (type instanceof FmtHLM.MetaRefExpression_Binder) {
-    let sourceContext = getParameterListContext(type.sourceParameters, context);
-    let resultContext = getParameterListContext(type.targetParameters, sourceContext);
+    const sourceContext = getParameterListContext(type.sourceParameters, context);
+    const resultContext = getParameterListContext(type.targetParameters, sourceContext);
     return {
       ...resultContext,
       binderSourceParameters: [...resultContext.binderSourceParameters, ...type.sourceParameters]
@@ -2283,17 +2283,17 @@ export class HLMCheckerContextUtils {
   constructor(private utils: HLMUtils, private context: HLMCheckerContext) {}
 
   getParameterListContextUtils(parameterList: Fmt.ParameterList): HLMCheckerContextUtils {
-    let resultContext = getParameterListContext(parameterList, this.context);
+    const resultContext = getParameterListContext(parameterList, this.context);
     return new HLMCheckerContextUtils(this.utils, resultContext);
   }
 
   getAvailableConstraints(split: boolean): HLMCheckerConstraint[] {
-    let constraints: HLMCheckerConstraint[] = [];
-    for (let variableInfo of this.context.context.getVariables()) {
+    const constraints: HLMCheckerConstraint[] = [];
+    for (const variableInfo of this.context.context.getVariables()) {
       if (!variableInfo.indexParameterLists && this.context.binderSourceParameters.indexOf(variableInfo.parameter) < 0) {
-        let constraint = this.utils.getParameterConstraint(variableInfo.parameter, this.context);
+        const constraint = this.utils.getParameterConstraint(variableInfo.parameter, this.context);
         if (constraint) {
-          let parameter = this.context.temporaryParameters.indexOf(variableInfo.parameter) < 0 ? variableInfo.parameter : undefined;
+          const parameter = this.context.temporaryParameters.indexOf(variableInfo.parameter) < 0 ? variableInfo.parameter : undefined;
           this.addConstraint(parameter, constraint, true, constraints, split);
         }
       }
@@ -2305,7 +2305,7 @@ export class HLMCheckerContextUtils {
     if (split) {
       if (constraint instanceof FmtHLM.MetaRefExpression_and) {
         if (constraint.formulas) {
-          for (let item of constraint.formulas) {
+          for (const item of constraint.formulas) {
             this.addConstraint(parameter, item, false, constraints, split);
           }
         }
@@ -2325,8 +2325,8 @@ export class HLMCheckerContextUtils {
   isTriviallyProvable(goal: Fmt.Expression): CachedPromise<boolean> {
     // TODO %in(a, %extendedSubset(#(...), x)) should be trivially provable if a and x can be unified appropriately such that all constraints on parameters are also trivially provable
     // TODO somewhere (maybe here), the "full" property of embeddings should be taken into account
-    let constraints = this.getAvailableConstraints(false);
-    let conjunction = this.utils.createConjunction(constraints.map((constraint: HLMCheckerConstraint) => constraint.constraint));
+    const constraints = this.getAvailableConstraints(false);
+    const conjunction = this.utils.createConjunction(constraints.map((constraint: HLMCheckerConstraint) => constraint.constraint));
     return this.utils.triviallyImplies(conjunction, goal, true);
   }
 
@@ -2337,7 +2337,7 @@ export class HLMCheckerContextUtils {
 
   stripConstraintsFromFormulas(formulas: Fmt.Expression[], stripExactPositive: boolean, stripPositive: boolean, stripNegative: boolean, allowTrivialResult: boolean): CachedPromise<Fmt.Expression[]> {
     let resultPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-    for (let formula of formulas) {
+    for (const formula of formulas) {
       resultPromise = resultPromise.then((currentResult: Fmt.Expression[]) =>
         this.stripConstraintsFromFormula(formula, stripExactPositive, stripPositive, stripNegative, allowTrivialResult).then((strippedFormula: Fmt.Expression) =>
           currentResult.concat(strippedFormula)));
@@ -2358,7 +2358,7 @@ export class HLMCheckerContextUtils {
           intermediatePromise = this.isTriviallyProvable(formula).then((result: boolean) =>
             (result ? new FmtHLM.MetaRefExpression_and : formula));
         } else if (stripExactPositive) {
-          for (let constraint of this.getAvailableConstraints(true)) {
+          for (const constraint of this.getAvailableConstraints(true)) {
             if (formula.isEquivalentTo(constraint.constraint)) {
               intermediatePromise = CachedPromise.resolve(new FmtHLM.MetaRefExpression_and);
             }
@@ -2369,7 +2369,7 @@ export class HLMCheckerContextUtils {
     return intermediatePromise.then((intermediateFormula: Fmt.Expression) => {
       if (intermediateFormula instanceof FmtHLM.MetaRefExpression_and && intermediateFormula.formulas) {
         let resultItemsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-        for (let item of intermediateFormula.formulas) {
+        for (const item of intermediateFormula.formulas) {
           resultItemsPromise = resultItemsPromise.then((currentResultItems: Fmt.Expression[]) =>
             this.stripConstraintsFromFormula(item, stripExactPositive, stripPositive, stripNegative, true, negate).then((strippedItem: Fmt.Expression) =>
               (this.utils.isTrueFormula(strippedItem) ? currentResultItems : currentResultItems.concat(strippedItem))));
@@ -2377,7 +2377,7 @@ export class HLMCheckerContextUtils {
         return resultItemsPromise.then((resultItems: Fmt.Expression[]) => this.utils.createConjunction(resultItems));
       } else if (intermediateFormula instanceof FmtHLM.MetaRefExpression_or && intermediateFormula.formulas) {
         let resultItemsPromise: CachedPromise<Fmt.Expression[]> = CachedPromise.resolve([]);
-        for (let item of intermediateFormula.formulas) {
+        for (const item of intermediateFormula.formulas) {
           resultItemsPromise = resultItemsPromise.then((currentResultItems: Fmt.Expression[]) =>
             this.stripConstraintsFromFormula(item, stripExactPositive, stripPositive, stripNegative, true, !negate).then((strippedItem: Fmt.Expression) =>
               (this.utils.isFalseFormula(strippedItem) ? currentResultItems : currentResultItems.concat(strippedItem))));
@@ -2417,7 +2417,7 @@ export class HLMRechecker {
   getProofStepChecker(proof: FmtHLM.ObjectContents_Proof, options: Logic.LogicCheckerOptions): HLMProofStepChecker {
     const incompleteProof = this.recheckData.incompleteProofs.get(proof.steps);
     if (incompleteProof) {
-      let contextUtils = new HLMCheckerContextUtils(this.utils, incompleteProof.context);
+      const contextUtils = new HLMCheckerContextUtils(this.utils, incompleteProof.context);
       return new HLMProofStepChecker(incompleteProof.context, contextUtils, (step: Fmt.Parameter) => incompleteProof.checkProofStepFn(step, options));
     } else {
       throw new InternalError('Proof not found');
@@ -2436,7 +2436,7 @@ export class HLMRecheckerInstance<T extends Fmt.ExpressionObject<T>> {
     if (debugRecheck) {
       console.log(`Checking ${item}...`);
     }
-    let resultPromise = this.checkFn(item);
+    const resultPromise = this.checkFn(item);
     return getRecheckResult(resultPromise, item);
   }
 }
@@ -2451,7 +2451,7 @@ function getRecheckResult<T extends Fmt.ExpressionObject<T>>(resultPromise: Cach
   return resultPromise.then((result: HLMCheckResult) => {
     if (result.autoFiller) {
       let resultValue = originalValue;
-      let onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression) => {
+      const onFillExpression = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression) => {
         resultValue = FmtUtils.substituteExpression(resultValue, originalExpression, filledExpression);
         if (originalExpression instanceof Fmt.PlaceholderExpression && originalExpression.onFill) {
           originalExpression.onFill(filledExpression);
@@ -2471,8 +2471,8 @@ export class HLMAutoFiller {
   constructor(private utils: HLMUtils, private placeholderCollection: HLMCheckerPlaceholderCollection, private restrictions: HLMCheckerPlaceholderRestrictions) {}
 
   autoFill(onFillExpression: HLMCheckerFillExpressionFn, fillAllExactValues: boolean = false): CachedPromise<void> {
-    let autoFilledPlaceholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
-    let allPlaceholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
+    const autoFilledPlaceholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
+    const allPlaceholderValues = new Map<Fmt.PlaceholderExpression, Fmt.Expression>();
     return this.getAutoPlaceholderValues(this.placeholderCollection, fillAllExactValues, autoFilledPlaceholderValues, allPlaceholderValues)
       .then(() => this.callAutoFillFns(this.placeholderCollection, allPlaceholderValues, onFillExpression))
       .then(() => this.autoFillPlaceholders(autoFilledPlaceholderValues, onFillExpression));
@@ -2481,7 +2481,7 @@ export class HLMAutoFiller {
   private getAutoPlaceholderValues(placeholderCollection: HLMCheckerPlaceholderCollection, fillAllExactValues: boolean, autoFilledPlaceholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, allPlaceholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>): CachedPromise<boolean> {
     let childResult = CachedPromise.resolve(true);
     if (placeholderCollection.childCollections) {
-      for (let childCollection of placeholderCollection.childCollections) {
+      for (const childCollection of placeholderCollection.childCollections) {
         childResult = childResult.then((allFilled: boolean) =>
           this.getAutoPlaceholderValues(childCollection, fillAllExactValues, autoFilledPlaceholderValues, allPlaceholderValues).then((filled: boolean) =>
             (allFilled && filled)));
@@ -2500,8 +2500,8 @@ export class HLMAutoFiller {
   private getOwnAutoPlaceholderValues(placeholderCollection: HLMCheckerPlaceholderCollection, placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, includeSuggestions: boolean): CachedPromise<boolean> {
     let result = CachedPromise.resolve(true);
     if (placeholderCollection.placeholders) {
-      for (let placeholder of placeholderCollection.placeholders) {
-        let placeholderRestriction = this.restrictions.get(placeholder);
+      for (const placeholder of placeholderCollection.placeholders) {
+        const placeholderRestriction = this.restrictions.get(placeholder);
         result = result.then((allFilled: boolean) => {
           if (placeholderRestriction) {
             if (placeholderRestriction.exactValue) {
@@ -2532,11 +2532,11 @@ export class HLMAutoFiller {
 
   private autoFillPlaceholders(placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn): void {
     let substitutedPlaceholders: Fmt.PlaceholderExpression[] = [];
-    let substitutePlaceholders = (expression: Fmt.Expression): Fmt.Expression => {
+    const substitutePlaceholders = (expression: Fmt.Expression): Fmt.Expression => {
       if (expression instanceof Fmt.PlaceholderExpression) {
         if (substitutedPlaceholders.indexOf(expression) < 0) {
           substitutedPlaceholders.push(expression);
-          let substitutedExpression = placeholderValues.get(expression);
+          const substitutedExpression = placeholderValues.get(expression);
           if (substitutedExpression) {
             return substitutedExpression.substitute(substitutePlaceholders);
           }
@@ -2544,9 +2544,9 @@ export class HLMAutoFiller {
       }
       return expression;
     };
-    for (let [placeholder, value] of placeholderValues) {
+    for (const [placeholder, value] of placeholderValues) {
       substitutedPlaceholders = [];
-      let substitutedValue = value.substitute(substitutePlaceholders).clone();
+      const substitutedValue = value.substitute(substitutePlaceholders).clone();
       onFillExpression(placeholder, substitutedValue, []);
     }
   }
@@ -2554,14 +2554,14 @@ export class HLMAutoFiller {
   private callAutoFillFns(placeholderCollection: HLMCheckerPlaceholderCollection, placeholderValues: Map<Fmt.PlaceholderExpression, Fmt.Expression>, onFillExpression: HLMCheckerFillExpressionFn): CachedPromise<void> {
     let result = CachedPromise.resolve();
     if (placeholderCollection.childCollections) {
-      for (let childCollection of placeholderCollection.childCollections) {
+      for (const childCollection of placeholderCollection.childCollections) {
         result = result.then(() => this.callAutoFillFns(childCollection, placeholderValues, onFillExpression));
       }
     }
     if (placeholderCollection.autoFillFn) {
       result = result.then(() => {
-        let onFillExpressionWithPlaceholders = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
-          let onFillInnerPlaceholder = (originalPlaceholderExpression: Fmt.Expression, filledPlaceholderExpression: Fmt.Expression) => {
+        const onFillExpressionWithPlaceholders = (originalExpression: Fmt.Expression, filledExpression: Fmt.Expression, newParameterLists: Fmt.ParameterList[]) => {
+          const onFillInnerPlaceholder = (originalPlaceholderExpression: Fmt.Expression, filledPlaceholderExpression: Fmt.Expression) => {
             filledExpression = FmtUtils.substituteExpression(filledExpression, originalPlaceholderExpression, filledPlaceholderExpression);
           };
           this.autoFillPlaceholders(placeholderValues, onFillInnerPlaceholder);

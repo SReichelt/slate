@@ -7,14 +7,14 @@ import { replaceDocumentText } from '../../utils';
 
 export class SlateDocumentFormatter implements vscode.DocumentFormattingEditProvider {
     provideDocumentFormattingEdits(document: vscode.TextDocument, options: vscode.FormattingOptions, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TextEdit[]> {
-        let unformatted = document.getText();
+        const unformatted = document.getText();
         try {
-            let file: Fmt.File = FmtReader.readString(unformatted, document.fileName, (path: Fmt.Path) => getMetaModelWithFallback(document.fileName, path));
+            const file: Fmt.File = FmtReader.readString(unformatted, document.fileName, (path: Fmt.Path) => getMetaModelWithFallback(document.fileName, path));
             if (token.isCancellationRequested) {
                 return undefined;
             }
-            let formatted = FmtWriter.writeString(file);
-            let textEdit = replaceDocumentText(document, formatted);
+            const formatted = FmtWriter.writeString(file);
+            const textEdit = replaceDocumentText(document, formatted);
             if (textEdit) {
                 return [textEdit];
             }

@@ -48,13 +48,13 @@ export abstract class GenericEditHandler {
   }
 
   protected cloneAndAdaptParameterNames<T extends Fmt.FileObject<T>>(expression: T): T {
-    let replacedParameters: Fmt.ReplacedParameter[] = [];
-    let result = expression.clone(replacedParameters);
+    const replacedParameters: Fmt.ReplacedParameter[] = [];
+    const result = expression.clone(replacedParameters);
     if (replacedParameters.length) {
-      let usedParameterNames = this.getUsedParameterNames();
-      for (let replacedParameter of replacedParameters) {
-        let param = replacedParameter.replacement;
-        let newName = this.utils.getUnusedDefaultName(param.name, usedParameterNames);
+      const usedParameterNames = this.getUsedParameterNames();
+      for (const replacedParameter of replacedParameters) {
+        const param = replacedParameter.replacement;
+        const newName = this.utils.getUnusedDefaultName(param.name, usedParameterNames);
         FmtUtils.renameParameter(param, newName, undefined, result);
       }
     }
@@ -66,14 +66,14 @@ export abstract class GenericEditHandler {
   }
 
   protected getTypeRow(type: string | undefined, onRenderType: RenderTypeFn, info: LibraryItemInfo): Menu.ExpressionMenuRow {
-    let action = new Menu.ImmediateExpressionMenuAction(() => {
-      let newInfo = {
+    const action = new Menu.ImmediateExpressionMenuAction(() => {
+      const newInfo = {
         ...info,
         type: type
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
     });
-    let item = new Menu.ExpressionMenuItem(onRenderType(type), action);
+    const item = new Menu.ExpressionMenuItem(onRenderType(type), action);
     item.selected = info.type === type;
     return item;
   }
@@ -86,41 +86,41 @@ export abstract class GenericEditHandler {
   }
 
   private getTitleRow(info: LibraryItemInfo): Menu.ExpressionMenuRow {
-    let titleText = info.title || '';
-    let titleAction = new Menu.ImmediateExpressionMenuAction(() => {
-      let newInfo = {
+    const titleText = info.title || '';
+    const titleAction = new Menu.ImmediateExpressionMenuAction(() => {
+      const newInfo = {
         ...info,
         title: titleText || undefined
       };
       return this.libraryDataProvider.setLocalItemInfo(this.definition.name, newInfo);
     });
-    let titleRow = new Menu.StandardExpressionMenuRow('Title');
+    const titleRow = new Menu.StandardExpressionMenuRow('Title');
     titleRow.subMenu = new Menu.ExpressionMenuTextInput(titleText, 20, false, titleAction);
     titleRow.selected = info.title !== undefined;
     return titleRow;
   }
 
   protected getActionInsertButton(action: Menu.ExpressionMenuAction | undefined): Notation.RenderedExpression {
-    let insertButton = new Notation.InsertPlaceholderExpression;
+    const insertButton = new Notation.InsertPlaceholderExpression;
     insertButton.action = action;
     return insertButton;
   }
 
   getImmediateInsertButton(onInsert: () => void, enabled: boolean = true): Notation.RenderedExpression {
-    let action = enabled ? new Menu.ImmediateExpressionMenuAction(onInsert) : undefined;
+    const action = enabled ? new Menu.ImmediateExpressionMenuAction(onInsert) : undefined;
     return this.getActionInsertButton(action);
   }
 
   protected getSemanticLinkInsertButton(onInitialize: (semanticLink: Notation.SemanticLink) => void, mandatory: boolean = false): Notation.RenderedExpression {
-    let insertButton = new Notation.InsertPlaceholderExpression(mandatory);
-    let semanticLink = new Notation.SemanticLink(insertButton, false, false);
+    const insertButton = new Notation.InsertPlaceholderExpression(mandatory);
+    const semanticLink = new Notation.SemanticLink(insertButton, false, false);
     onInitialize(semanticLink);
     insertButton.semanticLinks = [semanticLink];
     return insertButton;
   }
 
   protected getMenuInsertButton(onMenuOpened: () => Menu.ExpressionMenu, mandatory: boolean = false, autoOpen: boolean = false): Notation.RenderedExpression {
-    let onInitialize = (semanticLink: Notation.SemanticLink) => {
+    const onInitialize = (semanticLink: Notation.SemanticLink) => {
       semanticLink.onMenuOpened = onMenuOpened;
       semanticLink.autoOpenMenu = autoOpen;
     };
@@ -128,7 +128,7 @@ export abstract class GenericEditHandler {
   }
 
   protected addListItemInsertButton(renderedItems: Notation.ExpressionValue[], innerType: Fmt.Expression, onInsertItem: () => void, enabledPromise: CachedPromise<boolean>): void {
-    let insertButtonPromise = enabledPromise.then((enabled: boolean) => this.getImmediateInsertButton(onInsertItem, enabled));
+    const insertButtonPromise = enabledPromise.then((enabled: boolean) => this.getImmediateInsertButton(onInsertItem, enabled));
     let insertButton: Notation.ExpressionValue = new Notation.PromiseExpression(insertButtonPromise);
     while (innerType instanceof Fmt.IndexedExpression) {
       insertButton = [insertButton];
@@ -138,11 +138,11 @@ export abstract class GenericEditHandler {
   }
 
   addNotationMenu(semanticLink: Notation.SemanticLink, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, onGetDefault: () => Notation.RenderedExpression | undefined, onGetVariables: () => RenderedVariable[], isPredicate: boolean, renderer: GenericRenderer): void {
-    let type = new FmtNotation.MetaRefExpression_Expr;
+    const type = new FmtNotation.MetaRefExpression_Expr;
     semanticLink.onMenuOpened = () => {
-      let defaultValue = onGetDefault();
-      let variables = onGetVariables();
-      let rows: Menu.ExpressionMenuRow[] = [];
+      const defaultValue = onGetDefault();
+      const variables = onGetVariables();
+      const rows: Menu.ExpressionMenuRow[] = [];
       this.addNotationMenuRows(rows, notation, onSetNotation, defaultValue, variables, type, !notation, true, false, isPredicate, renderer);
       return new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     };
@@ -151,11 +151,11 @@ export abstract class GenericEditHandler {
 
   private addNotationItemMenu(semanticLink: Notation.SemanticLink, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, defaultValue: Notation.RenderedExpression | undefined, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, canRemove: boolean, isPredicate: boolean, renderer: GenericRenderer): void {
     semanticLink.onMenuOpened = () => {
-      let isDefault = !notation && !canRemove;
-      let rows: Menu.ExpressionMenuRow[] = [];
+      const isDefault = !notation && !canRemove;
+      const rows: Menu.ExpressionMenuRow[] = [];
       this.addNotationMenuRows(rows, notation, onSetNotation, defaultValue, variables, type, isDefault, isTopLevel, canRemove, isPredicate, renderer);
       if (rows.length === 1) {
-        let row = rows[0];
+        const row = rows[0];
         if (row instanceof Menu.StandardExpressionMenuRow && row.subMenu instanceof Menu.ExpressionMenu) {
           return row.subMenu;
         }
@@ -172,7 +172,7 @@ export abstract class GenericEditHandler {
         new Menu.ExpressionMenuSeparator
       );
     }
-    let complexExpressionRequired = isTopLevel && variables.length !== 0;
+    const complexExpressionRequired = isTopLevel && variables.length !== 0;
     if (type instanceof FmtNotation.MetaRefExpression_Expr) {
       if (!complexExpressionRequired) {
         rows.push(this.getNotationMenuTextRow(notation, onSetNotation));
@@ -195,13 +195,13 @@ export abstract class GenericEditHandler {
   }
 
   private getNotationMenuDefaultRow(renderedDefault: Notation.RenderedExpression | undefined, onSetNotation: SetNotationFn, isDefault: boolean, isRemoveRow: boolean): Menu.ExpressionMenuRow {
-    let defaultAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(undefined));
-    let defaultRow = new Menu.StandardExpressionMenuRow(isRemoveRow ? 'Remove' : 'Default');
+    const defaultAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(undefined));
+    const defaultRow = new Menu.StandardExpressionMenuRow(isRemoveRow ? 'Remove' : 'Default');
     if (isRemoveRow) {
       defaultRow.iconType = 'remove';
     }
     if (renderedDefault) {
-      let defaultItem = new Menu.ExpressionMenuItem(renderedDefault, defaultAction);
+      const defaultItem = new Menu.ExpressionMenuItem(renderedDefault, defaultAction);
       defaultItem.selected = isDefault;
       defaultRow.subMenu = defaultItem;
     } else {
@@ -211,86 +211,86 @@ export abstract class GenericEditHandler {
   }
 
   private getNotationMenuFalseRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
-    let falseRow = new Menu.StandardExpressionMenuRow('False');
+    const falseRow = new Menu.StandardExpressionMenuRow('False');
     falseRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(new FmtNotation.MetaRefExpression_false));
     falseRow.selected = notation instanceof FmtNotation.MetaRefExpression_false;
     return falseRow;
   }
 
   private getNotationMenuTrueRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
-    let trueRow = new Menu.StandardExpressionMenuRow('True');
+    const trueRow = new Menu.StandardExpressionMenuRow('True');
     trueRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => onSetNotation(new FmtNotation.MetaRefExpression_true));
     trueRow.selected = notation instanceof FmtNotation.MetaRefExpression_true;
     return trueRow;
   }
 
   private getNotationMenuIntegerRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn): Menu.ExpressionMenuRow {
-    let text = notation instanceof Fmt.IntegerExpression ? notation.value.toString() : '';
-    let action = new Menu.ImmediateExpressionMenuAction(() => {
+    const text = notation instanceof Fmt.IntegerExpression ? notation.value.toString() : '';
+    const action = new Menu.ImmediateExpressionMenuAction(() => {
       try {
-        let value = BigInt(integerItem.text);
-        let newNotation = new Fmt.IntegerExpression(value);
+        const value = BigInt(integerItem.text);
+        const newNotation = new Fmt.IntegerExpression(value);
         onSetNotation(newNotation);
       } catch {}
     });
-    let integerItem = new Menu.ExpressionMenuTextInput(text, 4, false, action);
+    const integerItem = new Menu.ExpressionMenuTextInput(text, 4, false, action);
     integerItem.selected = (notation !== undefined);
-    let integerRow = new Menu.StandardExpressionMenuRow('Number');
+    const integerRow = new Menu.StandardExpressionMenuRow('Number');
     integerRow.subMenu = integerItem;
     return integerRow;
   }
 
   private getNotationMenuTextRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, title: string = 'Symbol/Text'): Menu.ExpressionMenuRow {
-    let text = notation instanceof Fmt.StringExpression ? notation.value : '';
-    let action = new Menu.ImmediateExpressionMenuAction(() => {
-      let newNotation = new Fmt.StringExpression(textItem.text);
+    const text = notation instanceof Fmt.StringExpression ? notation.value : '';
+    const action = new Menu.ImmediateExpressionMenuAction(() => {
+      const newNotation = new Fmt.StringExpression(textItem.text);
       onSetNotation(newNotation);
     });
-    let textItem = new Menu.ExpressionMenuTextInput(text, 4, true, action);
+    const textItem = new Menu.ExpressionMenuTextInput(text, 4, true, action);
     textItem.selected = (notation !== undefined);
-    let textRow = new Menu.StandardExpressionMenuRow(title);
+    const textRow = new Menu.StandardExpressionMenuRow(title);
     textRow.subMenu = textItem;
     return textRow;
   }
 
   private getNotationMenuVariablesRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[]): Menu.ExpressionMenuRow {
-    let items: Menu.ExpressionMenuItem[] = [];
-    for (let variable of variables) {
-      let action = new Menu.ImmediateExpressionMenuAction(() => {
-        let newNotation = new Fmt.VariableRefExpression(variable.param);
+    const items: Menu.ExpressionMenuItem[] = [];
+    for (const variable of variables) {
+      const action = new Menu.ImmediateExpressionMenuAction(() => {
+        const newNotation = new Fmt.VariableRefExpression(variable.param);
         onSetNotation(newNotation);
       });
-      let variableItem = new Menu.ExpressionMenuItem(variable.notation, action);
+      const variableItem = new Menu.ExpressionMenuItem(variable.notation, action);
       if (notation instanceof Fmt.VariableRefExpression && notation.variable === variable.param) {
         variableItem.selected = true;
       }
       items.push(variableItem);
     }
-    let variablesGroup = new Menu.ExpressionMenuItemList(CachedPromise.resolve(items));
-    let variablesRow = new Menu.StandardExpressionMenuRow('Variable');
+    const variablesGroup = new Menu.ExpressionMenuItemList(CachedPromise.resolve(items));
+    const variablesRow = new Menu.StandardExpressionMenuRow('Variable');
     variablesRow.subMenu = variablesGroup;
     return variablesRow;
   }
 
   private getNotationMenuTemplatesRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, complexExpressionRequired: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let rows: Menu.ExpressionMenuRow[] = [];
-    for (let template of this.templates.definitions) {
+    const rows: Menu.ExpressionMenuRow[] = [];
+    for (const template of this.templates.definitions) {
       if ((!complexExpressionRequired || template.parameters.length)
           && this.isTemplateApplicable(template, isTopLevel, isPredicate)) {
-        let templateRow = this.getNotationMenuTemplateRow(template, notation, onSetNotation, variables, isTopLevel, isPredicate, renderer);
+        const templateRow = this.getNotationMenuTemplateRow(template, notation, onSetNotation, variables, isTopLevel, isPredicate, renderer);
         rows.push(templateRow);
       }
     }
-    let templateMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
+    const templateMenu = new Menu.ExpressionMenu(CachedPromise.resolve(rows));
     templateMenu.variable = true;
-    let templatesRow = new Menu.StandardExpressionMenuRow('Template');
+    const templatesRow = new Menu.StandardExpressionMenuRow('Template');
     templatesRow.subMenu = templateMenu;
     return templatesRow;
   }
 
   private isTemplateApplicable(template: Fmt.Definition, isTopLevel: boolean, isPredicate: boolean): boolean {
     if (template.contents instanceof FmtNotation.ObjectContents_Template) {
-      let context = template.contents.context;
+      const context = template.contents.context;
       if (context) {
         if (isTopLevel) {
           if (isPredicate) {
@@ -307,7 +307,7 @@ export abstract class GenericEditHandler {
           notation = notation.items[0];
         }
         if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
-          let notationTemplate = this.templates.definitions.getDefinition(notation.path.name);
+          const notationTemplate = this.templates.definitions.getDefinition(notation.path.name);
           return this.isTemplateApplicable(notationTemplate, isTopLevel, isPredicate);
         }
       }
@@ -316,17 +316,17 @@ export abstract class GenericEditHandler {
   }
 
   private getNotationMenuTemplateRow(template: Fmt.Definition, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let title = new Notation.TextExpression(template.name);
+    const title = new Notation.TextExpression(template.name);
     title.styleClasses = ['source-code'];
-    let templateRow = new Menu.StandardExpressionMenuRow(title);
+    const templateRow = new Menu.StandardExpressionMenuRow(title);
     templateRow.info = this.getDocumentation(template);
     templateRow.examples = this.getExamples(template, renderer);
     if (template.parameters.length) {
       templateRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getTemplateDialog(template, notation, onSetNotation, variables, isTopLevel, isPredicate, renderer));
     } else {
       templateRow.titleAction = new Menu.ImmediateExpressionMenuAction(() => {
-        let newPath = new Fmt.Path(template.name);
-        let newNotation = new Fmt.DefinitionRefExpression(newPath);
+        const newPath = new Fmt.Path(template.name);
+        const newNotation = new Fmt.DefinitionRefExpression(newPath);
         onSetNotation(newNotation);
       });
     }
@@ -335,15 +335,15 @@ export abstract class GenericEditHandler {
   }
 
   private getTemplateDialog(template: Fmt.Definition, notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
-    let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
+    const renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
     let title: Notation.RenderedExpression = new Notation.TextExpression(template.name);
     title.styleClasses = ['source-code'];
     if (template.documentation) {
-      let paragraphs: Notation.RenderedExpression[] = [title];
+      const paragraphs: Notation.RenderedExpression[] = [title];
       this.addDocumentation(template.documentation, undefined, paragraphs);
       title = new Notation.ParagraphExpression(paragraphs);
     }
-    let dialog = new Dialog.ExpressionDialog([
+    const dialog = new Dialog.ExpressionDialog([
       new Dialog.ExpressionDialogInfoItem(() => title),
       new Dialog.ExpressionDialogSeparatorItem
     ]);
@@ -352,13 +352,13 @@ export abstract class GenericEditHandler {
     if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath && notation.path.name === template.name) {
       newNotation = notation.clone() as Fmt.DefinitionRefExpression;
     } else {
-      let newPath = new Fmt.Path(template.name);
+      const newPath = new Fmt.Path(template.name);
       if (isTopLevel) {
         this.preFillArguments(template.parameters, newPath.arguments, variables);
       }
       newNotation = new Fmt.DefinitionRefExpression(newPath);
     }
-    let previewItem = this.createTemplateDialogPreviewItem(newNotation, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
+    const previewItem = this.createTemplateDialogPreviewItem(newNotation, isTopLevel && isPredicate, renderedTemplateArguments, renderer);
     let messageItem: Dialog.ExpressionDialogInfoItem | undefined = undefined;
     if (isTopLevel) {
       messageItem = new Dialog.ExpressionDialogInfoItem(() => undefined);
@@ -370,14 +370,14 @@ export abstract class GenericEditHandler {
       okEnabled = false;
     }
     let paramIndex = 0;
-    let previousParamNames: string[] = [];
-    for (let param of template.parameters) {
-      let paramTitle = new Notation.TextExpression(param.name);
+    const previousParamNames: string[] = [];
+    for (const param of template.parameters) {
+      const paramTitle = new Notation.TextExpression(param.name);
       paramTitle.styleClasses = ['source-code'];
-      let localPreviousParamNames = previousParamNames.slice();
-      let onGetValue = () => {
-        let value = newNotation.path.arguments.getOptionalValue(param.name, paramIndex);
-        let onUpdateParamNotation = () => {
+      const localPreviousParamNames = previousParamNames.slice();
+      const onGetValue = () => {
+        const value = newNotation.path.arguments.getOptionalValue(param.name, paramIndex);
+        const onUpdateParamNotation = () => {
           requiredArgumentsFilled = this.checkRequiredArguments(template, newNotation);
           previewItem.visible = requiredArgumentsFilled;
           previewItem.changed();
@@ -386,14 +386,14 @@ export abstract class GenericEditHandler {
             okEnabled = false;
           }
         };
-        let onSetParamNotation = (newValue: Fmt.Expression | undefined) => {
+        const onSetParamNotation = (newValue: Fmt.Expression | undefined) => {
           newNotation.path.arguments.setValue(param.name, paramIndex, newValue, localPreviousParamNames);
           onUpdateParamNotation();
         };
-        let canRemove = param.optional && value !== undefined;
+        const canRemove = param.optional && value !== undefined;
         return this.renderArgumentValue(value, param.type, param.defaultValue, onSetParamNotation, onUpdateParamNotation, variables, renderedTemplateArguments, false, canRemove, isPredicate, renderer);
       };
-      let paramItem = new Dialog.ExpressionDialogParameterItem(paramTitle, onGetValue);
+      const paramItem = new Dialog.ExpressionDialogParameterItem(paramTitle, onGetValue);
       paramItem.onGetInfo = () => this.getDocumentation(template, param);
       dialog.items.push(paramItem);
       previousParamNames.push(param.name);
@@ -413,7 +413,7 @@ export abstract class GenericEditHandler {
 
   private getDocumentation(definition: Fmt.Definition, param?: Fmt.Parameter): Notation.RenderedExpression | undefined {
     if (definition.documentation) {
-      let paragraphs: Notation.RenderedExpression[] = [];
+      const paragraphs: Notation.RenderedExpression[] = [];
       this.addDocumentation(definition.documentation, param, paragraphs);
       if (paragraphs.length) {
         return new Notation.ParagraphExpression(paragraphs);
@@ -423,7 +423,7 @@ export abstract class GenericEditHandler {
   }
 
   private addDocumentation(documentation: Fmt.DocumentationComment, param: Fmt.Parameter | undefined, paragraphs: Notation.RenderedExpression[]): void {
-    for (let documentationItem of documentation.items) {
+    for (const documentationItem of documentation.items) {
       if (param) {
         if (documentationItem.parameter !== param) {
           continue;
@@ -433,7 +433,7 @@ export abstract class GenericEditHandler {
           break;
         }
       }
-      let paragraph = new Notation.MarkdownExpression(documentationItem.text);
+      const paragraph = new Notation.MarkdownExpression(documentationItem.text);
       paragraph.styleClasses = ['info-text'];
       paragraphs.push(paragraph);
     }
@@ -441,16 +441,16 @@ export abstract class GenericEditHandler {
 
   private getExamples(definition: Fmt.Definition, renderer: GenericRenderer): Notation.RenderedExpression[] | undefined {
     if (definition.documentation) {
-      let result: Notation.RenderedExpression[] = [];
-      for (let documentationItem of definition.documentation.items) {
+      const result: Notation.RenderedExpression[] = [];
+      for (const documentationItem of definition.documentation.items) {
         if (documentationItem.kind === 'example') {
-          let example = new Notation.MarkdownExpression(documentationItem.text);
+          const example = new Notation.MarkdownExpression(documentationItem.text);
           example.onRenderCode = (code: string) => {
             try {
-              let expression = readCode(code, FmtNotation.metaModel);
-              let config: Notation.RenderedTemplateConfig = {
+              const expression = readCode(code, FmtNotation.metaModel);
+              const config: Notation.RenderedTemplateConfig = {
                 getArgFn: (name: string) => {
-                  let variable = new Notation.TextExpression(name);
+                  const variable = new Notation.TextExpression(name);
                   variable.styleClasses = ['var', 'dummy'];
                   return variable;
                 },
@@ -482,10 +482,10 @@ export abstract class GenericEditHandler {
         arrayExpression = new Fmt.ArrayExpression([]);
         onUpdateNotation = () => onSetNotation(arrayExpression);
       }
-      let items: Notation.RenderedExpression[] = [];
+      const items: Notation.RenderedExpression[] = [];
       for (let index = 0; index < arrayExpression.items.length; index++) {
-        let item = arrayExpression.items[index];
-        let onSetItem = (newValue: Fmt.Expression | undefined) => {
+        const item = arrayExpression.items[index];
+        const onSetItem = (newValue: Fmt.Expression | undefined) => {
           if (newValue) {
             arrayExpression.items[index] = newValue;
           } else {
@@ -499,18 +499,18 @@ export abstract class GenericEditHandler {
         }
         items.push(argValue);
       }
-      let group: Notation.RenderedExpression | undefined = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
-      let insertButton = new Notation.InsertPlaceholderExpression;
+      const group: Notation.RenderedExpression | undefined = items.length ? renderer.renderTemplate('Group', {'items': items}) : undefined;
+      const insertButton = new Notation.InsertPlaceholderExpression;
       if (type.body instanceof Fmt.IndexedExpression) {
-        let onInsertItem = () => {
-          let newItem = new Fmt.ArrayExpression([]);
+        const onInsertItem = () => {
+          const newItem = new Fmt.ArrayExpression([]);
           arrayExpression.items.push(newItem);
           onUpdateNotation();
         };
         insertButton.action = new Menu.ImmediateExpressionMenuAction(onInsertItem);
       } else {
-        let semanticLink = new Notation.SemanticLink(insertButton, false, false);
-        let onInsertItem = (newValue: Fmt.Expression | undefined) => {
+        const semanticLink = new Notation.SemanticLink(insertButton, false, false);
+        const onInsertItem = (newValue: Fmt.Expression | undefined) => {
           if (newValue) {
             arrayExpression.items.push(newValue);
             onUpdateNotation();
@@ -529,10 +529,10 @@ export abstract class GenericEditHandler {
         return insertButton;
       }
     } else {
-      let valueOrDefault = value || defaultValue;
-      let renderedValue = valueOrDefault ? renderer.renderNotationExpression(valueOrDefault, renderedTemplateArguments) : new Notation.EmptyExpression;
-      let semanticLink = new Notation.SemanticLink(renderedValue, false, false);
-      let onGetDefault = () => defaultValue ? renderer.renderNotationExpression(defaultValue, renderedTemplateArguments) : undefined;
+      const valueOrDefault = value || defaultValue;
+      const renderedValue = valueOrDefault ? renderer.renderNotationExpression(valueOrDefault, renderedTemplateArguments) : new Notation.EmptyExpression;
+      const semanticLink = new Notation.SemanticLink(renderedValue, false, false);
+      const onGetDefault = () => defaultValue ? renderer.renderNotationExpression(defaultValue, renderedTemplateArguments) : undefined;
       this.addNotationItemMenu(semanticLink, value, onSetNotation, onGetDefault(), variables, type, isTopLevel, canRemove, isPredicate, renderer);
       renderedValue.semanticLinks = [semanticLink];
       return renderedValue;
@@ -541,16 +541,16 @@ export abstract class GenericEditHandler {
 
   private createTemplateDialogPreviewItem(notation: Fmt.Expression, includeNegation: boolean, renderedTemplateArguments: RenderedTemplateArguments, renderer: GenericRenderer): Dialog.ExpressionDialogListItem<number | undefined> {
     // TODO add preview in different contexts, to validate parentheses
-    let items = includeNegation ? [0, 1] : [undefined];
-    let onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notation, renderedTemplateArguments, 0, negationCount);
+    const items = includeNegation ? [0, 1] : [undefined];
+    const onRenderItem = (negationCount: number | undefined) => renderer.renderNotationExpression(notation, renderedTemplateArguments, 0, negationCount);
     return new Dialog.ExpressionDialogListItem<number | undefined>(items, onRenderItem);
   }
 
   private checkReferencedParameters(notation: Fmt.Expression, variables: RenderedVariable[], messageItem: Dialog.ExpressionDialogInfoItem): boolean {
-    let referencedParams = this.utils.findReferencedParameters(notation);
-    let missingVariables: RenderedVariable[] = [];
-    let autoVariables: RenderedVariable[] = [];
-    for (let variable of variables) {
+    const referencedParams = this.utils.findReferencedParameters(notation);
+    const missingVariables: RenderedVariable[] = [];
+    const autoVariables: RenderedVariable[] = [];
+    for (const variable of variables) {
       if (referencedParams.indexOf(variable.param) < 0) {
         if (variable.canAutoFill) {
           autoVariables.push(variable);
@@ -571,7 +571,7 @@ export abstract class GenericEditHandler {
   }
 
   private checkRequiredArguments(template: Fmt.Definition, notation: Fmt.DefinitionRefExpression): boolean {
-    for (let param of template.parameters) {
+    for (const param of template.parameters) {
       if (!param.optional && !param.defaultValue && !notation.path.arguments.getOptionalValue(param.name)) {
         return false;
       }
@@ -580,9 +580,9 @@ export abstract class GenericEditHandler {
   }
 
   private setMessageItem(variables: RenderedVariable[], textFragment: string, messageItem: Dialog.ExpressionDialogInfoItem): void {
-    let row: Notation.RenderedExpression[] = [];
-    for (let variable of variables) {
-      let text = new Notation.TextExpression(row.length ? ', ' : variables.length > 1 ? `The following variables ${textFragment}: ` : `The following variable ${textFragment}: `);
+    const row: Notation.RenderedExpression[] = [];
+    for (const variable of variables) {
+      const text = new Notation.TextExpression(row.length ? ', ' : variables.length > 1 ? `The following variables ${textFragment}: ` : `The following variable ${textFragment}: `);
       text.styleClasses = ['info-text'];
       row.push(
         text,
@@ -593,25 +593,25 @@ export abstract class GenericEditHandler {
   }
 
   private preFillArguments(params: Fmt.ParameterList, args: Fmt.ArgumentList, variables: RenderedVariable[]): void {
-    let requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
-    for (let param of params) {
+    const requiredVariables = variables.filter((variable: RenderedVariable) => !variable.canAutoFill);
+    for (const param of params) {
       if (param.type instanceof Fmt.IndexedExpression) {
-        let items: Fmt.Expression[] = [];
+        const items: Fmt.Expression[] = [];
         if (!(param.type.body instanceof Fmt.IndexedExpression) && (param.name === 'items' || param.name === 'arguments' || (param.name === 'operands' && requiredVariables.length === 2))) {
-          for (let variable of requiredVariables) {
-            let value = new Fmt.VariableRefExpression(variable.param);
+          for (const variable of requiredVariables) {
+            const value = new Fmt.VariableRefExpression(variable.param);
             items.push(value);
           }
         }
-        let arrayValue = new Fmt.ArrayExpression(items);
+        const arrayValue = new Fmt.ArrayExpression(items);
         args.push(new Fmt.Argument(param.name, arrayValue));
       } else {
         if (param.name === 'function' || param.name === 'property' || param.name === 'singular' || param.name === 'plural') {
-          let text = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
-          let value = new Fmt.StringExpression(text);
+          const text = param.name === 'plural' ? this.definition.name + 's' : this.definition.name;
+          const value = new Fmt.StringExpression(text);
           args.push(new Fmt.Argument(param.name, value));
         } else if (param.name === 'operand' && requiredVariables.length === 1) {
-          let value = new Fmt.VariableRefExpression(requiredVariables[0].param);
+          const value = new Fmt.VariableRefExpression(requiredVariables[0].param);
           args.push(new Fmt.Argument(param.name, value));
         }
       }
@@ -619,15 +619,15 @@ export abstract class GenericEditHandler {
   }
 
   private getNotationMenuNegationRow(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Menu.ExpressionMenuRow {
-    let negationRow = new Menu.StandardExpressionMenuRow('With negation');
+    const negationRow = new Menu.StandardExpressionMenuRow('With negation');
     negationRow.titleAction = new Menu.DialogExpressionMenuAction(() => this.getNegationDialog(notation, onSetNotation, variables, type, isTopLevel, isPredicate, renderer));
     negationRow.selected = notation instanceof FmtNotation.MetaRefExpression_neg;
     return negationRow;
   }
 
   private getNegationDialog(notation: Fmt.Expression | undefined, onSetNotation: SetNotationFn, variables: RenderedVariable[], type: Fmt.Expression, isTopLevel: boolean, isPredicate: boolean, renderer: GenericRenderer): Dialog.ExpressionDialog {
-    let renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
-    let items: Dialog.ExpressionDialogItem[] = [];
+    const renderedTemplateArguments = this.getRenderedTemplateArguments(variables);
+    const items: Dialog.ExpressionDialogItem[] = [];
     let newNotation: FmtNotation.MetaRefExpression_neg;
     if (notation instanceof FmtNotation.MetaRefExpression_neg) {
       newNotation = notation.clone() as FmtNotation.MetaRefExpression_neg;
@@ -639,8 +639,8 @@ export abstract class GenericEditHandler {
       }
     }
     for (let index = 0; index <= 1; index++) {
-      let paramTitle = index ? 'Negated' : 'Regular';
-      let onSetItem = (newItem: Fmt.Expression | undefined) => {
+      const paramTitle = index ? 'Negated' : 'Regular';
+      const onSetItem = (newItem: Fmt.Expression | undefined) => {
         if (newItem) {
           if (newNotation.items.length <= index) {
             do {
@@ -651,75 +651,75 @@ export abstract class GenericEditHandler {
           }
         }
       };
-      let onGetValue = () => {
-        let regular = newNotation.items.length > index ? newNotation.items[index] : undefined;
+      const onGetValue = () => {
+        const regular = newNotation.items.length > index ? newNotation.items[index] : undefined;
         return this.renderArgumentValue(regular, type, undefined, onSetItem, () => {}, variables, renderedTemplateArguments, isTopLevel, false, isPredicate, renderer);
       };
       items.push(new Dialog.ExpressionDialogParameterItem(paramTitle, onGetValue));
     }
-    let onOK = () => onSetNotation(newNotation);
+    const onOK = () => onSetNotation(newNotation);
     return new Dialog.ExpressionDialog(items, onOK);
   }
 
   private getRenderedTemplateArguments(variables: RenderedVariable[]): RenderedTemplateArguments {
-    let renderedTemplateArguments: RenderedTemplateArguments = {};
-    for (let variable of variables) {
+    const renderedTemplateArguments: RenderedTemplateArguments = {};
+    for (const variable of variables) {
       renderedTemplateArguments[variable.param.name] = variable.notation;
     }
     return renderedTemplateArguments;
   }
 
   protected getParameterPlaceholderItem(type: Fmt.Expression, defaultName: string, onRenderParam: RenderParameterFn, onInsertParam: InsertParameterFn): Menu.ExpressionMenuItem {
-    let parameter = this.utils.createParameter(type, defaultName, this.getUsedParameterNames());
+    const parameter = this.utils.createParameter(type, defaultName, this.getUsedParameterNames());
 
-    let action = new Menu.ImmediateExpressionMenuAction(() => onInsertParam(parameter));
+    const action = new Menu.ImmediateExpressionMenuAction(() => onInsertParam(parameter));
     return new Menu.ExpressionMenuItem(onRenderParam(parameter), action);
   }
 
   protected getVariableRow(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: (variableInfo: Ctx.VariableInfo) => CachedPromise<Fmt.Expression[]>, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
     let variableItems: CachedPromise<Menu.ExpressionMenuItem[]> = CachedPromise.resolve([]);
-    for (let variableInfo of expressionEditInfo.context.getVariables()) {
+    for (const variableInfo of expressionEditInfo.context.getVariables()) {
       variableItems = variableItems.then((items: Menu.ExpressionMenuItem[]) =>
         onGetExpressions(variableInfo).then((expressions: Fmt.Expression[]) => {
-          let newItems = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
+          const newItems = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
           return items.concat(newItems);
         })
       );
     }
-    let variableList = new Menu.ExpressionMenuItemList(variableItems);
+    const variableList = new Menu.ExpressionMenuItemList(variableItems);
     variableList.variable = true;
-    let variableRow = new Menu.StandardExpressionMenuRow('Variable');
+    const variableRow = new Menu.StandardExpressionMenuRow('Variable');
     variableRow.subMenu = variableList;
     return variableRow;
   }
 
   protected getDefinitionRow(expressionEditInfo: Edit.ExpressionEditInfo, definitionTypes: Logic.LogicDefinitionType[], onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuRow {
-    let selectedDefinition = this.getSelectedDefinition(expressionEditInfo);
+    const selectedDefinition = this.getSelectedDefinition(expressionEditInfo);
 
-    let definitionRow = new Menu.StandardExpressionMenuRow('Definition');
+    const definitionRow = new Menu.StandardExpressionMenuRow('Definition');
     definitionRow.titleAction = new Menu.DialogExpressionMenuAction(() => {
-      let treeItem = new Dialog.ExpressionDialogTreeItem(this.libraryDataProvider.getRootProvider(), this.templates);
+      const treeItem = new Dialog.ExpressionDialogTreeItem(this.libraryDataProvider.getRootProvider(), this.templates);
       treeItem.onFilter = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinition: LibraryDefinition, definition: Fmt.Definition) => {
-        let getPath = () => this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
-        let expressionsPromise = onGetExpressions(getPath, libraryDefinition.definition, definition, false);
+        const getPath = () => this.libraryDataProvider.getRelativePathWithProvider(libraryDataProvider, path);
+        const expressionsPromise = onGetExpressions(getPath, libraryDefinition.definition, definition, false);
         if (expressionsPromise) {
           return expressionsPromise.then((expressions: Fmt.Expression[]) => expressions.length > 0);
         } else {
           return CachedPromise.resolve(false);
         }
       };
-      let selectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>([], onRenderExpression);
+      const selectionItem = new Dialog.ExpressionDialogSelectionItem<Fmt.Expression>([], onRenderExpression);
       treeItem.onItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, libraryDefinitionPromise?: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo) => {
-        let absolutePath = libraryDataProvider.getAbsolutePath(path);
+        const absolutePath = libraryDataProvider.getAbsolutePath(path);
         treeItem.selectedItemPath = absolutePath;
         treeItem.changed();
         if (!libraryDefinitionPromise) {
           libraryDefinitionPromise = libraryDataProvider.fetchItem(FmtUtils.getOuterPath(path), false);
         }
         libraryDefinitionPromise.then((libraryDefinition: LibraryDefinition) => {
-          let getPath = () => this.libraryDataProvider.getRelativePath(absolutePath);
-          let definition = FmtUtils.getInnerDefinition(libraryDefinition.definition, path);
-          let expressionsPromise = onGetExpressions(getPath, libraryDefinition.definition, definition, false);
+          const getPath = () => this.libraryDataProvider.getRelativePath(absolutePath);
+          const definition = FmtUtils.getInnerDefinition(libraryDefinition.definition, path);
+          const expressionsPromise = onGetExpressions(getPath, libraryDefinition.definition, definition, false);
           if (expressionsPromise) {
             expressionsPromise.then((expressions: Fmt.Expression[]) => {
               selectionItem.items = expressions;
@@ -732,19 +732,19 @@ export abstract class GenericEditHandler {
       if (selectedDefinition) {
         treeItem.onItemClicked(this.libraryDataProvider, selectedDefinition.path);
       } else {
-        let dummyPath = new Fmt.Path('');
+        const dummyPath = new Fmt.Path('');
         treeItem.selectedItemPath = this.libraryDataProvider.getAbsolutePath(dummyPath);
       }
-      let items = [
+      const items = [
         treeItem,
         selectionItem
       ];
-      let onOK = () => {
+      const onOK = () => {
         if (selectionItem.selectedItem) {
           this.setValueAndAddToMRU(selectionItem.selectedItem, expressionEditInfo);
         }
       };
-      let dialog = new Dialog.ExpressionDialog(items, onOK);
+      const dialog = new Dialog.ExpressionDialog(items, onOK);
       dialog.onCheckOKEnabled = () => (selectionItem.selectedItem !== undefined);
       return dialog;
     });
@@ -759,12 +759,12 @@ export abstract class GenericEditHandler {
   protected abstract getSelectedDefinition(expressionEditInfo: Edit.ExpressionEditInfo): Fmt.DefinitionRefExpression | undefined;
 
   private getMRURows(expressionEditInfo: Edit.ExpressionEditInfo, onGetExpressions: GetExpressionsFn, onRenderExpression: RenderExpressionFn): CachedPromise<Menu.ExpressionMenuRow[]> {
-    let iterator = this.mruList.iterator(this.libraryDataProvider);
-    let addAllDefinitions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, rows: Menu.ExpressionMenuRow[]) => {
-      let result = onGetExpressions(() => path, outerDefinition, definition, true) || CachedPromise.resolve([]);
+    const iterator = this.mruList.iterator(this.libraryDataProvider);
+    const addAllDefinitions = (path: Fmt.Path, outerDefinition: Fmt.Definition, definition: Fmt.Definition, rows: Menu.ExpressionMenuRow[]) => {
+      const result = onGetExpressions(() => path, outerDefinition, definition, true) || CachedPromise.resolve([]);
       return result.then((expressions: Fmt.Expression[]): void | CachedPromise<void> => {
         if (expressions.length) {
-          let items = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
+          const items = expressions.map((expression: Fmt.Expression) => this.getExpressionItem(expression, expressionEditInfo, onRenderExpression));
           if (items.length === 1) {
             rows.push(items[0]);
           } else {
@@ -773,18 +773,18 @@ export abstract class GenericEditHandler {
         }
         if (definition.innerDefinitions.length) {
           let currentResult = CachedPromise.resolve();
-          for (let innerDefinition of definition.innerDefinitions) {
-            let innerPath = new Fmt.Path(innerDefinition.name, undefined, path);
+          for (const innerDefinition of definition.innerDefinitions) {
+            const innerPath = new Fmt.Path(innerDefinition.name, undefined, path);
             currentResult = currentResult.then(() => addAllDefinitions(innerPath, outerDefinition, innerDefinition, rows));
           }
           return currentResult;
         }
       });
     };
-    let extendRows = (rows: Menu.ExpressionMenuRow[]) =>
+    const extendRows = (rows: Menu.ExpressionMenuRow[]) =>
       iterator.next().then((path: Fmt.Path | undefined): Menu.ExpressionMenuRow[] | CachedPromise<Menu.ExpressionMenuRow[]> => {
         if (path) {
-          let relativePath = this.libraryDataProvider.getRelativePath(path);
+          const relativePath = this.libraryDataProvider.getRelativePath(path);
           return this.libraryDataProvider.fetchItem(relativePath, false, false)
             .then((libraryDefinition: LibraryDefinition) => addAllDefinitions(relativePath, libraryDefinition.definition, libraryDefinition.definition, rows))
             .catch(() => {})
@@ -803,12 +803,12 @@ export abstract class GenericEditHandler {
   }
 
   protected getExpressionItem(expression: Fmt.Expression, expressionEditInfo: Edit.ExpressionEditInfo, onRenderExpression: RenderExpressionFn): Menu.ExpressionMenuItem {
-    let renderedExpression = onRenderExpression(expression);
-    let action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
-    let item = new Menu.ExpressionMenuItem(renderedExpression, action);
-    let origExpression = expressionEditInfo.expression;
+    const renderedExpression = onRenderExpression(expression);
+    const action = new Menu.ImmediateExpressionMenuAction(() => this.setValueAndAddToMRU(expression, expressionEditInfo));
+    const item = new Menu.ExpressionMenuItem(renderedExpression, action);
+    const origExpression = expressionEditInfo.expression;
     if (origExpression && !(origExpression instanceof Fmt.DefinitionRefExpression)) {
-      let newExpression = expression;
+      const newExpression = expression;
       if (Object.getPrototypeOf(newExpression) === Object.getPrototypeOf(origExpression)) {
         if (newExpression instanceof Fmt.VariableRefExpression && origExpression instanceof Fmt.VariableRefExpression) {
           item.selected = newExpression.variable === origExpression.variable;
@@ -827,16 +827,16 @@ export abstract class GenericEditHandler {
 
   protected addToMRU(expression: Fmt.Expression): void {
     if (expression instanceof Fmt.DefinitionRefExpression) {
-      let absolutePath = this.libraryDataProvider.getAbsolutePath(expression.path);
+      const absolutePath = this.libraryDataProvider.getAbsolutePath(expression.path);
       this.mruList.add(absolutePath);
     }
   }
 
   protected addParameterToGroup(param: Fmt.Parameter, parameterList?: Fmt.ParameterList): Fmt.Parameter | undefined {
     if (parameterList) {
-      let index = parameterList.indexOf(param);
+      const index = parameterList.indexOf(param);
       if (index >= 0) {
-        let paramClone = param.shallowClone();
+        const paramClone = param.shallowClone();
         paramClone.name = this.utils.getUnusedDefaultName(paramClone.name, this.getUsedParameterNames());
         parameterList.splice(index + 1, 0, paramClone);
         return paramClone;
@@ -852,12 +852,12 @@ export abstract class GenericEditHandler {
       }
       // TODO prevent shadowing of other variables (important because writer cannot check it)
       if (newText.endsWith(',')) {
-        let newName = newText.substring(0, newText.length - 1);
+        const newName = newText.substring(0, newText.length - 1);
         if (newName) {
           this.utils.renameParameter(param, newName, parameterList);
         }
         if (param.name) {
-          let paramClone = this.addParameterToGroup(param, parameterList);
+          const paramClone = this.addParameterToGroup(param, parameterList);
           if (paramClone) {
             GenericEditHandler.lastInsertedParameter = paramClone;
           }
@@ -875,15 +875,15 @@ export abstract class GenericEditHandler {
 
   addDefinitionRemarkEditor(markdown: Notation.MarkdownExpression, definition: Fmt.Definition, allKinds: (string | undefined)[], kind: string | undefined): void {
     markdown.onTextChanged = (newText: string) => {
-      let newItems: Fmt.DocumentationItem[] = [];
-      for (let otherKind of allKinds) {
+      const newItems: Fmt.DocumentationItem[] = [];
+      for (const otherKind of allKinds) {
         if (otherKind === kind) {
           if (newText) {
             newItems.push(new Fmt.DocumentationItem(kind, undefined, newText));
           }
         } else {
           if (definition.documentation) {
-            for (let item of definition.documentation.items) {
+            for (const item of definition.documentation.items) {
               if (item.kind === otherKind) {
                 newItems.push(item);
               }
@@ -903,7 +903,7 @@ export abstract class GenericEditHandler {
     };
     if (kind === 'references') {
       markdown.searchURLs = [];
-      for (let defaultReference of defaultReferences) {
+      for (const defaultReference of defaultReferences) {
         if (defaultReference.searchUrlPrefix) {
           markdown.searchURLs.push({
             title: defaultReference.title,
@@ -916,7 +916,7 @@ export abstract class GenericEditHandler {
   }
 
   addIntegerEditor(text: Notation.TextExpression, expression: Fmt.Expression, negativeValuesAllowed: boolean): void {
-    let expressionEditInfo = this.editAnalysis.expressionEditInfo.get(expression);
+    const expressionEditInfo = this.editAnalysis.expressionEditInfo.get(expression);
     if (expressionEditInfo) {
       text.onTextChanged = (newText: string) => {
         if (!newText || newText === '-') {
@@ -931,7 +931,7 @@ export abstract class GenericEditHandler {
         if (newValue < BigInt(0) && !negativeValuesAllowed) {
           return false;
         }
-        let newExpression = new Fmt.IntegerExpression(newValue);
+        const newExpression = new Fmt.IntegerExpression(newValue);
         expressionEditInfo!.onSetValue(newExpression);
         return true;
       };

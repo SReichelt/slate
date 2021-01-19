@@ -19,9 +19,9 @@ function getBaseURI(workspaceFolder: vscode.WorkspaceFolder): string {
 }
 
 function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.RequestMessage, fileAccessor: FileAccessor): any {
-    let postResponseMessage = (command: Embedding.ResponseCommand, text?: string): any => {
+    const postResponseMessage = (command: Embedding.ResponseCommand, text?: string): any => {
         if (requestMessage.index !== undefined && panel && panel.webview === webview) {
-            let responseMessage: Embedding.ResponseMessage = {
+            const responseMessage: Embedding.ResponseMessage = {
                 command: command,
                 index: requestMessage.index,
                 uri: requestMessage.uri,
@@ -31,16 +31,16 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
         }
         return undefined;
     };
-    let postResponse = (text?: string) => postResponseMessage('RESPONSE', text);
-    let postError = (message?: string) => postResponseMessage('ERROR', message);
+    const postResponse = (text?: string) => postResponseMessage('RESPONSE', text);
+    const postError = (message?: string) => postResponseMessage('ERROR', message);
     let fileReference: FileReference | undefined = undefined;
     if (requestMessage.uri) {
-        let baseURI = getBaseURI(currentWorkspaceFolder!);
+        const baseURI = getBaseURI(currentWorkspaceFolder!);
         fileReference = fileAccessor.openFile(baseURI + requestMessage.uri, requestMessage.command === 'CREATE');
         if (fileReference.watch) {
-            let watcher = fileReference.watch((newContents: string) => {
+            const watcher = fileReference.watch((newContents: string) => {
                 if (panel && panel.webview === webview) {
-                    let updateMessage: Embedding.ResponseMessage = {
+                    const updateMessage: Embedding.ResponseMessage = {
                         command: 'UPDATE',
                         uri: requestMessage.uri,
                         text: newContents
@@ -102,10 +102,10 @@ function onMessageReceived(webview: vscode.Webview, requestMessage: Embedding.Re
 
 function getEditorUri(editor: vscode.TextEditor | undefined): string | undefined {
     if (editor && editor.document.languageId === languageId) {
-        let documentWorkspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+        const documentWorkspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
         if (documentWorkspaceFolder && documentWorkspaceFolder === currentWorkspaceFolder) {
-            let baseURI = getBaseURI(documentWorkspaceFolder);
-            let uri = editor.document.uri.toString();
+            const baseURI = getBaseURI(documentWorkspaceFolder);
+            const uri = editor.document.uri.toString();
             if (uri.startsWith(baseURI)) {
                 return uri.substring(baseURI.length);
             }
@@ -116,7 +116,7 @@ function getEditorUri(editor: vscode.TextEditor | undefined): string | undefined
 
 function selectEditorUri(editor: vscode.TextEditor | undefined): Thenable<boolean> | undefined {
     if (panel) {
-        let message: Embedding.ResponseMessage = {
+        const message: Embedding.ResponseMessage = {
             command: 'SELECT',
             uri: getEditorUri(editor)
         };
@@ -129,7 +129,7 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
     if (panel) {
         panel.reveal(vscode.ViewColumn.Two);
     } else {
-        let initiallyActiveEditor = vscode.window.activeTextEditor;
+        const initiallyActiveEditor = vscode.window.activeTextEditor;
         if (initiallyActiveEditor) {
             currentWorkspaceFolder = vscode.workspace.getWorkspaceFolder(initiallyActiveEditor.document.uri);
         }
@@ -141,9 +141,9 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
             }
         }
 
-        let webViewPath = path.join(context.extensionPath, 'webview');
-        let webViewURI = vscode.Uri.file(webViewPath + '/');
-        let indexTemplateFileName = path.join(webViewPath, 'embedded.ejs');
+        const webViewPath = path.join(context.extensionPath, 'webview');
+        const webViewURI = vscode.Uri.file(webViewPath + '/');
+        const indexTemplateFileName = path.join(webViewPath, 'embedded.ejs');
         if (!fs.existsSync(indexTemplateFileName)) {
             return;
         }
@@ -162,7 +162,7 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
             }
         );
 
-        let onDidDispose = () => {
+        const onDidDispose = () => {
             panel = undefined;
             if (startCheckTimer) {
                 clearTimeout(startCheckTimer);
@@ -171,9 +171,9 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
         };
         panel.onDidDispose(onDidDispose, context.subscriptions);
 
-        let webview = panel.webview;
+        const webview = panel.webview;
         let initialMessageReceived = false;
-        let onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
+        const onDidReceiveMessage = (requestMessage: Embedding.RequestMessage) => {
             if (!initialMessageReceived) {
                 if (startCheckTimer) {
                     clearTimeout(startCheckTimer);
@@ -187,7 +187,7 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
         webview.onDidReceiveMessage(onDidReceiveMessage, undefined, context.subscriptions);
 
         // Work around https://github.com/microsoft/vscode/issues/89038.
-        let checkSuccessfulStart = () => {
+        const checkSuccessfulStart = () => {
             if (panel && !initialMessageReceived) {
                 panel.dispose();
                 panel = undefined;
@@ -195,9 +195,9 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
             }
         };
 
-        let baseURL = webview.asWebviewUri(webViewURI);
+        const baseURL = webview.asWebviewUri(webViewURI);
 
-        let indexTemplatePromise = ejs.renderFile(indexTemplateFileName, {
+        const indexTemplatePromise = ejs.renderFile(indexTemplateFileName, {
             'baseURL': baseURL.toString(),
             'cspSource': webview.cspSource
         });
@@ -217,7 +217,7 @@ export function activate(context: vscode.ExtensionContext, fileAccessor: FileAcc
 
     showGUI(context, fileAccessor);
 
-    let onActiveEditorChanged = (editor: vscode.TextEditor | undefined): any => {
+    const onActiveEditorChanged = (editor: vscode.TextEditor | undefined): any => {
         if (editor && editor.document.languageId === languageId) {
             return selectEditorUri(editor);
         }

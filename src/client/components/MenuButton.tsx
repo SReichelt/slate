@@ -34,8 +34,8 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
   }
 
   render(): React.ReactNode {
-    let enabled = (this.props.enabled === undefined || this.props.enabled);
-    let className = clsx('button', 'menu-button', this.props.className, {
+    const enabled = (this.props.enabled === undefined || this.props.enabled);
+    const className = clsx('button', 'menu-button', this.props.className, {
       'disabled': !enabled,
       'hoverable': enabled,
       'open': this.state.menuOpen
@@ -69,7 +69,7 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
     }
     let children = this.props.children;
     if (this.state.menuOpen) {
-      let ref = (htmlNode: HTMLDivElement | null) => {
+      const ref = (htmlNode: HTMLDivElement | null) => {
         if (htmlNode && !this.scrolled) {
           this.scrolled = true;
           scrollIntoView(htmlNode, {
@@ -79,11 +79,11 @@ class MenuButton extends React.Component<MenuButtonProps, MenuButtonState> {
           });
         }
       };
-      let menuClassName = clsx('menu-button-popup', this.props.menuClassName, {
+      const menuClassName = clsx('menu-button-popup', this.props.menuClassName, {
         'menu-button-popup-top': this.props.menuOnTop,
         'menu-button-popup-bottom': !this.props.menuOnTop
       });
-      let menu = (
+      const menu = (
         <div className={menuClassName} title={''} key="menu" ref={ref}>
           {this.props.menu}
         </div>

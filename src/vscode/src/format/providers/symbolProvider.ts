@@ -12,25 +12,25 @@ export class SlateDocumentSymbolProvider implements vscode.DocumentSymbolProvide
     constructor(private parsedDocuments: ParsedDocumentMap) {}
 
     provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
-        let parsedDocument = this.parsedDocuments.get(document);
+        const parsedDocument = this.parsedDocuments.get(document);
         if (parsedDocument) {
-            let result: vscode.DocumentSymbol[] = [];
-            for (let rangeInfo of parsedDocument.rangeList) {
+            const result: vscode.DocumentSymbol[] = [];
+            for (const rangeInfo of parsedDocument.rangeList) {
                 if (token.isCancellationRequested) {
                     break;
                 }
                 let symbol: vscode.DocumentSymbol | undefined = undefined;
                 if (rangeInfo.object instanceof Fmt.Definition) {
-                    let signature = rangeInfo.signatureRange ? readRange(document.uri, rangeInfo.signatureRange, true, document) : undefined;
+                    const signature = rangeInfo.signatureRange ? readRange(document.uri, rangeInfo.signatureRange, true, document) : undefined;
                     symbol = new vscode.DocumentSymbol(rangeInfo.object.name, signature || '', vscode.SymbolKind.Object, rangeInfo.range, rangeInfo.signatureRange ?? rangeInfo.range);
                 } else if (rangeInfo.object instanceof Fmt.Parameter && !rangeInfo.object.name.startsWith('_')) {
-                    let signature = readRange(document.uri, rangeInfo.range, true, document);
+                    const signature = readRange(document.uri, rangeInfo.range, true, document);
                     symbol = new vscode.DocumentSymbol(rangeInfo.object.name, signature || '', vscode.SymbolKind.Variable, rangeInfo.range, rangeInfo.range);
                 }
                 if (symbol) {
                     let i = 0;
                     while (i < result.length) {
-                        let prevSymbol = result[i];
+                        const prevSymbol = result[i];
                         if (rangeInfo.range.contains(prevSymbol.range)) {
                             result.splice(i, 1);
                             symbol.children.push(prevSymbol);
@@ -54,21 +54,21 @@ export class SlateWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvi
         }
         query = query.toLowerCase();
         return vscode.workspace.findFiles(`**/*${fileExtension}`, undefined, undefined, token).then((uris: vscode.Uri[]) => {
-            let result: vscode.SymbolInformation[] = [];
-            for (let uri of uris) {
+            const result: vscode.SymbolInformation[] = [];
+            for (const uri of uris) {
                 if (token.isCancellationRequested) {
                     break;
                 }
                 try {
-                    let contents = readRange(uri);
+                    const contents = readRange(uri);
                     if (contents) {
-                        let file = FmtReader.readString(contents, uri.fsPath, (path: Fmt.Path) => new Meta.DummyMetaModel(path.name));
-                        let location = new vscode.Location(uri, undefined!);
-                        for (let definition of file.definitions) {
+                        const file = FmtReader.readString(contents, uri.fsPath, (path: Fmt.Path) => new Meta.DummyMetaModel(path.name));
+                        const location = new vscode.Location(uri, undefined!);
+                        for (const definition of file.definitions) {
                             if (matchesQuery(definition.name.toLowerCase(), query)) {
                                 result.push(new vscode.SymbolInformation(definition.name, vscode.SymbolKind.Object, '', location));
                             }
-                            for (let innerDefinition of definition.innerDefinitions) {
+                            for (const innerDefinition of definition.innerDefinitions) {
                                 if (matchesQuery(innerDefinition.name.toLowerCase(), query)) {
                                     result.push(new vscode.SymbolInformation(innerDefinition.name, vscode.SymbolKind.Object, definition.name, location));
                                 }
@@ -83,12 +83,12 @@ export class SlateWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvi
     }
 
     resolveWorkspaceSymbol(symbol: vscode.SymbolInformation, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation> {
-        let parsedDocument = parseFile(symbol.location.uri);
+        const parsedDocument = parseFile(symbol.location.uri);
         if (parsedDocument && parsedDocument.file) {
             let definition: Fmt.Definition | undefined = undefined;
             try {
                 if (symbol.containerName) {
-                    let parentDefinition = parsedDocument.file.definitions.getDefinition(symbol.containerName);
+                    const parentDefinition = parsedDocument.file.definitions.getDefinition(symbol.containerName);
                     definition = parentDefinition.innerDefinitions.getDefinition(symbol.name);
                 } else {
                     definition = parsedDocument.file.definitions.getDefinition(symbol.name);
@@ -96,7 +96,7 @@ export class SlateWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvi
             } catch (error) {
             }
             if (definition) {
-                let rangeInfo = parsedDocument.rangeMap.get(definition);
+                const rangeInfo = parsedDocument.rangeMap.get(definition);
                 if (rangeInfo) {
                     return new vscode.SymbolInformation(symbol.name, symbol.kind, symbol.containerName, new vscode.Location(symbol.location.uri, rangeInfo.range));
                 }

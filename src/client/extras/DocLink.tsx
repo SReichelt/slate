@@ -11,7 +11,7 @@ interface DocLinkProps {
 }
 
 function DocLink(props: React.PropsWithChildren<DocLinkProps>): React.ReactElement {
-  let onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (event.button < 1) {
       disableOwnDefaultBehavior(event);
       props.onDocLinkClicked(props.href);

@@ -41,13 +41,13 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
   }
 
   render(): React.ReactNode {
-    let className = clsx('dialog-contents', this.props.dialog.styleClasses);
-    let rows = [];
+    const className = clsx('dialog-contents', this.props.dialog.styleClasses);
+    const rows = [];
     let index = 0;
     let separated = false;
     for (let itemIndex = 0; itemIndex < this.props.dialog.items.length; itemIndex++) {
-      let item = this.props.dialog.items[itemIndex];
-      let nextItem = itemIndex + 1 < this.props.dialog.items.length ? this.props.dialog.items[itemIndex + 1] : undefined;
+      const item = this.props.dialog.items[itemIndex];
+      const nextItem = itemIndex + 1 < this.props.dialog.items.length ? this.props.dialog.items[itemIndex + 1] : undefined;
       if (item instanceof Dialog.ExpressionDialogSeparatorItem) {
         if (index) {
           separated = true;
@@ -84,7 +84,7 @@ class ExpressionDialog extends React.Component<ExpressionDialogProps, Expression
 
   private checkOKEnabled(): void {
     if (this.props.dialog.onCheckOKEnabled) {
-      let okEnabled = this.props.dialog.onCheckOKEnabled();
+      const okEnabled = this.props.dialog.onCheckOKEnabled();
       if (this.state.okEnabled !== okEnabled) {
         this.setState({okEnabled: okEnabled});
       }
@@ -132,7 +132,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
   }
 
   render(): React.ReactNode {
-    let className = clsx('dialog-row', {
+    const className = clsx('dialog-row', {
       'separated': this.props.separated,
       'separated-above': this.props.separatedAbove,
       'separated-below': this.props.separatedBelow
@@ -141,7 +141,7 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
     let contents: React.ReactNode = null;
     if (this.props.item.visible) {
       if (this.props.item instanceof Dialog.ExpressionDialogExpressionItem) {
-        let expression = this.props.item.onRenderExpression();
+        const expression = this.props.item.onRenderExpression();
         if (expression) {
           let groupClassName: string | undefined = undefined;
           if (this.props.item instanceof Dialog.ExpressionDialogInfoItem) {
@@ -164,9 +164,9 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
         }
         title = [title, ':'];
         if (this.props.item.onGetInfo && this.titleNode) {
-          let onGetInfo = this.props.item.onGetInfo;
-          let getToolTipContents = () => {
-            let info = onGetInfo();
+          const onGetInfo = this.props.item.onGetInfo;
+          const getToolTipContents = () => {
+            const info = onGetInfo();
             if (info) {
               return <Expression expression={info}/>;
             } else {
@@ -186,10 +186,10 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
           </tr>
         );
       } else if (this.props.item instanceof Dialog.ExpressionDialogListItem) {
-        let listItem = this.props.item;
+        const listItem = this.props.item;
         if (listItem.items.length) {
           if (listItem instanceof Dialog.ExpressionDialogSelectionItem) {
-            let selectionItem = listItem;
+            const selectionItem = listItem;
             contents = (
               <fieldset className={'dialog-group'}>
                 <div className={'dialog-radio-button-group'}>
@@ -198,19 +198,19 @@ export class ExpressionDialogItem extends React.Component<ExpressionDialogItemPr
                       // If the dialog was opened from a nested placeholder, only onClick works, but onChange doesn't.
                       // In addition, the "checked" status fails to update unless we change the key of the selected item.
                       // I haven't figured out why.
-                      let onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                      const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                         if (event.target.value === `item${index}` && selectionItem !== item) {
                           selectionItem.selectedItem = item;
                           selectionItem.changed();
                         }
                       };
-                      let onClick = () => {
+                      const onClick = () => {
                         if (selectionItem !== item) {
                           selectionItem.selectedItem = item;
                           selectionItem.changed();
                         }
                       };
-                      let selected = selectionItem.selectedItem === item;
+                      const selected = selectionItem.selectedItem === item;
                       return (
                         <div key={selected ? -index : index}>
                           <input type={'radio'} id={`radio${index}`} name={'dialog-radio'} value={`item${index}`} checked={selected} onChange={onChange} onClick={onClick}/>

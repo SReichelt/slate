@@ -21,12 +21,12 @@ const logicCheckerOptions: Logic.LogicCheckerOptions = {
 };
 
 function checkLibrary(fileName: string): CachedPromise<void> {
-  let fileStr = fs.readFileSync(fileName, 'utf8');
-  let file = FmtReader.readString(fileStr, fileName, FmtLibrary.getMetaModel);
-  let contents = file.definitions[0].contents as FmtLibrary.ObjectContents_Library;
-  let baseName = path.basename(fileName);
-  let libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
-  let libraryDataProviderOptions: LibraryDataProviderOptions = {
+  const fileStr = fs.readFileSync(fileName, 'utf8');
+  const file = FmtReader.readString(fileStr, fileName, FmtLibrary.getMetaModel);
+  const contents = file.definitions[0].contents as FmtLibrary.ObjectContents_Library;
+  const baseName = path.basename(fileName);
+  const libraryName = baseName.substring(0, baseName.length - path.extname(baseName).length);
+  const libraryDataProviderOptions: LibraryDataProviderOptions = {
     logic: Logics.findLogic(contents.logic)!,
     fileAccessor: new PhysicalFileAccessor(path.dirname(fileName)),
     enablePrefetching: true,
@@ -34,7 +34,7 @@ function checkLibrary(fileName: string): CachedPromise<void> {
     checkMarkdownCode: true,
     allowPlaceholders: false
   };
-  let libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, libraryName);
+  const libraryDataProvider = new LibraryDataProvider(libraryDataProviderOptions, libraryName);
   return libraryDataProvider.fetchLocalSection()
     .then((definition: LibraryDefinition) => checkSection(definition, libraryDataProvider))
     .then(() => libraryDataProvider.close());
@@ -42,16 +42,16 @@ function checkLibrary(fileName: string): CachedPromise<void> {
 
 function checkSection(definition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
   let promise = CachedPromise.resolve();
-  let contents = definition.definition.contents as FmtLibrary.ObjectContents_Section;
-  for (let item of contents.items) {
+  const contents = definition.definition.contents as FmtLibrary.ObjectContents_Section;
+  for (const item of contents.items) {
     if (item instanceof FmtLibrary.MetaRefExpression_item) {
-      let ref = item.ref as Fmt.DefinitionRefExpression;
+      const ref = item.ref as Fmt.DefinitionRefExpression;
       promise = promise.then(() =>
         libraryDataProvider.fetchItem(ref.path, true).then((itemDefinition: LibraryDefinition) =>
           checkItem(itemDefinition, libraryDataProvider)));
     } else if (item instanceof FmtLibrary.MetaRefExpression_subsection) {
-      let ref = item.ref as Fmt.DefinitionRefExpression;
-      let subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
+      const ref = item.ref as Fmt.DefinitionRefExpression;
+      const subsectionDataProvider = libraryDataProvider.getProviderForSection(ref.path);
       promise = promise.then(() =>
         subsectionDataProvider.fetchLocalSection().then((subsectionDefinition: LibraryDefinition) =>
           checkSection(subsectionDefinition, subsectionDataProvider)));
@@ -61,12 +61,12 @@ function checkSection(definition: LibraryDefinition, libraryDataProvider: Librar
 }
 
 function checkItem(libraryDefinition: LibraryDefinition, libraryDataProvider: LibraryDataProvider): CachedPromise<void> {
-  let definition = libraryDefinition.definition;
-  let checker = libraryDataProvider.logic.getChecker();
+  const definition = libraryDefinition.definition;
+  const checker = libraryDataProvider.logic.getChecker();
   return checker.checkDefinition(definition, libraryDataProvider, logicCheckerOptions).then((checkResult: Logic.LogicCheckResult) => {
-    let expectedDiagnostics = getExpectedDiagnostics(definition);
-    for (let {message, severity} of checkResult.diagnostics) {
-      let expectedDiagnosticIndex = expectedDiagnostics.findIndex((diagnostic: Logic.LogicCheckDiagnostic) => (diagnostic.severity === severity && diagnostic.message === message));
+    const expectedDiagnostics = getExpectedDiagnostics(definition);
+    for (const {message, severity} of checkResult.diagnostics) {
+      const expectedDiagnosticIndex = expectedDiagnostics.findIndex((diagnostic: Logic.LogicCheckDiagnostic) => (diagnostic.severity === severity && diagnostic.message === message));
       if (expectedDiagnosticIndex >= 0) {
         expectedDiagnostics.splice(expectedDiagnosticIndex, 1);
       }
@@ -93,11 +93,11 @@ function checkItem(libraryDefinition: LibraryDefinition, libraryDataProvider: Li
       if (expectedDiagnosticIndex >= 0) {
         prefix += ' (expected)';
       }
-      message = `${prefix}: ${message}`;
+      let fullMessage = `${prefix}: ${message}`;
       if (libraryDefinition.fileReference) {
-        message = `${libraryDefinition.fileReference.fileName}: ${message}`;
+        fullMessage = `${libraryDefinition.fileReference.fileName}: ${fullMessage}`;
       }
-      console.error(message);
+      console.error(fullMessage);
     }
     for (let {message} of expectedDiagnostics) {
       message = `Warning: Expected diagnostic not found: ${message}`;
@@ -115,7 +115,7 @@ if (process.argv.length !== 3) {
   process.exit(2);
 }
 
-let libraryFileName = process.argv[2];
+const libraryFileName = process.argv[2];
 checkLibrary(libraryFileName)
   .then(() => {
     console.error(`Found ${errorCount} error(s) and ${warningCount} warning(s).`);

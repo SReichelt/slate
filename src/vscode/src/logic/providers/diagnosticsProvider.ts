@@ -10,15 +10,15 @@ export class SlateDiagnosticsProvider {
             return;
         }
         if (libraryDocument.document && libraryDocument.file.definitions.length) {
-            let definition = libraryDocument.file.definitions[0];
-            let checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
-            let options: Logic.LogicCheckerOptions = {
+            const definition = libraryDocument.file.definitions[0];
+            const checker = libraryDocument.documentLibraryDataProvider.logic.getChecker();
+            const options: Logic.LogicCheckerOptions = {
                 supportPlaceholders: true,
                 supportRechecking: false,
                 warnAboutMissingProofs: true
             };
             checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider, options).then((checkResult: Logic.LogicCheckResult) => {
-                let diagnostics = checkResult.diagnostics.map((diagnostic: Logic.LogicCheckDiagnostic) =>
+                const diagnostics = checkResult.diagnostics.map((diagnostic: Logic.LogicCheckDiagnostic) =>
                     new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
                 if (libraryDocument.document) {
                     libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);
@@ -28,11 +28,11 @@ export class SlateDiagnosticsProvider {
     }
 
     private getRange(libraryDocument: LibraryDocument, diagnostic: Logic.LogicCheckDiagnostic): vscode.Range {
-        let range = libraryDocument.rangeMap.get(diagnostic.object);
+        const range = libraryDocument.rangeMap.get(diagnostic.object);
         if (range) {
             return range.range;
         } else {
-            let dummyPosition = new vscode.Position(0, 0);
+            const dummyPosition = new vscode.Position(0, 0);
             return new vscode.Range(dummyPosition, dummyPosition);
         }
     }

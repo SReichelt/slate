@@ -12,19 +12,19 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Section {
-    let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
+    const result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let logicRaw = argumentList.getValue('logic', 0);
+    const logicRaw = argumentList.getValue('logic', 0);
     if (logicRaw instanceof Fmt.StringExpression) {
       this.logic = logicRaw.value;
     } else {
       throw new Error('logic: String expected');
     }
-    let itemsRaw = argumentList.getValue('items', 1);
+    const itemsRaw = argumentList.getValue('items', 1);
     if (itemsRaw instanceof Fmt.ArrayExpression) {
       this.items = itemsRaw.items;
     } else {
@@ -33,33 +33,33 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    let logicExpr = new Fmt.StringExpression(this.logic);
+    const argumentList = new Fmt.ArgumentList;
+    const logicExpr = new Fmt.StringExpression(this.logic);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'logic' : undefined, logicExpr, false));
-    let itemsExprItems: Fmt.Expression[] = [];
-    for (let item of this.items) {
+    const itemsExprItems: Fmt.Expression[] = [];
+    for (const item of this.items) {
       itemsExprItems.push(item);
     }
-    let itemsExpr = new Fmt.ArrayExpression(itemsExprItems);
+    const itemsExpr = new Fmt.ArrayExpression(itemsExprItems);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'items' : undefined, itemsExpr, false));
     return argumentList;
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Section {
-    let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
+    const result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Section {
-    let result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
+    const result: ObjectContents_Section = Object.create(ObjectContents_Section.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
   traverse(fn: Fmt.ExpressionTraversalFn): void {
     if (this.items) {
-      for (let item of this.items) {
+      for (const item of this.items) {
         item.traverse(fn);
       }
     }
@@ -70,8 +70,8 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
     result.logic = this.logic;
     if (this.items) {
       result.items = [];
-      for (let item of this.items) {
-        let newItem = item.substitute(fn, replacedParameters);
+      for (const item of this.items) {
+        const newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
@@ -93,8 +93,8 @@ export class ObjectContents_Section extends Fmt.ObjectContents {
         return false;
       }
       for (let i = 0; i < this.items.length; i++) {
-        let leftItem = this.items[i];
-        let rightItem = objectContents.items[i];
+        const leftItem = this.items[i];
+        const rightItem = objectContents.items[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -113,7 +113,7 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -139,7 +139,7 @@ export class MetaRefExpression_Section extends Fmt.MetaRefExpression {
 
 export class ObjectContents_Library extends ObjectContents_Section {
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Library {
-    let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
+    const result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -149,18 +149,18 @@ export class ObjectContents_Library extends ObjectContents_Section {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = super.toArgumentList(outputAllNames, reportFn);
+    const argumentList = super.toArgumentList(outputAllNames, reportFn);
     return argumentList;
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Library {
-    let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
+    const result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Library {
-    let result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
+    const result: ObjectContents_Library = Object.create(ObjectContents_Library.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -169,7 +169,7 @@ export class ObjectContents_Library extends ObjectContents_Section {
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_Library, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substitute(fn, result, replacedParameters);
+    const changed = super.substitute(fn, result, replacedParameters);
     return changed;
   }
 
@@ -190,7 +190,7 @@ export class MetaRefExpression_Library extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -225,7 +225,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.ref = argumentList.getValue('ref', 0);
-    let typeRaw = argumentList.getOptionalValue('type', 1);
+    const typeRaw = argumentList.getOptionalValue('type', 1);
     if (typeRaw !== undefined) {
       if (typeRaw instanceof Fmt.StringExpression) {
         this.type = typeRaw.value;
@@ -233,7 +233,7 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
         throw new Error('type: String expected');
       }
     }
-    let titleRaw = argumentList.getOptionalValue('title', 2);
+    const titleRaw = argumentList.getOptionalValue('title', 2);
     if (titleRaw !== undefined) {
       if (titleRaw instanceof Fmt.StringExpression) {
         this.title = titleRaw.value;
@@ -244,14 +244,14 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.ref, false));
     if (this.type !== undefined) {
-      let typeExpr = new Fmt.StringExpression(this.type);
+      const typeExpr = new Fmt.StringExpression(this.type);
       argumentList.push(new Fmt.Argument('type', typeExpr, true));
     }
     if (this.title !== undefined) {
-      let titleExpr = new Fmt.StringExpression(this.title);
+      const titleExpr = new Fmt.StringExpression(this.title);
       argumentList.push(new Fmt.Argument('title', titleExpr, true));
     }
     return argumentList;
@@ -259,14 +259,14 @@ export class MetaRefExpression_item extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let refResult = this.ref.substitute(fn, replacedParameters);
+    const refResult = this.ref.substitute(fn, replacedParameters);
     if (refResult !== this.ref) {
       changed = true;
     }
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_item(refResult, this.type, this.title);
+    const result = new MetaRefExpression_item(refResult, this.type, this.title);
     return fn ? fn(result) : result;
   }
 
@@ -298,7 +298,7 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.ref = argumentList.getValue('ref', 0);
-    let titleRaw = argumentList.getValue('title', 1);
+    const titleRaw = argumentList.getValue('title', 1);
     if (titleRaw instanceof Fmt.StringExpression) {
       this.title = titleRaw.value;
     } else {
@@ -307,23 +307,23 @@ export class MetaRefExpression_subsection extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.ref, false));
-    let titleExpr = new Fmt.StringExpression(this.title);
+    const titleExpr = new Fmt.StringExpression(this.title);
     argumentList.push(new Fmt.Argument(undefined, titleExpr, false));
     return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let refResult = this.ref.substitute(fn, replacedParameters);
+    const refResult = this.ref.substitute(fn, replacedParameters);
     if (refResult !== this.ref) {
       changed = true;
     }
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_subsection(refResult, this.title);
+    const result = new MetaRefExpression_subsection(refResult, this.title);
     return fn ? fn(result) : result;
   }
 
@@ -380,9 +380,9 @@ export class MetaModel extends Meta.MetaModel {
   }
 
   getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
-    let parent = previousContext.parentObject;
+    const parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type;
+      const type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Library
             || type instanceof MetaRefExpression_Section) {
@@ -406,8 +406,8 @@ export class MetaModel extends Meta.MetaModel {
   }
 
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
-    let context = parentContext;
-    let parent = context.parentObject;
+    const context = parentContext;
+    const parent = context.parentObject;
     if (parent instanceof Fmt.CompoundExpression) {
       for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
         if (currentContext instanceof ArgumentTypeContext) {

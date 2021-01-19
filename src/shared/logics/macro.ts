@@ -41,9 +41,9 @@ export class DefaultArrayArgumentOperations implements ArrayArgumentOperations {
 
   insertItem(): Fmt.DefinitionRefExpression | undefined {
     // TODO (low priority) display placeholder menu if applicable, instead of inserting placeholder
-    let newItem = this.config.createArgumentExpression?.(this.param);
+    const newItem = this.config.createArgumentExpression?.(this.param);
     if (newItem) {
-      let newSubExpression = new Fmt.ArrayExpression(this.subExpression.items.concat(newItem));
+      const newSubExpression = new Fmt.ArrayExpression(this.subExpression.items.concat(newItem));
       return FmtUtils.substituteExpression<Fmt.Expression>(this.expression, this.subExpression, newSubExpression) as Fmt.DefinitionRefExpression;
     } else {
       return undefined;

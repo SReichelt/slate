@@ -39,7 +39,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
   componentDidMount(): void {
     // Work around a bug in react-responsive-modal (I think) which breaks the autoFocus attribute on (our?) inputs.
     if (this.searchInputNode && this.props.autoFocus) {
-      let focusNode = () => {
+      const focusNode = () => {
         this.searchInputNode?.focus();
       };
       this.focusTimer = setTimeout(focusNode, 100);
@@ -61,7 +61,7 @@ export class SearchInput extends React.Component<SearchInputProps> {
   }
 
   private onChangeSearchText = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let searchText = event.target.value;
+    const searchText = event.target.value;
     if (this.searchTimer) {
       clearTimeout(this.searchTimer);
     }
@@ -100,7 +100,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
   }
 
   render(): React.ReactNode {
-    let sectionPromise = this.props.libraryDataProvider.fetchLocalSection();
+    const sectionPromise = this.props.libraryDataProvider.fetchLocalSection();
     return (
       <div className={'tree-container'}>
         <div className={'tree-search-area'}>
@@ -120,7 +120,7 @@ class LibraryTree extends React.Component<LibraryTreeProps, LibraryTreeState> {
   }
 
   private onSearch = (searchText: string) => {
-    let searchWords = searchText.toLowerCase().split(' ').filter((word: string) => (word.length > 2));
+    const searchWords = searchText.toLowerCase().split(' ').filter((word: string) => (word.length > 2));
     if (!areSearchWordsEqual(this.state.searchWords, searchWords)) {
       this.setState({searchWords: searchWords});
     }
@@ -148,7 +148,7 @@ export class LibraryItemList extends React.Component<LibraryItemListProps> {
         <div className={'tree'}>
           <div className={'tree-contents'}>
             {this.props.items.map((entry: LibraryItemListEntry) => {
-              let selected = FmtUtils.arePathsEqual(entry.absolutePath, this.props.selectedItemPath);
+              const selected = FmtUtils.arePathsEqual(entry.absolutePath, this.props.selectedItemPath);
               return <LibraryTreeItem libraryDataProvider={entry.libraryDataProvider} libraryDefinition={entry.libraryDefinition} isSubsection={false} path={entry.localPath} itemInfo={entry.itemInfo} templates={this.props.templates} positionSelectionMode={false} parentScrollPane={this.scrollPaneReference} searchWords={[]} onFilter={this.props.onFilter} autoOpen={false} selected={selected} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} key={entry.absolutePath.toString()} indent={1}/>;
             })}
           </div>
@@ -172,7 +172,7 @@ export class SectionItemList extends React.Component<SectionItemListProps> {
   private scrollPaneReference: ScrollPaneReference = {htmlNode: null};
 
   render(): React.ReactNode {
-    let sectionPromise = CachedPromise.resolve(this.props.section);
+    const sectionPromise = CachedPromise.resolve(this.props.section);
     let result = (
       <ScrollPane onRef={(htmlNode) => (this.scrollPaneReference.htmlNode = htmlNode)}>
         <div className={'tree'}>
@@ -183,9 +183,9 @@ export class SectionItemList extends React.Component<SectionItemListProps> {
       </ScrollPane>
     );
     if (this.props.positionSelectionMode && this.props.onChangeNewItemPosition) {
-      let newItemPosition = this.getNewItemPosition();
-      let upEnabled = newItemPosition > 0;
-      let downEnabled = newItemPosition < this.getItemCount();
+      const newItemPosition = this.getNewItemPosition();
+      const upEnabled = newItemPosition > 0;
+      const downEnabled = newItemPosition < this.getItemCount();
       result = (
         <div className={'tree-container'}>
           <div className={'tree-area tree-area-with-buttons'}>
@@ -214,7 +214,7 @@ export class SectionItemList extends React.Component<SectionItemListProps> {
   }
 
   private getItemCount(): number {
-    let contents = this.props.section.definition.contents;
+    const contents = this.props.section.definition.contents;
     if (contents instanceof FmtLibrary.ObjectContents_Section) {
       return contents.items.length;
     } else {
@@ -227,7 +227,7 @@ export class SectionItemList extends React.Component<SectionItemListProps> {
   }
 
   private moveSelectedItem(moveBy: number): void {
-    let newPosition = this.getNewItemPosition() + moveBy;
+    const newPosition = this.getNewItemPosition() + moveBy;
     this.props.onChangeNewItemPosition!(newPosition);
   }
 }
@@ -257,7 +257,7 @@ function areSearchWordsEqual(searchWords1: string[], searchWords2: string[]): bo
 }
 
 function containsSearchWord(word: string, texts: (string | undefined)[]): boolean {
-  for (let text of texts) {
+  for (const text of texts) {
     if (text && text.toLowerCase().indexOf(word) >= 0) {
       return true;
     }
@@ -288,7 +288,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
       selectedItemPathTail = new Fmt.Path(props.selectedItemPath.name);
       selectedItemPathHead = selectedItemPathTail;
       for (item = item.parentPath; item instanceof Fmt.NamedPathItem; item = item.parentPath) {
-        let itemCopy = new Fmt.NamedPathItem(item.name);
+        const itemCopy = new Fmt.NamedPathItem(item.name);
         if (item.parentPath) {
           selectedItemPathHead.parentPath = itemCopy;
         }
@@ -300,22 +300,22 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
   }
 
   let index = 0;
-  let treeItems: React.ReactNodeArray = [];
+  const treeItems: React.ReactNodeArray = [];
   let renderedNewItem = false;
-  for (let item of items) {
+  for (const item of items) {
     if (props.newItemTitle !== undefined && props.newItemPosition === index) {
       treeItems.push(<LibraryTreeNewItem libraryDataProvider={props.libraryDataProvider} parentScrollPane={props.parentScrollPane} newItemType={props.newItemType} newItemTitle={props.newItemTitle} indent={props.indent} key="<new-item>"/>);
       renderedNewItem = true;
     }
     if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection || item instanceof Fmt.Definition) {
-      let isSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
+      const isSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
       let path: Fmt.Path;
       if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
         path = (item.ref as Fmt.DefinitionRefExpression).path;
       } else {
         path = new Fmt.Path(item.name, undefined, parentPath);
       }
-      let title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
+      const title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
       let autoOpen = false;
       let searchWords = props.searchWords;
       if (searchWords.length) {
@@ -380,7 +380,7 @@ export class InnerLibraryTreeItems extends React.Component<InnerLibraryTreeProps
       }
     }
     if (this.props.sectionPromise) {
-      let render = this.props.sectionPromise.then((section: LibraryDefinition) => {
+      const render = this.props.sectionPromise.then((section: LibraryDefinition) => {
         if (section.definition.contents instanceof FmtLibrary.ObjectContents_Section) {
           return renderLibraryTreeItems(this.props, section.definition.contents.items, section, this.visibleItems);
         } else {
@@ -403,16 +403,16 @@ interface VisibilityResult {
 
 function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Path, isSubsection: boolean, libraryDefinition: LibraryDefinition, definition: Fmt.Definition, searchWords: string[], onFilter: OnFilter | undefined): VisibilityResult {
   if (isSubsection) {
-    let innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
+    const innerLibraryDataProvider = libraryDataProvider.getProviderForSection(path);
     let resultPromise = CachedPromise.resolve(false);
     if (definition.contents instanceof FmtLibrary.ObjectContents_Section) {
-      for (let item of definition.contents.items) {
+      for (const item of definition.contents.items) {
         resultPromise = resultPromise.or(() => {
           if (item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection) {
-            let itemIsSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
-            let itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
-            let title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
-            let filteredSearchWords = filterSearchWords(searchWords, [itemPath.name, title]);
+            const itemIsSubsection = item instanceof FmtLibrary.MetaRefExpression_subsection;
+            const itemPath = (item.ref as Fmt.DefinitionRefExpression).path;
+            const title = item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection ? item.title : undefined;
+            const filteredSearchWords = filterSearchWords(searchWords, [itemPath.name, title]);
             let itemDefinitionPromise: CachedPromise<LibraryDefinition>;
             if (itemIsSubsection) {
               itemDefinitionPromise = innerLibraryDataProvider.fetchSubsection(itemPath, undefined, false);
@@ -435,14 +435,14 @@ function checkVisibility(libraryDataProvider: LibraryDataProvider, path: Fmt.Pat
       selectable: CachedPromise.resolve(false)
     };
   } else if (onFilter) {
-    let asyncPromise = new Promise((resolve) => setTimeout(resolve, 0));
-    let ensureDelayPromise = new CachedPromise(asyncPromise.then(() => false));
-    let ownResultPromise = ensureDelayPromise.then(() =>
+    const asyncPromise = new Promise((resolve) => setTimeout(resolve, 0));
+    const ensureDelayPromise = new CachedPromise(asyncPromise.then(() => false));
+    const ownResultPromise = ensureDelayPromise.then(() =>
       onFilter(libraryDataProvider, path, libraryDefinition, definition));
     let resultPromise = ownResultPromise;
-    for (let innerDefinition of definition.innerDefinitions) {
+    for (const innerDefinition of definition.innerDefinitions) {
       resultPromise = resultPromise.or(() => {
-        let innerPath = new Fmt.Path(innerDefinition.name, undefined, path);
+        const innerPath = new Fmt.Path(innerDefinition.name, undefined, path);
         return checkVisibility(libraryDataProvider, innerPath, false, libraryDefinition, innerDefinition, searchWords, onFilter).visible;
       });
     }
@@ -505,7 +505,7 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
   };
 
   protected getTreeItemContents(icon: React.ReactNode, specialIcon: React.ReactNode, display: React.ReactNode): React.ReactNode {
-    let columns: React.ReactNodeArray = [
+    const columns: React.ReactNodeArray = [
       <div className={'tree-item-display'} key="display">
         <span key="display-span">{display}</span>
       </div>
@@ -531,8 +531,8 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
   // Calculate visible dimensions for tooltip.
   getBoundingClientRect(): ClientRect {
     if (this.props.parentScrollPane.htmlNode && this.htmlNode) {
-      let parentRect = this.props.parentScrollPane.htmlNode.getBoundingClientRect();
-      let itemRect = this.htmlNode.getBoundingClientRect();
+      const parentRect = this.props.parentScrollPane.htmlNode.getBoundingClientRect();
+      const itemRect = this.htmlNode.getBoundingClientRect();
       if (parentRect.width > 0) {
         return {
           left: parentRect.left,
@@ -655,23 +655,23 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
       this.setState({opened: false});
     }
 
-    let needsFiltering = this.initializeFilterState(props, true);
+    const needsFiltering = this.initializeFilterState(props, true);
 
     if (props.libraryDefinition) {
       this.libraryDefinitionPromise = CachedPromise.resolve(props.libraryDefinition);
-      let definition = props.path.parentPath instanceof Fmt.Path ? props.libraryDefinition.definition.innerDefinitions.getDefinition(props.path.name) : props.libraryDefinition.definition;
+      const definition = props.path.parentPath instanceof Fmt.Path ? props.libraryDefinition.definition.innerDefinitions.getDefinition(props.path.name) : props.libraryDefinition.definition;
       this.setState({definition: definition});
       if (needsFiltering) {
         this.triggerFilterStateUpdate(props, props.libraryDefinition, definition);
       }
     } else {
-      let prefetchContents = !needsFiltering;  // Avoid re-filtering due to arrival of prefetched contents.
+      const prefetchContents = !needsFiltering;  // Avoid re-filtering due to arrival of prefetched contents.
       if (props.isSubsection) {
         this.libraryDefinitionPromise = props.libraryDataProvider.fetchSubsection(props.path, props.itemInfo?.itemNumber, prefetchContents);
       } else {
         this.libraryDefinitionPromise = props.libraryDataProvider.fetchItem(props.path, false, prefetchContents);
       }
-      let libraryDefinitionPromise = this.libraryDefinitionPromise;
+      const libraryDefinitionPromise = this.libraryDefinitionPromise;
       libraryDefinitionPromise
         .then((libraryDefinition: LibraryDefinition) => {
           if (this.libraryDefinitionPromise === libraryDefinitionPromise) {
@@ -696,10 +696,10 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     if (props.visibleSiblings) {
       props.visibleSiblings.add(this);
     }
-    let needsFiltering = props.onFilter !== undefined || (props.isSubsection && props.searchWords.length > 0);
-    let clickable = (props.isSubsection || !needsFiltering) && !props.positionSelectionMode;
+    const needsFiltering = props.onFilter !== undefined || (props.isSubsection && props.searchWords.length > 0);
+    const clickable = (props.isSubsection || !needsFiltering) && !props.positionSelectionMode;
     if (this.state.clickable !== clickable || this.state.filtering !== needsFiltering || this.state.filtered) {
-      let newState: any = {
+      const newState: any = {
         clickable: clickable,
         filtering: needsFiltering
       };
@@ -718,7 +718,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
           this.triggerFilterStateUpdate(props, props.libraryDefinition, this.state.definition);
         }
       } else {
-        let libraryDefinitionPromise = this.libraryDefinitionPromise;
+        const libraryDefinitionPromise = this.libraryDefinitionPromise;
         if (libraryDefinitionPromise) {
           libraryDefinitionPromise
             .then((libraryDefinition: LibraryDefinition) => {
@@ -735,8 +735,8 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
   }
 
   private triggerFilterStateUpdate(props: LibraryTreeItemProps, libraryDefinition: LibraryDefinition, definition: Fmt.Definition): void {
-    let libraryDefinitionPromise = this.libraryDefinitionPromise;
-    let visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, libraryDefinition, definition, props.searchWords, props.onFilter);
+    const libraryDefinitionPromise = this.libraryDefinitionPromise;
+    const visibilityResult = checkVisibility(props.libraryDataProvider, props.path, props.isSubsection, libraryDefinition, definition, props.searchWords, props.onFilter);
     visibilityResult.visible.then((visible: boolean) => {
       if (this.libraryDefinitionPromise === libraryDefinitionPromise && areSearchWordsEqual(this.props.searchWords, props.searchWords) && this.props.onFilter === props.onFilter) {
         this.setState({
@@ -782,7 +782,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     if (this.state.filtered) {
       return null;
     }
-    let className = clsx('tree-item', {
+    const className = clsx('tree-item', {
       'hoverable': !this.props.positionSelectionMode,
       'selected': this.props.selected
     });
@@ -793,32 +793,32 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
       icon = getSectionIcon(this.state.opened, this.props.selected || this.props.selectedChildPath !== undefined);
       if (this.state.opened) {
         if (this.libraryDefinitionPromise) {
-          let innerLibraryDataProvider = this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo?.itemNumber);
+          const innerLibraryDataProvider = this.props.libraryDataProvider.getProviderForSection(this.props.path, this.props.itemInfo?.itemNumber);
           contents = <InnerLibraryTreeItems libraryDataProvider={innerLibraryDataProvider} sectionPromise={this.libraryDefinitionPromise} sectionItemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} positionSelectionMode={this.props.positionSelectionMode} parentScrollPane={this.props.parentScrollPane} searchWords={this.props.searchWords} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} onInsertButtonClicked={this.props.onInsertButtonClicked} indent={this.props.indent + 1} key={`inner-${innerLibraryDataProvider.getSectionChangeCounter()}`}/>;
         }
       }
     } else {
-      let definition = this.state.definition;
+      const definition = this.state.definition;
       if (definition && this.props.onFilter && this.libraryDefinitionPromise) {
         if (definition.innerDefinitions.length) {
           contents = <InnerLibraryTreeItems libraryDataProvider={this.props.libraryDataProvider} libraryDefinition={this.libraryDefinitionPromise.getImmediateResult()} innerDefinitions={definition.innerDefinitions} sectionItemNumber={this.props.itemInfo.itemNumber} templates={this.props.templates} positionSelectionMode={this.props.positionSelectionMode} parentScrollPane={this.props.parentScrollPane} searchWords={this.props.searchWords} onFilter={this.props.onFilter} selectedItemPath={this.props.selectedChildPath} interactionHandler={this.props.interactionHandler} onItemClicked={this.props.onItemClicked} indent={this.props.indent + 1} key="inner"/>;
         }
       }
       if (definition) {
-        let logic = this.props.libraryDataProvider.logic;
-        let logicDisplay = logic.getDisplay();
-        let definitionType = logicDisplay.getDefinitionType(definition);
+        const logic = this.props.libraryDataProvider.logic;
+        const logicDisplay = logic.getDisplay();
+        const definitionType = logicDisplay.getDefinitionType(definition);
         icon = getDefinitionIcon(definitionType, this.props.itemInfo);
         if (this.props.templates) {
-          let outerDefinition = this.props.libraryDefinition ? this.props.libraryDefinition.definition : definition;
-          let rendererOptions: Logic.LogicRendererOptions = {
+          const outerDefinition = this.props.libraryDefinition ? this.props.libraryDefinition.definition : definition;
+          const rendererOptions: Logic.LogicRendererOptions = {
             includeProofs: false,
             maxListLength: 10
           };
-          let renderer = logicDisplay.getDefinitionRenderer(outerDefinition, this.props.libraryDataProvider, this.props.templates, rendererOptions);
-          let summary = renderer.renderDefinitionSummary(definition);
+          const renderer = logicDisplay.getDefinitionRenderer(outerDefinition, this.props.libraryDataProvider, this.props.templates, rendererOptions);
+          const summary = renderer.renderDefinitionSummary(definition);
           if (summary) {
-            let summaryExpression = <Expression expression={summary} key="summary"/>;
+            const summaryExpression = <Expression expression={summary} key="summary"/>;
             if (display) {
               display = [display, ': ', summaryExpression];
             } else {
@@ -828,15 +828,15 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
           if (this.refreshToolTip) {
             this.refreshToolTip = false;
           } else if (display && this.props.parentScrollPane.htmlNode) {
-            let getToolTipContents = () => {
+            const getToolTipContents = () => {
               rendererOptions.maxListLength = 20;
-              let renderedDefinition = renderer.renderDefinition(undefined, LibraryTreeItem.renderedDefinitionOptions);
+              const renderedDefinition = renderer.renderDefinition(undefined, LibraryTreeItem.renderedDefinitionOptions);
               if (renderedDefinition) {
                 return <Expression expression={renderedDefinition}/>;
               }
               return null;
             };
-            let toolTip = <ExpressionToolTip active={this.state.showToolTip} position="right" parent={this} getContents={getToolTipContents} delay={250} key="tooltip"/>;
+            const toolTip = <ExpressionToolTip active={this.state.showToolTip} position="right" parent={this} getContents={getToolTipContents} delay={250} key="tooltip"/>;
             display = [display, toolTip];
           }
         }
@@ -855,7 +855,7 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
     if (this.state.filtering) {
       specialIcon = <Loading width={'1em'} height={'1em'}/>;
     } else if (this.libraryDefinitionPromise && !this.props.isSubsection) {
-      let libraryDefinition = this.libraryDefinitionPromise.getImmediateResult();
+      const libraryDefinition = this.libraryDefinitionPromise.getImmediateResult();
       if (libraryDefinition) {
         switch (libraryDefinition.state) {
         case LibraryDefinitionState.Editing:
@@ -870,12 +870,12 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
         }
       }
     }
-    let treeItemContents = this.getTreeItemContents(icon, specialIcon, display);
+    const treeItemContents = this.getTreeItemContents(icon, specialIcon, display);
     let treeItem: React.ReactNode;
-    let mouseEntered = () => this.setState({showToolTip: true});
-    let mouseLeft = () => this.setState({showToolTip: false});
+    const mouseEntered = () => this.setState({showToolTip: true});
+    const mouseLeft = () => this.setState({showToolTip: false});
     if (this.state.clickable) {
-      let href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
+      const href = this.props.libraryDataProvider.pathToURI(FmtUtils.getOuterPath(this.props.path));
       treeItem = (
         <a className={className} href={href} onClick={this.itemClicked} onMouseEnter={mouseEntered} onMouseLeave={mouseLeft} ref={(htmlNode) => (this.htmlNode = htmlNode)}>
           {treeItemContents}
@@ -926,9 +926,9 @@ export class LibraryTreeItem extends LibraryTreeItemBase<LibraryTreeItemProps, L
   };
 
   private checkVisibleSiblings(visibleSiblings: Set<LibraryTreeItem>): void {
-    let check = () => {
+    const check = () => {
       if (visibleSiblings.size <= 2) {
-        for (let item of visibleSiblings) {
+        for (const item of visibleSiblings) {
           if (item.props.isSubsection && !item.props.positionSelectionMode && !item.state.opened && !item.state.filtering) {
             item.setState({opened: true});
           }
@@ -965,7 +965,7 @@ export class LibraryTreeNewItem extends LibraryTreeItemBase<LibraryTreeNewItemPr
   render(): React.ReactNode {
     let display = this.props.newItemTitle;
     if (!display) {
-      let typeName = this.props.newItemType ? this.props.newItemType.name.toLowerCase() : 'section';
+      const typeName = this.props.newItemType ? this.props.newItemType.name.toLowerCase() : 'section';
       display = `(New ${typeName})`;
     }
     let icon: React.ReactNode;
@@ -974,12 +974,12 @@ export class LibraryTreeNewItem extends LibraryTreeItemBase<LibraryTreeNewItemPr
     } else {
       icon = getSectionIcon(false);
     }
-    let treeItemContents = this.getTreeItemContents(icon, null, display);
-    let ref = (htmlNode: HTMLElement | null) => {
+    const treeItemContents = this.getTreeItemContents(icon, null, display);
+    const ref = (htmlNode: HTMLElement | null) => {
       if (this.htmlNode !== htmlNode) {
         this.htmlNode = htmlNode;
         if (this.htmlNode && !this.scrollTimer) {
-          let scroll = () => {
+          const scroll = () => {
             this.scrollTimer = undefined;
             this.scrollIntoView();
           };
@@ -987,7 +987,7 @@ export class LibraryTreeNewItem extends LibraryTreeItemBase<LibraryTreeNewItemPr
         }
       }
     };
-    let treeItem = (
+    const treeItem = (
       <div className={'tree-item selected'} ref={ref}>
         {treeItemContents}
       </div>
@@ -1009,8 +1009,8 @@ export class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeIns
   }
 
   render(): React.ReactNode {
-    let menuItems: React.ReactNodeArray = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
-      let onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, this.props.sectionItemNumber, definitionType);
+    const menuItems: React.ReactNodeArray = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
+      const onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, this.props.sectionItemNumber, definitionType);
       return (
         <Button isMenuItem={true} onClick={onClick} key={definitionType.definitionType}>
           {[getDefinitionIcon(definitionType.definitionType), ' ', `New ${definitionType.name.toLowerCase()}...`]}
@@ -1018,19 +1018,19 @@ export class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeIns
       );
     });
     {
-      let onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, this.props.sectionItemNumber, undefined);
+      const onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, this.props.sectionItemNumber, undefined);
       menuItems.unshift(
         <Button isMenuItem={true} onClick={onClick} key="section">
           {[getSectionIcon(false), ' ', 'New section...']}
         </Button>
       );
     }
-    let insertButton = (
+    const insertButton = (
       <MenuButton className={'tree-item-insert-button standalone'} menuClassName={'open-menu'} toolTipText={'Add new item'} menu={menuItems} key="insert-button">
         {getButtonIcon(ButtonType.Insert)}
       </MenuButton>
     );
-    let treeItemContents = this.getTreeItemContents(undefined, undefined, insertButton);
+    const treeItemContents = this.getTreeItemContents(undefined, undefined, insertButton);
     return (
       <div className={'tree-item-row'} key="item">
         <div className={'tree-item'} ref={(htmlNode) => (this.htmlNode = htmlNode)}>

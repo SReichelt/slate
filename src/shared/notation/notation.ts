@@ -42,7 +42,7 @@ export abstract class IndirectExpression extends RenderedExpression {
   protected abstract doResolve(): RenderedExpression;
 
   getLineHeight(): CachedPromise<number> {
-    let result = super.getLineHeight();
+    const result = super.getLineHeight();
     if (result.getImmediateResult() === 0) {
       return result;
     }
@@ -60,7 +60,7 @@ export class PromiseExpression extends RenderedExpression {
   }
 
   getLineHeight(): CachedPromise<number> {
-    let result = super.getLineHeight();
+    const result = super.getLineHeight();
     if (result.getImmediateResult() === 0) {
       return result;
     }
@@ -112,13 +112,13 @@ export class RowExpression extends RenderedExpression {
     if (result.getImmediateResult() === 0) {
       return result;
     }
-    for (let item of this.items) {
-      let itemHeight = item.getLineHeight();
+    for (const item of this.items) {
+      const itemHeight = item.getLineHeight();
       if (itemHeight.getImmediateResult() === 0) {
         return itemHeight;
       }
     }
-    for (let item of this.items) {
+    for (const item of this.items) {
       result = result.then((value) => {
         if (value) {
           return item.getLineHeight().then((itemHeight) => {
@@ -181,7 +181,7 @@ export abstract class AbstractDecoratedExpression extends RenderedExpression {
   }
 
   getLineHeight(): CachedPromise<number> {
-    let result = super.getLineHeight();
+    const result = super.getLineHeight();
     if (result.getImmediateResult() === 0) {
       return result;
     }
@@ -199,7 +199,7 @@ export class ParenExpression extends AbstractDecoratedExpression {
   }
 
   getLineHeight(): CachedPromise<number> {
-    let result = super.getLineHeight();
+    const result = super.getLineHeight();
     if (result.getImmediateResult() === 0) {
       return result;
     }
@@ -224,7 +224,7 @@ export class InnerParenExpression extends OptionalParenExpression {
   maxLevel?: number;
 
   getLineHeight(): CachedPromise<number> {
-    let result = super.getLineHeight();
+    const result = super.getLineHeight();
     if (result.getImmediateResult() === 0) {
       return result;
     }
@@ -382,7 +382,7 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
   }
 
   protected getArg(name: string): ExpressionValue {
-    let arg = this.getOptionalArg(name);
+    const arg = this.getOptionalArg(name);
     if (arg === undefined) {
       throw new Error(`Missing argument for "${name}"`);
     }
@@ -390,7 +390,7 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
   }
 
   protected getOptionalExpressionArg(name: string): RenderedExpression | undefined {
-    let arg = this.getOptionalArg(name);
+    const arg = this.getOptionalArg(name);
     if (arg === undefined) {
       return undefined;
     }
@@ -398,17 +398,17 @@ export abstract class ExpressionWithArgs extends IndirectExpression {
   }
 
   protected getExpressionArg(name: string): RenderedExpression {
-    let arg = this.getArg(name);
+    const arg = this.getArg(name);
     return this.toRenderedExpression(arg);
   }
 
   protected getExpressionListArg(name: string): RenderedExpression[] {
-    let arg = this.getArg(name);
+    const arg = this.getArg(name);
     return this.toRenderedExpressionList(arg);
   }
 
   protected getExpressionListListArg(name: string): RenderedExpression[][] {
-    let arg = this.getArg(name);
+    const arg = this.getArg(name);
     return this.toRenderedExpressionListList(arg);
   }
 }
@@ -425,11 +425,11 @@ export class UserDefinedExpression extends ExpressionWithArgs {
   }
 
   protected doResolveExpressionWithArgs(): RenderedExpression {
-    let result: ExpressionValue[] = [];
+    const result: ExpressionValue[] = [];
     if (this.notation) {
       this.translateExpression(this.notation, undefined, result, true);
     }
-    let row = this.toRenderedExpressionList(result);
+    const row = this.toRenderedExpressionList(result);
     if (row.length === 1) {
       return row[0];
     } else {
@@ -443,8 +443,8 @@ export class UserDefinedExpression extends ExpressionWithArgs {
     } else if (expression instanceof Fmt.IntegerExpression) {
       result.push(Number(expression.value));
     } else if (expression instanceof Fmt.VariableRefExpression) {
-      let parameter = expression.variable;
-      let param = parameter.name;
+      const parameter = expression.variable;
+      const param = parameter.name;
       let arg = this.getOptionalArg(param);
       if (arg === undefined && parameter.defaultValue) {
         this.translateExpression(parameter.defaultValue, undefined, result);
@@ -453,7 +453,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       if (loopData) {
         let dimension = 0;
         while (arg instanceof Array) {
-          let index = loopData.getLoopBinding(param, dimension);
+          const index = loopData.getLoopBinding(param, dimension);
           if (index === undefined) {
             break;
           }
@@ -463,11 +463,11 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       }
       result.push(arg);
     } else if (expression instanceof Fmt.DefinitionRefExpression) {
-      let referencedTemplate = this.allTemplates.definitions.getDefinition(expression.path.name);
-      let args = new Map<string, ExpressionValue>();
-      for (let argument of expression.path.arguments) {
+      const referencedTemplate = this.allTemplates.definitions.getDefinition(expression.path.name);
+      const args = new Map<string, ExpressionValue>();
+      for (const argument of expression.path.arguments) {
         if (argument.name) {
-          let arg: ExpressionValue[] = [];
+          const arg: ExpressionValue[] = [];
           this.translateExpression(argument.value, loopData, arg);
           if (arg.length === 1) {
             args.set(argument.name, arg[0]);
@@ -478,7 +478,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
           throw new Error('Arguments must be named');
         }
       }
-      let config: RenderedTemplateConfig = {
+      const config: RenderedTemplateConfig = {
         getArgFn: (name: string) => args.get(name),
         isBeforeFn: this.config.isBeforeFn,
         omitArguments: isTopLevel ? this.config.omitArguments : 0,
@@ -497,13 +497,13 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       } else if (expression instanceof FmtNotation.MetaRefExpression_false) {
         result.push(false);
       } else if (expression instanceof FmtNotation.MetaRefExpression_not) {
-        let arg: ExpressionValue[] = [];
+        const arg: ExpressionValue[] = [];
         this.translateExpression(expression.condition, loopData, arg);
         result.push(!arg.some((value) => value));
       } else if (expression instanceof FmtNotation.MetaRefExpression_opt) {
-        let paramExpr = expression.param as Fmt.VariableRefExpression;
-        let param = paramExpr.variable.name;
-        let arg = this.getOptionalArg(param);
+        const paramExpr = expression.param as Fmt.VariableRefExpression;
+        const param = paramExpr.variable.name;
+        const arg = this.getOptionalArg(param);
         if (arg === undefined) {
           if (expression.valueIfMissing) {
             this.translateExpression(expression.valueIfMissing, loopData, result);
@@ -517,20 +517,20 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         }
       } else if (expression instanceof FmtNotation.MetaRefExpression_add) {
         let value = 0;
-        for (let argument of expression.items) {
-          let arg: ExpressionValue[] = [];
+        for (const argument of expression.items) {
+          const arg: ExpressionValue[] = [];
           this.translateExpression(argument, undefined, arg);
-          for (let item of arg) {
+          for (const item of arg) {
             value += item;
           }
         }
         result.push(value);
       } else if (expression instanceof FmtNotation.MetaRefExpression_for) {
-        let part: ExpressionValue[] = loopData ? result : [];
-        let paramExpr = expression.param as Fmt.VariableRefExpression;
-        let param = paramExpr.variable.name;
+        const part: ExpressionValue[] = loopData ? result : [];
+        const paramExpr = expression.param as Fmt.VariableRefExpression;
+        const param = paramExpr.variable.name;
         let arg = this.getOptionalArg(param);
-        let dimensionValue = Number(expression.dimension);
+        const dimensionValue = Number(expression.dimension);
         let dimension = 0;
         while (arg instanceof Array && dimension < dimensionValue) {
           arg = arg.length ? arg[0] : undefined;
@@ -545,7 +545,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
                 this.translateExpression(expression.separator, loopData, part);
               }
             }
-            let newLoopData: LoopData = {
+            const newLoopData: LoopData = {
               getLoopBinding: (testParameter: string, testDimension: number): number | undefined => {
                 if (testParameter === param && testDimension === dimension) {
                   return index;
@@ -575,9 +575,9 @@ export class UserDefinedExpression extends ExpressionWithArgs {
       } else if (expression instanceof FmtNotation.MetaRefExpression_last) {
         result.push(loopData && loopData.lastIteration);
       } else if (expression instanceof FmtNotation.MetaRefExpression_rev) {
-        let arg: any[] = [];
+        const arg: any[] = [];
         this.translateExpression(expression.list, loopData, arg);
-        for (let item of arg) {
+        for (const item of arg) {
           if (item instanceof Array) {
             result.push(item.slice().reverse());
           } else {
@@ -588,7 +588,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         if (expression.items.length) {
           let item = expression.items[0];
           for (let index = 1; index < expression.items.length; index++) {
-            let curItem = expression.items[index];
+            const curItem = expression.items[index];
             if (this.orderMatches(curItem)) {
               item = curItem;
               break;
@@ -630,7 +630,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
         throw new Error('Undefined meta reference');
       }
     } else if (expression instanceof Fmt.ArrayExpression) {
-      let part: ExpressionValue[] = [];
+      const part: ExpressionValue[] = [];
       this.translateExpressionList(expression.items, loopData, part);
       result.push(part);
     } else if (expression instanceof Fmt.IndexedExpression && !expression.arguments) {
@@ -641,7 +641,7 @@ export class UserDefinedExpression extends ExpressionWithArgs {
   }
 
   private translateExpressionList(expressions: Fmt.Expression[], loopData: LoopData | undefined, result: RenderedExpression[]): void {
-    for (let expression of expressions) {
+    for (const expression of expressions) {
       this.translateExpression(expression, loopData, result);
     }
   }
@@ -649,12 +649,12 @@ export class UserDefinedExpression extends ExpressionWithArgs {
   private orderMatches(expression: Fmt.Expression): boolean {
     let result: boolean | undefined = undefined;
     if (this.config.isBeforeFn) {
-      let isBeforeFn = this.config.isBeforeFn;
+      const isBeforeFn = this.config.isBeforeFn;
       expression.traverse((subExpression: Fmt.Expression) => {
         if (result !== false && subExpression instanceof FmtNotation.MetaRefExpression_rev) {
-          let arg: any[] = [];
+          const arg: any[] = [];
           this.translateExpression(subExpression.list, undefined, arg);
-          for (let item of arg) {
+          for (const item of arg) {
             if (item instanceof Array && item.length > 1) {
               result = true;
               for (let index = item.length - 1; index > 0; index--) {
@@ -681,7 +681,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     switch (this.template.name) {
     case 'Style':
       {
-        let body = this.getExpressionArg('body');
+        const body = this.getExpressionArg('body');
         expression = new StyleExpression(body);
         expression.styleClasses = [this.getArg('styleClass')];
       }
@@ -695,7 +695,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       break;
     case 'OuterParens':
       {
-        let parenExpression = new OuterParenExpression(this.getExpressionArg('body'));
+        const parenExpression = new OuterParenExpression(this.getExpressionArg('body'));
         parenExpression.minLevel = this.getOptionalArg('minLevel');
         if (this.getOptionalArg('left') === false) {
           parenExpression.left = false;
@@ -708,7 +708,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       break;
     case 'InnerParens':
       {
-        let parenExpression = new InnerParenExpression(this.getExpressionArg('body'));
+        const parenExpression = new InnerParenExpression(this.getExpressionArg('body'));
         parenExpression.maxLevel = this.getOptionalArg('maxLevel');
         if (this.getOptionalArg('left') === false) {
           parenExpression.left = false;
@@ -721,12 +721,12 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
       break;
     default:
       {
-        let contents = this.template.contents as FmtNotation.ObjectContents_Template;
-        let fallback = new UserDefinedExpression(contents.notation, this.config, this.allTemplates);
+        const contents = this.template.contents as FmtNotation.ObjectContents_Template;
+        const fallback = new UserDefinedExpression(contents.notation, this.config, this.allTemplates);
         switch (this.template.name) {
         case 'SubSup':
           {
-            let subSupExpression = new SubSupExpression(this.getExpressionArg('body'));
+            const subSupExpression = new SubSupExpression(this.getExpressionArg('body'));
             subSupExpression.sub = this.getOptionalExpressionArg('sub');
             subSupExpression.sup = this.getOptionalExpressionArg('sup');
             subSupExpression.preSub = this.getOptionalExpressionArg('preSub');
@@ -736,10 +736,10 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
           break;
         case 'OverUnder':
           {
-            let overUnderExpression = new OverUnderExpression(this.getExpressionArg('body'));
+            const overUnderExpression = new OverUnderExpression(this.getExpressionArg('body'));
             overUnderExpression.over = this.getOptionalExpressionArg('over');
             overUnderExpression.under = this.getOptionalExpressionArg('under');
-            let style = this.getOptionalArg('style');
+            const style = this.getOptionalArg('style');
             if (style) {
               overUnderExpression.styleClasses = [style];
             }
@@ -754,7 +754,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
           break;
         default:
           if (this.config.omitArguments > 1 && (this.config.omitArguments > 2 || !(contents.useSymbol instanceof FmtNotation.MetaRefExpression_false))) {
-            let symbol = contents.symbol;
+            const symbol = contents.symbol;
             if (symbol) {
               expression = new UserDefinedExpression(symbol, this.config, this.allTemplates);
               if (this.canUseSymbol(expression)) {
@@ -779,7 +779,7 @@ export class TemplateInstanceExpression extends ExpressionWithArgs {
     if (expression instanceof TextExpression && expression.text && !expression.hasStyleClass('var')) {
       return true;
     } else if (expression instanceof RowExpression) {
-      for (let item of expression.items) {
+      for (const item of expression.items) {
         if (this.canUseSymbol(item)) {
           return true;
         }

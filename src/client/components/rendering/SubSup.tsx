@@ -12,7 +12,7 @@ interface SubSupProps {
 }
 
 export function SubSup(props: React.PropsWithChildren<SubSupProps>): React.ReactElement {
-  let empty = <span className={'subsup-empty'} key="empty"/>;
+  const empty = <span className={'subsup-empty'} key="empty"/>;
   let rightSub = null;
   let rightSup = null;
   if (props.sub) {

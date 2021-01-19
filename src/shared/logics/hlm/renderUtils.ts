@@ -47,12 +47,12 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   private doExtractStructuralCases(parameters: Fmt.Parameter[], expressions: Fmt.Expression[], allowMultipleCases: boolean): ExtractedStructuralCase[] {
-    let cases: ExtractedStructuralCase[] = [{definitions: expressions}];
+    const cases: ExtractedStructuralCase[] = [{definitions: expressions}];
     if (expressions.length) {
       let changed: boolean;
       do {
         changed = false;
-        for (let currentCase of cases) {
+        for (const currentCase of cases) {
           let currentCaseDefinition = currentCase.definitions[0];
           while (currentCaseDefinition instanceof FmtHLM.MetaRefExpression_asElementOf || currentCaseDefinition instanceof FmtHLM.MetaRefExpression_setAssociative || currentCaseDefinition instanceof FmtHLM.MetaRefExpression_associative) {
             currentCaseDefinition = currentCaseDefinition.term;
@@ -62,22 +62,22 @@ export class HLMRenderUtils extends GenericRenderUtils {
               && currentCaseDefinition.cases.length
               && (currentCaseDefinition.cases.length === 1 || (expressions.length === 1 && allowMultipleCases))
               && currentCaseDefinition.term instanceof Fmt.VariableRefExpression) {
-            let currentParameter = currentCaseDefinition.term.variable;
-            let currentParameterStructuralCase = this.findExtractableInductionParameterOrigin(currentParameter, parameters, currentCase.structuralCases);
+            const currentParameter = currentCaseDefinition.term.variable;
+            const currentParameterStructuralCase = this.findExtractableInductionParameterOrigin(currentParameter, parameters, currentCase.structuralCases);
             if (currentParameterStructuralCase !== undefined && this.mayExtractStructuralCases(currentParameter, currentCaseDefinition.cases)) {
-              let affectedParameters = currentCase.affectedParameters ? [currentParameter, ...currentCase.affectedParameters] : [currentParameter];
-              let constructions = currentCase.constructions ? [currentCaseDefinition.construction, ...currentCase.constructions] : [currentCaseDefinition.construction];
-              let previousStructuralCases = currentCase.structuralCases || [];
-              let previousCaseParameters = currentCase.caseParameters || [];
-              let otherDefinitions = currentCase.definitions.slice(1);
-              for (let structuralCase of currentCaseDefinition.cases) {
-                let caseStructuralCases = [structuralCase, ...previousStructuralCases];
-                let caseParameters = previousCaseParameters.slice();
+              const affectedParameters = currentCase.affectedParameters ? [currentParameter, ...currentCase.affectedParameters] : [currentParameter];
+              const constructions = currentCase.constructions ? [currentCaseDefinition.construction, ...currentCase.constructions] : [currentCaseDefinition.construction];
+              const previousStructuralCases = currentCase.structuralCases || [];
+              const previousCaseParameters = currentCase.caseParameters || [];
+              const otherDefinitions = currentCase.definitions.slice(1);
+              for (const structuralCase of currentCaseDefinition.cases) {
+                const caseStructuralCases = [structuralCase, ...previousStructuralCases];
+                const caseParameters = previousCaseParameters.slice();
                 if (structuralCase.parameters && !currentParameterStructuralCase) {
                   caseParameters.unshift(...structuralCase.parameters);
                 }
-                let caseDefinitions = [structuralCase.value, ...otherDefinitions];
-                let extractedCase: ExtractedStructuralCase = {
+                const caseDefinitions = [structuralCase.value, ...otherDefinitions];
+                const extractedCase: ExtractedStructuralCase = {
                   affectedParameters: affectedParameters,
                   constructions: constructions,
                   structuralCases: caseStructuralCases,
@@ -108,7 +108,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
       return null;
     }
     if (parentCases) {
-      for (let parentCase of parentCases) {
+      for (const parentCase of parentCases) {
         if (parentCase.parameters) {
           if (parentCase.parameters.indexOf(param) >= 0) {
             return parentCase;
@@ -120,7 +120,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   private mayExtractStructuralCases(param: Fmt.Parameter, cases: FmtHLM.ObjectContents_StructuralCase[]): boolean {
-    for (let structuralCase of cases) {
+    for (const structuralCase of cases) {
       if (this.utils.referencesParameter(structuralCase.value, param)) {
         return false;
       }
@@ -129,9 +129,9 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   convertStructuralCaseToOverride(parameters: Fmt.Parameter[], expression: Fmt.Expression, elementParameterOverrides: ElementParameterOverrides): Fmt.Expression {
-    let cases = this.doExtractStructuralCases(parameters, [expression], false);
+    const cases = this.doExtractStructuralCases(parameters, [expression], false);
     if (cases.length === 1) {
-      let extractedCase = cases[0];
+      const extractedCase = cases[0];
       if (this.fillVariableOverridesFromExtractedCase(extractedCase, elementParameterOverrides, true)) {
         return extractedCase.definitions[0];
       }
@@ -142,11 +142,11 @@ export class HLMRenderUtils extends GenericRenderUtils {
   fillVariableOverridesFromExtractedCase(extractedCase: ExtractedStructuralCase, elementParameterOverrides: ElementParameterOverrides, isDefinition: boolean = false): boolean {
     if (extractedCase.structuralCases) {
       for (let index = 0; index < extractedCase.structuralCases.length; index++) {
-        let structuralCase = extractedCase.structuralCases[index];
+        const structuralCase = extractedCase.structuralCases[index];
         let caseTermPromise = this.utils.getStructuralCaseTerm(extractedCase.constructions![index].path, structuralCase);
         if (isDefinition && extractedCase.caseParameters) {
           caseTermPromise = caseTermPromise.then((caseTerm: Fmt.Expression) => {
-            let substitutionContext = new HLMSubstitutionContext;
+            const substitutionContext = new HLMSubstitutionContext;
             this.markParametersAsDefinition(extractedCase.caseParameters!, substitutionContext);
             return this.utils.applySubstitutionContext(caseTerm, substitutionContext);
           });
@@ -160,7 +160,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   applyElementParameterOverrides(expressionPromise: CachedPromise<Fmt.Expression>, elementParameterOverrides: ElementParameterOverrides): CachedPromise<Fmt.Expression> {
-    for (let [param, paramOverridePromise] of elementParameterOverrides) {
+    for (const [param, paramOverridePromise] of elementParameterOverrides) {
       expressionPromise = expressionPromise.then((expression) => {
         return paramOverridePromise.then((paramOverride) => FmtUtils.substituteVariable(expression, param, paramOverride));
       });
@@ -171,7 +171,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
   private markParametersAsDefinition(parameters: Fmt.Parameter[], substitutionContext: HLMSubstitutionContext): void {
     substitutionContext.substitutionFns.push((subExpression: Fmt.Expression) => {
       if (subExpression instanceof Fmt.VariableRefExpression && this.utils.parameterListContainsParameter(parameters, subExpression.variable)) {
-        let result = subExpression.clone();
+        const result = subExpression.clone();
         (result as any).isDefinition = true;
         return result;
       } else {
@@ -181,20 +181,20 @@ export class HLMRenderUtils extends GenericRenderUtils {
   }
 
   convertBoundStructuralCasesToOverrides(parameters: Fmt.Parameter[], binderArgumentList: Fmt.ArgumentList, elementParameterOverrides: ElementParameterOverrides): Fmt.ArgumentList {
-    let newBinderArgumentList = new Fmt.ArgumentList;
+    const newBinderArgumentList = new Fmt.ArgumentList;
     let changed = false;
     for (let binderArg of binderArgumentList) {
       let binderArgValue = binderArg.value;
       if (binderArgValue instanceof Fmt.CompoundExpression && binderArgValue.arguments.length > 1 && binderArgValue.arguments[0].value instanceof Fmt.ParameterExpression) {
           // Looks like a nested binder argument; recurse into it.
-        let expression = binderArgValue.arguments[0].value;
-        let nestedArgumentsExpression = binderArgValue.arguments[1].value;
+        const expression = binderArgValue.arguments[0].value;
+        const nestedArgumentsExpression = binderArgValue.arguments[1].value;
         if (nestedArgumentsExpression instanceof Fmt.CompoundExpression) {
-          let allParameters = [...parameters, ...expression.parameters];
-          let newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
+          const allParameters = [...parameters, ...expression.parameters];
+          const newNestedArguments = this.convertBoundStructuralCasesToOverrides(allParameters, nestedArgumentsExpression.arguments, elementParameterOverrides);
           if (newNestedArguments !== nestedArgumentsExpression.arguments) {
             binderArg = binderArg.clone();
-            let newBinderArgValue = binderArg.value as Fmt.CompoundExpression;
+            const newBinderArgValue = binderArg.value as Fmt.CompoundExpression;
             newBinderArgValue.arguments[0].value = expression;
             (newBinderArgValue.arguments[1].value as Fmt.CompoundExpression).arguments = newNestedArguments;
             changed = true;
@@ -205,7 +205,7 @@ export class HLMRenderUtils extends GenericRenderUtils {
         if (binderArgValue instanceof Fmt.CompoundExpression && binderArgValue.arguments.length) {
           binderArgValue = binderArgValue.arguments[0].value;
         }
-        let newBinderArgValue = this.convertStructuralCaseToOverride(parameters, binderArgValue, elementParameterOverrides);
+        const newBinderArgValue = this.convertStructuralCaseToOverride(parameters, binderArgValue, elementParameterOverrides);
         if (newBinderArgValue !== binderArgValue) {
           binderArg = binderArg.clone();
           binderArg.value = newBinderArgValue;

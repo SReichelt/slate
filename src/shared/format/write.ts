@@ -51,7 +51,7 @@ export class Writer {
   }
 
   constructPathAliases(file: Fmt.File): void {
-    let paths = new Map<string, PathInfo[]>();
+    const paths = new Map<string, PathInfo[]>();
     file.traverse((expression: Fmt.Expression) => {
       if (expression instanceof Fmt.DefinitionRefExpression) {
         let path = expression.path;
@@ -62,10 +62,10 @@ export class Writer {
       }
     });
     this.disambiguatePathAliases(paths);
-    let keys = [...paths.keys()];
+    const keys = [...paths.keys()];
     keys.sort();
-    for (let name of keys) {
-      for (let pathInfo of paths.get(name)!) {
+    for (const name of keys) {
+      for (const pathInfo of paths.get(name)!) {
         if (pathInfo.occurrences > 1) {
           this.pathAliases.push(new Fmt.PathAlias(name, pathInfo.path));
           break;
@@ -76,14 +76,14 @@ export class Writer {
 
   private addToPathAliases(path: Fmt.PathItem | undefined, paths: Map<string, PathInfo[]>): void {
     if (path instanceof Fmt.NamedPathItem && path.parentPath) {
-      let name = path.name;
+      const name = path.name;
       let pathInfos = paths.get(name);
       if (!pathInfos) {
         pathInfos = [];
         paths.set(name, pathInfos);
       }
-      let pathWithoutArgs = new Fmt.NamedPathItem(path.name, path.parentPath);
-      for (let pathInfo of pathInfos) {
+      const pathWithoutArgs = new Fmt.NamedPathItem(path.name, path.parentPath);
+      for (const pathInfo of pathInfos) {
         if (pathWithoutArgs.isEquivalentTo(pathInfo.path)) {
           pathInfo.occurrences++;
           return;
@@ -100,15 +100,15 @@ export class Writer {
     let adapted: boolean;
     do {
       adapted = false;
-      for (let pathInfos of paths.values()) {
+      for (const pathInfos of paths.values()) {
         let usedCount = 0;
-        for (let pathInfo of pathInfos) {
+        for (const pathInfo of pathInfos) {
           if (pathInfo.occurrences > 1) {
             usedCount++;
           }
         }
-        let nameConflict = (usedCount > 1);
-        for (let pathInfo of pathInfos.slice()) {
+        const nameConflict = (usedCount > 1);
+        for (const pathInfo of pathInfos.slice()) {
           if (nameConflict ? pathInfo.occurrences > 1 : pathInfo.occurrences === 1) {
             this.addToPathAliases(pathInfo.path.parentPath, paths);
             pathInfo.occurrences = 0;
@@ -125,8 +125,8 @@ export class Writer {
 
   private findPathAlias(path: Fmt.PathItem): Fmt.PathAlias | undefined {
     if (path instanceof Fmt.NamedPathItem && path.parentPath && !(path.parentPath instanceof Fmt.Path)) {
-      let pathWithoutArgs = new Fmt.NamedPathItem(path.name, path.parentPath);
-      for (let pathAlias of this.pathAliases) {
+      const pathWithoutArgs = new Fmt.NamedPathItem(path.name, path.parentPath);
+      for (const pathAlias of this.pathAliases) {
         if (pathWithoutArgs.isEquivalentTo(pathAlias.path)) {
           return pathAlias;
         }
@@ -171,7 +171,7 @@ export class Writer {
 
   writePathItem(path: Fmt.PathItem, isLinkRange: boolean, useAliases: boolean): void {
     this.writeRange(path, false, isLinkRange, false, false, () => {
-      let pathAlias = useAliases ? this.findPathAlias(path) : undefined;
+      const pathAlias = useAliases ? this.findPathAlias(path) : undefined;
       if (pathAlias) {
         this.write('~');
         this.writeIdentifier(pathAlias.name, path, false);
@@ -209,9 +209,9 @@ export class Writer {
   }
 
   private writePathAliases(indent?: IndentInfo): void {
-    let aliasIndent = this.indent(indent);
+    const aliasIndent = this.indent(indent);
     let first = true;
-    for (let pathAlias of this.pathAliases) {
+    for (const pathAlias of this.pathAliases) {
       if (first) {
         first = false;
         this.writeNewLine();
@@ -244,7 +244,7 @@ export class Writer {
 
   writeDefinitions(definitions: Fmt.Definition[], indent?: IndentInfo): void {
     let first = true;
-    for (let definition of definitions) {
+    for (const definition of definitions) {
       if (first) {
         first = false;
       } else {
@@ -276,7 +276,7 @@ export class Writer {
       }
       if (definition.innerDefinitions.length || (args && args.length)) {
         this.writeNewLine();
-        let innerIndent = this.indent(indent);
+        const innerIndent = this.indent(indent);
         this.writeDefinitions(definition.innerDefinitions, innerIndent);
         if (args && args.length) {
           if (definition.innerDefinitions.length) {
@@ -310,9 +310,9 @@ export class Writer {
     let multiLine = (this.newLineStr.length > 0
                      && parameters.length > 1
                      && parameters.some((param: Fmt.Parameter) => this.isLargeParameter(param, false)));
-    let currentGroup: Fmt.Parameter[] = [];
+    const currentGroup: Fmt.Parameter[] = [];
     let firstGroup = true;
-    for (let parameter of parameters) {
+    for (const parameter of parameters) {
       if (currentGroup.length && (parameter.type !== currentGroup[0].type || parameter.defaultValue !== currentGroup[0].defaultValue)) {
         if (firstGroup && multiLine) {
           groupIndent = this.indent(groupIndent);
@@ -415,8 +415,8 @@ export class Writer {
     }
     let index = 0;
     let prevArg: Fmt.Argument | undefined = undefined;
-    for (let arg of args) {
-      let newLine = (multiLine
+    for (const arg of args) {
+      const newLine = (multiLine
                      && (blockMode
                          || !prevArg
                          || this.isLargeArgument(prevArg)
@@ -475,7 +475,7 @@ export class Writer {
     }
     let index = 0;
     let remainingLineLength = 0;
-    for (let expression of expressions) {
+    for (const expression of expressions) {
       if (index) {
         this.write(',');
         if (remainingLineLength) {
@@ -501,7 +501,7 @@ export class Writer {
 
   writeExpressionList(expressions: Fmt.Expression[], indent?: IndentInfo): void {
     let maxLineLength = expressions.length > 10 ? 10 : 0;
-    for (let item of expressions) {
+    for (const item of expressions) {
       if (this.isLargeExpression(item)) {
         maxLineLength = 1;
         break;
@@ -525,7 +525,7 @@ export class Writer {
           this.write('%');
           this.writeIdentifier(expression.getName(), expression, true);
         });
-        let args = expression.toArgumentList();
+        const args = expression.toArgumentList();
         this.writeOptionalArgumentList(args, indent);
       } else if (expression instanceof Fmt.DefinitionRefExpression) {
         this.write('$');
@@ -594,10 +594,10 @@ export class Writer {
     if (!this.newLineStr) {
       breakLines = false;
     }
-    let indentLength = this.lineLength;
+    const indentLength = this.lineLength;
     let result = quoteChar;
     let insertLineBreak = false;
-    for (let c of str) {
+    for (const c of str) {
       if (insertLineBreak) {
         result += quoteChar;
         this.write(result);
@@ -639,7 +639,7 @@ export class Writer {
     this.writeRange(object, true, isLinkRange, false, false, () => {
       if (identifier) {
         let first = true;
-        for (let c of identifier) {
+        for (const c of identifier) {
           if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
             this.writeString(identifier, '"', false);
             return;
@@ -658,7 +658,7 @@ export class Writer {
       this.write('/**');
       let prevItem: Fmt.DocumentationItem | undefined = undefined;
       let needEmptyLine = false;
-      for (let item of documentationComment.items) {
+      for (const item of documentationComment.items) {
         if (prevItem
             && (!item.kind
                 || item.kind !== prevItem.kind
@@ -687,9 +687,9 @@ export class Writer {
             this.write(' ');
             this.writeIdentifier(item.parameter.name, item, true);
           }
-          let indentLength = this.lineLength + 1;
+          const indentLength = this.lineLength + 1;
           let textLine = '';
-          for (let c of item.text.trim()) {
+          for (const c of item.text.trim()) {
             if (c === '\r') {
               // ignore
             } else if (c === '\n') {
@@ -755,7 +755,7 @@ export class Writer {
 
   private indent(indent: IndentInfo | undefined, keepOuterIndent: boolean = false): IndentInfo | undefined {
     if (indent) {
-      let newIndent = indent.indent + this.indentStr;
+      const newIndent = indent.indent + this.indentStr;
       return {
         indent: newIndent,
         outerIndent: keepOuterIndent ? indent.outerIndent : newIndent
@@ -794,12 +794,12 @@ export class Writer {
 
 
 export function writeStream(file: Fmt.File, stream: OutputStream, allowPlaceholders: boolean = false): void {
-  let writer = new Writer(stream, allowPlaceholders);
+  const writer = new Writer(stream, allowPlaceholders);
   writer.writeFile(file);
 }
 
 export function writeString(file: Fmt.File, allowPlaceholders: boolean = false): string {
-  let stream = new StringOutputStream;
+  const stream = new StringOutputStream;
   writeStream(file, stream, allowPlaceholders);
   return stream.str;
 }

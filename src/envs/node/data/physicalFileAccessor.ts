@@ -8,7 +8,7 @@ export class PhysicalFileAccessor implements FileAccessor {
   constructor(private basePath?: string) {}
 
   openFile(uri: string, createNew: boolean): FileReference {
-    let fileName = this.getFileName(uri);
+    const fileName = this.getFileName(uri);
     if (createNew) {
       this.makeDirectories(fileName);
     }
@@ -16,7 +16,7 @@ export class PhysicalFileAccessor implements FileAccessor {
   }
 
   createChildAccessor(uri: string): FileAccessor {
-    let fileName = this.getFileName(uri);
+    const fileName = this.getFileName(uri);
     return new PhysicalFileAccessor(fileName);
   }
 
@@ -29,7 +29,7 @@ export class PhysicalFileAccessor implements FileAccessor {
   }
 
   private makeDirectories(fileName: string): void {
-    let dirName = path.dirname(fileName);
+    const dirName = path.dirname(fileName);
     if (dirName && !fs.existsSync(dirName)) {
       this.makeDirectories(dirName);
       fs.mkdirSync(dirName);
@@ -43,13 +43,13 @@ class PhysicalFileReference implements FileReference {
   constructor(public fileName: string) {}
 
   read(): CachedPromise<string> {
-    let contents = util.promisify(fs.readFile)(this.fileName, 'utf8');
+    const contents = util.promisify(fs.readFile)(this.fileName, 'utf8');
     return new CachedPromise(contents);
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     this.writingFile = true;
-    let result = util.promisify(fs.writeFile)(this.fileName, contents, 'utf8')
+    const result = util.promisify(fs.writeFile)(this.fileName, contents, 'utf8')
       .then(() => {
         this.writingFile = false;
         return {};
@@ -62,7 +62,7 @@ class PhysicalFileReference implements FileReference {
   }
 
   watch(onChange: (newContents: string) => void): FileWatcher {
-    let listener = () => {
+    const listener = () => {
       if (!this.writingFile) {
         fs.readFile(this.fileName, 'utf8', (error, data) => {
           if (!error) {

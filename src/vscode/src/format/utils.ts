@@ -9,18 +9,18 @@ export function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocume
     if (sourceDocument && areUrisEqual(uri, sourceDocument.uri)) {
         return sourceDocument.getText(range);
     }
-    for (let document of vscode.workspace.textDocuments) {
+    for (const document of vscode.workspace.textDocuments) {
         if (areUrisEqual(uri, document.uri)) {
             return document.getText(range);
         }
     }
-    let fileName = uri.fsPath;
+    const fileName = uri.fsPath;
     if (lastReadFileName !== fileName) {
         lastReadFileName = undefined;
         lastReadFileContents = fs.readFileSync(fileName, 'utf8');
         lastReadFileName = fileName;
     }
-    let contents = lastReadFileContents!;
+    const contents = lastReadFileContents!;
     if (range) {
         let position = 0;
         let line = 0;
@@ -32,7 +32,7 @@ export function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocume
             position++;
         }
         if (position >= 0) {
-            let start = position + range.start.character;
+            const start = position + range.start.character;
             for (; line < range.end.line; line++) {
                 position = contents.indexOf('\n', position);
                 if (position < 0) {
@@ -41,7 +41,7 @@ export function readRangeRaw(uri: vscode.Uri, range?: vscode.Range, sourceDocume
                 position++;
             }
             if (position >= 0) {
-                let end = position + range.end.character;
+                const end = position + range.end.character;
                 return contents.substring(start, end);
             }
         }
@@ -78,7 +78,7 @@ export function readRange(uri: vscode.Uri, range?: vscode.Range, singleLine: boo
     } else if (range) {
         let result = '';
         let spacesToSkip = 0;
-        for (let c of raw) {
+        for (const c of raw) {
             if (c === '\n') {
                 spacesToSkip = range.start.character;
             } else if (spacesToSkip) {

@@ -51,19 +51,19 @@ export function getLatexInputSuggestions(current: string): LatexInputReplacement
 // Replaces the current input by unicode character if the current input either matches a
 // LaTeX replacement OR is a prefix of a LaTeX replacement.
 export function replaceLatexCodeOrPrefix(current: string): string {
-  let firstReplacement = findLatexReplacementByPrefix(current, false);
+  const firstReplacement = findLatexReplacementByPrefix(current, false);
   return firstReplacement !== undefined ? firstReplacement.unicodeCharacters : current;
 }
 
 // Replaces the current input by unicode character if the current input matches a
 // LaTeX replacement AND is not a prefix of another LaTeX replacement.
 export function replaceExactLatexCodeOnly(current: string): string {
-  let replacement = findLatexReplacementByPrefix(current, true);
+  const replacement = findLatexReplacementByPrefix(current, true);
   return replacement !== undefined && replacement.latexCode === current ? replacement.unicodeCharacters : current;
 }
 
 function findLatexReplacementByPrefix(current: string, uniqueOnly: boolean): LatexInputReplacement | undefined {
-  let matches = getLatexInputSuggestions(current);
+  const matches = getLatexInputSuggestions(current);
   if (matches.length && (matches.length === 1 || !uniqueOnly)) {
     return matches[0];
   } else {

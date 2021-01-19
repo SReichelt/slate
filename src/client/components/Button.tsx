@@ -44,8 +44,8 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   }
 
   render(): React.ReactNode {
-    let enabled = (this.props.enabled === undefined || this.props.enabled);
-    let className = clsx('button', this.props.className, {
+    const enabled = (this.props.enabled === undefined || this.props.enabled);
+    const className = clsx('button', this.props.className, {
       'disabled': !enabled,
       'hoverable': enabled,
       'pressed': this.state.pressed,
@@ -60,7 +60,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     let onTouchCancel = undefined;
     if (enabled) {
       if (this.props.onClick) {
-        let propsOnClick = this.props.onClick;
+        const propsOnClick = this.props.onClick;
         onClick = (event: React.SyntheticEvent<HTMLElement>) => {
           disableOwnDefaultBehavior(event);
           if (this.ready && !this.props.isMenuItem) {

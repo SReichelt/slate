@@ -125,10 +125,10 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   constructor(props: AppPropsWithAlert) {
     super(props);
 
-    let libraryURI = librariesURIPrefix + selectedLibraryName;
-    let libraryRepository = libraries[selectedLibraryName];
+    const libraryURI = librariesURIPrefix + selectedLibraryName;
+    const libraryRepository = libraries[selectedLibraryName];
 
-    let state: AppState = {
+    const state: AppState = {
       verticalLayout: !config.embedded && window.innerHeight > window.innerWidth,
       navigationPaneVisible: true,
       extraContentsVisible: false,
@@ -143,9 +143,9 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     if (props.fileAccessor) {
       this.fileAccessor = props.fileAccessor;
     } else if (config.vsCodeAPI) {
-      let fileAccessor = new VSCodeExtensionFileAccessor;
+      const fileAccessor = new VSCodeExtensionFileAccessor;
       window.onmessage = (event: MessageEvent) => {
-        let message: Embedding.ResponseMessage = event.data;
+        const message: Embedding.ResponseMessage = event.data;
         fileAccessor.messageReceived(message);
         this.processEmbeddingResponseMessage(message);
       };
@@ -163,7 +163,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
           selectionURI = gitHubQueryStringResult.path;
         }
       }
-      let gitHubAPIAccess = this.createGitHubAPIAccess(gitHubQueryStringResult?.token);
+      const gitHubAPIAccess = this.createGitHubAPIAccess(gitHubQueryStringResult?.token);
 
       this.gitHubRepositoryAccess = {
         repository: libraryRepository
@@ -179,7 +179,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
           libraryFileAccessor = new PreloadingWebFileAccessor(fetchHelper, dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         }
       } else {
-        let fallbackFileAccessor = new PreloadingWebFileAccessor(fetchHelper, dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
+        const fallbackFileAccessor = new PreloadingWebFileAccessor(fetchHelper, dataURIPrefix + libraryURI, preloadURIPrefix + libraryURI);
         libraryFileAccessor = this.createGitHubFileAccessor(state, gitHubAPIAccess, fallbackFileAccessor);
         state.selectedItemRepository = libraryRepository;
       }
@@ -189,7 +189,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       libraryFileAccessor = this.fileAccessor.createChildAccessor(dataURIPrefix + libraryURI);
     }
 
-    let libraryDataProviderOptions: LibraryDataProviderOptions = {
+    const libraryDataProviderOptions: LibraryDataProviderOptions = {
       logic: Logics.hlm,
       fileAccessor: libraryFileAccessor,
       watchForChanges: !config.testing,
@@ -204,7 +204,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       this.updateSelectionState(state, selectionURI);
     }
     this.state = state;
-    let title = this.getTitle(state);
+    const title = this.getTitle(state);
     if (selectionURI && queryString) {
       this.setDocumentURI(selectionURI, title);
     }
@@ -219,7 +219,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       state.selectedDocURI = uri;
       return true;
     } else if (uri.startsWith(librariesURIPrefix)) {
-      let path = this.libraryDataProvider.uriToPath(uri);
+      const path = this.libraryDataProvider.uriToPath(uri);
       if (path) {
         this.fillSelectionState(state, this.libraryDataProvider, path);
         return true;
@@ -237,7 +237,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     }
     state.selectedItemProvider = libraryDataProvider;
     state.selectedItemLocalPath = path;
-    let isSubsectionPromise = libraryDataProvider.isSubsection(path.name);
+    const isSubsectionPromise = libraryDataProvider.isSubsection(path.name);
     state.selectedItemDefinition = isSubsectionPromise.then((isSubsection: boolean) =>
       isSubsection ? undefined : libraryDataProvider.fetchLocalItem(path.name, true));
     state.selectedItemInfo = libraryDataProvider.getLocalItemInfo(path.name);
@@ -261,7 +261,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     if (!(config.embedded || config.testing)) {
       window.onpopstate = () => {
         // Explicitly set members to undefined; otherwise the back button cannot be used to return to an empty selection.
-        let state: SelectionState = {
+        const state: SelectionState = {
           selectedDocURI: undefined,
           selectedItemAbsolutePath: undefined,
           selectedItemProvider: undefined,
@@ -290,7 +290,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       };
 
       window.onbeforeunload = () => {
-        for (let editedDefinition of this.state.editedDefinitions) {
+        for (const editedDefinition of this.state.editedDefinitions) {
           if (editedDefinition.libraryDefinition.modified) {
             return 'Closing Slate will discard all unsubmitted edits. Are you sure?';
           }
@@ -310,10 +310,10 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       }
     }
 
-    let templateFile = this.fileAccessor.openFile('data/notation/templates' + fileExtension, false);
-    let setTemplates = (contents: string) => {
+    const templateFile = this.fileAccessor.openFile('data/notation/templates' + fileExtension, false);
+    const setTemplates = (contents: string) => {
       if (this.mounted) {
-        let templates = FmtReader.readString(contents, templateFile.fileName, FmtNotation.getMetaModel);
+        const templates = FmtReader.readString(contents, templateFile.fileName, FmtNotation.getMetaModel);
         this.setState({templates: templates});
         if (this.state.selectedItemProvider && this.state.selectedItemDefinition) {
           this.setState({interactionHandler: this.createInteractionHandler(this.state.selectedItemProvider, templates, this.state.selectedItemDefinition)});
@@ -345,7 +345,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
 
   private createGitHubAPIAccess(tokenPromise: Promise<string> | undefined): CachedPromise<GitHub.APIAccess> | undefined {
     if (tokenPromise) {
-      let apiAccessPromise = tokenPromise.then((accessToken: string) => {
+      const apiAccessPromise = tokenPromise.then((accessToken: string) => {
         try {
           window.localStorage.setItem(App.gitHubAccessTokenStorageIdentifier, accessToken);
         } catch (error) {
@@ -356,7 +356,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       return new CachedPromise<GitHub.APIAccess>(apiAccessPromise);
     } else {
       try {
-        let gitHubAccessToken = window.localStorage.getItem(App.gitHubAccessTokenStorageIdentifier);
+        const gitHubAccessToken = window.localStorage.getItem(App.gitHubAccessTokenStorageIdentifier);
         if (gitHubAccessToken) {
           return CachedPromise.resolve(new GitHub.APIAccess(gitHubAccessToken));
         }
@@ -368,7 +368,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   }
 
   private createGitHubFileAccessor(state: AppState, gitHubAPIAccessPromise: CachedPromise<GitHub.APIAccess> | undefined, fallbackFileAccessor?: FileAccessor): FileAccessor {
-    let gitHubRepositoryAccess = this.gitHubRepositoryAccess!;
+    const gitHubRepositoryAccess = this.gitHubRepositoryAccess!;
     let gitHubRepositoryAccessPromise: CachedPromise<GitHubRepositoryAccess>;
     if (gitHubAPIAccessPromise) {
       state.gitHubUserInfo = gitHubAPIAccessPromise.then((apiAccess: GitHub.APIAccess) => {
@@ -377,7 +377,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       });
       gitHubRepositoryAccessPromise = state.gitHubUserInfo
         .then(() => {
-          let {repository, apiAccess} = gitHubRepositoryAccess;
+          const {repository, apiAccess} = gitHubRepositoryAccess;
           if (apiAccess && repository.parentOwner && !repository.hasPullRequest) {
             return apiAccess.fastForward(repository, false)
               .then(() => { repository.pullRequestAllowed = true; })
@@ -435,8 +435,8 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       return <div className={'error'}>Error: {this.state.error}</div>;
     }
 
-    let windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
-    let defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
+    const windowSize = this.state.verticalLayout ? window.innerHeight : window.innerWidth;
+    const defaultItemHeight = this.state.verticalLayout ? window.innerHeight / 3 : window.innerHeight / 2;
 
     let navigationPane: React.ReactNode = null;
     if (this.state.navigationPaneVisible) {
@@ -467,9 +467,9 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     if (this.state.selectedDocURI) {
       mainContents = <DocPage uri={this.state.selectedDocURI} onDocLinkClicked={this.docLinkClicked}/>;
     } else if (this.state.selectedItemDefinition) {
-      let mainContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
+      const mainContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
         if (definition && this.state.selectedItemProvider && this.state.templates) {
-          let editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
+          const editing = definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew;
           let itemInfo = this.state.selectedItemInfo;
           if (editing && this.state.selectedItemLocalPath) {
             // When editing, item info may change according to user input. Need to make sure to get the correct instance - the one where the changes happen.
@@ -483,7 +483,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
             } else if (this.state.gitHubAuthInfo && !this.state.gitHubUserInfo && !config.runningLocally) {
               mainContentsResult = [<Message type={'info'} key="message">You are currently contributing anonymously. To get credit for your work, you can either log in with a <a href="https://github.com/" target="_blank">GitHub</a> account or use the <a href="https://marketplace.visualstudio.com/items?itemName=sreichelt.slate" target="_blank">Visual Studio Code extension</a>.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
             } else if (this.state.selectedItemRepository) {
-              let repository = this.state.selectedItemRepository;
+              const repository = this.state.selectedItemRepository;
               if (!repository.hasWriteAccess) {
                 mainContentsResult = [<Message type={'info'} key="message">For your contribution, a personal fork of the <a href={GitHub.getRepositoryURL(repository)} target="_blank">library repository</a> will be created on GitHub.<br/>All contributed material is assumed to be in the public domain.</Message>, mainContentsResult];
               } else if (repository.hasLocalChanges && !repository.hasPullRequest) {
@@ -500,7 +500,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
 
       if (!config.embedded) {
         if (this.state.extraContentsVisible) {
-          let extraContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
+          const extraContentsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
             if (definition) {
               return <SourceCodeView libraryDataProvider={this.state.selectedItemProvider} definition={definition} templates={this.state.templates} options={App.renderedDefinitionOptions} interactionHandler={this.state.interactionHandler} mruList={this.mruList} key="source"/>;
             } else {
@@ -519,7 +519,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         mainContents = <Button className={'standalone'} onClick={() => this.setState({showStartPage: true})} key="start-page-placeholder">Show start page</Button>;
       }
 
-      let repository = this.state.selectedItemRepository;
+      const repository = this.state.selectedItemRepository;
       if (repository) {
         if (repository.hasPullRequest) {
           mainContents = [<Message type={'info'} key="message">Your pull request has not been accepted yet. Therefore you may be seeing a slightly outdated version of the library. If necessary, you can manually merge upstream changes into your <a href={GitHub.getRepositoryURL(repository)} target="_blank">personal fork</a> on GitHub.</Message>, mainContents];
@@ -586,9 +586,9 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       );
     }
 
-    let tutorialState = this.state.tutorialState;
+    const tutorialState = this.state.tutorialState;
     if (tutorialState) {
-      let currentEditedDefinition = this.state.selectedItemDefinition?.getImmediateResult();
+      const currentEditedDefinition = this.state.selectedItemDefinition?.getImmediateResult();
       result = addTutorial(this, result, tutorialState, currentEditedDefinition);
     }
 
@@ -596,7 +596,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   }
 
   private getLeftButtons(): React.ReactNode {
-    let leftButtons: React.ReactNode[] = [];
+    const leftButtons: React.ReactNode[] = [];
 
     if (config.embedded) {
       leftButtons.push(
@@ -606,8 +606,8 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       );
     }
     if (this.state.gitHubUserInfo) {
-      let loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
-        let userID: React.ReactNode[] = [];
+      const loginInfoPromise = this.state.gitHubUserInfo.then((userInfo: GitHub.UserInfo) => {
+        const userID: React.ReactNode[] = [];
         if (userInfo.avatarUrl) {
           userID.push(<img src={userInfo.avatarUrl} key="avatar"/>);
         }
@@ -617,7 +617,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
           }
           userID.push(userInfo.login);
         }
-        let userMenu: React.ReactNode[] = [
+        const userMenu: React.ReactNode[] = [
           (
             <Button toolTipText={'Log out (Warning: Does not sign out of GitHub.)'} isMenuItem={true} onClick={this.logOutOfGitHub} key="logout">
               {getButtonIcon(ButtonType.LogOut)}
@@ -650,7 +650,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
     let rightButtonsPromise: CachedPromise<React.ReactNode[]>;
 
     if (this.state.selectedDocURI) {
-      let rightButtons: React.ReactNode[] = [];
+      const rightButtons: React.ReactNode[] = [];
       if (!config.embedded) {
         if (config.runningLocally) {
           rightButtons.push(
@@ -669,14 +669,14 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
       rightButtonsPromise = CachedPromise.resolve(rightButtons);
     } else if (this.state.selectedItemDefinition) {
       rightButtonsPromise = this.state.selectedItemDefinition.then((definition: LibraryDefinition | undefined) => {
-        let rightButtons: React.ReactNode[] = [];
+        const rightButtons: React.ReactNode[] = [];
         if (definition) {
           if (definition.state === LibraryDefinitionState.Submitting) {
             rightButtons.push(<div className={'submitting'} key="submitting"><Loading width={'1em'} height={'1em'}/></div>);
             rightButtons.push(' ');
           } else if ((definition.state === LibraryDefinitionState.Editing || definition.state === LibraryDefinitionState.EditingNew)) {
             let willSubmit: boolean | undefined;
-            let repository = this.state.selectedItemRepository;
+            const repository = this.state.selectedItemRepository;
             if (repository) {
               willSubmit = (repository.parentOwner && repository.pullRequestAllowed) || !repository.hasWriteAccess;
             } else {
@@ -742,7 +742,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   }
 
   private navigateToURI(uri: string): boolean {
-    let state: SelectionState = {};
+    const state: SelectionState = {};
     if (this.updateSelectionState(state, uri)) {
       this.navigate(state, false);
       return true;
@@ -765,7 +765,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   }
 
   private treeItemClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path, definitionPromise: CachedPromise<LibraryDefinition>, itemInfo?: LibraryItemInfo): void => {
-    let definition = definitionPromise.getImmediateResult();
+    const definition = definitionPromise.getImmediateResult();
     if (!definition || definition.state === LibraryDefinitionState.Preloaded) {
       definitionPromise = libraryDataProvider.fetchLocalItem(path.name, true);
     }
@@ -780,7 +780,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private linkClicked = (libraryDataProvider: LibraryDataProvider, path: Fmt.Path): void => {
-    let state: SelectionState = {};
+    const state: SelectionState = {};
     this.fillSelectionState(state, libraryDataProvider, path);
     this.navigate(state);
   };
@@ -811,11 +811,11 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         uri = this.libraryDataProvider.pathToURI(state.selectedItemAbsolutePath);
       }
     }
-    let title = this.getTitle(state);
+    const title = this.getTitle(state);
     if (notify) {
       if (config.embedded) {
-        let libraryDataProvider = state.selectedItemProvider;
-        let path = state.selectedItemLocalPath;
+        const libraryDataProvider = state.selectedItemProvider;
+        const path = state.selectedItemLocalPath;
         if (libraryDataProvider && path) {
           libraryDataProvider.viewLocalItem(path.name, true)
             .catch(() => {});
@@ -849,7 +849,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   private setDocumentTitleInternal(title: string): void {
     document.title = title;
     if (config.vsCodeAPI) {
-      let message: Embedding.RequestMessage = {
+      const message: Embedding.RequestMessage = {
         command: 'TITLE',
         text: title
       };
@@ -864,7 +864,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   }
 
   private insert = (libraryDataProvider: LibraryDataProvider, section: LibraryDefinition, sectionItemNumber: LibraryItemNumber, definitionType: Logic.LogicDefinitionTypeDescription | undefined): void => {
-    let dialog = new Dialog.InsertDialog(libraryDataProvider, definitionType, this.checkNameInUse, this.state.templates);
+    const dialog = new Dialog.InsertDialog(libraryDataProvider, definitionType, this.checkNameInUse, this.state.templates);
     dialog.section = section;
     dialog.sectionItemNumber = sectionItemNumber;
     this.setState({
@@ -873,16 +873,16 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private finishInsert = (result: Dialog.InsertDialogResult): CachedPromise<LibraryDefinition | undefined> => {
-    let dialog = this.state.insertDialog;
+    const dialog = this.state.insertDialog;
     if (dialog && dialog.libraryDataProvider) {
-      let libraryDataProvider = dialog.libraryDataProvider;
+      const libraryDataProvider = dialog.libraryDataProvider;
       if (dialog.definitionType) {
-        let definitionType = dialog.definitionType;
+        const definitionType = dialog.definitionType;
         return libraryDataProvider.insertLocalItem(result.name, definitionType, result.title, undefined, result.position)
           .then((libraryDefinition: LibraryDefinition) => {
-            let localPath = new Fmt.Path(result.name);
-            let absolutePath = libraryDataProvider.getAbsolutePath(localPath);
-            let itemInfoPromise = libraryDataProvider.getLocalItemInfo(result.name);
+            const localPath = new Fmt.Path(result.name);
+            const absolutePath = libraryDataProvider.getAbsolutePath(localPath);
+            const itemInfoPromise = libraryDataProvider.getLocalItemInfo(result.name);
             this.navigate({
               selectedDocURI: undefined,
               selectedItemAbsolutePath: absolutePath,
@@ -895,7 +895,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
               this.setState({navigationPaneVisible: false});
             }
             return itemInfoPromise.then((itemInfo: LibraryItemInfo) => {
-              let editedDefinition: LibraryItemListEntry = {
+              const editedDefinition: LibraryItemListEntry = {
                 libraryDataProvider: libraryDataProvider,
                 libraryDefinition: libraryDefinition,
                 absolutePath: absolutePath,
@@ -938,11 +938,11 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private checkNameInUse = (name: string): boolean => {
-    let dialog = this.state.insertDialog;
+    const dialog = this.state.insertDialog;
     if (dialog && dialog.section) {
-      let nameLower = name.toLowerCase();
-      let sectionContents = dialog.section.definition.contents as FmtLibrary.ObjectContents_Section;
-      for (let item of sectionContents.items) {
+      const nameLower = name.toLowerCase();
+      const sectionContents = dialog.section.definition.contents as FmtLibrary.ObjectContents_Section;
+      for (const item of sectionContents.items) {
         if ((item instanceof FmtLibrary.MetaRefExpression_item || item instanceof FmtLibrary.MetaRefExpression_subsection)
             && item.ref instanceof Fmt.DefinitionRefExpression
             && nameLower === item.ref.path.name.toLowerCase()) {
@@ -954,17 +954,17 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private edit = (): void => {
-    let libraryDataProvider = this.state.selectedItemProvider;
-    let definitionPromise = this.state.selectedItemDefinition;
-    let absolutePath = this.state.selectedItemAbsolutePath;
-    let localPath = this.state.selectedItemLocalPath;
-    let itemInfoPromise = this.state.selectedItemInfo;
+    const libraryDataProvider = this.state.selectedItemProvider;
+    const definitionPromise = this.state.selectedItemDefinition;
+    const absolutePath = this.state.selectedItemAbsolutePath;
+    const localPath = this.state.selectedItemLocalPath;
+    const itemInfoPromise = this.state.selectedItemInfo;
     if (libraryDataProvider && definitionPromise && absolutePath && localPath && itemInfoPromise) {
       definitionPromise.then((definition: LibraryDefinition | undefined) => {
         itemInfoPromise!.then((itemInfo: LibraryItemInfo) => {
-          let clonedDefinition = libraryDataProvider!.editLocalItem(definition!, itemInfo);
-          let clonedDefinitionPromise = CachedPromise.resolve(clonedDefinition);
-          let editedDefinition: LibraryItemListEntry = {
+          const clonedDefinition = libraryDataProvider!.editLocalItem(definition!, itemInfo);
+          const clonedDefinitionPromise = CachedPromise.resolve(clonedDefinition);
+          const editedDefinition: LibraryItemListEntry = {
             libraryDataProvider: libraryDataProvider!,
             libraryDefinition: clonedDefinition,
             absolutePath: absolutePath!,
@@ -982,18 +982,18 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private submit = (): void => {
-    let libraryDataProvider = this.state.selectedItemProvider;
-    let definitionPromise = this.state.selectedItemDefinition;
-    let absolutePath = this.state.selectedItemAbsolutePath;
+    const libraryDataProvider = this.state.selectedItemProvider;
+    const definitionPromise = this.state.selectedItemDefinition;
+    const absolutePath = this.state.selectedItemAbsolutePath;
     if (libraryDataProvider && definitionPromise) {
-      let definition = definitionPromise.getImmediateResult();
+      const definition = definitionPromise.getImmediateResult();
       if (definition) {
         if (!this.state.tutorialState && !libraryDataProvider.checkDefaultReferences(definition)) {
           this.props.alert.error('References must be adapted before submitting.');
           return;
         }
         if (this.state.tutorialState) {
-          let notify = !config.runningLocally && !this.state.gitHubUserInfo;
+          const notify = !config.runningLocally && !this.state.gitHubUserInfo;
           libraryDataProvider.submitLocalTutorialItem(definition, notify);
           this.submitted(definition, absolutePath);
         } else {
@@ -1002,7 +1002,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
               this.submitted(definition!, absolutePath);
               if (writeFileResult instanceof GitHubWriteFileResult) {
                 if (writeFileResult.pullRequestState !== undefined) {
-                  let action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
+                  const action = writeFileResult.pullRequestState === GitHub.PullRequestState.Updated ? 'updated' : 'created';
                   this.props.alert.info(`GitHub pull request ${action} successfully.`);
                 }
               } else if (writeFileResult instanceof WebWriteFileResult) {
@@ -1029,17 +1029,17 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   }
 
   private cancelEditing = (): void => {
-    let libraryDataProvider = this.state.selectedItemProvider;
-    let definitionPromise = this.state.selectedItemDefinition;
+    const libraryDataProvider = this.state.selectedItemProvider;
+    const definitionPromise = this.state.selectedItemDefinition;
     if (libraryDataProvider && definitionPromise) {
-      let definition = definitionPromise.getImmediateResult();
+      const definition = definitionPromise.getImmediateResult();
       if (definition) {
         libraryDataProvider.cancelEditing(definition);
         this.removeEditedDefinition(definition);
         if (definition.state === LibraryDefinitionState.EditingNew) {
           this.navigateToRoot(false);
         } else {
-          let oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
+          const oldDefinition = libraryDataProvider.fetchLocalItem(definition!.definition.name, true);
           this.setState({selectedItemDefinition: oldDefinition});
         }
       }
@@ -1049,7 +1049,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   private removeEditedDefinition(definition: LibraryDefinition): void {
     this.setState((prevState) => {
       let editedDefinitions = prevState.editedDefinitions;
-      let index = editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
+      const index = editedDefinitions.findIndex((entry: LibraryItemListEntry) => (entry.libraryDefinition === definition));
       if (index >= 0) {
         editedDefinitions = editedDefinitions.slice(0, index).concat(editedDefinitions.slice(index + 1));
       }
@@ -1066,8 +1066,8 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private viewFile(openLocally: boolean): void {
-    let libraryDataProvider = this.state.selectedItemProvider;
-    let path = this.state.selectedItemLocalPath;
+    const libraryDataProvider = this.state.selectedItemProvider;
+    const path = this.state.selectedItemLocalPath;
     if (libraryDataProvider && path) {
       libraryDataProvider.viewLocalItem(path.name, openLocally)
         .catch((error) => {
@@ -1078,7 +1078,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
 
   private openDocPageLocally = (): void  => {
     if (this.state.selectedDocURI) {
-      let uri = this.state.selectedDocURI + markdownSuffix;
+      const uri = this.state.selectedDocURI + markdownSuffix;
       this.fileAccessor.openFile(uri, false)
         .view!(true)
         .catch((error) => {
@@ -1089,7 +1089,7 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
 
   private openDocPageRemotely = (): void  => {
     if (this.state.selectedDocURI) {
-      let uri = this.state.selectedDocURI + markdownSuffix;
+      const uri = this.state.selectedDocURI + markdownSuffix;
       window.open(sourceCodeURLPrefix + uri, '_blank');
     }
   };
@@ -1106,9 +1106,9 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
   };
 
   private startTutorial = (withTouchWarning: boolean, runAutomatically: boolean = false): void => {
-    let onChangeTutorialState = (stateTransitionFn: TutorialStateTransitionFn): void => {
-      let oldTutorialState = this.state.tutorialState;
-      let newTutorialState = stateTransitionFn(oldTutorialState);
+    const onChangeTutorialState = (stateTransitionFn: TutorialStateTransitionFn): void => {
+      const oldTutorialState = this.state.tutorialState;
+      const newTutorialState = stateTransitionFn(oldTutorialState);
       if (newTutorialState !== oldTutorialState) {
         this.setState({tutorialState: newTutorialState});
         if (!newTutorialState) {
@@ -1119,11 +1119,11 @@ class App extends React.Component<AppPropsWithAlert, AppState> {
         }
       }
     };
-    let onReplaceDefinitionContents = (definition: Fmt.Definition) => {
-      let editedDefinition = this.state.tutorialState?.editedDefinition;
+    const onReplaceDefinitionContents = (definition: Fmt.Definition) => {
+      const editedDefinition = this.state.tutorialState?.editedDefinition;
       if (editedDefinition) {
         editedDefinition.definition.contents = undefined;
-        let replacedParameters: Fmt.ReplacedParameter[] = [];
+        const replacedParameters: Fmt.ReplacedParameter[] = [];
         editedDefinition.definition.parameters = definition.parameters.clone(replacedParameters);
         editedDefinition.definition.contents = definition.contents?.clone(replacedParameters);
         this.state.interactionHandler?.expressionChanged();

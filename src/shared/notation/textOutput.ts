@@ -16,14 +16,14 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
   if (!optionalParenStyle) {
     optionalParenStyle = expression.optionalParenStyle;
   }
-  let indent = options.indent ?? '';
+  const indent = options.indent ?? '';
   if (expression.hasStyleClass('script')) {
     options = {
       ...options,
       shrinkMathSpaces: true
     };
   }
-  let singleLineOptions: RenderAsTextOptions = options.singleLine ? options : {
+  const singleLineOptions: RenderAsTextOptions = options.singleLine ? options : {
     ...options,
     singleLine: true,
     allowEmptyLines: false
@@ -49,12 +49,12 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
       return renderList(expression.items.map((item) => renderAsText(item, singleLineOptions)));
     }
   } else if (expression instanceof Notation.ParagraphExpression) {
-    let paragraphs = expression.paragraphs.map((item: Notation.RenderedExpression) => {
+    const paragraphs = expression.paragraphs.map((item: Notation.RenderedExpression) => {
       let ownIndent = '';
       if ((item.hasStyleClass('indented') || item.hasStyleClass('display-math')) && !options.singleLine) {
         ownIndent = options.outputMarkdown ? '\u2007' : '  ';
       }
-      let innerOptions: RenderAsTextOptions = {
+      const innerOptions: RenderAsTextOptions = {
         ...options,
         indent: indent + ownIndent
       };
@@ -63,7 +63,7 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
     });
     return renderList(paragraphs, options.singleLine ? ' ' : (options.allowEmptyLines ? '\n\n' : '\n') + indent);
   } else if (expression instanceof Notation.ListExpression) {
-    let items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
+    const items = expression.items.map((item: Notation.RenderedExpression, index: number) => {
       let prefix: string;
       if (expression.style instanceof Array) {
         prefix = expression.style[index];
@@ -71,7 +71,7 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
         prefix = expression.style.replace('1', (index + 1).toString());
       }
       prefix += ' ';
-      let innerOptions: RenderAsTextOptions = {
+      const innerOptions: RenderAsTextOptions = {
         ...options,
         allowEmptyLines: false,
         indent: indent + ' '.repeat(prefix.length)
@@ -80,17 +80,17 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
     });
     return renderList(items, options.singleLine ? ', ' : (options.outputMarkdown && expression.style !== '1.' ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Notation.TableExpression) {
-    let isAligned = (expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid'));
-    let isDefinitionList = expression.hasStyleClass('definitions');
-    let isConstruction = expression.hasStyleClass('construction');
-    let separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
-    let secondarySeparator = isDefinitionList ? '  ' : undefined;
-    let rows = expression.items.map((row: Notation.RenderedExpression[]) =>
+    const isAligned = (expression.hasStyleClass('aligned') || expression.hasStyleClass('proof-grid'));
+    const isDefinitionList = expression.hasStyleClass('definitions');
+    const isConstruction = expression.hasStyleClass('construction');
+    const separator = isConstruction ? ' | ' : isAligned ? '' : ' ';
+    const secondarySeparator = isDefinitionList ? '  ' : undefined;
+    const rows = expression.items.map((row: Notation.RenderedExpression[]) =>
       renderList(row.map((cell) => renderAsText(cell, singleLineOptions)), separator, secondarySeparator));
     return renderList(rows, options.singleLine ? ', ' : (options.outputMarkdown ? '\\\n' : '\n') + indent);
   } else if (expression instanceof Notation.ParenExpression) {
     return expression.body.getSurroundingParenStyle().then((surroundingParenStyle: string) => {
-      let body = renderAsText(expression.body, singleLineOptions);
+      const body = renderAsText(expression.body, singleLineOptions);
       if (surroundingParenStyle === expression.style) {
         return body;
       } else {
@@ -155,7 +155,7 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
   } else if (expression instanceof Notation.PlaceholderExpression) {
     return CachedPromise.resolve('?');
   } else {
-    let error = expression instanceof Notation.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
+    const error = expression instanceof Notation.ErrorExpression ? expression.errorMessage : 'Unknown expression type';
     return CachedPromise.resolve(`[Error: ${error}]`);
   }
 }
@@ -163,8 +163,8 @@ export function renderAsText(expression: Notation.RenderedExpression, options: R
 function renderList(items: CachedPromise<string>[], separator: string = '', secondarySeparator?: string): CachedPromise<string> {
   let resultPromise = CachedPromise.resolve('');
   let index = 0;
-  for (let itemPromise of items) {
-    let currentSeparator = (secondarySeparator !== undefined && index > 1 ? secondarySeparator : separator);
+  for (const itemPromise of items) {
+    const currentSeparator = (secondarySeparator !== undefined && index > 1 ? secondarySeparator : separator);
     resultPromise = resultPromise.then((currentResult: string) =>
       itemPromise.then((item: string) =>
         currentResult ? (item ? currentResult + currentSeparator + item : currentResult) : item));

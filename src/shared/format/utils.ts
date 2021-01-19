@@ -34,7 +34,7 @@ export function arePathsEqual(path1?: Fmt.PathItem, path2?: Fmt.PathItem): boole
 
 export function getInnerDefinition(outerDefinition: Fmt.Definition, path: Fmt.Path): Fmt.Definition {
   if (path.parentPath instanceof Fmt.Path) {
-    let parentDefinition = getInnerDefinition(outerDefinition, path.parentPath);
+    const parentDefinition = getInnerDefinition(outerDefinition, path.parentPath);
     return parentDefinition.innerDefinitions.getDefinition(path.name);
   } else {
     return outerDefinition;
@@ -82,10 +82,10 @@ export function containsSubExpression<T extends Fmt.Traversable>(value: T, fn: (
 }
 
 export function renameParameter(parameter: Fmt.Parameter, newName: string, parameterList: Fmt.ParameterList | undefined, scope: Fmt.Traversable | undefined): void {
-  let oldName = parameter.name;
+  const oldName = parameter.name;
   if (newName !== oldName) {
     parameter.name = newName;
-    let paramIndex = parameterList?.indexOf(parameter);
+    const paramIndex = parameterList?.indexOf(parameter);
     scope?.traverse((expression: Fmt.Expression) => {
       if (expression instanceof Fmt.IndexedExpression && expression.parameters && expression.arguments) {
         let arg: Fmt.Argument | undefined = undefined;
@@ -94,7 +94,7 @@ export function renameParameter(parameter: Fmt.Parameter, newName: string, param
             arg = expression.arguments.get(oldName, paramIndex);
           }
         } else {
-          let localParamIndex = expression.parameters.indexOf(parameter);
+          const localParamIndex = expression.parameters.indexOf(parameter);
           if (localParamIndex >= 0) {
             arg = expression.arguments.get(oldName, localParamIndex);
           }
@@ -108,9 +108,9 @@ export function renameParameter(parameter: Fmt.Parameter, newName: string, param
 }
 
 export function readCode(code: string, metaModel: Meta.MetaModel): Fmt.Expression {
-  let stream = new FmtReader.StringInputStream(code);
-  let errorHandler = new FmtReader.DefaultErrorHandler;
-  let reader = new FmtReader.Reader(stream, errorHandler, () => metaModel);
-  let context = new Ctx.DummyContext(metaModel);
+  const stream = new FmtReader.StringInputStream(code);
+  const errorHandler = new FmtReader.DefaultErrorHandler;
+  const reader = new FmtReader.Reader(stream, errorHandler, () => metaModel);
+  const context = new Ctx.DummyContext(metaModel);
   return reader.readExpression(false, metaModel.functions, context);
 }

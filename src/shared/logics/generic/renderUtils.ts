@@ -29,19 +29,19 @@ export abstract class GenericRenderUtils {
   protected abstract getConstraint(param: Fmt.Parameter): [Fmt.Expression | undefined, number];
 
   getNotationAlternatives(definition: Fmt.Definition): (Fmt.Expression | undefined)[] {
-    let notation = this.getNotation(definition);
+    const notation = this.getNotation(definition);
     return this.getSelections(notation);
   }
 
   private getSelections(notation: Fmt.Expression | undefined, args?: Map<Fmt.Parameter, Fmt.Expression>): (Fmt.Expression | undefined)[] {
     if (notation instanceof FmtNotation.MetaRefExpression_sel) {
-      let result: (Fmt.Expression | undefined)[] = [];
-      for (let selection of notation.items) {
-        let resultItems: Fmt.Expression[] = [];
+      const result: (Fmt.Expression | undefined)[] = [];
+      for (const selection of notation.items) {
+        const resultItems: Fmt.Expression[] = [];
         selection.traverse((subExpression: Fmt.Expression) => {
           if (args) {
             if (subExpression instanceof FmtNotation.MetaRefExpression_rev && subExpression.list instanceof Fmt.VariableRefExpression) {
-              let arg = args.get(subExpression.list.variable);
+              const arg = args.get(subExpression.list.variable);
               if (arg instanceof Fmt.ArrayExpression) {
                 resultItems.push(...arg.items);
               }
@@ -60,14 +60,14 @@ export abstract class GenericRenderUtils {
       }
       return result;
     } else if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
-      let template = this.templates.definitions.getDefinition(notation.path.name);
+      const template = this.templates.definitions.getDefinition(notation.path.name);
       if (template.contents instanceof FmtNotation.ObjectContents_Template) {
-        let templateArgs = new Map<Fmt.Parameter, Fmt.Expression>();
-        for (let templateParam of template.parameters) {
+        const templateArgs = new Map<Fmt.Parameter, Fmt.Expression>();
+        for (const templateParam of template.parameters) {
           let templateArg = notation.path.arguments.getOptionalValue(templateParam.name);
           if (templateArg) {
             if (args) {
-              for (let [param, arg] of args) {
+              for (const [param, arg] of args) {
                 templateArg = FmtUtils.substituteVariable(templateArg, param, arg);
               }
             }
@@ -100,7 +100,7 @@ export abstract class GenericRenderUtils {
         }
         let property: PropertyInfo | undefined = undefined;
         for (let index = 0; index < parameters.length; index++) {
-          let currentProperty = this.getConstraintParamProperty(parameters[index], remainingParameters[index], remainingDefinitions[index]);
+          const currentProperty = this.getConstraintParamProperty(parameters[index], remainingParameters[index], remainingDefinitions[index]);
           if (!currentProperty) {
             property = undefined;
             break;
@@ -156,7 +156,7 @@ export abstract class GenericRenderUtils {
 
   private getConstraintParamProperty(param: Fmt.Parameter, constraintParam: Fmt.Parameter, definition: Fmt.Definition | undefined): PropertyInfo | undefined {
     if (definition) {
-      let [constraint, negationCount] = this.getConstraint(constraintParam);
+      const [constraint, negationCount] = this.getConstraint(constraintParam);
       if (constraint instanceof Fmt.DefinitionRefExpression) {
         return this.getConstraintProperty(param, constraint, negationCount, definition);
       }
@@ -165,13 +165,13 @@ export abstract class GenericRenderUtils {
   }
 
   getConstraintProperty(param: Fmt.Parameter, constraint: Fmt.DefinitionRefExpression, negationCount: number, definition: Fmt.Definition): PropertyInfo | undefined {
-    let notation = this.getNotation(definition);
+    const notation = this.getNotation(definition);
     if (notation instanceof Fmt.DefinitionRefExpression && !notation.path.parentPath) {
-      let template = this.templates.definitions.getDefinition(notation.path.name);
+      const template = this.templates.definitions.getDefinition(notation.path.name);
       if (template.contents instanceof FmtNotation.ObjectContents_Template) {
-        let elements = template.contents.elements;
+        const elements = template.contents.elements;
         if (elements && elements.operand instanceof Fmt.VariableRefExpression) {
-          let operand = notation.path.arguments.getValue(elements.operand.variable.name);
+          const operand = notation.path.arguments.getValue(elements.operand.variable.name);
           if (operand instanceof Fmt.VariableRefExpression) {
             let operandArg = constraint.path.arguments.getValue(operand.variable.name);
             if (operandArg instanceof Fmt.CompoundExpression && operandArg.arguments.length) {
@@ -222,14 +222,14 @@ export abstract class GenericRenderUtils {
       if (expression instanceof Array && expression.length === notation.length) {
         let result = CachedPromise.resolve(true);
         for (let index = 0; index < expression.length; index++) {
-          let expressionItem = expression[index];
-          let notationItem = notation[index];
+          const expressionItem = expression[index];
+          const notationItem = notation[index];
           result = result.and(() => this.matchParameterizedNotation(expressionItem, notationItem, abbreviationArgs));
         }
         return result;
       }
     } else if (notation instanceof AbbreviationParamExpression) {
-      let paramName = notation.abbreviationParam.name;
+      const paramName = notation.abbreviationParam.name;
       if (abbreviationArgs[paramName] === notation) {
         abbreviationArgs[paramName] = expression;
         return CachedPromise.resolve(true);
@@ -239,9 +239,9 @@ export abstract class GenericRenderUtils {
     } else if (notation instanceof Notation.TemplateInstanceExpression) {
       if (expression instanceof Notation.TemplateInstanceExpression && expression.template === notation.template) {
         let result = CachedPromise.resolve(true);
-        for (let param of expression.template.parameters) {
-          let expressionArg = expression.config.getArgFn(param.name);
-          let notationArg = notation.config.getArgFn(param.name);
+        for (const param of expression.template.parameters) {
+          const expressionArg = expression.config.getArgFn(param.name);
+          const notationArg = notation.config.getArgFn(param.name);
           if (notationArg !== undefined) {
             if (expressionArg === undefined) {
               return CachedPromise.resolve(false);
@@ -263,9 +263,9 @@ export abstract class GenericRenderUtils {
         this.matchParameterizedNotation(expression, innerNotation, abbreviationArgs, semanticLinks));
     } else if (notation instanceof Notation.RenderedExpression && notation.semanticLinks) {
       if (expression instanceof Notation.RenderedExpression && expression.semanticLinks) {
-        for (let semanticLink of notation.semanticLinks) {
+        for (const semanticLink of notation.semanticLinks) {
           if (semanticLink.linkedObject instanceof Fmt.Parameter) {
-            for (let expressionSemanticLink of expression.semanticLinks) {
+            for (const expressionSemanticLink of expression.semanticLinks) {
               if (expressionSemanticLink.linkedObject === semanticLink.linkedObject) {
                 return CachedPromise.resolve(true);
               }

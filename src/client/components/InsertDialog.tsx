@@ -40,7 +40,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   componentDidMount(): void {
     // Work around a bug in react-responsive-modal (I think) which breaks the autoFocus attribute on (our?) inputs.
     if (this.nameInputNode) {
-      let focusNode = () => {
+      const focusNode = () => {
         this.nameInputNode?.focus();
       };
       this.focusTimer = setTimeout(focusNode, 100);
@@ -54,10 +54,10 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   render(): React.ReactNode {
-    let definitionType = this.props.dialog.definitionType;
+    const definitionType = this.props.dialog.definitionType;
     let titleRow: React.ReactNode = null;
     if (!definitionType) {
-      let titleClassName = this.state.titleError ? 'input-error' : undefined;
+      const titleClassName = this.state.titleError ? 'input-error' : undefined;
       titleRow = (
         <tr className={'dialog-row separated-below'}>
           <td className={'dialog-cell'}>Title:</td>
@@ -69,8 +69,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
         </tr>
       );
     }
-    let nameClassName = this.state.nameError ? 'input-error' : undefined;
-    let nameRow = (
+    const nameClassName = this.state.nameError ? 'input-error' : undefined;
+    const nameRow = (
       <tr className={'dialog-row separated-above' + (titleRow ? '' : ' dialog-row separated-below')}>
         <td className={'dialog-cell'}>Name:</td>
         <td className={'dialog-cell'}>
@@ -82,7 +82,7 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
     );
     let positionRow: React.ReactNode = null;
     if (this.props.dialog.section) {
-      let title = this.state.title || this.state.name;
+      const title = this.state.title || this.state.name;
       positionRow = (
         <tr className={'dialog-row separated-above separated-below'}>
           <td className={'dialog-cell dialog-position-list-cell'} colSpan={2}>
@@ -105,8 +105,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   private onChangeName = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    let newName = event.target.value;
-    let nameError = this.checkName(newName);
+    const newName = event.target.value;
+    const nameError = this.checkName(newName);
     this.setState((prevState) => ({
       name: newName,
       nameError: nameError,
@@ -115,9 +115,9 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   };
 
   private onBlurName = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    let newName = event.target.value;
+    const newName = event.target.value;
     if (newName && !this.props.dialog.definitionType && !this.state.title) {
-      let titleError = this.checkTitle(newName);
+      const titleError = this.checkTitle(newName);
       this.setState((prevState) => ({
         title: newName,
         titleError: titleError,
@@ -127,8 +127,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   };
 
   private onChangeTitle = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    let newTitle = event.target.value;
-    let titleError = this.checkTitle(newTitle);
+    const newTitle = event.target.value;
+    const titleError = this.checkTitle(newTitle);
     this.setState((prevState) => ({
       title: newTitle,
       titleError: titleError,
@@ -140,13 +140,13 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
     if (!name) {
       return new Error('Name is required');
     }
-    for (let c of name) {
+    for (const c of name) {
       if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c === ' ' || c === '-' || c === '(' || c === ')')) {
         return new Error('Name can only contain alphanumeric characters, spaces, dashes, and parentheses');
       }
     }
-    let firstChar = name[0];
-    let definitionType = this.props.dialog.definitionType;
+    const firstChar = name[0];
+    const definitionType = this.props.dialog.definitionType;
     if (definitionType && (definitionType.definitionType === Logic.LogicDefinitionType.Constructor || definitionType.definitionType === Logic.LogicDefinitionType.Operator || definitionType.definitionType === Logic.LogicDefinitionType.Predicate)) {
       if (!(firstChar >= 'a' && firstChar <= 'z')) {
         return new Error(`${this.getDefinitionTypeName()} name must start with a lowercase letter`);
@@ -181,9 +181,9 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   private getDefinitionTypeName(): string {
-    let definitionType = this.props.dialog.definitionType;
+    const definitionType = this.props.dialog.definitionType;
     if (definitionType) {
-      let name = definitionType.name.toLowerCase();
+      const name = definitionType.name.toLowerCase();
       return name[0].toUpperCase() + name.substring(1);
     } else {
       return 'Section';
@@ -191,8 +191,8 @@ class InsertDialog extends React.Component<InsertDialogProps, InsertDialogState>
   }
 
   private onOK = (): void => {
-    let title = InsertDialog.trimString(this.state.title);
-    let result: Dialog.InsertDialogResult = {
+    const title = InsertDialog.trimString(this.state.title);
+    const result: Dialog.InsertDialogResult = {
       name: InsertDialog.trimString(this.state.name),
       title: title || undefined,
       position: this.state.position

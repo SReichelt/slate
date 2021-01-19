@@ -47,14 +47,14 @@ export abstract class ExpressionDialogItem {
   }
 
   unregisterChangeListener(listener: ChangeListener): void {
-    let index = this.listeners.indexOf(listener);
+    const index = this.listeners.indexOf(listener);
     if (index >= 0) {
       this.listeners.splice(index, 1);
     }
   }
 
   changed(): void {
-    for (let listener of this.listeners) {
+    for (const listener of this.listeners) {
       listener();
     }
   }

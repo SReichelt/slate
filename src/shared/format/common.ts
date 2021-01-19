@@ -61,7 +61,7 @@ export function escapeIdentifier(identifier: string): string {
   if (identifier) {
     let escape = false;
     let first = true;
-    for (let c of identifier) {
+    for (const c of identifier) {
       if (isSpecialCharacter(c) || (first && isNumericalCharacter(c))) {
         escape = true;
       }
@@ -97,7 +97,7 @@ export function getNextDefaultName(name: string): string {
     if (name === 'n') {
       return 'x';
     }
-    let charCode = name.charCodeAt(0);
+    const charCode = name.charCodeAt(0);
     if (charCode >= 0x41 && charCode <= 0x5a) {
       return String.fromCharCode(charCode === 0x5a ? 0x41 : charCode + 1);
     }
@@ -106,8 +106,8 @@ export function getNextDefaultName(name: string): string {
     }
   }
   if (name.startsWith('_')) {
-    let numStr = name.substring(1);
-    let num = parseInt(numStr, 10);
+    const numStr = name.substring(1);
+    const num = parseInt(numStr, 10);
     if (name === `_${num}`) {
       return `_${num + 1}`;
     }

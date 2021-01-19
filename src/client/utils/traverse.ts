@@ -16,7 +16,7 @@ function assignProps(props: any, nodeObject: any, fallbackKey: number | undefine
   } else if (fallbackKey !== undefined) {
     props.key = fallbackKey;
   }
-  let origRef = nodeObject.ref;
+  const origRef = nodeObject.ref;
   if (additionalRef) {
     props.ref = (ref: any) => {
       additionalRef(ref);
@@ -37,7 +37,7 @@ function getManipulatedProps(nodeObject: any, fallbackKey: number | undefined, i
   if (nodeObject.key === null && nodeObject.ref === null && fallbackKey === undefined && !manipulator?.manipulateContents && !manipulator?.componentAction && !manipulator?.elementAction) {
     return props;
   }
-  let result = {...props};
+  const result = {...props};
   let additionalRef = undefined;
   if (manipulator?.elementAction && !isComponent) {
     additionalRef = (ref: any) => {
@@ -65,8 +65,8 @@ function attachElementAction(nodeObject: any, elementAction: (reactElement: Reac
   if (nodeObject.type === undefined || nodeObject.props === undefined) {
     throw new Error('Cannot attach element action to non-element node');
   }
-  let newContentProps = {...nodeObject.props};
-  let additionalRef = (ref: any) => {
+  const newContentProps = {...nodeObject.props};
+  const additionalRef = (ref: any) => {
     if (ref !== null) {
       elementAction(nodeObject, ref);
     }
@@ -75,8 +75,8 @@ function attachElementAction(nodeObject: any, elementAction: (reactElement: Reac
   return React.createElement(nodeObject.type, newContentProps);
 }
 
-let wrappedClassComponents = new Map<any, any>();
-let wrappedFunctionComponents = new Map<any, any>();
+const wrappedClassComponents = new Map<any, any>();
+const wrappedFunctionComponents = new Map<any, any>();
 
 function getManipulatedContents(contents: any, props: any, component: React.Component<any, any> | undefined): any {
   if (props._manipulateContents) {
@@ -159,7 +159,7 @@ export function traverseReactComponents(node: React.ReactNode, visitor: ReactEle
     if (typeof type !== 'undefined') {
       let isComponent = false;
 
-      let manipulator = visitor(nodeObject);
+      const manipulator = visitor(nodeObject);
 
       if (typeof type.prototype !== 'undefined' && typeof type.prototype.render === 'function') {
         isComponent = true;
@@ -184,7 +184,7 @@ export function traverseReactComponents(node: React.ReactNode, visitor: ReactEle
         if (manipulator.manipulateContents) {
           nodeObject = manipulator.manipulateContents(node, undefined);
           if (manipulator.manipulateProps) {
-            let newProps = manipulator.manipulateProps(nodeObject.props);
+            const newProps = manipulator.manipulateProps(nodeObject.props);
             nodeObject = React.createElement(nodeObject.type, newProps);
           }
           if (manipulator.elementAction) {
@@ -195,7 +195,7 @@ export function traverseReactComponents(node: React.ReactNode, visitor: ReactEle
       }
 
       if (manipulator?.manipulateProps || manipulator?.elementAction || nodeObject.props?.children) {
-        let newProps = {
+        const newProps = {
           ...getManipulatedProps(nodeObject, fallbackKey, isComponent, manipulator),
           children: traverseReactComponents(nodeObject.props.children, visitor)
         };

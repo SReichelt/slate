@@ -23,18 +23,18 @@ export class WebFileReference extends StandardFileReference {
   }
 
   read(): CachedPromise<string> {
-    let result = this.fetchHelper.fetchText(this.uri);
+    const result = this.fetchHelper.fetchText(this.uri);
     return new CachedPromise(result);
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
-    let options: RequestInit = {
+    const options: RequestInit = {
       method: 'PUT',
       body: contents
     };
-    let result = this.fetchHelper.fetchAny(this.uri, options)
+    const result = this.fetchHelper.fetchAny(this.uri, options)
       .then((response: Response) => {
-        let writeFileResult = new WebWriteFileResult;
+        const writeFileResult = new WebWriteFileResult;
         writeFileResult.writtenDirectly = (response.status === 200);
         return writeFileResult;
       });
@@ -42,10 +42,10 @@ export class WebFileReference extends StandardFileReference {
   }
 
   view(openLocally: boolean): CachedPromise<void> {
-    let options: RequestInit = {
+    const options: RequestInit = {
       method: 'REPORT'
     };
-    let result = this.fetchHelper.fetchVoid(this.uri, options);
+    const result = this.fetchHelper.fetchVoid(this.uri, options);
     return new CachedPromise(result);
   }
 }

@@ -13,12 +13,12 @@ export class DynamicMetaModel extends Meta.MetaModel {
   onObjectContentsCreated?: ObjectContentsCallbackFn;
 
   constructor(file: Fmt.File, fileName: string, getReferencedMetaModel: Meta.MetaModelGetter) {
-    let definitions = file.definitions;
-    let metaModelDefinition = definitions[0];
-    let metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
-    let definitionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.definitionTypes, metaModelDefinitionContents.expressionTypes);
-    let expressionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.expressionTypes);
-    let functions = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.functions);
+    const definitions = file.definitions;
+    const metaModelDefinition = definitions[0];
+    const metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
+    const definitionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.definitionTypes, metaModelDefinitionContents.expressionTypes);
+    const expressionTypes = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.expressionTypes);
+    const functions = new DynamicMetaDefinitionFactory(definitions, metaModelDefinitionContents.functions);
     super(metaModelDefinition.name, definitionTypes, expressionTypes, functions);
     this.fileName = fileName;
     this.definitions = definitions;
@@ -48,17 +48,17 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
-    let parentTypeDefinition = this.getParentTypeDefinition(context);
+    const parentTypeDefinition = this.getParentTypeDefinition(context);
     if (parentTypeDefinition) {
-      let member = this.findMember(parentTypeDefinition, argument.name, argumentIndex).result;
+      const member = this.findMember(parentTypeDefinition, argument.name, argumentIndex).result;
       if (member) {
         for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
           if (context instanceof DefinitionContentsContext || context instanceof Ctx.ParentInfoContext) {
             let stop = true;
             if (member.dependencies) {
-              for (let dependency of member.dependencies) {
+              for (const dependency of member.dependencies) {
                 if (dependency instanceof Fmt.DefinitionRefExpression) {
-                  let curParentTypeDefinition = this.getParentTypeDefinition(context);
+                  const curParentTypeDefinition = this.getParentTypeDefinition(context);
                   if (curParentTypeDefinition && !dependency.path.parentPath && dependency.path.name === curParentTypeDefinition.name) {
                     stop = true;
                     break;
@@ -73,7 +73,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
           }
         }
         if (member.dependencies) {
-          for (let dependency of member.dependencies) {
+          for (const dependency of member.dependencies) {
             if (dependency instanceof Fmt.VariableRefExpression) {
               context = this.getMemberArgumentExports(previousArguments, parentTypeDefinition, dependency.variable, context).result;
             }
@@ -82,12 +82,12 @@ export class DynamicMetaModel extends Meta.MetaModel {
         context = this.getArgumentTypeContext(member.type, context);
       }
     }
-    let parent = context.parentObject;
+    const parent = context.parentObject;
     if (parent instanceof DynamicMetaRefExpression) {
       try {
-        let metaParameter = parent.metaDefinition.parameters.getParameter(argument.name, argumentIndex);
+        const metaParameter = parent.metaDefinition.parameters.getParameter(argument.name, argumentIndex);
         if (metaParameter.dependencies) {
-          for (let dependency of metaParameter.dependencies) {
+          for (const dependency of metaParameter.dependencies) {
             if (dependency instanceof FmtMeta.MetaRefExpression_self) {
               for (let currentContext = context; currentContext instanceof Ctx.DerivedContext; currentContext = currentContext.parentContext) {
                 if (currentContext instanceof ParameterTypeContext) {
@@ -108,13 +108,13 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   private getParentTypeDefinition(context: Ctx.Context): Fmt.Definition | undefined {
-    let parent = context.parentObject;
+    const parent = context.parentObject;
     if (parent instanceof Fmt.Definition && parent.type instanceof DynamicMetaRefExpression) {
       return parent.type.metaDefinition;
     } else if (parent instanceof Fmt.CompoundExpression) {
       for (; context instanceof Ctx.DerivedContext; context = context.parentContext) {
         if (context instanceof ArgumentTypeContext) {
-          let definition = this.definitions.getDefinition(context.metaDefinitionName);
+          const definition = this.definitions.getDefinition(context.metaDefinitionName);
           if (definition.type instanceof FmtMeta.MetaRefExpression_ExpressionType) {
             return definition;
           }
@@ -132,9 +132,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
       type = type.body;
     }
     if (type instanceof Fmt.DefinitionRefExpression) {
-      let path = type.path;
-      let context = new ArgumentTypeContext(path.name, parentContext);
-      let metaModel = this.getReferencedMetaModelFromPath(path);
+      const path = type.path;
+      const context = new ArgumentTypeContext(path.name, parentContext);
+      const metaModel = this.getReferencedMetaModelFromPath(path);
       if (metaModel) {
         context.metaModel = metaModel;
       }
@@ -146,9 +146,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
   protected getExports(expression: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     let context = parentContext;
     if (expression instanceof DynamicMetaRefExpression) {
-      let metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
+      const metaContents = expression.metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
       if (metaContents.exports) {
-        for (let metaExport of metaContents.exports) {
+        for (const metaExport of metaContents.exports) {
           context = this.getArgumentExports(expression.arguments, expression.metaDefinition.parameters, metaExport, context, indexParameterLists);
         }
       }
@@ -160,10 +160,10 @@ export class DynamicMetaModel extends Meta.MetaModel {
     let context = parentContext;
     while (parameterExpression instanceof Fmt.IndexedExpression) {
       if (parameterExpression.arguments) {
-        let newIndexParameterLists: Fmt.ParameterList[] = [];
-        for (let indexArg of parameterExpression.arguments) {
+        const newIndexParameterLists: Fmt.ParameterList[] = [];
+        for (const indexArg of parameterExpression.arguments) {
           if (indexArg.value instanceof Fmt.VariableRefExpression) {
-            let indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
+            const indexValue = this.getArgumentValue(argumentList, parameterList, indexArg.value.variable);
             if (indexValue instanceof Fmt.ParameterExpression) {
               newIndexParameterLists.push(indexValue.parameters);
             }
@@ -174,8 +174,8 @@ export class DynamicMetaModel extends Meta.MetaModel {
       parameterExpression = parameterExpression.body;
     }
     if (parameterExpression instanceof Fmt.VariableRefExpression) {
-      let parameter = parameterExpression.variable;
-      let value = this.getArgumentValue(argumentList, parameterList, parameter, indexOffset);
+      const parameter = parameterExpression.variable;
+      const value = this.getArgumentValue(argumentList, parameterList, parameter, indexOffset);
       if (value) {
         context = this.getValueExports(value, parameter.type, context, indexParameterLists);
       }
@@ -185,16 +185,16 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   private getMemberArgumentExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, member: Fmt.Parameter, parentContext: Ctx.Context): {result: Ctx.Context, memberCount: number} {
     let context = parentContext;
-    let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
+    const metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
     if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
-      let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
-      let parentExports = parentMetaModel.getMemberArgumentExports(argumentList, parentMetaDefinition, member, context);
+      const [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
+      const parentExports = parentMetaModel.getMemberArgumentExports(argumentList, parentMetaDefinition, member, context);
       context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
     if (metaContents.members) {
-      let value = this.getArgumentValue(argumentList, metaContents.members, member, parentMemberCount);
+      const value = this.getArgumentValue(argumentList, metaContents.members, member, parentMemberCount);
       if (value) {
         context = this.getValueExports(value, member.type, context);
       }
@@ -206,14 +206,14 @@ export class DynamicMetaModel extends Meta.MetaModel {
   private getValueExports(expression: Fmt.Expression, metaType: Fmt.Expression, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     if (expression instanceof Fmt.ArrayExpression && metaType instanceof Fmt.IndexedExpression) {
       let context = parentContext;
-      for (let item of expression.items) {
+      for (const item of expression.items) {
         context = this.getValueExports(item, metaType.body, context, indexParameterLists);
       }
       return context;
     } else if (expression instanceof Fmt.ParameterExpression) {
       return this.getParameterListContext(expression.parameters, parentContext, indexParameterLists);
     } else if (expression instanceof Fmt.CompoundExpression && metaType instanceof Fmt.DefinitionRefExpression) {
-      let [metaModel, metaDefinition] = this.getMetaDefinition(metaType.path);
+      const [metaModel, metaDefinition] = this.getMetaDefinition(metaType.path);
       return metaModel.getTypeExports(expression.arguments, metaDefinition, parentContext, indexParameterLists).result;
     } else {
       return parentContext;
@@ -222,17 +222,17 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   private getTypeExports(argumentList: Fmt.ArgumentList, metaDefinition: Fmt.Definition, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): {result: Ctx.Context, memberCount: number} {
     let context = parentContext;
-    let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
+    const metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let parentMemberCount = 0;
     if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
-      let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
-      let parentExports = parentMetaModel.getTypeExports(argumentList, parentMetaDefinition, context, indexParameterLists);
+      const [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
+      const parentExports = parentMetaModel.getTypeExports(argumentList, parentMetaDefinition, context, indexParameterLists);
       context = parentExports.result;
       parentMemberCount = parentExports.memberCount;
     }
     if (metaContents.members) {
       if (metaContents.exports) {
-        for (let metaExport of metaContents.exports) {
+        for (const metaExport of metaContents.exports) {
           if (metaExport instanceof Fmt.VariableRefExpression) {
             context = this.getArgumentExports(argumentList, metaContents.members, metaExport, context, indexParameterLists, parentMemberCount);
           }
@@ -244,7 +244,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   private getArgumentValue(argumentList: Fmt.ArgumentList, parameterList: Fmt.ParameterList, parameter: Fmt.Parameter, indexOffset: number = 0): Fmt.Expression | undefined {
-    let index = parameterList.indexOf(parameter);
+    const index = parameterList.indexOf(parameter);
     if (index >= 0) {
       return argumentList.getOptionalValue(parameter.name, indexOffset + index);
     } else {
@@ -258,7 +258,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
         return true;
       }
       if (metaDefinition.contents.superType instanceof Fmt.DefinitionRefExpression) {
-        let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaDefinition.contents.superType.path);
+        const [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaDefinition.contents.superType.path);
         return parentMetaModel.hasObjectContents(parentMetaDefinition);
       }
     }
@@ -268,13 +268,13 @@ export class DynamicMetaModel extends Meta.MetaModel {
   canOmitBraces(metaDefinition: Fmt.Definition): boolean {
     if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType && !metaDefinition.contents.superType && metaDefinition.contents.members) {
       let first = true;
-      for (let member of metaDefinition.contents.members) {
+      for (const member of metaDefinition.contents.members) {
         if (first) {
           if (member.optional || member.type instanceof Fmt.IndexedExpression) {
             return false;
           }
           if (member.type instanceof Fmt.DefinitionRefExpression && !member.type.path.parentPath) {
-            let [memberMetaModel, memberMetaDefinition] = this.getMetaDefinition(member.type.path);
+            const [memberMetaModel, memberMetaDefinition] = this.getMetaDefinition(member.type.path);
             if (memberMetaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && this.hasObjectContents(memberMetaDefinition)) {
               return false;
             }
@@ -293,18 +293,18 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   findMember(metaDefinition: Fmt.Definition, name?: string, index?: number): {result: Fmt.Parameter | undefined, memberCount: number} {
-    let metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
+    const metaContents = metaDefinition.contents as FmtMeta.ObjectContents_DefinedType;
     let result: Fmt.Parameter | undefined = undefined;
     let parentMemberCount = 0;
     if (metaContents.superType instanceof Fmt.DefinitionRefExpression) {
-      let [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
-      let parentMember = parentMetaModel.findMember(parentMetaDefinition, name, index);
+      const [parentMetaModel, parentMetaDefinition] = this.getMetaDefinition(metaContents.superType.path);
+      const parentMember = parentMetaModel.findMember(parentMetaDefinition, name, index);
       result = parentMember.result;
       parentMemberCount = parentMember.memberCount;
     }
     if (metaContents.members) {
       if (name !== undefined) {
-        for (let member of metaContents.members) {
+        for (const member of metaContents.members) {
           if (member.name === name) {
             result = member;
           }
@@ -322,7 +322,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
       if (!(value instanceof Fmt.ArrayExpression)) {
         throw new Error('Array expression expected');
       }
-      for (let item of value.items) {
+      for (const item of value.items) {
         this.checkValueImpl(type.body, item, onObjectContentsCreated, onMemberFound);
       }
     } else if (type instanceof Fmt.MetaRefExpression) {
@@ -351,9 +351,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
         }
       }
     } else if (type instanceof Fmt.DefinitionRefExpression) {
-      let [metaModel, metaDefinition] = this.getMetaDefinition(type.path);
+      const [metaModel, metaDefinition] = this.getMetaDefinition(type.path);
       if (metaDefinition.type instanceof FmtMeta.MetaRefExpression_ExpressionType && metaModel.hasObjectContents(metaDefinition) && value instanceof Fmt.CompoundExpression) {
-        let objectContents = new DynamicObjectContents(metaModel, metaDefinition, false, onMemberFound);
+        const objectContents = new DynamicObjectContents(metaModel, metaDefinition, false, onMemberFound);
         onObjectContentsCreated?.(value, objectContents);
         objectContents.fromExpression(value);
       }
@@ -365,9 +365,9 @@ export class DynamicMetaModel extends Meta.MetaModel {
   }
 
   private getReferencedMetaModelFromPath(path: Fmt.Path): Meta.MetaModel | undefined {
-    let parentPath = path.parentPath;
+    const parentPath = path.parentPath;
     if (parentPath instanceof Fmt.NamedPathItem) {
-      let metaModelPath = new Fmt.Path(parentPath.name, undefined, parentPath.parentPath);
+      const metaModelPath = new Fmt.Path(parentPath.name, undefined, parentPath.parentPath);
       return this.getReferencedMetaModel(metaModelPath);
     } else {
       return undefined;
@@ -376,7 +376,7 @@ export class DynamicMetaModel extends Meta.MetaModel {
 
   getMetaDefinition(path: Fmt.Path): [DynamicMetaModel, Fmt.Definition] {
     if (path.parentPath) {
-      let metaModel = this.getReferencedMetaModelFromPath(path);
+      const metaModel = this.getReferencedMetaModelFromPath(path);
       if (metaModel instanceof DynamicMetaModel) {
         return metaModel.getNamedMetaDefinition(path.name);
       } else {
@@ -399,13 +399,13 @@ export class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
 
   constructor(definitions: Fmt.DefinitionList, list: Fmt.Expression[] | undefined, secondaryList?: Fmt.Expression[]) {
     if (list) {
-      for (let item of list) {
+      for (const item of list) {
         if (item instanceof Fmt.DefinitionRefExpression && !item.path.parentPath) {
           this.metaDefinitions.set(item.path.name, definitions.getDefinition(item.path.name));
         } else if (item instanceof FmtMeta.MetaRefExpression_Any) {
           this.includesAny = true;
           if (secondaryList) {
-            for (let secondaryItem of secondaryList) {
+            for (const secondaryItem of secondaryList) {
               if (secondaryItem instanceof Fmt.DefinitionRefExpression && !secondaryItem.path.parentPath) {
                 this.metaDefinitions.set(secondaryItem.path.name, definitions.getDefinition(secondaryItem.path.name));
               }
@@ -417,7 +417,7 @@ export class DynamicMetaDefinitionFactory implements Fmt.MetaDefinitionFactory {
   }
 
   createMetaRefExpression(name: string): Fmt.MetaRefExpression {
-    let metaDefinition = this.metaDefinitions.get(name);
+    const metaDefinition = this.metaDefinitions.get(name);
     if (metaDefinition) {
       return new DynamicMetaRefExpression(this.metaModel, metaDefinition);
     } else {
@@ -441,7 +441,7 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
     this.originalArguments = argumentList;
     let paramIndex = 0;
     let hadOptionalParams = false;
-    for (let param of this.metaDefinition.parameters) {
+    for (const param of this.metaDefinition.parameters) {
       let paramName = param.list ? undefined : param.name;
       let value: Fmt.Expression | undefined;
       if (param.optional || param.defaultValue) {
@@ -469,10 +469,10 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
         }
       }
     }
-    let foundParams = new Set<Fmt.Parameter>();
+    const foundParams = new Set<Fmt.Parameter>();
     let argIndex = 0;
-    for (let arg of argumentList) {
-      let param = this.metaDefinition.parameters.getParameter(arg.name, argIndex);
+    for (const arg of argumentList) {
+      const param = this.metaDefinition.parameters.getParameter(arg.name, argIndex);
       if (foundParams.has(param) && !param.list) {
         throw new Error(`Duplicate argument for "${param.name}"`);
       } else {
@@ -484,9 +484,9 @@ export class DynamicMetaRefExpression extends Fmt.GenericMetaRefExpression {
 
   getMetaInnerDefinitionTypes(): Fmt.MetaDefinitionFactory | undefined {
     if (this.metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinitionType) {
-      let metaModelDefinition = this.metaModel.definitions[0];
-      let metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
-      let factory = new DynamicMetaDefinitionFactory(this.metaModel.definitions, this.metaDefinition.contents.innerDefinitionTypes, metaModelDefinitionContents.expressionTypes);
+      const metaModelDefinition = this.metaModel.definitions[0];
+      const metaModelDefinitionContents = metaModelDefinition.contents as FmtMeta.ObjectContents_MetaModel;
+      const factory = new DynamicMetaDefinitionFactory(this.metaModel.definitions, this.metaDefinition.contents.innerDefinitionTypes, metaModelDefinitionContents.expressionTypes);
       factory.metaModel = this.metaModel;
       return factory;
     } else {
@@ -520,10 +520,10 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
   fromArgumentList(argumentList: Fmt.ArgumentList): void {
     this.originalArguments = argumentList;
     this.checkMembers(argumentList, this.metaModel, this.metaDefinition);
-    let foundMembers = new Set<Fmt.Parameter>();
+    const foundMembers = new Set<Fmt.Parameter>();
     let argIndex = 0;
-    for (let arg of argumentList) {
-      let member = this.metaModel.findMember(this.metaDefinition, arg.name, argIndex).result;
+    for (const arg of argumentList) {
+      const member = this.metaModel.findMember(this.metaDefinition, arg.name, argIndex).result;
       if (member) {
         if (foundMembers.has(member)) {
           throw new Error(`Duplicate argument for "${member.name}"`);
@@ -545,15 +545,15 @@ export class DynamicObjectContents extends Fmt.GenericObjectContents {
     let memberIndex = 0;
     let hadOptionalMembers = this.isDefinition;
     if (metaDefinition.contents instanceof FmtMeta.ObjectContents_DefinedType) {
-      let superType = metaDefinition.contents.superType;
+      const superType = metaDefinition.contents.superType;
       if (superType instanceof Fmt.DefinitionRefExpression) {
-        let [superTypeMetaModel, superTypeMetaDefinition] = metaModel.getMetaDefinition(superType.path);
-        let superTypeResult = this.checkMembers(argumentList, superTypeMetaModel, superTypeMetaDefinition);
+        const [superTypeMetaModel, superTypeMetaDefinition] = metaModel.getMetaDefinition(superType.path);
+        const superTypeResult = this.checkMembers(argumentList, superTypeMetaModel, superTypeMetaDefinition);
         memberIndex = superTypeResult.memberCount;
         hadOptionalMembers = superTypeResult.hadOptionalMembers;
       }
       if (metaDefinition.contents.members) {
-        for (let member of metaDefinition.contents.members) {
+        for (const member of metaDefinition.contents.members) {
           let memberName: string | undefined = member.name;
           let value: Fmt.Expression | undefined;
           if (member.optional || member.defaultValue) {

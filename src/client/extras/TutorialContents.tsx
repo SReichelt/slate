@@ -36,7 +36,7 @@ export type ReplaceDefinitionContentsFn = (definition: Fmt.Definition) => void;
 
 function inject(fn: (...args: any) => any, action: (result: any, ...args: any) => void) {
   return (...args: any) => {
-    let result = fn(...args);
+    const result = fn(...args);
     action(result, ...args);
     return result;
   };
@@ -875,8 +875,8 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('f');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
+      const param = definition.parameters.getParameter('f');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['Functions'], [[
         this.createSetArg('X'),
         this.createSetArg('Y')
@@ -971,10 +971,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('f');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
-      let functions = type._set as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'S');
+      const param = definition.parameters.getParameter('f');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
+      const functions = type._set as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'S');
       this.setArgValue(functions.path.arguments, 'X', variableRef);
     }
   };
@@ -1061,10 +1061,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('f');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
-      let functions = type._set as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'T');
+      const param = definition.parameters.getParameter('f');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
+      const functions = type._set as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'T');
       this.setArgValue(functions.path.arguments, 'Y', variableRef);
     }
   };
@@ -1287,8 +1287,8 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('g');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
+      const param = definition.parameters.getParameter('g');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['Functions'], [[
         this.createSetArg('X'),
         this.createSetArg('Y')
@@ -1378,10 +1378,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('g');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
-      let functions = type._set as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'S');
+      const param = definition.parameters.getParameter('g');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
+      const functions = type._set as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'S');
       this.setArgValue(functions.path.arguments, 'X', variableRef);
     }
   };
@@ -1468,10 +1468,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('g');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
-      let functions = type._set as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'S');
+      const param = definition.parameters.getParameter('g');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
+      const functions = type._set as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'S');
       this.setArgValue(functions.path.arguments, 'Y', variableRef);
     }
   };
@@ -1808,8 +1808,8 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('n');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
+      const param = definition.parameters.getParameter('n');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
     }
   };
@@ -2002,7 +2002,7 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      const contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
       contents.definition[0] = this.createDefinitionRefExpression(['composition'], [[
         this.createSetArg('X'),
         this.createSetArg('Y'),
@@ -2112,9 +2112,9 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
-      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'f');
+      const contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      const composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'f');
       this.setArgValue(composition.path.arguments, 'g', variableRef);
     }
   };
@@ -2205,15 +2205,15 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
-      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
-      let variableRef1 = this.createVariableRefExpression(definition, 'g');
+      const contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      const composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      const variableRef1 = this.createVariableRefExpression(definition, 'g');
       this.setArgValue(composition.path.arguments, 'f', variableRef1);
-      let variableRef2 = this.createVariableRefExpression(definition, 'S');
+      const variableRef2 = this.createVariableRefExpression(definition, 'S');
       this.setArgValue(composition.path.arguments, 'X', variableRef2);
-      let variableRef3 = this.createVariableRefExpression(definition, 'S');
+      const variableRef3 = this.createVariableRefExpression(definition, 'S');
       this.setArgValue(composition.path.arguments, 'Y', variableRef3);
-      let variableRef4 = this.createVariableRefExpression(definition, 'T');
+      const variableRef4 = this.createVariableRefExpression(definition, 'T');
       this.setArgValue(composition.path.arguments, 'Z', variableRef4);
     }
   };
@@ -2403,16 +2403,16 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
-      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
-      let power = this.createDefinitionRefExpression(['power to natural number'], [[
+      const contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      const composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      const power = this.createDefinitionRefExpression(['power to natural number'], [[
         this.createSetArg('X'),
         this.createElementArg('f'),
         this.createElementArg('n')
       ]]);
-      let variableRef1 = this.createVariableRefExpression(definition, 'g');
+      const variableRef1 = this.createVariableRefExpression(definition, 'g');
       this.setArgValue(power.path.arguments, 'f', variableRef1);
-      let variableRef2 = this.createVariableRefExpression(definition, 'S');
+      const variableRef2 = this.createVariableRefExpression(definition, 'S');
       this.setArgValue(power.path.arguments, 'X', variableRef2);
       this.setArgValue(composition.path.arguments, 'f', power);
     }
@@ -2511,10 +2511,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
-      let composition = contents.definition[0] as Fmt.DefinitionRefExpression;
-      let power = this.getElementArgValue(composition.path.arguments, 'f') as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'n');
+      const contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      const composition = contents.definition[0] as Fmt.DefinitionRefExpression;
+      const power = this.getElementArgValue(composition.path.arguments, 'f') as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'n');
       this.setArgValue(power.path.arguments, 'n', variableRef);
     }
   };
@@ -3149,17 +3149,17 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param1 = definition.parameters.getParameter('S');
-      let paramType1 = param1.type as FmtHLM.MetaRefExpression_Set;
+      const param1 = definition.parameters.getParameter('S');
+      const paramType1 = param1.type as FmtHLM.MetaRefExpression_Set;
       paramType1.auto = new FmtHLM.MetaRefExpression_true;
-      let param2 = definition.parameters.getParameter('T');
-      let paramType2 = param2.type as FmtHLM.MetaRefExpression_Set;
+      const param2 = definition.parameters.getParameter('T');
+      const paramType2 = param2.type as FmtHLM.MetaRefExpression_Set;
       paramType2.auto = new FmtHLM.MetaRefExpression_true;
-      let contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
-      let body = this.createVariableRefExpression(definition, 'g');
-      let sup = this.createVariableRefExpression(definition, 'n');
-      let preSub = this.createVariableRefExpression(definition, 'f');
-      let preSup = new Fmt.StringExpression('my');
+      const contents = definition.contents as FmtHLM.ObjectContents_ExplicitOperator;
+      const body = this.createVariableRefExpression(definition, 'g');
+      const sup = this.createVariableRefExpression(definition, 'n');
+      const preSub = this.createVariableRefExpression(definition, 'f');
+      const preSup = new Fmt.StringExpression('my');
       contents.notation = this.createDefinitionRefExpression(['SubSup'], [[
         new Fmt.Argument('body', body),
         new Fmt.Argument('sup', sup),
@@ -3748,8 +3748,8 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('φ');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
+      const param = definition.parameters.getParameter('φ');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['Functions'], [[
         this.createSetArg('X'),
         this.createSetArg('Y')
@@ -3849,10 +3849,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('φ');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
-      let functions = type._set as Fmt.DefinitionRefExpression;
-      let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      const param = definition.parameters.getParameter('φ');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
+      const functions = type._set as Fmt.DefinitionRefExpression;
+      const naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setArgValue(functions.path.arguments, 'X', naturalNumbers);
     }
   };
@@ -3933,10 +3933,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('φ');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
-      let functions = type._set as Fmt.DefinitionRefExpression;
-      let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      const param = definition.parameters.getParameter('φ');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
+      const functions = type._set as Fmt.DefinitionRefExpression;
+      const naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setArgValue(functions.path.arguments, 'Y', naturalNumbers);
     }
   };
@@ -4143,8 +4143,8 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let param = definition.parameters.getParameter('n');
-      let type = param.type as FmtHLM.MetaRefExpression_Element;
+      const param = definition.parameters.getParameter('n');
+      const type = param.type as FmtHLM.MetaRefExpression_Element;
       type._set = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
     }
   };
@@ -4214,7 +4214,7 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      const contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
       contents.claim = new FmtHLM.MetaRefExpression_equals(new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm), new Fmt.PlaceholderExpression(HLMExpressionType.ElementTerm));
     }
   };
@@ -4295,8 +4295,8 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
-      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      const contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      const equality = contents.claim as FmtHLM.MetaRefExpression_equals;
       equality.terms[0] = this.createDefinitionRefExpression([this.operator!.definition.name], [[
         this.createSetArg('S'),
         this.createSetArg('T'),
@@ -4385,10 +4385,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
-      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
-      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'φ');
+      const contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      const equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      const operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'φ');
       this.setArgValue(operator.path.arguments, 'f', variableRef);
     }
   };
@@ -4568,13 +4568,13 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
-      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
-      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
-      let identity = this.createDefinitionRefExpression(['identity'], [[
+      const contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      const equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      const operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      const identity = this.createDefinitionRefExpression(['identity'], [[
         this.createSetArg('X')
       ]]);
-      let naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      const naturalNumbers = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setArgValue(identity.path.arguments, 'X', naturalNumbers);
       this.setArgValue(operator.path.arguments, 'g', identity);
     }
@@ -4668,10 +4668,10 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
-      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
-      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
-      let variableRef = this.createVariableRefExpression(definition, 'n');
+      const contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      const equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      const operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      const variableRef = this.createVariableRefExpression(definition, 'n');
       this.setArgValue(operator.path.arguments, 'n', variableRef);
     }
   };
@@ -4743,13 +4743,13 @@ class TutorialStates {
       }
     ],
     applyExpectedChange: (definition: Fmt.Definition) => {
-      let contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
-      let equality = contents.claim as FmtHLM.MetaRefExpression_equals;
+      const contents = definition.contents as FmtHLM.ObjectContents_StandardTheorem;
+      const equality = contents.claim as FmtHLM.MetaRefExpression_equals;
       equality.terms[1] = this.createVariableRefExpression(definition, 'φ');
-      let operator = equality.terms[0] as Fmt.DefinitionRefExpression;
-      let naturalNumbers1 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      const operator = equality.terms[0] as Fmt.DefinitionRefExpression;
+      const naturalNumbers1 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setArgValue(operator.path.arguments, 'S', naturalNumbers1);
-      let naturalNumbers2 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
+      const naturalNumbers2 = this.createDefinitionRefExpression(['..', 'Numbers', 'Natural', 'Natural numbers'], [[]]);
       this.setArgValue(operator.path.arguments, 'T', naturalNumbers2);
     }
   };
@@ -4979,20 +4979,20 @@ class TutorialStates {
 
   private changeState(staticState: StaticTutorialState | undefined, newEditedDefinition?: LibraryDefinition | null): void {
     if (staticState) {
-      let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => {
-        let result: DynamicTutorialState = {
+      const stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => {
+        const result: DynamicTutorialState = {
           ...oldTutorialState,
           staticState: staticState,
           refComponents: [],
           additionalStateData: undefined,
           checkPreconditions: this.checkPreconditions
         };
-        let oldStaticState = oldTutorialState?.staticState;
+        const oldStaticState = oldTutorialState?.staticState;
         if (oldStaticState !== staticState) {
           if (result.editedDefinition && result.initialDefinitionContents && oldStaticState?.applyExpectedChange) {
-            let expectedContents = result.initialDefinitionContents.clone();
+            const expectedContents = result.initialDefinitionContents.clone();
             oldStaticState.applyExpectedChange(expectedContents, staticState);
-            let actualContents = result.editedDefinition.definition;
+            const actualContents = result.editedDefinition.definition;
             if (actualContents.toString() === expectedContents.toString()) {
               result.initialDefinitionContents = expectedContents;
               result.initialDefinitionContentsState = result;
@@ -5021,10 +5021,10 @@ class TutorialStates {
   }
 
   private changeAdditionalStateData(changeData: (oldAdditionalStateData: any) => any): void {
-    let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined): DynamicTutorialState | undefined => {
+    const stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined): DynamicTutorialState | undefined => {
       if (oldTutorialState) {
-        let oldAdditionalStateData = oldTutorialState.additionalStateData;
-        let newAdditionalStateData = changeData(oldAdditionalStateData);
+        const oldAdditionalStateData = oldTutorialState.additionalStateData;
+        const newAdditionalStateData = changeData(oldAdditionalStateData);
         if (newAdditionalStateData !== oldAdditionalStateData) {
           return {
             ...oldTutorialState,
@@ -5038,17 +5038,17 @@ class TutorialStates {
   }
 
   private checkPreconditions = (tutorialState: DynamicTutorialState, currentEditedDefinition: LibraryDefinition | undefined): DynamicTutorialState | undefined => {
-    let editedDefinition = tutorialState.editedDefinition;
+    const editedDefinition = tutorialState.editedDefinition;
     if (editedDefinition) {
       if (currentEditedDefinition !== editedDefinition) {
         return this.getReturnToDefinitionState(editedDefinition);
       } else if (tutorialState.initialDefinitionContents) {
-        let contentsAsString = editedDefinition.definition.toString();
+        const contentsAsString = editedDefinition.definition.toString();
         if (contentsAsString === tutorialState.initialDefinitionContents.toString()) {
           return undefined;
         }
         if (tutorialState.staticState.applyExpectedChange) {
-          let finalContents = tutorialState.initialDefinitionContents.clone();
+          const finalContents = tutorialState.initialDefinitionContents.clone();
           tutorialState.staticState.applyExpectedChange(finalContents);
           if (contentsAsString === finalContents.toString()) {
             return undefined;
@@ -5134,7 +5134,7 @@ class TutorialStates {
   };
 
   private revertChanges(): void {
-    let stateTransitionFn = (currentState: DynamicTutorialState | undefined) => {
+    const stateTransitionFn = (currentState: DynamicTutorialState | undefined) => {
       if (!currentState) {
         return undefined;
       }
@@ -5147,17 +5147,17 @@ class TutorialStates {
   }
 
   private skipStates(skippedStates: StaticTutorialState[], targetState: StaticTutorialState): void {
-    let stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => {
+    const stateTransitionFn = (oldTutorialState: DynamicTutorialState | undefined) => {
       if (!oldTutorialState) {
         return undefined;
       }
       if (oldTutorialState.initialDefinitionContents) {
-        let definitionContents = oldTutorialState.initialDefinitionContents.clone();
-        for (let skippedState of skippedStates) {
+        const definitionContents = oldTutorialState.initialDefinitionContents.clone();
+        for (const skippedState of skippedStates) {
           skippedState.applyExpectedChange?.(definitionContents, targetState);
         }
         this.onReplaceDefinitionContents(definitionContents);
-        let result: DynamicTutorialState = {
+        const result: DynamicTutorialState = {
           ...oldTutorialState,
           staticState: targetState,
           refComponents: [],
@@ -5177,22 +5177,22 @@ class TutorialStates {
     let done = false;
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done) {
-        let clickableElement = this.findClickableReactElement(reactElement);
+        const clickableElement = this.findClickableReactElement(reactElement);
         if (clickableElement) {
-          let props = clickableElement.props;
+          const props = clickableElement.props;
           if (props) {
             done = true;
-            let simulateClick = () => {
+            const simulateClick = () => {
               if (props.onMouseDown) {
-                let mouseDownEvent = createDummyEvent(htmlElement);
+                const mouseDownEvent = createDummyEvent(htmlElement);
                 props.onMouseDown(mouseDownEvent);
               }
               if (props.onMouseUp) {
-                let mouseUpEvent = createDummyEvent(htmlElement);
+                const mouseUpEvent = createDummyEvent(htmlElement);
                 props.onMouseUp(mouseUpEvent);
               }
               if (props.onClick) {
-                let clickEvent = createDummyEvent(htmlElement);
+                const clickEvent = createDummyEvent(htmlElement);
                 props.onClick(clickEvent);
               }
             };
@@ -5242,9 +5242,9 @@ class TutorialStates {
           }
         }
         if (reactElement.props) {
-          let simulateHover = () => {
+          const simulateHover = () => {
             if (reactElement.props.onMouseEnter) {
-              let mouseEnterEvent = createDummyEvent(htmlElement);
+              const mouseEnterEvent = createDummyEvent(htmlElement);
               reactElement.props.onMouseEnter(mouseEnterEvent);
             }
           };
@@ -5259,13 +5259,13 @@ class TutorialStates {
     return (reactElement: React.ReactElement, htmlElement: HTMLElement) => {
       if (this.runAutomatically && !done && htmlElement instanceof HTMLInputElement) {
         done = true;
-        let simulateTextInput = () => {
+        const simulateTextInput = () => {
           htmlElement.value = text;
           if (reactElement.props.onChange) {
             reactElement.props.onChange(createDummyEvent(htmlElement));
           }
           if (pressEnter && reactElement.props.onKeyPress) {
-            let enterKeyEvent = createDummyEvent(htmlElement);
+            const enterKeyEvent = createDummyEvent(htmlElement);
             enterKeyEvent.key = 'Enter';
             reactElement.props.onKeyPress(enterKeyEvent);
           }
@@ -5280,19 +5280,19 @@ class TutorialStates {
   }
 
   private addSetParameter(definition: Fmt.Definition, name: string): void {
-    let type = new FmtHLM.MetaRefExpression_Set;
+    const type = new FmtHLM.MetaRefExpression_Set;
     this.addParameter(definition, name, type);
   }
 
   private addSubsetParameter(definition: Fmt.Definition, name: string): void {
-    let superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    let type = new FmtHLM.MetaRefExpression_Subset(superset);
+    const superset = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    const type = new FmtHLM.MetaRefExpression_Subset(superset);
     this.addParameter(definition, name, type);
   }
 
   private addElementParameter(definition: Fmt.Definition, name: string): void {
-    let set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
-    let type = new FmtHLM.MetaRefExpression_Element(set);
+    const set = new Fmt.PlaceholderExpression(HLMExpressionType.SetTerm);
+    const type = new FmtHLM.MetaRefExpression_Element(set);
     this.addParameter(definition, name, type);
   }
 
@@ -5307,14 +5307,14 @@ class TutorialStates {
   }
 
   private createVariableRefExpression(definition: Fmt.Definition, name: string): Fmt.VariableRefExpression {
-    let variable = definition.parameters.getParameter(name);
+    const variable = definition.parameters.getParameter(name);
     return new Fmt.VariableRefExpression(variable);
   }
 
   private createDefinitionRefExpression(path: string[], args: Fmt.Argument[][]): Fmt.DefinitionRefExpression {
     let parentPath: Fmt.PathItem | undefined = undefined;
     for (let pathIndex = 0; pathIndex < path.length - args.length; pathIndex++) {
-      let pathComponent = path[pathIndex];
+      const pathComponent = path[pathIndex];
       let pathItem: Fmt.PathItem;
       if (pathComponent === '.') {
         pathItem = new Fmt.IdentityPathItem;
@@ -5327,8 +5327,8 @@ class TutorialStates {
       parentPath = pathItem;
     }
     for (let argIndex = 0; argIndex < args.length; argIndex++) {
-      let pathIndex = path.length - args.length + argIndex;
-      let pathItem = new Fmt.Path(path[pathIndex]);
+      const pathIndex = path.length - args.length + argIndex;
+      const pathItem = new Fmt.Path(path[pathIndex]);
       pathItem.arguments.push(...args[argIndex]);
       pathItem.parentPath = parentPath;
       parentPath = pathItem;
@@ -5349,20 +5349,20 @@ class TutorialStates {
   }
 
   private getSetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
-    let valueExpression = argumentList.getValue(name);
-    let contents = FmtHLM.ObjectContents_SetArg.createFromExpression(valueExpression);
+    const valueExpression = argumentList.getValue(name);
+    const contents = FmtHLM.ObjectContents_SetArg.createFromExpression(valueExpression);
     return contents._set;
   }
 
   private getSubsetArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
-    let valueExpression = argumentList.getValue(name);
-    let contents = FmtHLM.ObjectContents_SubsetArg.createFromExpression(valueExpression);
+    const valueExpression = argumentList.getValue(name);
+    const contents = FmtHLM.ObjectContents_SubsetArg.createFromExpression(valueExpression);
     return contents._set;
   }
 
   private getElementArgValue(argumentList: Fmt.ArgumentList, name: string): Fmt.Expression {
-    let valueExpression = argumentList.getValue(name);
-    let contents = FmtHLM.ObjectContents_ElementArg.createFromExpression(valueExpression);
+    const valueExpression = argumentList.getValue(name);
+    const contents = FmtHLM.ObjectContents_ElementArg.createFromExpression(valueExpression);
     return contents.element;
   }
 
@@ -5372,6 +5372,6 @@ class TutorialStates {
 }
 
 export function startTutorial(onChangeTutorialState: ChangeTutorialStateFn, onReplaceDefinitionContents: ReplaceDefinitionContentsFn, onDocLinkClicked: OnDocLinkClicked, withTouchWarning: boolean, runAutomatically: boolean = false): void {
-  let tutorialStates = new TutorialStates(onChangeTutorialState, onReplaceDefinitionContents, onDocLinkClicked, withTouchWarning, runAutomatically);
+  const tutorialStates = new TutorialStates(onChangeTutorialState, onReplaceDefinitionContents, onDocLinkClicked, withTouchWarning, runAutomatically);
   tutorialStates.start();
 }

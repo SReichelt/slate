@@ -11,20 +11,20 @@ class LibraryPreloadWriter extends LibraryPreloadGenerator {
   }
 
   protected getFileContents(uri: string): CachedPromise<string> {
-    let fileReference = this.inputFileAccessor.openFile(uri, false);
+    const fileReference = this.inputFileAccessor.openFile(uri, false);
     return fileReference.read();
   }
 
   protected outputFile(preloadURI: string, contents: string): void {
-    let fileReference = this.outputFileAccessor.openFile(preloadURI, true);
+    const fileReference = this.outputFileAccessor.openFile(preloadURI, true);
     fileReference.write!(contents, false);
   }
 }
 
 function outputPreload(libraryFileName: string, outputDirName: string): CachedPromise<void> {
-  let inputFileAccessor = new PhysicalFileAccessor(path.dirname(libraryFileName));
-  let outputFileAccessor = new PhysicalFileAccessor(outputDirName);
-  let preloadWriter = new LibraryPreloadWriter(inputFileAccessor, outputFileAccessor);
+  const inputFileAccessor = new PhysicalFileAccessor(path.dirname(libraryFileName));
+  const outputFileAccessor = new PhysicalFileAccessor(outputDirName);
+  const preloadWriter = new LibraryPreloadWriter(inputFileAccessor, outputFileAccessor);
   return preloadWriter.preloadLibrary(path.basename(libraryFileName, fileExtension));
 }
 

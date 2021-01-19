@@ -19,8 +19,8 @@ const mailTransporter = MAIL_TRANSPORT_CONFIG ? nodemailer.createTransport(MAIL_
 
 export function handleSubmit(req: Request, res: Response): void {
   if (mailTransporter && MAIL_FROM && MAIL_TO) {
-    let requestPath = decodeURI(req.url);
-    let mail: nodemailer.SendMailOptions = {
+    const requestPath = decodeURI(req.url);
+    const mail: nodemailer.SendMailOptions = {
       from: MAIL_FROM,
       to: MAIL_TO,
       subject: 'Slate submission: ' + requestPath,

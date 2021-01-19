@@ -5,7 +5,7 @@ import './Parentheses.css';
 
 
 function renderTextParentheses(className: string, body: React.ReactNode, lineHeight: number, openParen: string, closeParen: string): React.ReactElement {
-  let parenClassName = `${className}-text`;
+  const parenClassName = `${className}-text`;
   let heightClassName = 'height';
   for (let i = 1; i <= lineHeight; i++) {
     heightClassName = clsx(heightClassName, `height-${i}`);
@@ -37,7 +37,7 @@ function renderTableBasedParentheses(className: string, body: React.ReactNode, l
   if (lineHeight) {
     return renderTextParentheses(className, body, lineHeight, openParen, closeParen);
   } else {
-    let bodyClassName = clsx('paren-table-cell', 'paren-table-body', left === '∣' && 'paren-left-hairline', right === '∣' && 'paren-right-hairline');
+    const bodyClassName = clsx('paren-table-cell', 'paren-table-body', left === '∣' && 'paren-left-hairline', right === '∣' && 'paren-right-hairline');
     return renderLargeParentheses(
       clsx('paren-table', className),
       <span className={'paren-table-row'}>

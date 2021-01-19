@@ -53,9 +53,9 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
 
   private createRenderer(props: LibraryItemProps): Logic.LogicRenderer | undefined {
     if (props.libraryDataProvider && props.templates) {
-      let logic = props.libraryDataProvider.logic;
-      let logicNotation = logic.getDisplay();
-      let editing = props.definition.state === LibraryDefinitionState.Editing || props.definition.state === LibraryDefinitionState.EditingNew;
+      const logic = props.libraryDataProvider.logic;
+      const logicNotation = logic.getDisplay();
+      const editing = props.definition.state === LibraryDefinitionState.Editing || props.definition.state === LibraryDefinitionState.EditingNew;
       return logicNotation.getDefinitionEditor(props.definition.definition, props.libraryDataProvider, props.templates, props.options, editing, props.mruList);
     } else {
       return undefined;
@@ -85,9 +85,9 @@ export abstract class LibraryItemBase extends React.Component<LibraryItemProps> 
 
 class LibraryItem extends LibraryItemBase {
   render(): React.ReactNode {
-    let renderer = this.getRenderer();
+    const renderer = this.getRenderer();
     if (renderer) {
-      let expression = renderer.renderDefinition(this.props.itemInfo, this.props.options);
+      const expression = renderer.renderDefinition(this.props.itemInfo, this.props.options);
       if (expression) {
         return (
           <div className="library-item">
@@ -101,12 +101,12 @@ class LibraryItem extends LibraryItemBase {
 
   protected onExpressionChanged = (editorUpdateRequired: boolean): void => {
     if (editorUpdateRequired) {
-      let onAutoFilled = () => {
+      const onAutoFilled = () => {
         if (this.props.interactionHandler) {
           this.props.interactionHandler.expressionChanged(true);
         }
       };
-      let renderer = this.getRenderer();
+      const renderer = this.getRenderer();
       if (renderer) {
         renderer.updateEditorState(onAutoFilled).then(() => this.forceUpdate());
       }

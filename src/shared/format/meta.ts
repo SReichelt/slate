@@ -12,19 +12,19 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_MetaModel {
-    let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
+    const result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let definitionTypesRaw = argumentList.getValue('definitionTypes', 0);
+    const definitionTypesRaw = argumentList.getValue('definitionTypes', 0);
     if (definitionTypesRaw instanceof Fmt.ArrayExpression) {
       this.definitionTypes = definitionTypesRaw.items;
     } else {
       throw new Error('definitionTypes: Array expression expected');
     }
-    let expressionTypesRaw = argumentList.getOptionalValue('expressionTypes', 1);
+    const expressionTypesRaw = argumentList.getOptionalValue('expressionTypes', 1);
     if (expressionTypesRaw !== undefined) {
       if (expressionTypesRaw instanceof Fmt.ArrayExpression) {
         this.expressionTypes = expressionTypesRaw.items;
@@ -32,7 +32,7 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
         throw new Error('expressionTypes: Array expression expected');
       }
     }
-    let functionsRaw = argumentList.getOptionalValue('functions', 2);
+    const functionsRaw = argumentList.getOptionalValue('functions', 2);
     if (functionsRaw !== undefined) {
       if (functionsRaw instanceof Fmt.ArrayExpression) {
         this.functions = functionsRaw.items;
@@ -44,27 +44,27 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    let definitionTypesExprItems: Fmt.Expression[] = [];
-    for (let item of this.definitionTypes) {
+    const argumentList = new Fmt.ArgumentList;
+    const definitionTypesExprItems: Fmt.Expression[] = [];
+    for (const item of this.definitionTypes) {
       definitionTypesExprItems.push(item);
     }
-    let definitionTypesExpr = new Fmt.ArrayExpression(definitionTypesExprItems);
+    const definitionTypesExpr = new Fmt.ArrayExpression(definitionTypesExprItems);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'definitionTypes' : undefined, definitionTypesExpr, false));
     if (this.expressionTypes !== undefined) {
-      let expressionTypesExprItems: Fmt.Expression[] = [];
-      for (let item of this.expressionTypes) {
+      const expressionTypesExprItems: Fmt.Expression[] = [];
+      for (const item of this.expressionTypes) {
         expressionTypesExprItems.push(item);
       }
-      let expressionTypesExpr = new Fmt.ArrayExpression(expressionTypesExprItems);
+      const expressionTypesExpr = new Fmt.ArrayExpression(expressionTypesExprItems);
       argumentList.push(new Fmt.Argument('expressionTypes', expressionTypesExpr, true));
     }
     if (this.functions !== undefined) {
-      let functionsExprItems: Fmt.Expression[] = [];
-      for (let item of this.functions) {
+      const functionsExprItems: Fmt.Expression[] = [];
+      for (const item of this.functions) {
         functionsExprItems.push(item);
       }
-      let functionsExpr = new Fmt.ArrayExpression(functionsExprItems);
+      const functionsExpr = new Fmt.ArrayExpression(functionsExprItems);
       argumentList.push(new Fmt.Argument('functions', functionsExpr, true));
     }
     if (this.lookup !== undefined) {
@@ -74,30 +74,30 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_MetaModel {
-    let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
+    const result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_MetaModel {
-    let result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
+    const result: ObjectContents_MetaModel = Object.create(ObjectContents_MetaModel.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
   traverse(fn: Fmt.ExpressionTraversalFn): void {
     if (this.definitionTypes) {
-      for (let item of this.definitionTypes) {
+      for (const item of this.definitionTypes) {
         item.traverse(fn);
       }
     }
     if (this.expressionTypes) {
-      for (let item of this.expressionTypes) {
+      for (const item of this.expressionTypes) {
         item.traverse(fn);
       }
     }
     if (this.functions) {
-      for (let item of this.functions) {
+      for (const item of this.functions) {
         item.traverse(fn);
       }
     }
@@ -110,8 +110,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     let changed = false;
     if (this.definitionTypes) {
       result.definitionTypes = [];
-      for (let item of this.definitionTypes) {
-        let newItem = item.substitute(fn, replacedParameters);
+      for (const item of this.definitionTypes) {
+        const newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
@@ -120,8 +120,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     }
     if (this.expressionTypes) {
       result.expressionTypes = [];
-      for (let item of this.expressionTypes) {
-        let newItem = item.substitute(fn, replacedParameters);
+      for (const item of this.expressionTypes) {
+        const newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
@@ -130,8 +130,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
     }
     if (this.functions) {
       result.functions = [];
-      for (let item of this.functions) {
-        let newItem = item.substitute(fn, replacedParameters);
+      for (const item of this.functions) {
+        const newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
@@ -156,8 +156,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
         return false;
       }
       for (let i = 0; i < this.definitionTypes.length; i++) {
-        let leftItem = this.definitionTypes[i];
-        let rightItem = objectContents.definitionTypes[i];
+        const leftItem = this.definitionTypes[i];
+        const rightItem = objectContents.definitionTypes[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -168,8 +168,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
         return false;
       }
       for (let i = 0; i < this.expressionTypes.length; i++) {
-        let leftItem = this.expressionTypes[i];
-        let rightItem = objectContents.expressionTypes[i];
+        const leftItem = this.expressionTypes[i];
+        const rightItem = objectContents.expressionTypes[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -180,8 +180,8 @@ export class ObjectContents_MetaModel extends Fmt.ObjectContents {
         return false;
       }
       for (let i = 0; i < this.functions.length; i++) {
-        let leftItem = this.functions[i];
-        let rightItem = objectContents.functions[i];
+        const leftItem = this.functions[i];
+        const rightItem = objectContents.functions[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -203,7 +203,7 @@ export class MetaRefExpression_MetaModel extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -233,14 +233,14 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinedType {
-    let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
+    const result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.superType = argumentList.getOptionalValue('superType', 0);
-    let membersRaw = argumentList.getOptionalValue('members', 1);
+    const membersRaw = argumentList.getOptionalValue('members', 1);
     if (membersRaw !== undefined) {
       if (membersRaw instanceof Fmt.ParameterExpression) {
         this.members = membersRaw.parameters;
@@ -248,7 +248,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
         throw new Error('members: Parameter expression expected');
       }
     }
-    let exportsRaw = argumentList.getOptionalValue('exports', 2);
+    const exportsRaw = argumentList.getOptionalValue('exports', 2);
     if (exportsRaw !== undefined) {
       if (exportsRaw instanceof Fmt.ArrayExpression) {
         this.exports = exportsRaw.items;
@@ -259,33 +259,33 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.superType !== undefined) {
       argumentList.push(new Fmt.Argument('superType', this.superType, true));
     }
     if (this.members !== undefined) {
-      let membersExpr = new Fmt.ParameterExpression(this.members);
+      const membersExpr = new Fmt.ParameterExpression(this.members);
       argumentList.push(new Fmt.Argument('members', membersExpr, true));
     }
     if (this.exports !== undefined) {
-      let exportsExprItems: Fmt.Expression[] = [];
-      for (let item of this.exports) {
+      const exportsExprItems: Fmt.Expression[] = [];
+      for (const item of this.exports) {
         exportsExprItems.push(item);
       }
-      let exportsExpr = new Fmt.ArrayExpression(exportsExprItems);
+      const exportsExpr = new Fmt.ArrayExpression(exportsExprItems);
       argumentList.push(new Fmt.Argument('exports', exportsExpr, true));
     }
     return argumentList;
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinedType {
-    let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
+    const result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinedType {
-    let result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
+    const result: ObjectContents_DefinedType = Object.create(ObjectContents_DefinedType.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -298,7 +298,7 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
       this.members.traverse(fn);
     }
     if (this.exports) {
-      for (let item of this.exports) {
+      for (const item of this.exports) {
         item.traverse(fn);
       }
     }
@@ -320,8 +320,8 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
     }
     if (this.exports) {
       result.exports = [];
-      for (let item of this.exports) {
-        let newItem = item.substitute(fn, replacedParameters);
+      for (const item of this.exports) {
+        const newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
@@ -346,8 +346,8 @@ export class ObjectContents_DefinedType extends Fmt.ObjectContents {
         return false;
       }
       for (let i = 0; i < this.exports.length; i++) {
-        let leftItem = this.exports[i];
-        let rightItem = objectContents.exports[i];
+        const leftItem = this.exports[i];
+        const rightItem = objectContents.exports[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -363,14 +363,14 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionType {
-    let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
+    const result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     super.fromArgumentList(argumentList, reportFn);
-    let innerDefinitionTypesRaw = argumentList.getOptionalValue('innerDefinitionTypes', 3);
+    const innerDefinitionTypesRaw = argumentList.getOptionalValue('innerDefinitionTypes', 3);
     if (innerDefinitionTypesRaw !== undefined) {
       if (innerDefinitionTypesRaw instanceof Fmt.ArrayExpression) {
         this.innerDefinitionTypes = innerDefinitionTypesRaw.items;
@@ -381,33 +381,33 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = super.toArgumentList(outputAllNames, reportFn);
+    const argumentList = super.toArgumentList(outputAllNames, reportFn);
     if (this.innerDefinitionTypes !== undefined) {
-      let innerDefinitionTypesExprItems: Fmt.Expression[] = [];
-      for (let item of this.innerDefinitionTypes) {
+      const innerDefinitionTypesExprItems: Fmt.Expression[] = [];
+      for (const item of this.innerDefinitionTypes) {
         innerDefinitionTypesExprItems.push(item);
       }
-      let innerDefinitionTypesExpr = new Fmt.ArrayExpression(innerDefinitionTypesExprItems);
+      const innerDefinitionTypesExpr = new Fmt.ArrayExpression(innerDefinitionTypesExprItems);
       argumentList.push(new Fmt.Argument('innerDefinitionTypes', innerDefinitionTypesExpr, true));
     }
     return argumentList;
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionType {
-    let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
+    const result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionType {
-    let result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
+    const result: ObjectContents_DefinitionType = Object.create(ObjectContents_DefinitionType.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
 
   traverse(fn: Fmt.ExpressionTraversalFn): void {
     if (this.innerDefinitionTypes) {
-      for (let item of this.innerDefinitionTypes) {
+      for (const item of this.innerDefinitionTypes) {
         item.traverse(fn);
       }
     }
@@ -417,8 +417,8 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
     let changed = super.substitute(fn, result, replacedParameters);
     if (this.innerDefinitionTypes) {
       result.innerDefinitionTypes = [];
-      for (let item of this.innerDefinitionTypes) {
-        let newItem = item.substitute(fn, replacedParameters);
+      for (const item of this.innerDefinitionTypes) {
+        const newItem = item.substitute(fn, replacedParameters);
         if (newItem !== item) {
           changed = true;
         }
@@ -437,8 +437,8 @@ export class ObjectContents_DefinitionType extends ObjectContents_DefinedType {
         return false;
       }
       for (let i = 0; i < this.innerDefinitionTypes.length; i++) {
-        let leftItem = this.innerDefinitionTypes[i];
-        let rightItem = objectContents.innerDefinitionTypes[i];
+        const leftItem = this.innerDefinitionTypes[i];
+        const rightItem = objectContents.innerDefinitionTypes[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -462,7 +462,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.resultType !== undefined) {
       argumentList.push(new Fmt.Argument('resultType', this.resultType, true));
     }
@@ -481,7 +481,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_DefinitionType(resultTypeResult);
+    const result = new MetaRefExpression_DefinitionType(resultTypeResult);
     return fn ? fn(result) : result;
   }
 
@@ -502,7 +502,7 @@ export class MetaRefExpression_DefinitionType extends Fmt.MetaRefExpression {
 
 export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExpressionType {
-    let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
+    const result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -512,18 +512,18 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = super.toArgumentList(outputAllNames, reportFn);
+    const argumentList = super.toArgumentList(outputAllNames, reportFn);
     return argumentList;
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ExpressionType {
-    let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
+    const result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ExpressionType {
-    let result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
+    const result: ObjectContents_ExpressionType = Object.create(ObjectContents_ExpressionType.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -532,7 +532,7 @@ export class ObjectContents_ExpressionType extends ObjectContents_DefinedType {
   }
 
   substitute(fn: Fmt.ExpressionSubstitutionFn | undefined, result: ObjectContents_ExpressionType, replacedParameters: Fmt.ReplacedParameter[] = []): boolean {
-    let changed = super.substitute(fn, result, replacedParameters);
+    const changed = super.substitute(fn, result, replacedParameters);
     return changed;
   }
 
@@ -553,7 +553,7 @@ export class MetaRefExpression_ExpressionType extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -583,7 +583,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_ParameterType {
-    let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
+    const result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -596,7 +596,7 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = super.toArgumentList(outputAllNames, reportFn);
+    const argumentList = super.toArgumentList(outputAllNames, reportFn);
     if (this.optional !== undefined) {
       argumentList.push(new Fmt.Argument('optional', this.optional, true));
     }
@@ -610,13 +610,13 @@ export class ObjectContents_ParameterType extends ObjectContents_ExpressionType 
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_ParameterType {
-    let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
+    const result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_ParameterType {
-    let result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
+    const result: ObjectContents_ParameterType = Object.create(ObjectContents_ParameterType.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -687,7 +687,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.variableType !== undefined) {
       argumentList.push(new Fmt.Argument('variableType', this.variableType, true));
     }
@@ -706,7 +706,7 @@ export class MetaRefExpression_ParameterType extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_ParameterType(variableTypeResult);
+    const result = new MetaRefExpression_ParameterType(variableTypeResult);
     return fn ? fn(result) : result;
   }
 
@@ -734,7 +734,7 @@ export class MetaRefExpression_Any extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -763,7 +763,7 @@ export class MetaRefExpression_self extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -792,7 +792,7 @@ export class MetaRefExpression_Type extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -821,7 +821,7 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -850,7 +850,7 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -879,7 +879,7 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -908,7 +908,7 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -937,7 +937,7 @@ export class MetaRefExpression_ParameterList extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -971,7 +971,7 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.type !== undefined) {
       argumentList.push(new Fmt.Argument('type', this.type, true));
     }
@@ -990,7 +990,7 @@ export class MetaRefExpression_SingleParameter extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_SingleParameter(typeResult);
+    const result = new MetaRefExpression_SingleParameter(typeResult);
     return fn ? fn(result) : result;
   }
 
@@ -1014,7 +1014,7 @@ export class MetaRefExpression_ArgumentList extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -1073,9 +1073,9 @@ export class MetaModel extends Meta.MetaModel {
   }
 
   getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
-    let parent = previousContext.parentObject;
+    const parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type;
+      const type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_MetaModel
             || type instanceof MetaRefExpression_DefinitionType
@@ -1102,13 +1102,13 @@ export class MetaModel extends Meta.MetaModel {
 
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
-    let parent = context.parentObject;
+    const parent = context.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type;
+      const type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_DefinitionType) {
           if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-            let membersValue = previousArguments.getOptionalValue('members', 1);
+            const membersValue = previousArguments.getOptionalValue('members', 1);
             if (membersValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(membersValue.parameters, context);
             }
@@ -1116,7 +1116,7 @@ export class MetaModel extends Meta.MetaModel {
         }
         if (type instanceof MetaRefExpression_ExpressionType) {
           if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-            let membersValue = previousArguments.getOptionalValue('members', 1);
+            const membersValue = previousArguments.getOptionalValue('members', 1);
             if (membersValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(membersValue.parameters, context);
             }
@@ -1124,7 +1124,7 @@ export class MetaModel extends Meta.MetaModel {
         }
         if (type instanceof MetaRefExpression_ParameterType) {
           if (argument.name === 'exports' || (argument.name === undefined && argumentIndex === 2)) {
-            let membersValue = previousArguments.getOptionalValue('members', 1);
+            const membersValue = previousArguments.getOptionalValue('members', 1);
             if (membersValue instanceof Fmt.ParameterExpression) {
               context = this.getParameterListContext(membersValue.parameters, context);
             }

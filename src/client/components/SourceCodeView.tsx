@@ -11,10 +11,10 @@ class SourceCodeView extends LibraryItemBase {
   private timer: any;
 
   render(): React.ReactNode {
-    let renderer = this.getRenderer();
-    let stream = new SourceCodeDisplay.SourceCodeStream(renderer);
-    let writer = new FmtWriter.Writer(stream, true);
-    let indent: FmtWriter.IndentInfo = {
+    const renderer = this.getRenderer();
+    const stream = new SourceCodeDisplay.SourceCodeStream(renderer);
+    const writer = new FmtWriter.Writer(stream, true);
+    const indent: FmtWriter.IndentInfo = {
       indent: '',
       outerIndent: ''
     };
@@ -26,8 +26,8 @@ class SourceCodeView extends LibraryItemBase {
     if (this.timer) {
       clearTimeout(this.timer);
     }
-    let update = () => {
-      let renderer = this.getRenderer();
+    const update = () => {
+      const renderer = this.getRenderer();
       if (renderer) {
         renderer.updateEditorState().then(() => this.forceUpdate());
       } else {

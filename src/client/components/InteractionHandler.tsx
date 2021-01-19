@@ -23,14 +23,14 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
   }
 
   unregisterExpressionChangeListener(listener: OnExpressionChanged): void {
-    let index = this.expressionChangeListeners.indexOf(listener);
+    const index = this.expressionChangeListeners.indexOf(listener);
     if (index >= 0) {
       this.expressionChangeListeners.splice(index, 1);
     }
   }
 
   expressionChanged(editorUpdateRequired: boolean = true): void {
-    for (let handler of this.expressionChangeListeners) {
+    for (const handler of this.expressionChangeListeners) {
       handler(editorUpdateRequired);
     }
   }
@@ -40,15 +40,15 @@ export class ExpressionInteractionHandlerImpl implements ExpressionInteractionHa
   }
 
   unregisterHoverChangeListener(listener: OnHoverChanged): void {
-    let index = this.hoverChangeListeners.indexOf(listener);
+    const index = this.hoverChangeListeners.indexOf(listener);
     if (index >= 0) {
       this.hoverChangeListeners.splice(index, 1);
     }
   }
 
   hoverChanged(hover: Notation.SemanticLink[]): void {
-    let objects = hover.map((semanticLink) => semanticLink.linkedObject);
-    for (let handler of this.hoverChangeListeners) {
+    const objects = hover.map((semanticLink) => semanticLink.linkedObject);
+    for (const handler of this.hoverChangeListeners) {
       handler(objects);
     }
   }
@@ -109,7 +109,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
   }
 
   getURI(semanticLink: Notation.SemanticLink): string | undefined {
-    let path = this.getPath(semanticLink);
+    const path = this.getPath(semanticLink);
     if (path) {
       return this.libraryDataProvider.pathToURI(path);
     } else {
@@ -119,7 +119,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
 
   linkClicked(semanticLink: Notation.SemanticLink): void {
     if (this.onLinkClicked) {
-      let path = this.getPath(semanticLink);
+      const path = this.getPath(semanticLink);
       if (path) {
         this.onLinkClicked(this.libraryDataProvider, path);
       }
@@ -131,15 +131,15 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
   }
 
   getToolTipContents(semanticLink: Notation.SemanticLink): React.ReactNode {
-    let path = this.getPath(semanticLink);
+    const path = this.getPath(semanticLink);
     if (path) {
-      let parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
-      let definitionPromise = parentProvider.fetchLocalItem(path.name, false);
+      const parentProvider = this.libraryDataProvider.getProviderForSection(path.parentPath);
+      const definitionPromise = parentProvider.fetchLocalItem(path.name, false);
 
       // Render library item directly instead of creating a component, so that tooltip is not even displayed if it returns null.
-      let render = definitionPromise.then((definition: LibraryDefinition) => {
-        let renderer = parentProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, parentProvider, this.templates, LibraryItemInteractionHandler.toolTipRenderedDefinitionOptions);
-        let expression = renderer.renderDefinition(undefined, LibraryItemInteractionHandler.toolTipRenderedDefinitionOptions);
+      const render = definitionPromise.then((definition: LibraryDefinition) => {
+        const renderer = parentProvider.logic.getDisplay().getDefinitionRenderer(definition.definition, parentProvider, this.templates, LibraryItemInteractionHandler.toolTipRenderedDefinitionOptions);
+        const expression = renderer.renderDefinition(undefined, LibraryItemInteractionHandler.toolTipRenderedDefinitionOptions);
         if (expression) {
           return <Expression expression={expression}/>;
         } else {
@@ -159,7 +159,7 @@ export class LibraryItemInteractionHandler extends ExpressionInteractionHandlerI
         path = path.parentPath;
       }
       if (!path.parentPath && this.definition) {
-        let ownDefinition = this.definition.getImmediateResult();
+        const ownDefinition = this.definition.getImmediateResult();
         if (ownDefinition && path.name === ownDefinition.definition.name) {
           return undefined;
         }

@@ -11,7 +11,7 @@ import { readRange } from './utils';
 import { parseFile } from './parse';
 
 function findDefinition(definitions: Fmt.DefinitionList, path: Fmt.Path): Fmt.Definition | undefined {
-    for (let definition of definitions) {
+    for (const definition of definitions) {
         if (definition.name === path.name) {
             return definition;
         }
@@ -21,7 +21,7 @@ function findDefinition(definitions: Fmt.DefinitionList, path: Fmt.Path): Fmt.De
 
 function findDefinitionInFile(file: Fmt.File, path: Fmt.Path, ignorePathPath: boolean): Fmt.Definition | undefined {
     if (path.parentPath instanceof Fmt.Path) {
-        let parentDefinition = findDefinitionInFile(file, path.parentPath, ignorePathPath);
+        const parentDefinition = findDefinitionInFile(file, path.parentPath, ignorePathPath);
         if (parentDefinition) {
             return findDefinition(parentDefinition.innerDefinitions, path);
         }
@@ -40,7 +40,7 @@ export interface ReferencedDefinition {
 
 function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object: Object, context: Ctx.Context | undefined, sourceDocument: vscode.TextDocument | undefined, checkUri: (uri: vscode.Uri) => boolean, reportAllInUri: boolean): ReferencedDefinition | null | undefined {
     if (object instanceof FmtDynamic.DynamicMetaRefExpression && parsedDocument.metaModelDocuments) {
-        let metaModelDocument = parsedDocument.metaModelDocuments.get(object.metaModel);
+        const metaModelDocument = parsedDocument.metaModelDocuments.get(object.metaModel);
         if (metaModelDocument && checkUri(metaModelDocument.uri)) {
             return {
                 parsedDocument: metaModelDocument,
@@ -54,7 +54,7 @@ function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object
             if (reportAllInUri) {
                 return null;
             }
-            let metaModelDefinition = parsedDocument.metaModelDocument.file.definitions[0];
+            const metaModelDefinition = parsedDocument.metaModelDocument.file.definitions[0];
             if (parsedDocument.file && object === parsedDocument.file.metaModelPath) {
                 return {
                     parsedDocument: parsedDocument.metaModelDocument,
@@ -64,9 +64,9 @@ function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object
             }
         }
         if (context && context.metaModel instanceof FmtDynamic.DynamicMetaModel && context.metaModel.definitions.length) {
-            let metaModelDefinition = context.metaModel.definitions[0];
+            const metaModelDefinition = context.metaModel.definitions[0];
             if (metaModelDefinition.contents instanceof FmtMeta.ObjectContents_MetaModel) {
-                let lookup = metaModelDefinition.contents.lookup;
+                const lookup = metaModelDefinition.contents.lookup;
                 let fileName: string;
                 let checkForDirectory = false;
                 if (lookup instanceof FmtMeta.MetaRefExpression_self) {
@@ -77,7 +77,7 @@ function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object
                                 return null;
                             }
                             if (parsedDocument.file) {
-                                let definition = findDefinitionInFile(parsedDocument.file, object, false);
+                                const definition = findDefinitionInFile(parsedDocument.file, object, false);
                                 if (definition) {
                                     return {
                                         parsedDocument: parsedDocument,
@@ -98,24 +98,24 @@ function findReferencedDefinitionInternal(parsedDocument: ParsedDocument, object
                 } else {
                     return null;
                 }
-                let uri = vscode.Uri.file(fileName);
+                const uri = vscode.Uri.file(fileName);
                 if (checkUri(uri)) {
                     if (reportAllInUri) {
                         return null;
                     }
                     if (checkForDirectory && !fs.existsSync(fileName)) {
-                        let dirName = getFileNameFromPath(parsedDocument.uri.fsPath, object, false, false);
+                        const dirName = getFileNameFromPath(parsedDocument.uri.fsPath, object, false, false);
                         if (fs.existsSync(dirName)) {
-                            let dirStat = fs.statSync(dirName);
+                            const dirStat = fs.statSync(dirName);
                             if (dirStat.isDirectory()) {
                                 return null;
                             }
                         }
                         return undefined;
                     }
-                    let referencedDocument = parseFile(uri, false, undefined, undefined, sourceDocument);
+                    const referencedDocument = parseFile(uri, false, undefined, undefined, sourceDocument);
                     if (referencedDocument && referencedDocument.file) {
-                        let definition = findDefinitionInFile(referencedDocument.file, object, true);
+                        const definition = findDefinitionInFile(referencedDocument.file, object, true);
                         if (definition) {
                             return {
                                 parsedDocument: referencedDocument,
@@ -144,7 +144,7 @@ function findObjectContents(parsedDocument: ParsedDocument, object: Object, sour
     if (object instanceof Fmt.Definition && object.contents instanceof FmtDynamic.DynamicObjectContents) {
         return object.contents;
     } else if (object instanceof Fmt.CompoundExpression) {
-        let objectContents = parsedDocument.objectContentsMap?.get(object);
+        const objectContents = parsedDocument.objectContentsMap?.get(object);
         if (objectContents) {
             return objectContents;
         }
@@ -162,8 +162,8 @@ export interface SignatureInfo {
 }
 
 export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position | undefined, readSignatureCode: boolean, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): SignatureInfo | undefined {
-    let checkUri = restrictToUri ? (uri: vscode.Uri) => areUrisEqual(restrictToUri, uri) : () => true;
-    let referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument, checkUri);
+    const checkUri = restrictToUri ? (uri: vscode.Uri) => areUrisEqual(restrictToUri, uri) : () => true;
+    const referencedDefinition = findReferencedDefinition(parsedDocument, rangeInfo.object, rangeInfo.context, sourceDocument, checkUri);
     if (referencedDefinition) {
         if (position && rangeInfo.linkRange?.end.isAfterOrEqual(position)) {
             return {
@@ -172,9 +172,9 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
                 referencedDefinition: referencedDefinition
             };
         }
-        let definitionRangeInfo = referencedDefinition.parsedDocument.rangeMap.get(referencedDefinition.definition);
+        const definitionRangeInfo = referencedDefinition.parsedDocument.rangeMap.get(referencedDefinition.definition);
         if (definitionRangeInfo && definitionRangeInfo.signatureRange) {
-            let signatureCode = readSignatureCode ? readRange(referencedDefinition.parsedDocument.uri, definitionRangeInfo.signatureRange, true, sourceDocument) : undefined;
+            const signatureCode = readSignatureCode ? readRange(referencedDefinition.parsedDocument.uri, definitionRangeInfo.signatureRange, true, sourceDocument) : undefined;
             return {
                 signatureCode: signatureCode,
                 parsedDocument: referencedDefinition.parsedDocument,
@@ -186,12 +186,12 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
         }
     }
     if (rangeInfo.object instanceof Fmt.CompoundExpression) {
-        let expression = rangeInfo.object;
-        let nestedArgumentListInfo = parsedDocument.nestedArgumentListsMap?.get(expression.arguments);
+        const expression = rangeInfo.object;
+        const nestedArgumentListInfo = parsedDocument.nestedArgumentListsMap?.get(expression.arguments);
         if (nestedArgumentListInfo) {
-            let parameterExpressionRangeInfo = nestedArgumentListInfo.targetDocument.rangeMap.get(nestedArgumentListInfo.parameterExpression);
+            const parameterExpressionRangeInfo = nestedArgumentListInfo.targetDocument.rangeMap.get(nestedArgumentListInfo.parameterExpression);
             if (parameterExpressionRangeInfo) {
-                let signatureCode = readSignatureCode ? readRange(nestedArgumentListInfo.targetDocument.uri, parameterExpressionRangeInfo.range, true, sourceDocument) : undefined;
+                const signatureCode = readSignatureCode ? readRange(nestedArgumentListInfo.targetDocument.uri, parameterExpressionRangeInfo.range, true, sourceDocument) : undefined;
                 return {
                     signatureCode: signatureCode,
                     parsedDocument: nestedArgumentListInfo.targetDocument,
@@ -202,17 +202,17 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
             }
         }
     } else if (rangeInfo.object instanceof Fmt.IndexedExpression) {
-        let expression = rangeInfo.object;
+        const expression = rangeInfo.object;
         if (expression.parameters && expression.arguments) {
             if (position) {
-                let bodyRangeInfo = parsedDocument.rangeMap.get(expression.body);
+                const bodyRangeInfo = parsedDocument.rangeMap.get(expression.body);
                 if (bodyRangeInfo?.range.contains(position)) {
                     return undefined;
                 }
             }
-            let parametersRangeInfo = parsedDocument.rangeMap.get(expression.parameters);
+            const parametersRangeInfo = parsedDocument.rangeMap.get(expression.parameters);
             if (parametersRangeInfo) {
-                let signatureCode = readSignatureCode ? readRange(parsedDocument.uri, parametersRangeInfo.range, true, sourceDocument) : undefined;
+                const signatureCode = readSignatureCode ? readRange(parsedDocument.uri, parametersRangeInfo.range, true, sourceDocument) : undefined;
                 return {
                     signatureCode: signatureCode,
                     parsedDocument: parsedDocument,
@@ -224,31 +224,31 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
         }
     }
     if (parsedDocument.metaModelDocuments) {
-        let objectContents = findObjectContents(parsedDocument, rangeInfo.object, sourceDocument);
+        const objectContents = findObjectContents(parsedDocument, rangeInfo.object, sourceDocument);
         if (objectContents) {
-            let metaModelDocument = parsedDocument.metaModelDocuments.get(objectContents.metaModel);
+            const metaModelDocument = parsedDocument.metaModelDocuments.get(objectContents.metaModel);
             if (metaModelDocument && (!restrictToUri || areUrisEqual(restrictToUri, metaModelDocument.uri))) {
                 if (rangeInfo.object instanceof Fmt.Definition) {
                     if (position && rangeInfo.signatureRange && rangeInfo.signatureRange.contains(position)) {
                         return undefined;
                     }
                     if (rangeInfo.object.innerDefinitions.length) {
-                        let innerDefinitionRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.innerDefinitions);
+                        const innerDefinitionRangeInfo = parsedDocument.rangeMap.get(rangeInfo.object.innerDefinitions);
                         if (position && innerDefinitionRangeInfo && innerDefinitionRangeInfo.range.contains(position)) {
                             return undefined;
                         }
                     }
                 }
                 let signatureCode = readSignatureCode ? '' : undefined;
-                let allMembers: Fmt.Parameter[] = [];
+                const allMembers: Fmt.Parameter[] = [];
                 let metaContents = objectContents.metaDefinition.contents;
                 while (metaContents instanceof FmtMeta.ObjectContents_DefinedType) {
                     if (metaContents.members) {
                         allMembers.unshift(...metaContents.members);
                         if (readSignatureCode) {
-                            let definitionRangeInfo = metaModelDocument.rangeMap.get(metaContents.members);
+                            const definitionRangeInfo = metaModelDocument.rangeMap.get(metaContents.members);
                             if (definitionRangeInfo) {
-                                let text = readRange(metaModelDocument.uri, definitionRangeInfo.range, true, sourceDocument);
+                                const text = readRange(metaModelDocument.uri, definitionRangeInfo.range, true, sourceDocument);
                                 if (text) {
                                     if (signatureCode) {
                                         signatureCode = ', ' + signatureCode;
@@ -260,7 +260,7 @@ export function getSignatureInfo(parsedDocument: ParsedDocument, rangeInfo: Rang
                     }
                     if (metaContents.superType instanceof Fmt.DefinitionRefExpression && !metaContents.superType.path.parentPath) {
                         try {
-                            let superTypeDefinition = objectContents.metaModel.definitions.getDefinition(metaContents.superType.path.name);
+                            const superTypeDefinition = objectContents.metaModel.definitions.getDefinition(metaContents.superType.path.name);
                             metaContents = superTypeDefinition.contents;
                         } catch (error) {
                             break;
@@ -291,15 +291,15 @@ export interface DefinitionLink extends vscode.DefinitionLink {
 }
 
 export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: RangeInfo, position: vscode.Position | undefined, preferSignature: boolean, sourceDocument?: vscode.TextDocument, restrictToUri?: vscode.Uri): DefinitionLink[] {
-    let result: DefinitionLink[] = [];
-    let signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, false, sourceDocument, restrictToUri);
+    const result: DefinitionLink[] = [];
+    const signatureInfo = getSignatureInfo(parsedDocument, rangeInfo, position, false, sourceDocument, restrictToUri);
     if (signatureInfo) {
         if (signatureInfo.referencedDefinition && rangeInfo.nameRange && rangeInfo.linkRange && (!position || rangeInfo.linkRange.contains(position))) {
-            let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(signatureInfo.referencedDefinition.definition);
+            const targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(signatureInfo.referencedDefinition.definition);
             if (targetRangeInfo) {
                 let originNameRange: vscode.Range | undefined = rangeInfo.nameRange;
                 if (rangeInfo.pathAlias && !position) {
-                    let aliasPathRange = parsedDocument.rangeMap.get(rangeInfo.pathAlias.path);
+                    const aliasPathRange = parsedDocument.rangeMap.get(rangeInfo.pathAlias.path);
                     originNameRange = aliasPathRange?.nameRange;
                 }
                 if (originNameRange) {
@@ -321,13 +321,13 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
             }
         }
         if (signatureInfo.parameters && signatureInfo.arguments) {
-            for (let arg of signatureInfo.arguments) {
+            for (const arg of signatureInfo.arguments) {
                 if (arg.name) {
-                    let argRangeInfo = parsedDocument.rangeMap.get(arg);
+                    const argRangeInfo = parsedDocument.rangeMap.get(arg);
                     if (argRangeInfo && argRangeInfo.nameRange && (!position || argRangeInfo.nameRange.contains(position))) {
-                        for (let param of signatureInfo.parameters) {
+                        for (const param of signatureInfo.parameters) {
                             if (arg.name === param.name) {
-                                let targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
+                                const targetRangeInfo = signatureInfo.parsedDocument.rangeMap.get(param);
                                 if (targetRangeInfo) {
                                     result.push({
                                         originNameRange: argRangeInfo.nameRange,
@@ -359,7 +359,7 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
             variable = rangeInfo.object.parameter;
         }
         if (variable) {
-            let targetRangeInfo = parsedDocument.rangeMap.get(variable);
+            const targetRangeInfo = parsedDocument.rangeMap.get(variable);
             if (targetRangeInfo) {
                 result.push({
                     originNameRange: rangeInfo.nameRange,
@@ -381,7 +381,7 @@ export function getDefinitionLinks(parsedDocument: ParsedDocument, rangeInfo: Ra
 }
 
 export function getNameDefinitionLocation(parsedDocument: ParsedDocument, position: vscode.Position, sourceDocument?: vscode.TextDocument): DefinitionLink | undefined {
-    for (let rangeInfo of parsedDocument.rangeList) {
+    for (const rangeInfo of parsedDocument.rangeList) {
         if (rangeInfo.range.contains(position)) {
             if ((rangeInfo.object instanceof Fmt.Definition || rangeInfo.object instanceof Fmt.Parameter) && rangeInfo.nameRange && rangeInfo.nameRange.contains(position)) {
                 let referencedDefinition: ReferencedDefinition | undefined = undefined;
@@ -404,7 +404,7 @@ export function getNameDefinitionLocation(parsedDocument: ParsedDocument, positi
                     referencedDefinition: referencedDefinition
                 };
             }
-            let definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, sourceDocument);
+            const definitionLinks = getDefinitionLinks(parsedDocument, rangeInfo, position, false, sourceDocument);
             if (definitionLinks.length) {
                 return definitionLinks[0];
             }
@@ -415,7 +415,7 @@ export function getNameDefinitionLocation(parsedDocument: ParsedDocument, positi
 
 export function getArgumentType(param: Fmt.Parameter): Fmt.Expression | undefined {
     if (param.type instanceof FmtDynamic.DynamicMetaRefExpression) {
-        let metaContents = param.type.metaDefinition.contents;
+        const metaContents = param.type.metaDefinition.contents;
         if (metaContents instanceof FmtMeta.ObjectContents_ParameterType) {
             return metaContents.argumentType;
         }

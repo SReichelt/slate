@@ -27,7 +27,7 @@ class Message extends React.Component<MessageProps, MessageState> {
 
   render(): React.ReactNode {
     if (this.state.visible) {
-      let props: AlertComponentPropsWithStyle = {
+      const props: AlertComponentPropsWithStyle = {
         id: 'message',
         message: this.props.children,
         options: {

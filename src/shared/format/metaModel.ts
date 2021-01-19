@@ -37,13 +37,13 @@ export class MetaModel {
   }
 
   getParameterContext(parameter: Fmt.Parameter, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
-    let innerContext = this.getExports(parameter.type, parentContext, indexParameterLists);
+    const innerContext = this.getExports(parameter.type, parentContext, indexParameterLists);
     return new Ctx.ParameterContext(parameter, innerContext, indexParameterLists);
   }
 
   getParameterListContext(parameters: Fmt.ParameterList, parentContext: Ctx.Context, indexParameterLists?: Fmt.ParameterList[]): Ctx.Context {
     let context = parentContext;
-    for (let param of parameters) {
+    for (const param of parameters) {
       context = this.getParameterContext(param, context, indexParameterLists);
     }
     return context;
@@ -56,7 +56,7 @@ export class MetaModel {
 
 export class DummyMetaModel extends MetaModel {
   constructor(name: string) {
-    let dummyFactory = new Fmt.GenericMetaDefinitionFactory;
+    const dummyFactory = new Fmt.GenericMetaDefinitionFactory;
     super(name, dummyFactory, dummyFactory, dummyFactory);
   }
 

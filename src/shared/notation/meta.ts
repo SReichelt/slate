@@ -12,7 +12,7 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_Template {
-    let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
+    const result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -21,22 +21,22 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
     this.notation = argumentList.getOptionalValue('notation', 0);
     this.symbol = argumentList.getOptionalValue('symbol', 1);
     this.useSymbol = argumentList.getOptionalValue('useSymbol', 2);
-    let elementsRaw = argumentList.getOptionalValue('elements', 3);
+    const elementsRaw = argumentList.getOptionalValue('elements', 3);
     if (elementsRaw !== undefined) {
-      let newItem = ObjectContents_TemplateElements.createFromExpression(elementsRaw, reportFn);
+      const newItem = ObjectContents_TemplateElements.createFromExpression(elementsRaw, reportFn);
       this.elements = newItem;
       reportFn?.(elementsRaw, newItem);
     }
-    let contextRaw = argumentList.getOptionalValue('context', 4);
+    const contextRaw = argumentList.getOptionalValue('context', 4);
     if (contextRaw !== undefined) {
-      let newItem = ObjectContents_TemplateContext.createFromExpression(contextRaw, reportFn);
+      const newItem = ObjectContents_TemplateContext.createFromExpression(contextRaw, reportFn);
       this.context = newItem;
       reportFn?.(contextRaw, newItem);
     }
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.notation !== undefined) {
       argumentList.push(new Fmt.Argument('notation', this.notation, true));
     }
@@ -47,12 +47,12 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
       argumentList.push(new Fmt.Argument('useSymbol', this.useSymbol, true));
     }
     if (this.elements !== undefined) {
-      let elementsExpr = this.elements.toExpression(true, reportFn);
+      const elementsExpr = this.elements.toExpression(true, reportFn);
       argumentList.push(new Fmt.Argument('elements', elementsExpr, true));
       reportFn?.(elementsExpr, this.elements);
     }
     if (this.context !== undefined) {
-      let contextExpr = this.context.toExpression(true, reportFn);
+      const contextExpr = this.context.toExpression(true, reportFn);
       argumentList.push(new Fmt.Argument('context', contextExpr, true));
       reportFn?.(contextExpr, this.context);
     }
@@ -60,13 +60,13 @@ export class ObjectContents_Template extends Fmt.ObjectContents {
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_Template {
-    let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
+    const result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_Template {
-    let result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
+    const result: ObjectContents_Template = Object.create(ObjectContents_Template.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -156,7 +156,7 @@ export class MetaRefExpression_Template extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -186,7 +186,7 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateElements {
-    let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
+    const result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -201,7 +201,7 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.operand !== undefined) {
       argumentList.push(new Fmt.Argument('operand', this.operand, true));
     }
@@ -224,13 +224,13 @@ export class ObjectContents_TemplateElements extends Fmt.ObjectContents {
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateElements {
-    let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
+    const result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateElements {
-    let result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
+    const result: ObjectContents_TemplateElements = Object.create(ObjectContents_TemplateElements.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -329,7 +329,7 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateContext {
-    let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
+    const result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
@@ -342,7 +342,7 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     if (this.operator !== undefined) {
       argumentList.push(new Fmt.Argument('operator', this.operator, true));
     }
@@ -359,13 +359,13 @@ export class ObjectContents_TemplateContext extends Fmt.ObjectContents {
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_TemplateContext {
-    let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
+    const result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_TemplateContext {
-    let result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
+    const result: ObjectContents_TemplateContext = Object.create(ObjectContents_TemplateContext.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -443,7 +443,7 @@ export class MetaRefExpression_Bool extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -472,7 +472,7 @@ export class MetaRefExpression_Int extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -501,7 +501,7 @@ export class MetaRefExpression_String extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -530,7 +530,7 @@ export class MetaRefExpression_Expr extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -559,7 +559,7 @@ export class MetaRefExpression_true extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -588,7 +588,7 @@ export class MetaRefExpression_false extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -622,21 +622,21 @@ export class MetaRefExpression_not extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.condition, false));
     return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let conditionResult = this.condition.substitute(fn, replacedParameters);
+    const conditionResult = this.condition.substitute(fn, replacedParameters);
     if (conditionResult !== this.condition) {
       changed = true;
     }
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_not(conditionResult);
+    const result = new MetaRefExpression_not(conditionResult);
     return fn ? fn(result) : result;
   }
 
@@ -667,7 +667,7 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.param, false));
     if (this.valueIfPresent !== undefined) {
       argumentList.push(new Fmt.Argument('valueIfPresent', this.valueIfPresent, true));
@@ -680,7 +680,7 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let paramResult = this.param.substitute(fn, replacedParameters);
+    const paramResult = this.param.substitute(fn, replacedParameters);
     if (paramResult !== this.param) {
       changed = true;
     }
@@ -701,7 +701,7 @@ export class MetaRefExpression_opt extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_opt(paramResult, valueIfPresentResult, valueIfMissingResult);
+    const result = new MetaRefExpression_opt(paramResult, valueIfPresentResult, valueIfMissingResult);
     return fn ? fn(result) : result;
   }
 
@@ -738,7 +738,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
     this.items = [];
     let index = 0;
     for (;;) {
-      let itemsRaw = argumentList.getOptionalValue(undefined, index);
+      const itemsRaw = argumentList.getOptionalValue(undefined, index);
       if (itemsRaw === undefined) {
         break;
       }
@@ -748,8 +748,8 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    for (let itemsArg of this.items) {
+    const argumentList = new Fmt.ArgumentList;
+    for (const itemsArg of this.items) {
       argumentList.push(new Fmt.Argument(undefined, itemsArg, true));
     }
     return argumentList;
@@ -757,9 +757,9 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let itemsResult: Fmt.Expression[] = [];
-    for (let item of this.items) {
-      let newItem = item.substitute(fn, replacedParameters);
+    const itemsResult: Fmt.Expression[] = [];
+    for (const item of this.items) {
+      const newItem = item.substitute(fn, replacedParameters);
       if (newItem !== item) {
         changed = true;
       }
@@ -768,7 +768,7 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_add(...itemsResult);
+    const result = new MetaRefExpression_add(...itemsResult);
     return fn ? fn(result) : result;
   }
 
@@ -781,8 +781,8 @@ export class MetaRefExpression_add extends Fmt.MetaRefExpression {
         return false;
       }
       for (let i = 0; i < this.items.length; i++) {
-        let leftItem = this.items[i];
-        let rightItem = expression.items[i];
+        const leftItem = this.items[i];
+        const rightItem = expression.items[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -803,7 +803,7 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
     this.param = argumentList.getValue('param', 0);
-    let dimensionRaw = argumentList.getValue('dimension', 1);
+    const dimensionRaw = argumentList.getValue('dimension', 1);
     if (dimensionRaw instanceof Fmt.IntegerExpression) {
       this.dimension = dimensionRaw.value;
     } else {
@@ -814,9 +814,9 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.param, false));
-    let dimensionExpr = new Fmt.IntegerExpression(this.dimension);
+    const dimensionExpr = new Fmt.IntegerExpression(this.dimension);
     argumentList.push(new Fmt.Argument(undefined, dimensionExpr, false));
     argumentList.push(new Fmt.Argument(undefined, this.item, false));
     if (this.separator !== undefined) {
@@ -827,11 +827,11 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let paramResult = this.param.substitute(fn, replacedParameters);
+    const paramResult = this.param.substitute(fn, replacedParameters);
     if (paramResult !== this.param) {
       changed = true;
     }
-    let itemResult = this.item.substitute(fn, replacedParameters);
+    const itemResult = this.item.substitute(fn, replacedParameters);
     if (itemResult !== this.item) {
       changed = true;
     }
@@ -845,7 +845,7 @@ export class MetaRefExpression_for extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_for(paramResult, this.dimension, itemResult, separatorResult);
+    const result = new MetaRefExpression_for(paramResult, this.dimension, itemResult, separatorResult);
     return fn ? fn(result) : result;
   }
 
@@ -878,7 +878,7 @@ export class MetaRefExpression_first extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -907,7 +907,7 @@ export class MetaRefExpression_last extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     return argumentList;
   }
 
@@ -941,21 +941,21 @@ export class MetaRefExpression_rev extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
+    const argumentList = new Fmt.ArgumentList;
     argumentList.push(new Fmt.Argument(undefined, this.list, false));
     return argumentList;
   }
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let listResult = this.list.substitute(fn, replacedParameters);
+    const listResult = this.list.substitute(fn, replacedParameters);
     if (listResult !== this.list) {
       changed = true;
     }
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_rev(listResult);
+    const result = new MetaRefExpression_rev(listResult);
     return fn ? fn(result) : result;
   }
 
@@ -986,7 +986,7 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
     this.items = [];
     let index = 0;
     for (;;) {
-      let itemsRaw = argumentList.getOptionalValue(undefined, index);
+      const itemsRaw = argumentList.getOptionalValue(undefined, index);
       if (itemsRaw === undefined) {
         break;
       }
@@ -996,8 +996,8 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    for (let itemsArg of this.items) {
+    const argumentList = new Fmt.ArgumentList;
+    for (const itemsArg of this.items) {
       argumentList.push(new Fmt.Argument(undefined, itemsArg, true));
     }
     return argumentList;
@@ -1005,9 +1005,9 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let itemsResult: Fmt.Expression[] = [];
-    for (let item of this.items) {
-      let newItem = item.substitute(fn, replacedParameters);
+    const itemsResult: Fmt.Expression[] = [];
+    for (const item of this.items) {
+      const newItem = item.substitute(fn, replacedParameters);
       if (newItem !== item) {
         changed = true;
       }
@@ -1016,7 +1016,7 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_sel(...itemsResult);
+    const result = new MetaRefExpression_sel(...itemsResult);
     return fn ? fn(result) : result;
   }
 
@@ -1029,8 +1029,8 @@ export class MetaRefExpression_sel extends Fmt.MetaRefExpression {
         return false;
       }
       for (let i = 0; i < this.items.length; i++) {
-        let leftItem = this.items[i];
-        let rightItem = expression.items[i];
+        const leftItem = this.items[i];
+        const rightItem = expression.items[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -1056,7 +1056,7 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
     this.items = [];
     let index = 0;
     for (;;) {
-      let itemsRaw = argumentList.getOptionalValue(undefined, index);
+      const itemsRaw = argumentList.getOptionalValue(undefined, index);
       if (itemsRaw === undefined) {
         break;
       }
@@ -1066,8 +1066,8 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
   }
 
   toArgumentList(reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    for (let itemsArg of this.items) {
+    const argumentList = new Fmt.ArgumentList;
+    for (const itemsArg of this.items) {
       argumentList.push(new Fmt.Argument(undefined, itemsArg, true));
     }
     return argumentList;
@@ -1075,9 +1075,9 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
 
   substitute(fn?: Fmt.ExpressionSubstitutionFn, replacedParameters: Fmt.ReplacedParameter[] = []): Fmt.Expression {
     let changed = false;
-    let itemsResult: Fmt.Expression[] = [];
-    for (let item of this.items) {
-      let newItem = item.substitute(fn, replacedParameters);
+    const itemsResult: Fmt.Expression[] = [];
+    for (const item of this.items) {
+      const newItem = item.substitute(fn, replacedParameters);
       if (newItem !== item) {
         changed = true;
       }
@@ -1086,7 +1086,7 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
     if (fn && !changed) {
       return fn(this);
     }
-    let result = new MetaRefExpression_neg(...itemsResult);
+    const result = new MetaRefExpression_neg(...itemsResult);
     return fn ? fn(result) : result;
   }
 
@@ -1099,8 +1099,8 @@ export class MetaRefExpression_neg extends Fmt.MetaRefExpression {
         return false;
       }
       for (let i = 0; i < this.items.length; i++) {
-        let leftItem = this.items[i];
-        let rightItem = expression.items[i];
+        const leftItem = this.items[i];
+        const rightItem = expression.items[i];
         if (!Fmt.areObjectsEquivalent(leftItem, rightItem, fn, replacedParameters)) {
           return false;
         }
@@ -1116,13 +1116,13 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_NotationAbbreviation {
-    let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
+    const result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let parametersRaw = argumentList.getValue('parameters', 0);
+    const parametersRaw = argumentList.getValue('parameters', 0);
     if (parametersRaw instanceof Fmt.ParameterExpression) {
       this.parameters = parametersRaw.parameters;
     } else {
@@ -1134,8 +1134,8 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    let parametersExpr = new Fmt.ParameterExpression(this.parameters);
+    const argumentList = new Fmt.ArgumentList;
+    const parametersExpr = new Fmt.ParameterExpression(this.parameters);
     argumentList.push(new Fmt.Argument(outputAllNames ? 'parameters' : undefined, parametersExpr, false));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'originalParameter' : undefined, this.originalParameter, false));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'originalParameterValue' : undefined, this.originalParameterValue, false));
@@ -1144,13 +1144,13 @@ export class ObjectContents_NotationAbbreviation extends Fmt.ObjectContents {
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_NotationAbbreviation {
-    let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
+    const result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_NotationAbbreviation {
-    let result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
+    const result: ObjectContents_NotationAbbreviation = Object.create(ObjectContents_NotationAbbreviation.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -1225,13 +1225,13 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
   }
 
   static createFromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionNotation {
-    let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
+    const result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
     result.fromArgumentList(argumentList, reportFn);
     return result;
   }
 
   fromArgumentList(argumentList: Fmt.ArgumentList, reportFn?: Fmt.ReportConversionFn): void {
-    let parameterRaw = argumentList.getValue('parameter', 0);
+    const parameterRaw = argumentList.getValue('parameter', 0);
     if (parameterRaw instanceof Fmt.ParameterExpression && parameterRaw.parameters.length === 1) {
       this.parameter = parameterRaw.parameters[0];
     } else {
@@ -1244,8 +1244,8 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
   }
 
   toArgumentList(outputAllNames: boolean, reportFn?: Fmt.ReportConversionFn): Fmt.ArgumentList {
-    let argumentList = new Fmt.ArgumentList;
-    let parameterExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.parameter));
+    const argumentList = new Fmt.ArgumentList;
+    const parameterExpr = new Fmt.ParameterExpression(new Fmt.ParameterList(this.parameter));
     argumentList.push(new Fmt.Argument(outputAllNames ? 'parameter' : undefined, parameterExpr, false));
     if (this.notation !== undefined) {
       argumentList.push(new Fmt.Argument('notation', this.notation, true));
@@ -1263,13 +1263,13 @@ export class ObjectContents_DefinitionNotation extends Fmt.ObjectContents {
   }
 
   static createFromExpression(expression: Fmt.Expression, reportFn?: Fmt.ReportConversionFn): ObjectContents_DefinitionNotation {
-    let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
+    const result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
     result.fromExpression(expression, reportFn);
     return result;
   }
 
   clone(replacedParameters: Fmt.ReplacedParameter[] = []): ObjectContents_DefinitionNotation {
-    let result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
+    const result: ObjectContents_DefinitionNotation = Object.create(ObjectContents_DefinitionNotation.prototype);
     this.substitute(undefined, result, replacedParameters);
     return result;
   }
@@ -1389,9 +1389,9 @@ export class MetaModel extends Meta.MetaModel {
   }
 
   getNextArgumentContext(argument: Fmt.Argument, argumentIndex: number, previousContext: Ctx.Context): Ctx.Context {
-    let parent = previousContext.parentObject;
+    const parent = previousContext.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type;
+      const type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Template) {
           return previousContext;
@@ -1415,9 +1415,9 @@ export class MetaModel extends Meta.MetaModel {
 
   getArgumentValueContext(argument: Fmt.Argument, argumentIndex: number, previousArguments: Fmt.ArgumentList, parentContext: Ctx.Context): Ctx.Context {
     let context = parentContext;
-    let parent = context.parentObject;
+    const parent = context.parentObject;
     if (parent instanceof Fmt.Definition) {
-      let type = parent.type;
+      const type = parent.type;
       if (type instanceof Fmt.MetaRefExpression) {
         if (type instanceof MetaRefExpression_Template) {
           if (argument.name === 'elements' || (argument.name === undefined && argumentIndex === 3)) {
@@ -1434,13 +1434,13 @@ export class MetaModel extends Meta.MetaModel {
         if (currentContext instanceof ArgumentTypeContext) {
           if (currentContext.objectContentsClass === ObjectContents_NotationAbbreviation) {
             if (argument.name === 'originalParameterValue' || (argument.name === undefined && argumentIndex === 2)) {
-              let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+              const parametersValue = previousArguments.getOptionalValue('parameters', 0);
               if (parametersValue instanceof Fmt.ParameterExpression) {
                 context = this.getParameterListContext(parametersValue.parameters, context);
               }
             }
             if (argument.name === 'abbreviation' || (argument.name === undefined && argumentIndex === 3)) {
-              let parametersValue = previousArguments.getOptionalValue('parameters', 0);
+              const parametersValue = previousArguments.getOptionalValue('parameters', 0);
               if (parametersValue instanceof Fmt.ParameterExpression) {
                 context = this.getParameterListContext(parametersValue.parameters, context);
               }
@@ -1448,7 +1448,7 @@ export class MetaModel extends Meta.MetaModel {
           }
           if (currentContext.objectContentsClass === ObjectContents_DefinitionNotation) {
             if (argument.name === 'notation' || (argument.name === undefined && argumentIndex === 1)) {
-              let parameterValue = previousArguments.getOptionalValue('parameter', 0);
+              const parameterValue = previousArguments.getOptionalValue('parameter', 0);
               if (parameterValue instanceof Fmt.ParameterExpression) {
                 context = this.getParameterListContext(parameterValue.parameters, context);
               }

@@ -21,11 +21,11 @@ interface DocPageProps {
 export const markdownSuffix = '.md';
 
 const DocPage = React.memo((props: DocPageProps) => {
-  let baseUriEnd = props.uri.lastIndexOf('/');
-  let baseUri = baseUriEnd >= 0 ? props.uri.substring(0, baseUriEnd + 1) : '';
-  let markdownUri = `${props.uri}${markdownSuffix}`;
-  let promise = fetchHelper.fetchText(markdownUri).then((text: string) => {
-    let md = new Remarkable;
+  const baseUriEnd = props.uri.lastIndexOf('/');
+  const baseUri = baseUriEnd >= 0 ? props.uri.substring(0, baseUriEnd + 1) : '';
+  const markdownUri = `${props.uri}${markdownSuffix}`;
+  const promise = fetchHelper.fetchText(markdownUri).then((text: string) => {
+    const md = new Remarkable;
     md.use(linkify);
     md.renderer = new RemarkableReactRenderer({
       components: {

@@ -11,18 +11,18 @@ import { SlateCodeLensProvider } from './providers/codeLensProvider';
 import { SlateLogicHoverProvider } from './providers/logicHoverProvider';
 
 export function activate(context: vscode.ExtensionContext, onDidParseDocument: vscode.Event<ParseDocumentEvent>, onDidForgetDocument: vscode.Event<ForgetDocumentEvent>, onShowHover: vscode.Event<HoverEvent>, fileAccessor: FileAccessor): void {
-    let libraryDocumentProvider = new LibraryDocumentProvider(fileAccessor);
-    let diagnosticsProvider = new SlateDiagnosticsProvider(libraryDocumentProvider);
-    let changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
+    const libraryDocumentProvider = new LibraryDocumentProvider(fileAccessor);
+    const diagnosticsProvider = new SlateDiagnosticsProvider(libraryDocumentProvider);
+    const changeCodeLensesEventEmitter = new vscode.EventEmitter<void>();
     context.subscriptions.push(changeCodeLensesEventEmitter);
-    let codeLensProvider = new SlateCodeLensProvider(libraryDocumentProvider, changeCodeLensesEventEmitter.event);
-    let hoverProvider = new SlateLogicHoverProvider(libraryDocumentProvider);
+    const codeLensProvider = new SlateCodeLensProvider(libraryDocumentProvider, changeCodeLensesEventEmitter.event);
+    const hoverProvider = new SlateLogicHoverProvider(libraryDocumentProvider);
 
     context.subscriptions.push(
         libraryDocumentProvider,
         onDidParseDocument((event: ParseDocumentEvent) => {
             try {
-                let document = libraryDocumentProvider.parseDocument(event);
+                const document = libraryDocumentProvider.parseDocument(event);
                 if (document) {
                     diagnosticsProvider.checkDocument(document);
                     changeCodeLensesEventEmitter.fire();
@@ -42,11 +42,11 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
     }
 
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
-        let templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/notation/templates' + fileExtension;
-        let templateFileReference = fileAccessor.openFile(templatesUri, false);
-        let onChange = (newContents: string) => {
+        const templatesUri = vscode.workspace.workspaceFolders[0].uri.toString() + '/data/notation/templates' + fileExtension;
+        const templateFileReference = fileAccessor.openFile(templatesUri, false);
+        const onChange = (newContents: string) => {
             try {
-                let templates = FmtReader.readString(newContents, templatesUri, FmtNotation.getMetaModel);
+                const templates = FmtReader.readString(newContents, templatesUri, FmtNotation.getMetaModel);
                 codeLensProvider.templates = templates;
                 hoverProvider.templates = templates;
             } catch (error) {
@@ -54,7 +54,7 @@ export function activate(context: vscode.ExtensionContext, onDidParseDocument: v
             changeCodeLensesEventEmitter.fire();
         };
         if (templateFileReference.watch) {
-            let watcher = templateFileReference.watch(onChange);
+            const watcher = templateFileReference.watch(onChange);
             context.subscriptions.push({ dispose() { watcher.close(); } });
         }
         templateFileReference.read().then(onChange);

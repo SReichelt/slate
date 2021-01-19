@@ -33,8 +33,8 @@ class AWSResponse implements Response {
 export function wrapHandler(handler: Handler, expectedMethod: string): APIGatewayProxyHandler {
   return (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>) => {
     if (event.httpMethod === expectedMethod) {
-      let req = new AWSRequest(event.path, event.queryStringParameters ?? {}, event.body);
-      let res = new AWSResponse(callback);
+      const req = new AWSRequest(event.path, event.queryStringParameters ?? {}, event.body);
+      const res = new AWSResponse(callback);
       handler(req, res);
     } else {
       callback(`Expected method ${expectedMethod} instead of ${event.httpMethod}`);

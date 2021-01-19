@@ -24,7 +24,7 @@ const modalClassNames = {
 };
 
 function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): React.ReactElement {
-  let onOK = (event: React.FormEvent<HTMLFormElement>) => {
+  const onOK = (event: React.FormEvent<HTMLFormElement>) => {
     if (props.okEnabled) {
       props.onOK();
     }
