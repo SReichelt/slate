@@ -1,6 +1,8 @@
 [build]
+  # We need to run "npm install" because Netlify currently fails to cache and restore non-top-level node_modules,
+  # breaking the build (unless dependencies have changed).
+  command = "npm install && npm run build"
   publish = "dist/public/"
-  command = "npm run build"
   functions = "dist/functions/"
 
 # At the root, just load the app via index.html.
