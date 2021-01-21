@@ -6,8 +6,8 @@
 ]
 
 /**
- * @expectedError Type mismatch: element of $../Essentials/"Pointed sets" expected
- * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
+ * @expectedError Type mismatch: element of `$../Essentials/"Pointed sets"` expected
+ * @expectedError Type mismatch: element of `$../Essentials/"Natural numbers"` expected
  */
 $FAIL_indices(_1: %Binder(
   #(

@@ -8,12 +8,12 @@
 ]
 
 /**
- * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
- * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
- * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
- * @expectedError Type mismatch: $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers") and $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") are incompatible
- * @expectedError Type mismatch: element of $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers") expected
- * @expectedError Type mismatch: element of $../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Pointed sets") expected
+ * @expectedError Type mismatch: `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers")` and `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers")` are incompatible
+ * @expectedError Type mismatch: `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers")` and `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers")` are incompatible
+ * @expectedError Type mismatch: `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers")` and `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers")` are incompatible
+ * @expectedError Type mismatch: `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Natural numbers")` and `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers")` are incompatible
+ * @expectedError Type mismatch: element of `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Cardinal numbers")` expected
+ * @expectedError Type mismatch: element of `$../Essentials/Functions(X = $../Essentials/"Natural numbers", Y = $../Essentials/"Pointed sets")` expected
  */
 $FAIL_differentConstructionArguments(
   s: %Element($~Functions(X = $~"Natural numbers", Y = $~"Natural numbers")),

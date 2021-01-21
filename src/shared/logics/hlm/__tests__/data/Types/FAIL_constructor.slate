@@ -5,7 +5,7 @@
 ]
 
 /**
- * @expectedError Type mismatch: $../Essentials/"Pointed sets" and S are incompatible
+ * @expectedError Type mismatch: `$../Essentials/"Pointed sets"` and `S` are incompatible
  */
 $FAIL_constructor(S: %Set): %Predicate {
   definition = [%in(

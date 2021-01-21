@@ -42,7 +42,7 @@ export class File implements FileObject<File> {
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeFile(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeFile(this));
   }
 }
 
@@ -77,7 +77,7 @@ export abstract class PathItem implements ExpressionObject<PathItem> {
   protected abstract matches(pathItem: PathItem, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean;
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writePathItem(this, false, false));
+    return toString((writer: FmtWriter.Writer) => writer.writePathItem(this, false, false));
   }
 }
 
@@ -177,7 +177,7 @@ export class Path extends NamedPathItem {
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writePath(this));
+    return toString((writer: FmtWriter.Writer) => writer.writePath(this));
   }
 }
 
@@ -213,7 +213,7 @@ export class Definition implements FileObject<Definition> {
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeDefinition(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeDefinition(this));
   }
 }
 
@@ -242,7 +242,7 @@ export class DefinitionList extends Array<Definition> implements FileObject<Defi
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeDefinitions(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeDefinitions(this));
   }
 }
 
@@ -363,7 +363,7 @@ export class Parameter implements ExpressionObject<Parameter> {
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeParameter(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeParameter(this));
   }
 }
 
@@ -438,7 +438,7 @@ export class ParameterList extends Array<Parameter> implements ExpressionObject<
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeParameters(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeParameters(this));
   }
 }
 
@@ -471,7 +471,7 @@ export class Argument implements ExpressionObject<Argument> {
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeArgument(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeArgument(this));
   }
 }
 
@@ -602,7 +602,7 @@ export class ArgumentList extends Array<Argument> implements ExpressionObject<Ar
   }
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeArguments(this));
   }
 }
 
@@ -630,7 +630,7 @@ export abstract class ObjectContents implements FileObject<ObjectContents> {
 
   toString(): string {
     const argumentList = this.toArgumentList(false);
-    return writeToString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
+    return toString((writer: FmtWriter.Writer) => writer.writeArguments(argumentList));
   }
 }
 
@@ -695,7 +695,7 @@ export abstract class Expression implements ExpressionObject<Expression> {
   protected abstract matches(expression: Expression, fn: ExpressionUnificationFn | undefined, replacedParameters: ReplacedParameter[]): boolean;
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeExpression(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeExpression(this));
   }
 }
 
@@ -1050,7 +1050,7 @@ export class DocumentationComment implements FileObject<DocumentationComment> {
   traverse(fn: ExpressionTraversalFn): void {}
 
   toString(): string {
-    return writeToString((writer: FmtWriter.Writer) => writer.writeDocumentationComment(this));
+    return toString((writer: FmtWriter.Writer) => writer.writeDocumentationComment(this));
   }
 }
 
@@ -1155,9 +1155,9 @@ export function reverseReplacedParameters(replacedParameters: ReplacedParameter[
   }));
 }
 
-function writeToString(doWrite: (writer: FmtWriter.Writer) => void): string {
+function toString(doWrite: (writer: FmtWriter.Writer) => void): string {
   const stream = new FmtWriter.StringOutputStream;
   const writer = new FmtWriter.Writer(stream, true, true, '', '');
   doWrite(writer);
-  return stream.str;
+  return `\`${stream.str}\``;
 }

@@ -7,7 +7,7 @@
 ]
 
 /**
- * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
+ * @expectedError Type mismatch: element of `$../Essentials/"Natural numbers"` expected
  */
 $FAIL_invalidFunctionCall(f: %Element($~Essentials/Functions(X = $~"Natural numbers", Y = $~"Pointed sets"))): %Predicate {
   definition = [%equals(

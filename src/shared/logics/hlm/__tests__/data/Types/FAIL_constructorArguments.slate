@@ -5,7 +5,7 @@
 ]
 
 /**
- * @expectedError Type mismatch: element of $../Essentials/"Natural numbers" expected
+ * @expectedError Type mismatch: element of `$../Essentials/"Natural numbers"` expected
  */
 $FAIL_constructorArguments(
   S: %Set,

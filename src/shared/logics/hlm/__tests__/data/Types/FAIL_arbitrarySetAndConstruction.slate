@@ -5,10 +5,10 @@
 ]
 
 /**
- * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
- * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
- * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
- * @expectedError Type mismatch: S and $../Essentials/"Natural numbers" are incompatible
+ * @expectedError Type mismatch: `S` and `$../Essentials/"Natural numbers"` are incompatible
+ * @expectedError Type mismatch: `S` and `$../Essentials/"Natural numbers"` are incompatible
+ * @expectedError Type mismatch: `S` and `$../Essentials/"Natural numbers"` are incompatible
+ * @expectedError Type mismatch: `S` and `$../Essentials/"Natural numbers"` are incompatible
  */
 $FAIL_arbitrarySetAndConstruction(
   S: %Set,

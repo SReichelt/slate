@@ -6,7 +6,7 @@
 ]
 
 /**
- * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $FAIL_InvalidEmbedding are incompatible
+ * @expectedError Type mismatch: `$../Essentials/"Pointed sets"` and `$FAIL_InvalidEmbedding` are incompatible
  *
  * @expectedWarning Proof required
  */

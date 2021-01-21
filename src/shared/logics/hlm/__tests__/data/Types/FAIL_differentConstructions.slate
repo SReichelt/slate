@@ -6,10 +6,10 @@
 ]
 
 /**
- * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
- * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
- * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
- * @expectedError Type mismatch: $../Essentials/"Pointed sets" and $../Essentials/"Natural numbers" are incompatible
+ * @expectedError Type mismatch: `$../Essentials/"Pointed sets"` and `$../Essentials/"Natural numbers"` are incompatible
+ * @expectedError Type mismatch: `$../Essentials/"Pointed sets"` and `$../Essentials/"Natural numbers"` are incompatible
+ * @expectedError Type mismatch: `$../Essentials/"Pointed sets"` and `$../Essentials/"Natural numbers"` are incompatible
+ * @expectedError Type mismatch: `$../Essentials/"Pointed sets"` and `$../Essentials/"Natural numbers"` are incompatible
  */
 $FAIL_differentConstructions(
   s: %Element($~"Pointed sets"),
