@@ -44,6 +44,10 @@
 			]
 		},
 		{
+			"name": "comment.block.empty",
+			"match": "/\\*\\*/"
+		},
+		{
 			"name": "comment.block.documentation",
 			"begin": "/\\*\\*",
 			"end": "\\*/",

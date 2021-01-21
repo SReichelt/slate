@@ -811,6 +811,10 @@ export class Reader {
     let c = this.stream.peekChar();
     if (handleDocumentationComment && c === '*') {
       this.stream.readChar();
+      if (this.stream.peekChar() === '/') {
+        this.stream.readChar();
+        return;
+      }
       documentationItems = [];
     }
     let atLineStart = false;
