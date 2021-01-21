@@ -779,240 +779,11 @@ export class Reader {
           switch (c) {
           case '/':
             this.stream.readChar();
-            do {
-              c = this.stream.readChar();
-            } while (c && c !== '\r' && c !== '\n');
+            this.skipLineCommentAfterStart();
             break;
           case '*':
             this.stream.readChar();
-            {
-              let documentationItems: RawDocumentationItem[] | undefined = undefined;
-              c = this.stream.peekChar();
-              if (handleDocumentationComment && c === '*') {
-                this.stream.readChar();
-                documentationItems = [];
-              }
-              let atLineStart = false;
-              let afterAsterisk = true;
-              let atCommentLineStart = true;
-              let inKind = false;
-              let atNameStart = false;
-              let inUnescapedName = false;
-              let inEscapedName = false;
-              let inEscapeSequence = false;
-              let inMarkdownCode = '';
-              let atMarkdownStart = false;
-              let kind: string | undefined = undefined;
-              let name: string | undefined = undefined;
-              let text = '';
-              let textStartCol = 0;
-              let commentLineStart: Location | undefined = undefined;
-              let itemStart: Location | undefined = undefined;
-              let itemEnd: Location | undefined = undefined;
-              let nameStart: Location | undefined = undefined;
-              let nameEnd: Location | undefined = undefined;
-              for (;;) {
-                if (atLineStart || afterAsterisk) {
-                  commentLineStart = this.stream.getLocation();
-                }
-                c = this.stream.readChar();
-                if (!c) {
-                  this.markedEnd = undefined;
-                  this.error('Unterminated comment', this.markEnd(commentStart));
-                  break;
-                } else if (c === '*') {
-                  if (this.stream.peekChar() === '/') {
-                    this.stream.readChar();
-                    break;
-                  }
-                  if (atLineStart) {
-                    atLineStart = false;
-                    afterAsterisk = true;
-                    c = '';
-                  } else {
-                    afterAsterisk = false;
-                  }
-                } else if (c === '\r' || c === '\n') {
-                  atLineStart = true;
-                  afterAsterisk = false;
-                } else if (isWhitespaceCharacter(c) && (atLineStart || afterAsterisk)) {
-                  c = '';
-                  afterAsterisk = false;
-                } else {
-                  atLineStart = false;
-                  afterAsterisk = false;
-                }
-                if (documentationItems && c) {
-                  if (c !== '`') {
-                    atMarkdownStart = false;
-                  }
-                  if (c === '\r' || c === '\n') {
-                    if (text) {
-                      text += c;
-                    }
-                    atCommentLineStart = true;
-                    inKind = false;
-                    atNameStart = false;
-                    inUnescapedName = false;
-                    inEscapedName = false;
-                    inEscapeSequence = false;
-                  } else if (atCommentLineStart && c === '@') {
-                    text = text.trimRight();
-                    if (kind || text) {
-                      if (!itemStart) {
-                        itemStart = this.stream.getLocation();
-                      }
-                      if (!itemEnd) {
-                        itemEnd = this.stream.getLocation();
-                      }
-                      documentationItems.push({
-                        kind: kind,
-                        parameterName: name,
-                        text: text,
-                        range: {
-                          start: itemStart,
-                          end: itemEnd
-                        },
-                        nameRange: nameStart && nameEnd ? {
-                          start: nameStart,
-                          end: nameEnd
-                        } : undefined
-                      });
-                    }
-                    kind = '';
-                    name = undefined;
-                    text = '';
-                    atCommentLineStart = false;
-                    inKind = true;
-                    textStartCol = 0;
-                    itemStart = commentLineStart;
-                    itemEnd = undefined;
-                    nameStart = undefined;
-                    nameEnd = undefined;
-                  } else if (inKind) {
-                    if (isWhitespaceCharacter(c)) {
-                      inKind = false;
-                      if (kind === 'param') {
-                        atNameStart = true;
-                        nameStart = this.stream.getLocation();
-                      }
-                    } else {
-                      kind += c;
-                    }
-                  } else if (atNameStart) {
-                    if (isWhitespaceCharacter(c)) {
-                      nameStart = this.stream.getLocation();
-                    } else if (c === '"') {
-                      name = '';
-                      atNameStart = false;
-                      inEscapedName = true;
-                    } else {
-                      atNameStart = false;
-                      inUnescapedName = true;
-                      name = c;
-                      nameEnd = this.stream.getLocation();
-                    }
-                  } else if (inUnescapedName) {
-                    if (isWhitespaceCharacter(c)) {
-                      inUnescapedName = false;
-                    } else {
-                      name += c;
-                      nameEnd = this.stream.getLocation();
-                    }
-                  } else if (inEscapedName) {
-                    if (inEscapeSequence) {
-                      const escapedCharacter = this.getEscapedCharacter(c);
-                      if (escapedCharacter) {
-                        name += escapedCharacter;
-                      }
-                      inEscapeSequence = false;
-                    } else if (c === '\\') {
-                      inEscapeSequence = true;
-                    } else if (c === '"') {
-                      inEscapedName = false;
-                      nameEnd = this.stream.getLocation();
-                    } else {
-                      name += c;
-                      itemEnd = this.stream.getLocation();
-                    }
-                  } else {
-                    if (!text) {
-                      textStartCol = this.stream.getLocation().col;
-                    } else if (this.stream.getLocation().col >= textStartCol) {
-                      atCommentLineStart = false;
-                    }
-                    if ((!text || atCommentLineStart) && isWhitespaceCharacter(c)) {
-                      if (atCommentLineStart) {
-                        commentLineStart = this.stream.getLocation();
-                      }
-                    } else {
-                      text += c;
-                      if (!itemStart) {
-                        itemStart = commentLineStart;
-                      }
-                      itemEnd = this.stream.getLocation();
-                      if (c === '`') {
-                        if (inMarkdownCode) {
-                          if (atMarkdownStart) {
-                            inMarkdownCode += c;
-                          } else if (text.endsWith(inMarkdownCode)) {
-                            inMarkdownCode = '';
-                          }
-                        } else {
-                          inMarkdownCode = c;
-                          atMarkdownStart = true;
-                        }
-                        if (atMarkdownStart && this.errorHandler.checkMarkdownCode && this.stream.peekChar() !== '`') {
-                          const origStream = this.stream;
-                          this.stream = this.stream.fork();
-                          try {
-                            const dummyContext = new Ctx.DummyContext(this.metaModel!);
-                            this.readExpression(false, this.metaModel!.functions, dummyContext);
-                            this.skipWhitespace(false);
-                            for (const endChar of inMarkdownCode) {
-                              this.readChar(endChar);
-                            }
-                          } finally {
-                            this.stream = origStream;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              if (documentationItems) {
-                text = text.trimRight();
-                if (kind || text) {
-                  if (!itemStart) {
-                    itemStart = this.stream.getLocation();
-                  }
-                  if (!itemEnd) {
-                    itemEnd = this.stream.getLocation();
-                  }
-                  documentationItems.push({
-                    kind: kind,
-                    parameterName: name,
-                    text: text,
-                    range: {
-                      start: itemStart,
-                      end: itemEnd
-                    },
-                    nameRange: nameStart && nameEnd ? {
-                      start: nameStart,
-                      end: nameEnd
-                    } : undefined
-                  });
-                }
-                this.lastDocumentationComment = {
-                  items: documentationItems,
-                  range: {
-                    start: commentStart,
-                    end: this.stream.getLocation()
-                  }
-                };
-              }
-            }
+            this.skipBlockCommentAfterStart(commentStart, handleDocumentationComment);
             break;
           default:
             this.error(`'/' or '*' expected`);
@@ -1025,6 +796,242 @@ export class Reader {
       if (this.markedStart) {
         Object.assign(this.markedStart, this.stream.getLocation());
       }
+    }
+  }
+
+  private skipLineCommentAfterStart(): void {
+    let c: string;
+    do {
+      c = this.stream.readChar();
+    } while (c && c !== '\r' && c !== '\n');
+  }
+
+  private skipBlockCommentAfterStart(commentStart: Location, handleDocumentationComment: boolean): void {
+    let documentationItems: RawDocumentationItem[] | undefined = undefined;
+    let c = this.stream.peekChar();
+    if (handleDocumentationComment && c === '*') {
+      this.stream.readChar();
+      documentationItems = [];
+    }
+    let atLineStart = false;
+    let afterAsterisk = true;
+    let atCommentLineStart = true;
+    let inKind = false;
+    let atNameStart = false;
+    let inUnescapedName = false;
+    let inEscapedName = false;
+    let inEscapeSequence = false;
+    let inMarkdownCode = '';
+    let atMarkdownStart = false;
+    let kind: string | undefined = undefined;
+    let name: string | undefined = undefined;
+    let text = '';
+    let textStartCol = 0;
+    let commentLineStart: Location | undefined = undefined;
+    let itemStart: Location | undefined = undefined;
+    let itemEnd: Location | undefined = undefined;
+    let nameStart: Location | undefined = undefined;
+    let nameEnd: Location | undefined = undefined;
+    for (;;) {
+      if (atLineStart || afterAsterisk) {
+        commentLineStart = this.stream.getLocation();
+      }
+      c = this.stream.readChar();
+      if (!c) {
+        this.markedEnd = undefined;
+        this.error('Unterminated comment', this.markEnd(commentStart));
+        break;
+      } else if (c === '*') {
+        if (this.stream.peekChar() === '/') {
+          this.stream.readChar();
+          break;
+        }
+        if (atLineStart) {
+          atLineStart = false;
+          afterAsterisk = true;
+          c = '';
+        } else {
+          afterAsterisk = false;
+        }
+      } else if (c === '\r' || c === '\n') {
+        atLineStart = true;
+        afterAsterisk = false;
+      } else if (isWhitespaceCharacter(c) && (atLineStart || afterAsterisk)) {
+        c = '';
+        afterAsterisk = false;
+      } else {
+        atLineStart = false;
+        afterAsterisk = false;
+      }
+      if (documentationItems && c) {
+        if (c !== '`') {
+          atMarkdownStart = false;
+        }
+        if (c === '\r' || c === '\n') {
+          if (text) {
+            text += c;
+          }
+          atCommentLineStart = true;
+          inKind = false;
+          atNameStart = false;
+          inUnescapedName = false;
+          inEscapedName = false;
+          inEscapeSequence = false;
+        } else if (atCommentLineStart && c === '@') {
+          text = text.trimRight();
+          if (kind || text) {
+            if (!itemStart) {
+              itemStart = this.stream.getLocation();
+            }
+            if (!itemEnd) {
+              itemEnd = this.stream.getLocation();
+            }
+            documentationItems.push({
+              kind: kind,
+              parameterName: name,
+              text: text,
+              range: {
+                start: itemStart,
+                end: itemEnd
+              },
+              nameRange: nameStart && nameEnd ? {
+                start: nameStart,
+                end: nameEnd
+              } : undefined
+            });
+          }
+          kind = '';
+          name = undefined;
+          text = '';
+          atCommentLineStart = false;
+          inKind = true;
+          textStartCol = 0;
+          itemStart = commentLineStart;
+          itemEnd = undefined;
+          nameStart = undefined;
+          nameEnd = undefined;
+        } else if (inKind) {
+          if (isWhitespaceCharacter(c)) {
+            inKind = false;
+            if (kind === 'param') {
+              atNameStart = true;
+              nameStart = this.stream.getLocation();
+            }
+          } else {
+            kind += c;
+          }
+        } else if (atNameStart) {
+          if (isWhitespaceCharacter(c)) {
+            nameStart = this.stream.getLocation();
+          } else if (c === '"') {
+            name = '';
+            atNameStart = false;
+            inEscapedName = true;
+          } else {
+            atNameStart = false;
+            inUnescapedName = true;
+            name = c;
+            nameEnd = this.stream.getLocation();
+          }
+        } else if (inUnescapedName) {
+          if (isWhitespaceCharacter(c)) {
+            inUnescapedName = false;
+          } else {
+            name += c;
+            nameEnd = this.stream.getLocation();
+          }
+        } else if (inEscapedName) {
+          if (inEscapeSequence) {
+            const escapedCharacter = this.getEscapedCharacter(c);
+            if (escapedCharacter) {
+              name += escapedCharacter;
+            }
+            inEscapeSequence = false;
+          } else if (c === '\\') {
+            inEscapeSequence = true;
+          } else if (c === '"') {
+            inEscapedName = false;
+            nameEnd = this.stream.getLocation();
+          } else {
+            name += c;
+            itemEnd = this.stream.getLocation();
+          }
+        } else {
+          if (!text) {
+            textStartCol = this.stream.getLocation().col;
+          } else if (this.stream.getLocation().col >= textStartCol) {
+            atCommentLineStart = false;
+          }
+          if ((!text || atCommentLineStart) && isWhitespaceCharacter(c)) {
+            if (atCommentLineStart) {
+              commentLineStart = this.stream.getLocation();
+            }
+          } else {
+            text += c;
+            if (!itemStart) {
+              itemStart = commentLineStart;
+            }
+            itemEnd = this.stream.getLocation();
+            if (c === '`') {
+              if (inMarkdownCode) {
+                if (atMarkdownStart) {
+                  inMarkdownCode += c;
+                } else if (text.endsWith(inMarkdownCode)) {
+                  inMarkdownCode = '';
+                }
+              } else {
+                inMarkdownCode = c;
+                atMarkdownStart = true;
+              }
+              if (atMarkdownStart && this.errorHandler.checkMarkdownCode && this.stream.peekChar() !== '`') {
+                const origStream = this.stream;
+                this.stream = this.stream.fork();
+                try {
+                  const dummyContext = new Ctx.DummyContext(this.metaModel!);
+                  this.readExpression(false, this.metaModel!.functions, dummyContext);
+                  this.skipWhitespace(false);
+                  for (const endChar of inMarkdownCode) {
+                    this.readChar(endChar);
+                  }
+                } finally {
+                  this.stream = origStream;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (documentationItems) {
+      text = text.trimRight();
+      if (kind || text) {
+        if (!itemStart) {
+          itemStart = this.stream.getLocation();
+        }
+        if (!itemEnd) {
+          itemEnd = this.stream.getLocation();
+        }
+        documentationItems.push({
+          kind: kind,
+          parameterName: name,
+          text: text,
+          range: {
+            start: itemStart,
+            end: itemEnd
+          },
+          nameRange: nameStart && nameEnd ? {
+            start: nameStart,
+            end: nameEnd
+          } : undefined
+        });
+      }
+      this.lastDocumentationComment = {
+        items: documentationItems,
+        range: {
+          start: commentStart,
+          end: this.stream.getLocation()
+        }
+      };
     }
   }
 
