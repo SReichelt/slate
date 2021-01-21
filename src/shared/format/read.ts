@@ -822,7 +822,7 @@ export class Reader {
     let inEscapedName = false;
     let inEscapeSequence = false;
     let inMarkdownCode = '';
-    let atMarkdownStart = false;
+    let atMarkdownCodeStart = false;
     let kind: string | undefined = undefined;
     let name: string | undefined = undefined;
     let text = '';
@@ -865,7 +865,7 @@ export class Reader {
       }
       if (documentationItems && c) {
         if (c !== '`') {
-          atMarkdownStart = false;
+          atMarkdownCodeStart = false;
         }
         if (c === '\r' || c === '\n') {
           if (text) {
@@ -878,28 +878,7 @@ export class Reader {
           inEscapedName = false;
           inEscapeSequence = false;
         } else if (atCommentLineStart && c === '@') {
-          text = text.trimRight();
-          if (kind || text) {
-            if (!itemStart) {
-              itemStart = this.stream.getLocation();
-            }
-            if (!itemEnd) {
-              itemEnd = this.stream.getLocation();
-            }
-            documentationItems.push({
-              kind: kind,
-              parameterName: name,
-              text: text,
-              range: {
-                start: itemStart,
-                end: itemEnd
-              },
-              nameRange: nameStart && nameEnd ? {
-                start: nameStart,
-                end: nameEnd
-              } : undefined
-            });
-          }
+          this.finalizeDocumentationItem(kind, name, text, itemStart, itemEnd, nameStart, nameEnd, documentationItems);
           kind = '';
           name = undefined;
           text = '';
@@ -972,30 +951,23 @@ export class Reader {
               itemStart = commentLineStart;
             }
             itemEnd = this.stream.getLocation();
-            if (c === '`') {
+            if (inEscapeSequence) {
+              inEscapeSequence = false;
+            } else if (c === '\\') {
+              inEscapeSequence = true;
+            } else if (c === '`') {
               if (inMarkdownCode) {
-                if (atMarkdownStart) {
+                if (atMarkdownCodeStart) {
                   inMarkdownCode += c;
                 } else if (text.endsWith(inMarkdownCode)) {
                   inMarkdownCode = '';
                 }
               } else {
                 inMarkdownCode = c;
-                atMarkdownStart = true;
+                atMarkdownCodeStart = true;
               }
-              if (atMarkdownStart && this.errorHandler.checkMarkdownCode && this.stream.peekChar() !== '`') {
-                const origStream = this.stream;
-                this.stream = this.stream.fork();
-                try {
-                  const dummyContext = new Ctx.DummyContext(this.metaModel!);
-                  this.readExpression(false, this.metaModel!.functions, dummyContext);
-                  this.skipWhitespace(false);
-                  for (const endChar of inMarkdownCode) {
-                    this.readChar(endChar);
-                  }
-                } finally {
-                  this.stream = origStream;
-                }
+              if (atMarkdownCodeStart && this.errorHandler.checkMarkdownCode && this.stream.peekChar() !== '`') {
+                this.checkMarkdownCode(inMarkdownCode);
               }
             }
           }
@@ -1003,28 +975,7 @@ export class Reader {
       }
     }
     if (documentationItems) {
-      text = text.trimRight();
-      if (kind || text) {
-        if (!itemStart) {
-          itemStart = this.stream.getLocation();
-        }
-        if (!itemEnd) {
-          itemEnd = this.stream.getLocation();
-        }
-        documentationItems.push({
-          kind: kind,
-          parameterName: name,
-          text: text,
-          range: {
-            start: itemStart,
-            end: itemEnd
-          },
-          nameRange: nameStart && nameEnd ? {
-            start: nameStart,
-            end: nameEnd
-          } : undefined
-        });
-      }
+      this.finalizeDocumentationItem(kind, name, text, itemStart, itemEnd, nameStart, nameEnd, documentationItems);
       this.lastDocumentationComment = {
         items: documentationItems,
         range: {
@@ -1032,6 +983,46 @@ export class Reader {
           end: this.stream.getLocation()
         }
       };
+    }
+  }
+
+  private finalizeDocumentationItem(kind: string | undefined, name: string | undefined, text: string, itemStart: Location | undefined, itemEnd: Location | undefined, nameStart: Location | undefined, nameEnd: Location | undefined, documentationItems: RawDocumentationItem[]): void {
+    text = text.trimRight();
+    if (kind || text) {
+      if (!itemStart) {
+        itemStart = this.stream.getLocation();
+      }
+      if (!itemEnd) {
+        itemEnd = this.stream.getLocation();
+      }
+      documentationItems.push({
+        kind: kind,
+        parameterName: name,
+        text: text,
+        range: {
+          start: itemStart,
+          end: itemEnd
+        },
+        nameRange: nameStart && nameEnd ? {
+          start: nameStart,
+          end: nameEnd
+        } : undefined
+      });
+    }
+  }
+
+  private checkMarkdownCode(endSequence: string): void {
+    const origStream = this.stream;
+    this.stream = this.stream.fork();
+    try {
+      const dummyContext = new Ctx.DummyContext(this.metaModel!);
+      this.readExpression(false, this.metaModel!.functions, dummyContext);
+      this.skipWhitespace(false);
+      for (const endChar of endSequence) {
+        this.readChar(endChar);
+      }
+    } finally {
+      this.stream = origStream;
     }
   }
 
