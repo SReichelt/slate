@@ -6,21 +6,31 @@
         {
             "type": "npm",
             "script": "build",
-            "problemMatcher": [
-                "$tsc"
-            ],
+            "problemMatcher": "$ts-webpack",
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
         },
         {
-            "label": "util: sleep 30s",
-            "type": "shell",
-            "command": "sleep 30",
-            "group": "none",
-            "presentation": {
-                "reveal": "silent"
+            "type": "npm",
+            "script": "dev",
+            "problemMatcher": {
+                "base": "$ts-webpack-watch",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^[CLIENT] asset",
+                    "endsPattern": "compiled successfully"
+                }
+            },
+            "isBackground": true
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
             }
         }
     ]

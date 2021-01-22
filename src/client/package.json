@@ -2,7 +2,7 @@
   "name": "slate-client",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --mode production",
-    "dev": "webpack serve -w"
+    "dev": "webpack serve --watch"
   },
   "dependencies": {
     "slate-shared": "",

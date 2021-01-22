@@ -3,7 +3,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "cross-env NODE_ENV=production node ../../../dist/server/server.js",
-    "dev": "webpack --mode development && node --inspect=9229 ../../../dist/server/server.js"
+    "dev": "webpack --mode development && node ../../../dist/server/server.js"
   },
   "dependencies": {
     "slate-shared": "",

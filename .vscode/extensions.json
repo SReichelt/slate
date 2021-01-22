@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "sreichelt.slate"
+        "sreichelt.slate",
+        "eamodio.tsl-problem-matcher"
     ]
 }

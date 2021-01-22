@@ -69,7 +69,7 @@
 	"scripts": {
 		"clean": "rimraf out *.vsix",
 		"build": "npm run clean && webpack --mode production",
-		"watch": "tsc --watch -p ./",
+		"watch": "webpack --mode development --watch",
 		"package": "vsce package --yarn -o slate.vsix",
 		"lint": "eslint --no-eslintrc -c .eslintrc.json '**/*.@(ts|tsx)'"
 	},

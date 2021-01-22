@@ -6,11 +6,15 @@
         {
             "type": "npm",
             "script": "watch",
-            "problemMatcher": "$tsc-watch",
-            "isBackground": true,
-            "presentation": {
-                "reveal": "never"
+            "problemMatcher": {
+                "base": "$ts-webpack-watch",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^asset",
+                    "endsPattern": "compiled successfully"
+                }
             },
+            "isBackground": true,
             "group": {
                 "kind": "build",
                 "isDefault": true
