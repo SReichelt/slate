@@ -19,7 +19,7 @@
                 "base": "$ts-webpack-watch",
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "^[CLIENT] asset",
+                    "beginsPattern": "[CLIENT].* asset",
                     "endsPattern": "compiled successfully"
                 }
             },
