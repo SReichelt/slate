@@ -65,7 +65,7 @@
 		"onLanguage:slate",
 		"onCommand:slate.showGUI"
 	],
-	"main": "./out/vscode/src/extension",
+	"main": "./dist/extension",
 	"scripts": {
 		"clean": "rimraf out *.vsix",
 		"build": "npm run clean && webpack --mode production",
