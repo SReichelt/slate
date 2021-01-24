@@ -90,12 +90,12 @@ function checkItem(libraryDefinition: LibraryDefinition, libraryDataProvider: Li
         prefix = 'Hint';
         break;
       }
-      if (expectedDiagnosticIndex >= 0) {
-        prefix += ' (expected)';
-      }
       let fullMessage = `${prefix}: ${message}`;
       if (libraryDefinition.fileReference) {
         fullMessage = `${libraryDefinition.fileReference.fileName}: ${fullMessage}`;
+      }
+      if (expectedDiagnosticIndex >= 0) {
+        fullMessage = `[Expected] ${fullMessage}`;
       }
       console.error(fullMessage);
     }

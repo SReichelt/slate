@@ -1,4 +1,5 @@
 out
+dist
 /webview
 node_modules
 *.vsix

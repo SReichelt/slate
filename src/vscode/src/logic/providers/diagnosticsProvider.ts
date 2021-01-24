@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as Logic from 'slate-shared/logics/logic';
+import { getExpectedDiagnostics } from 'slate-shared/logics/diagnostics';
 import { LibraryDocument, LibraryDocumentProvider } from '../data';
 
 export class SlateDiagnosticsProvider {
@@ -18,13 +19,24 @@ export class SlateDiagnosticsProvider {
                 warnAboutMissingProofs: true
             };
             checker.checkDefinition(definition, libraryDocument.documentLibraryDataProvider, options).then((checkResult: Logic.LogicCheckResult) => {
+                const expectedDiagnostics = getExpectedDiagnostics(definition);
                 const diagnostics = checkResult.diagnostics.map((diagnostic: Logic.LogicCheckDiagnostic) =>
-                    new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), diagnostic.message, this.getSeverity(diagnostic)));
+                    this.createDiagnostic(libraryDocument, diagnostic, expectedDiagnostics));
                 if (libraryDocument.document) {
                     libraryDocument.library.diagnosticCollection.set(libraryDocument.document.uri, diagnostics);
                 }
             });
         }
+    }
+
+    private createDiagnostic(libraryDocument: LibraryDocument, diagnostic: Logic.LogicCheckDiagnostic, expectedDiagnostics: Logic.LogicCheckDiagnostic[]): vscode.Diagnostic {
+        let message = diagnostic.message;
+        const expectedDiagnosticIndex = expectedDiagnostics.findIndex((expectedDiagnostic: Logic.LogicCheckDiagnostic) => (expectedDiagnostic.severity === diagnostic.severity && expectedDiagnostic.message === diagnostic.message));
+        if (expectedDiagnosticIndex >= 0) {
+            expectedDiagnostics.splice(expectedDiagnosticIndex, 1);
+            message = `[Expected] ${message}`;
+        }
+        return new vscode.Diagnostic(this.getRange(libraryDocument, diagnostic), message, this.getSeverity(diagnostic));
     }
 
     private getRange(libraryDocument: LibraryDocument, diagnostic: Logic.LogicCheckDiagnostic): vscode.Range {
