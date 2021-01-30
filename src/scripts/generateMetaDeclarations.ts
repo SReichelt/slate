@@ -1417,16 +1417,16 @@ function generate(inFileName: string, outFileName: string, referencedMetaModels:
   fs.writeFileSync(outFileName, outFileStr, 'utf8');
 }
 
-if (process.argv.length < 4) {
+if (process.argv.length >= 4) {
+  const refs: ReferencedMetaModel[] = [];
+  for (let argIndex = 4; argIndex + 1 < process.argv.length; argIndex++) {
+    refs.push({
+      inFileName: process.argv[argIndex],
+      outFileName: process.argv[argIndex + 1]
+    });
+  }
+  generate(process.argv[2], process.argv[3], refs);
+} else {
   console.error('usage: src/scripts/generateMetaDeclarations.sh <infile> <outfile> [<refinfile> <refoutfile> [...]]');
-  process.exit(2);
+  process.exitCode = 2;
 }
-
-const refs: ReferencedMetaModel[] = [];
-for (let argIndex = 4; argIndex + 1 < process.argv.length; argIndex++) {
-  refs.push({
-    inFileName: process.argv[argIndex],
-    outFileName: process.argv[argIndex + 1]
-  });
-}
-generate(process.argv[2], process.argv[3], refs);

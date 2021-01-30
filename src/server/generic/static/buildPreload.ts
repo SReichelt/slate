@@ -28,13 +28,13 @@ function outputPreload(libraryFileName: string, outputDirName: string): CachedPr
   return preloadWriter.preloadLibrary(path.basename(libraryFileName, fileExtension));
 }
 
-if (process.argv.length !== 4) {
+if (process.argv.length === 4) {
+  outputPreload(process.argv[2], process.argv[3])
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
+} else {
   console.error('usage: node buildPreload.js <libraryFile> <outputDir>');
-  process.exit(2);
+  process.exitCode = 2;
 }
-
-outputPreload(process.argv[2], process.argv[3])
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });

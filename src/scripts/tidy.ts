@@ -24,11 +24,11 @@ function tidy(fileName: string): void {
   }
 }
 
-if (process.argv.length < 3) {
+if (process.argv.length >= 3) {
+  for (const fileName of process.argv.slice(2)) {
+    tidy(fileName);
+  }
+} else {
   console.error('usage: src/scripts/tidy.sh <file1> [<file2>...]');
-  process.exit(2);
-}
-
-for (const fileName of process.argv.slice(2)) {
-  tidy(fileName);
+  process.exitCode = 2;
 }

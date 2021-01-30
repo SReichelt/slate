@@ -250,13 +250,13 @@ function buildStaticPages(libraryFileName: string, logicName: string, htmlTempla
     .then(() => libraryDataProvider.close());
 }
 
-if (process.argv.length !== 9) {
+if (process.argv.length === 9) {
+  buildStaticPages(process.argv[2], process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8])
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
+} else {
   console.error('usage: node buildStatic.js <libraryFile> <logic> <htmlTemplateFile> <notationTemplateFile> <libraryURL> <gitHubURL> <outputDir>');
-  process.exit(2);
+  process.exitCode = 2;
 }
-
-buildStaticPages(process.argv[2], process.argv[3], process.argv[4], process.argv[5], process.argv[6], process.argv[7], process.argv[8])
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });

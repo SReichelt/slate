@@ -11,6 +11,15 @@ const linkCheck = require('link-check');
 let linksFound = 0;
 let linksChecking = 0;
 let linksChecked = 0;
+let errors = 0;
+
+function finished(): void {
+  console.log(`${linksChecked} links checked.`);
+  if (errors) {
+    console.log(`${errors} error(s) found.`);
+    process.exitCode = 1;
+  }
+}
 
 class LinkExtractor {
   constructor(private fileName: string) {}
@@ -35,13 +44,15 @@ class LinkExtractor {
       linkCheck(uri, (err: any, result: any) => {
         if (err) {
           console.error(`${this.fileName}: ${err}`);
+          errors++;
         } else if (result.status !== 'alive') {
           console.error(`${this.fileName}: ${result.status} link: ${result.link}`);
+          errors++;
         }
         linksChecking--;
         linksChecked++;
         if (linksChecked === linksFound) {
-          console.log(`${linksChecked} links checked.`);
+          finished();
         }
       });
     } else {
@@ -80,13 +91,12 @@ function checkLinks(fileName: string): void {
   }
 }
 
-if (process.argv.length < 3) {
+if (process.argv.length >= 3) {
+  for (const fileName of process.argv.slice(2)) {
+    checkLinks(fileName);
+  }
+  console.log(`${linksFound} links found.`);
+} else {
   console.error('usage: src/scripts/checkLinks.sh <file1> [<file2>...]');
-  process.exit(2);
+  process.exitCode = 2;
 }
-
-for (const fileName of process.argv.slice(2)) {
-  checkLinks(fileName);
-}
-
-console.log(`${linksFound} links found.`);

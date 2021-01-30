@@ -110,18 +110,20 @@ function checkItem(libraryDefinition: LibraryDefinition, libraryDataProvider: Li
   });
 }
 
-if (process.argv.length !== 3) {
+if (process.argv.length === 3) {
+  const libraryFileName = process.argv[2];
+  checkLibrary(libraryFileName)
+    .then(() => {
+      console.error(`Found ${errorCount} error(s) and ${warningCount} warning(s).`);
+      if (unexpectedError) {
+        process.exitCode = 1;
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
+} else {
   console.error('usage: src/scripts/check.sh <libraryFile>');
-  process.exit(2);
+  process.exitCode = 2;
 }
-
-const libraryFileName = process.argv[2];
-checkLibrary(libraryFileName)
-  .then(() => {
-    console.error(`Found ${errorCount} error(s) and ${warningCount} warning(s).`);
-    process.exit(unexpectedError ? 1 : 0);
-  })
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
