@@ -74,19 +74,19 @@
 		"lint": "eslint --no-eslintrc -c .eslintrc.json '**/*.@(ts|tsx)'"
 	},
 	"engines": {
-		"vscode": "^1.52.0"
+		"vscode": "^1.55.0"
 	},
 	"dependencies": {
 		"slate-shared": "",
 		"slate-env-web-api": "",
 		"slate-env-node": "",
-		"ejs": "^3.1.5"
+		"ejs": "^3.1.6"
 	},
 	"devDependencies": {
-		"@types/ejs": "^3.0.5",
-		"@types/node": "^14.14.21",
-		"@types/vscode": "^1.52.0",
-		"vsce": "^1.84.0"
+		"@types/ejs": "^3.0.6",
+		"@types/node": "^15.0.1",
+		"@types/vscode": "^1.55.0",
+		"vsce": "^1.87.1"
 	},
 	"__metadata": {
 		"id": "ea7b3c4b-a00f-4f95-a431-7a74aa78303c",

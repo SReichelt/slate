@@ -991,7 +991,7 @@ class HLMCheckerState {
     const checkCaseInternal = (structuralCase: FmtHLM.ObjectContents_StructuralCase, constructorContents: FmtHLM.ObjectContents_Constructor, structuralCaseTerm: Fmt.Expression, constraintParam: Fmt.Parameter, caseContext: HLMCheckerContext) => {
       caseContext = getParameterContext(constraintParam, caseContext);
       checkCase(structuralCase.value, caseContext);
-      if ((getWellDefinednessProofGoal && constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
+      if ((constructorContents.equalityDefinition && !(constructorContents.equalityDefinition.isomorphic instanceof FmtHLM.MetaRefExpression_true)) || structuralCase.wellDefinednessProof) {
         let clonedParameters: Fmt.ParameterList;
         const replacedParameters: Fmt.ReplacedParameter[] = [];
         let clonedValue = structuralCase.value;
@@ -1003,7 +1003,7 @@ class HLMCheckerState {
         }
         clonedParameters.push(constraintParam.clone(replacedParameters));
         const goalContext = getParameterListContext(clonedParameters, caseContext);
-        const goal = getWellDefinednessProofGoal ? getWellDefinednessProofGoal(structuralCase.value, clonedValue, goalContext, clonedParameters) : new FmtHLM.MetaRefExpression_and;
+        const goal = getWellDefinednessProofGoal(structuralCase.value, clonedValue, goalContext, clonedParameters);
         this.checkProof(structuralCase.value, structuralCase.wellDefinednessProof, clonedParameters, goal, caseContext);
       }
     };
