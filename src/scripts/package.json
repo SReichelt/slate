@@ -7,7 +7,7 @@
     "link-check": "^4.5.4"
   },
   "devDependencies": {
-    "@types/node": "^15.0.1",
+    "@types/node": "^15.0.2",
     "@types/remarkable": "^2.0.1",
     "ts-node": "^9.1.1"
   }

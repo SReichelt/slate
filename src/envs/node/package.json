@@ -4,6 +4,6 @@
     "slate-shared": ""
   },
   "devDependencies": {
-    "@types/node": "^15.0.1"
+    "@types/node": "^15.0.2"
   }
 }
