@@ -3336,7 +3336,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
 * https://mathworld.wolfram.com/Minimum.html
-* https://proofwiki.org/wiki/Definition:Minimal/Ordered_Set"
+* https://proofwiki.org/wiki/Definition:Smallest/Ordered_Set"
 `;
 
 exports[`render hlm library: 1.8.1.43 Essentials/Numbers/Natural/minimum%20of%20two%20numbers 1`] = `
@@ -3370,7 +3370,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
 * https://mathworld.wolfram.com/Maximum.html
-* https://proofwiki.org/wiki/Definition:Maximal/Ordered_Set"
+* https://proofwiki.org/wiki/Definition:Greatest/Ordered_Set"
 `;
 
 exports[`render hlm library: 1.8.1.45 Essentials/Numbers/Natural/maximum%20of%20two%20numbers 1`] = `
@@ -5084,7 +5084,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
 * https://mathworld.wolfram.com/Minimum.html
-* https://proofwiki.org/wiki/Definition:Minimal/Ordered_Set"
+* https://proofwiki.org/wiki/Definition:Smallest/Ordered_Set"
 `;
 
 exports[`render hlm library: 1.8.4.23 Essentials/Numbers/Integer/minimum%20of%20two%20numbers 1`] = `
@@ -5116,7 +5116,7 @@ References.
 
 * https://en.wikipedia.org/wiki/Maxima_and_minima#In_relation_to_sets
 * https://mathworld.wolfram.com/Maximum.html
-* https://proofwiki.org/wiki/Definition:Maximal/Ordered_Set"
+* https://proofwiki.org/wiki/Definition:Greatest/Ordered_Set"
 `;
 
 exports[`render hlm library: 1.8.4.25 Essentials/Numbers/Integer/maximum%20of%20two%20numbers 1`] = `
