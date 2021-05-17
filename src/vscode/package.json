@@ -84,7 +84,7 @@
 	},
 	"devDependencies": {
 		"@types/ejs": "^3.0.6",
-		"@types/node": "^15.0.2",
+		"@types/node": "^15.3.0",
 		"@types/vscode": "^1.56.0",
 		"vsce": "^1.88.0"
 	},
