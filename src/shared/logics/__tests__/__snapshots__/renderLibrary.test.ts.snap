@@ -125,7 +125,7 @@ Equivalence.
 
 Remarks.
 
-This definition uses functions as well as the natural and cardinal numbers, all of which are defined in later sections (see \`$../Functions/Functions\`, \`$../Numbers/Natural/\\"Natural numbers\\"\`, \`$../Numbers/Cardinal/\\"Cardinal numbers\\"\`). That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
+This definition uses functions as well as the natural and cardinal numbers, all of which are defined in later sections (see \`$../Functions/Functions\`, \`$../Numbers/Natural/"Natural numbers"\`, \`$../Numbers/Cardinal/"Cardinal numbers"\`). That is not a problem as long as no circularities exist. In other words, definitions and theorems are ordered by topic instead of by dependency.
 
 References.
 
@@ -192,7 +192,7 @@ References.
 * https://en.wikipedia.org/wiki/Countable_set
 * https://mathworld.wolfram.com/CountablyInfinite.html
 * https://proofwiki.org/wiki/Definition:Countably_Infinite_Set
-* https://ncatlab.org/nlab/show/countable+set (called \\"denumerable\\" here)"
+* https://ncatlab.org/nlab/show/countable+set (called "denumerable" here)"
 `;
 
 exports[`render hlm library: 1.1.8 Essentials/Sets/Intersection 1`] = `
@@ -523,9 +523,9 @@ For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' ⊎ T
 
 Remarks.
 
-In contrast to the definition of set union, the disjoint union of sets is a \\"construction,\\" which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two \\"constructors.\\"
+In contrast to the definition of set union, the disjoint union of sets is a "construction," which is an HLM-specific concept very similar to an inductive definition in type theory. The disjoint union has two "constructors."
 
-Note that the set and its constructors are introduced at the same time, hence the non-standard notation \\":=:\\". The notation on both sides can be specified freely.
+Note that the set and its constructors are introduced at the same time, hence the non-standard notation ":=:". The notation on both sides can be specified freely.
 
 A construction always includes definitions of equality for each constructor. In this case, those definitions are what one might expect. (Different constructors are never considered equal.)
 
@@ -549,7 +549,7 @@ For S' ⊆ S and T' ⊆ T, we canonically treat elements of S' × T'
 
 Remarks.
 
-The Cartesian product is, again, a \\"construction.\\" Note that HLM does not have any built-in notion of \\"tuple\\" – it is actually defined here as a constructor, with the usual notation.
+The Cartesian product is, again, a "construction." Note that HLM does not have any built-in notion of "tuple" – it is actually defined here as a constructor, with the usual notation.
 
 References.
 
@@ -644,7 +644,7 @@ exports[`render hlm library: 1.1.29.5 Essentials/Sets/Generalized%20operators/Ge
 
 Remarks.
 
-In HLM, the disjoint union additionally needs to be equipped with a \\"heterogenous equality\\" \`≃\` that allows us to ask whether \`%equals(s, t)\` given \`%equals(j, k)\`.
+In HLM, the disjoint union additionally needs to be equipped with a "heterogenous equality" \`≃\` that allows us to ask whether \`%equals(s, t)\` given \`%equals(j, k)\`.
 
 References.
 
@@ -697,11 +697,11 @@ Remarks.
 
 This is the simplest formulation of the axiom of choice that can be formalized in HLM. The standard formulation is not directly applicable because an indexed family of arbitrary sets cannot be defined as an object – there is no suitable equality definition.
 
-It is possible to state, as a theorem, that AC implies that the Cartesian product \`$../\\"Generalized operators\\"/\\"Generalized cartesian product\\"\` of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
+It is possible to state, as a theorem, that AC implies that the Cartesian product \`$../"Generalized operators"/"Generalized cartesian product"\` of any family of nonempty sets is nonempty. However, whether this is provable in HLM remains to be investigated. The equivalence with Zorn's lemma and the well-ordering theorem is likely to hold.
 
-HLM actually does not have \\"axioms\\" as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
-* The simplest solution is to add \\"assume AC\\" as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
-* A preferred method is to replace this with \\"assume \`S\` has a choice function\\" for a suitable \`S\`.
+HLM actually does not have "axioms" as a concept; an axiom is simply a predicate. Thus, at the moment, every theorem (or definition) that requires the axiom of choice (or a weaker form) must be prefixed accordingly:
+* The simplest solution is to add "assume AC" as a condition. However, this condition will likely propagate to all dependent results, even if the axiom of choice is not needed in particular cases.
+* A preferred method is to replace this with "assume \`S\` has a choice function" for a suitable \`S\`.
 * Better yet, build the result explicitly from a given choice function.
 
 Hopefully this will not be too inconvenient. It does have a few advantages:
@@ -734,7 +734,7 @@ Remarks.
 
 Note that we only formalize multi-subsets of a given set \`S\`. Arbitrary multisets cannot be defined because there is no suitable notion of equality.
 
-A multi-subset of \`S\` is essentially the same as a function from \`S\` to \`$../../Numbers/Natural/\\"Natural numbers\\"\`.
+A multi-subset of \`S\` is essentially the same as a function from \`S\` to \`$../../Numbers/Natural/"Natural numbers"\`.
 
 References.
 
@@ -810,7 +810,7 @@ exports[`render hlm library: 1.2.1 Essentials/Boolean%20values/Boolean%20values 
 
 Remarks.
 
-This definition captures propositions up to equivalence. Since HLM uses classical logic, it can be proved to contain only two values, true and false. It can therefore be used interchangeably with the set \`$../Numbers/Natural/Subsets/\\"Binary digits\\"\` of binary digits.
+This definition captures propositions up to equivalence. Since HLM uses classical logic, it can be proved to contain only two values, true and false. It can therefore be used interchangeably with the set \`$../Numbers/Natural/Subsets/"Binary digits"\` of binary digits.
 
 References.
 
@@ -920,7 +920,7 @@ We write “let p be a property on S” for “let p ∈ 𝓟𝓻𝓹(S).”
 
 Remarks.
 
-This definition encodes a property (aka unary relation) on \`S\` as a proposition depending on an element of \`S\` (up to equivalence). Since it is equally possible to encode a unary relation on \`S\` as a subset of \`S\`, this definition is interchangeable with \`$../Sets/\\"Power set\\"\`. The given definition is just more convenient.
+This definition encodes a property (aka unary relation) on \`S\` as a proposition depending on an element of \`S\` (up to equivalence). Since it is equally possible to encode a unary relation on \`S\` as a subset of \`S\`, this definition is interchangeable with \`$../Sets/"Power set"\`. The given definition is just more convenient.
 
 References.
 
@@ -986,7 +986,7 @@ exports[`render hlm library: 1.3.7 Essentials/Properties/generalized%20conjuncti
 
 Remarks.
 
-This definition is the equivalent of \`$../Sets/\\"Generalized operators\\"/\\"Generalized intersection using power set\\"\`."
+This definition is the equivalent of \`$../Sets/"Generalized operators"/"Generalized intersection using power set"\`."
 `;
 
 exports[`render hlm library: 1.3.8 Essentials/Properties/generalized%20disjunction 1`] = `
@@ -996,7 +996,7 @@ exports[`render hlm library: 1.3.8 Essentials/Properties/generalized%20disjuncti
 
 Remarks.
 
-This definition is the equivalent of \`$../Sets/\\"Generalized operators\\"/\\"Generalized union using power set\\"\`."
+This definition is the equivalent of \`$../Sets/"Generalized operators"/"Generalized union using power set"\`."
 `;
 
 exports[`render hlm library: 1.3.9 Essentials/Properties/restriction 1`] = `
@@ -1080,7 +1080,7 @@ exports[`render hlm library: 1.4.4 Essentials/Relations/mapping 1`] = `
 
 Remarks.
 
-In this library, \\"mapping\\" and \\"function\\" are not synonymous but interchangeable, via a definition that transforms a mapping to a function (see \`$../Functions/\\"mapping as function\\"\`). The difference is not fundamental but a matter of convenience.
+In this library, "mapping" and "function" are not synonymous but interchangeable, via a definition that transforms a mapping to a function (see \`$../Functions/"mapping as function"\`). The difference is not fundamental but a matter of convenience.
 
 References.
 
@@ -1350,7 +1350,7 @@ exports[`render hlm library: 1.4.23 Essentials/Relations/Equivalence%20classes 1
 
 Remarks.
 
-This definition uses the \\"construction\\" concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
+This definition uses the "construction" concept to define quotient sets and equivalence classes, which is straightforward because the requirements for an equality definition are precisely the properties of an equivalence relation.
 
 A more traditional definition where equivalence classes are subsets of \`S\` is possible as well, of course. Then the set of equivalence classes is a subset of the power set. However, the given definition has the advantage that well-definedness proofs can be stated more easily. On the other hand, there is the drawback that since equivalence classes are not sets, it is not directly possible to ask about their cardinality, etc. Moreover, there should be a general definition of a partition, and a theorem that equivalence classes form a partition; this requires the powerset approach.
 
@@ -1510,7 +1510,7 @@ It might seem that asking whether \`%equals(s, t)\` should simply be allowed in 
 
 E.g. in category theory, \`I\` may be a set of objects (which are equal whenever they are isomorphic), and \`S[i = i]\` may be a set of morphisms from or to \`i\`. To check whether two of these morphisms are equal, one of them first needs to be composed with a specific isomorphism.
 
-In HLM, there is no global heterogenous equality. Instead, generalized disjoint unions aka ∑ types must be parameterized with a specific heterogenous equality (see \`$../../Sets/\\"Generalized operators\\"/\\"Generalized disjoint union\\"\`)."
+In HLM, there is no global heterogenous equality. Instead, generalized disjoint unions aka ∑ types must be parameterized with a specific heterogenous equality (see \`$../../Sets/"Generalized operators"/"Generalized disjoint union"\`)."
 `;
 
 exports[`render hlm library: 1.4.27.2 Essentials/Relations/Heterogenous%20equality/equal 1`] = `
@@ -1536,7 +1536,7 @@ We write “f :  X → Y, x ↦ y_x” for “f := (X → 
 
 Remarks.
 
-This definition uses binders as a built-in feature of the HLM logic. It is equivalent to the usual set-theoretic definition, which is called \\"mapping\\" in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$\\"mapping as function\\"\`).
+This definition uses binders as a built-in feature of the HLM logic. It is equivalent to the usual set-theoretic definition, which is called "mapping" in this library to distinguish the two definitions (see \`$../Relations/mapping\`, \`$"mapping as function"\`).
 
 The major advantage of the definition using binders is that given an explicitly defined function, determining the value at a specific input is simply a matter of resolving definitions.
 
@@ -1563,7 +1563,7 @@ by:
 Remarks.
 
 This explicit definition works due to the special way that functions are defined. Within proofs, it enables unfolding of function application if the function has an explicit definition.
-The corresponding definition for mappings (see \`$../Relations/\\"mapping value\\"\`) is an implicit definition instead.
+The corresponding definition for mappings (see \`$../Relations/"mapping value"\`) is an implicit definition instead.
 
 References.
 
@@ -2334,11 +2334,11 @@ We write “let 𝐚 be a/an α-tuple on S” for “let 𝐚 ∈ S^α.”
 
 Remarks.
 
-This is a slightly generalized notion of \\"tuple\\" where the length \`α\` can be an arbitrary ordinal number. If \`α\` is a natural number, it matches the common definition.
+This is a slightly generalized notion of "tuple" where the length \`α\` can be an arbitrary ordinal number. If \`α\` is a natural number, it matches the common definition.
 
 We could define tuples simply as functions, but a custom construction has several advantages, including the ability to easily destruct a tuple into its elements, and the ability to omit \`S\` from the constructor.
 
-In this definition, the codomain is a fixed set \`S\`. If each item is an element of a different set, a generalized Cartesian product \`$../Sets/\\"Generalized operators\\"/\\"Generalized cartesian product\\"\` can be used instead.
+In this definition, the codomain is a fixed set \`S\`. If each item is an element of a different set, a generalized Cartesian product \`$../Sets/"Generalized operators"/"Generalized cartesian product"\` can be used instead.
 
 References.
 
@@ -2355,7 +2355,7 @@ exports[`render hlm library: 1.7.2 Essentials/Sequences/tuple 1`] = `
 
 We write:
 
-\`$tuple(S = S, items = [a_0, a_1, \\"...\\", \\"a_n-1\\"])\` := \`$Tuples(S = S, α = n).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/\\"Segment (less)\\"(α = n))), {a = a_k}})\`"
+\`$tuple(S = S, items = [a_0, a_1, "...", "a_n-1"])\` := \`$Tuples(S = S, α = n).sequence(_1 = {#(k: %Element($../Numbers/Ordinal/Subsets/"Segment (less)"(α = n))), {a = a_k}})\`"
 `;
 
 exports[`render hlm library: 1.7.3 Essentials/Sequences/tuple%20from%20function 1`] = `
@@ -2422,7 +2422,7 @@ We write “let 𝐚 be a sequence on S” for “let 𝐚 ∈ S^ω.”
 
 Remarks.
 
-We omit the word \\"infinite\\" because infinite sequences are used much more frequently than finite ones.
+We omit the word "infinite" because infinite sequences are used much more frequently than finite ones.
 
 We could define infinite sequences simply as functions, but a custom construction has several advantages, including the ability to easily destruct a sequence into its elements, and the ability to omit \`S\` from the constructor.
 
@@ -2548,7 +2548,7 @@ exports[`render hlm library: 1.8.1.1 Essentials/Numbers/Natural/Natural%20number
 
 Remarks.
 
-The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the \\"successor\\" constructor, but we could just as well write \\"S(\`n\`)\\". The notation is justified by \`$\\"Addition of one yields successor\\"\`.
+The set of natural numbers is defined as a construction with two constructors, which, in this case, exactly matches the corresponding definition of an [inductive data type](https://en.wikipedia.org/wiki/Recursive_data_type). We merely use a custom notation for the "successor" constructor, but we could just as well write "S(\`n\`)". The notation is justified by \`$"Addition of one yields successor"\`.
 
 In this library, the natural numbers start at 0, which is known to be far more convenient than starting at 1.
 
@@ -2568,10 +2568,10 @@ exports[`render hlm library: 1.8.1.2 Essentials/Numbers/Natural/number 1`] = `
 "Definition 1.8.1.2 (Positional notation).
 
 We write:
-* 0 := \`$\\"Natural numbers\\".zero\`
-* 1 := \`$\\"Natural numbers\\".successor(n = $number(value = 0))\`
-* 2 := \`$\\"Natural numbers\\".successor(n = $number(value = 1))\`
-* 3 := \`$\\"Natural numbers\\".successor(n = $number(value = 2))\`
+* 0 := \`$"Natural numbers".zero\`
+* 1 := \`$"Natural numbers".successor(n = $number(value = 0))\`
+* 2 := \`$"Natural numbers".successor(n = $number(value = 1))\`
+* 3 := \`$"Natural numbers".successor(n = $number(value = 2))\`
 * ...
 
 Remarks.
@@ -2596,7 +2596,7 @@ by:
 
 Remarks.
 
-Such inductive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the \\"+\\" symbols appearing in this definition are part of the notation of the successor constructor.
+Such inductive definitions are possible due to the definition of natural numbers as a construction (i.e. inductive data type). Note that some of the "+" symbols appearing in this definition are part of the notation of the successor constructor.
 
 References.
 
@@ -2996,7 +2996,7 @@ Remarks.
 
 There are, of course, many equivalent definitions of binary digits. The simplest definition would be a construction with two constructors. However, we also want the sets to be embedded in the natural numbers, and (currently) this requires everything to be mapped to a single constructor of the target set. So we simply define binary digits as a subset of the natural numbers.
 
-In some cases, the set \`$../../../\\"Boolean values\\"/\\"Boolean values\\"\` of Boolean values may be more convenient to use.
+In some cases, the set \`$../../../"Boolean values"/"Boolean values"\` of Boolean values may be more convenient to use.
 
 References.
 
@@ -3401,7 +3401,7 @@ by:
 
 Remarks.
 
-This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`), and to provide a way of obtaining a sequence from a finite set of natural numbers (see \`$\\"sequence from subset\\"\`)."
+This definition is used to prove the equivalence of alternative definitions of finiteness (see \`$../../../Sets/finite\`), and to provide a way of obtaining a sequence from a finite set of natural numbers (see \`$"sequence from subset"\`)."
 `;
 
 exports[`render hlm library: 1.8.1.46.2 Essentials/Numbers/Natural/Sequences/bounded%20cardinality 1`] = `
@@ -3488,7 +3488,7 @@ by:
 
 Remarks.
 
-We use this definition of the binomial coefficient because it does not need any well-definedness proof. It can then easily be proved to be equal to the standard definition (see \`$\\"Binomial coefficient equality\\"\`).
+We use this definition of the binomial coefficient because it does not need any well-definedness proof. It can then easily be proved to be equal to the standard definition (see \`$"Binomial coefficient equality"\`).
 
 References.
 
@@ -3519,7 +3519,7 @@ exports[`render hlm library: 1.8.1.51.1 Essentials/Numbers/Natural/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Natural numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Natural numbers", ⨂ = $"iterated sum", n = n, _1 = {#(i: %Element($../Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -3567,7 +3567,7 @@ exports[`render hlm library: 1.8.1.51.6 Essentials/Numbers/Natural/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Natural numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Natural numbers", ⨂ = $"iterated product", n = n, _1 = {#(i: %Element($../Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -3628,7 +3628,7 @@ Remarks.
 
 Note that this definition presupposes that \`$../less(n = n, m = $../number(value = 1))\`. Otherwise, not all equivalences would hold.
 
-In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the set \`$\\"Prime numbers\\"\` of prime numbers, no such explicit exclusion of 1 is necessary.
+In particular, this makes it impossible to ask whether 1 is prime. However, it is rarely necessary to ask whether a given number is prime without knowing that it is greater than 1. For definitions and theorems involving the set \`$"Prime numbers"\` of prime numbers, no such explicit exclusion of 1 is necessary.
 
 References.
 
@@ -3760,7 +3760,7 @@ Well-definedness.  No proof.
 
 Remarks.
 
-This definition would make sense even if \`p\` was not required to be prime. However, the term \\"multiplicity\\" is reserved for prime numbers due to its use in the unique prime factorization.
+This definition would make sense even if \`p\` was not required to be prime. However, the term "multiplicity" is reserved for prime numbers due to its use in the unique prime factorization.
 
 References.
 
@@ -3806,7 +3806,7 @@ No proof.
 
 Remarks.
 
-This \\"official\\" statement of the fundamental theorem of arithmetic is actually a simple corollary of the previous version.
+This "official" statement of the fundamental theorem of arithmetic is actually a simple corollary of the previous version.
 
 Note that the product over all elements of \`𝑷\` takes into account the multiplicity in the multiset.
 
@@ -3885,13 +3885,13 @@ Remarks.
 
 In HLM, cardinal numbers have a very simple definition as a construction with one constructor, which can be conveniently equipped with a notation that matches mathematical practice.
 
-Given that two arbitrary sets cannot be compared element-wise due to the type system, the equality definition for cardinal numbers is the most general definition possible: No other valid equality definition can possibly distinguish two equipollent sets. This implies that definitions involving the \\"deconstruction\\" of cardinal numbers into sets are automatically well-defined.
+Given that two arbitrary sets cannot be compared element-wise due to the type system, the equality definition for cardinal numbers is the most general definition possible: No other valid equality definition can possibly distinguish two equipollent sets. This implies that definitions involving the "deconstruction" of cardinal numbers into sets are automatically well-defined.
 
 HLM does not distinguish between sets and proper classes; instead there are rules preventing certain circularities. Thus, the set of cardinals can be treated like any other set in most situations.
 
-When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions and theorems (see \`$finite\`, \`$\\"Cardinality of power set\\"\`).
+When defining a construction, an embedding from another set into the newly defined set can be specified, subject to a suitable well-definedness condition. Embedding the natural numbers in the cardinal numbers simplifies a lot of definitions and theorems (see \`$finite\`, \`$"Cardinality of power set"\`).
 
-In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures (see e.g. \`$../../../Algebra/\\"Pointed sets\\"/\\"Pointed sets\\"\`, \`$../../../Algebra/Magmas/Magmas\`, \`$../../../Algebra/Groups/Groups\`). This is especially visible in the use of this definition in the category of sets \`$../../../\\"Category theory\\"/\\"Concrete categories\\"/cardinals\`.
+In a way, the definition of cardinal numbers in HLM is very similar to the definition of algebraic structures (see e.g. \`$../../../Algebra/"Pointed sets"/"Pointed sets"\`, \`$../../../Algebra/Magmas/Magmas\`, \`$../../../Algebra/Groups/Groups\`). This is especially visible in the use of this definition in the category of sets \`$../../../"Category theory"/"Concrete categories"/cardinals\`.
 
 References.
 
@@ -3951,7 +3951,7 @@ Equality.  No proof.
 
 Remarks.
 
-An isomorphism between cardinal numbers is simply a bijection between their representative sets. Thus, the existence of an isomorphism implies that the two cardinal numbers are in fact equal, as is shown below in \`$../\\"Equality criterion\\"\`).
+An isomorphism between cardinal numbers is simply a bijection between their representative sets. Thus, the existence of an isomorphism implies that the two cardinal numbers are in fact equal, as is shown below in \`$../"Equality criterion"\`).
 
 References.
 
@@ -4028,7 +4028,7 @@ exports[`render hlm library: 1.8.2.6 Essentials/Numbers/Cardinal/less 1`] = `
 
 Remarks.
 
-Note that without the axiom of choice, this is not equivalent to the negation of \\"greater or equal\\"."
+Note that without the axiom of choice, this is not equivalent to the negation of "greater or equal"."
 `;
 
 exports[`render hlm library: 1.8.2.7 Essentials/Numbers/Cardinal/Cardinality%20of%20subset%20is%20less%20or%20equal 1`] = `
@@ -4268,7 +4268,7 @@ Equivalence.  No proof.
 
 Remarks.
 
-See also the definition of a \`$../../Sets/\\"countably infinite\\"\` set, which references this definition as one alternative."
+See also the definition of a \`$../../Sets/"countably infinite"\` set, which references this definition as one alternative."
 `;
 
 exports[`render hlm library: 1.8.2.22 Essentials/Numbers/Cardinal/Cantors%20theorem 1`] = `
@@ -4318,7 +4318,7 @@ exports[`render hlm library: 1.8.2.25.1 Essentials/Numbers/Cardinal/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Cardinal numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Cardinal numbers", ⨂ = $"iterated sum", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -4334,7 +4334,7 @@ exports[`render hlm library: 1.8.2.25.2 Essentials/Numbers/Cardinal/Iterated%20o
 
 Remarks.
 
-In contrast to the previous definition, this definition works for arbitrary index sets \`I\`, using the generalized disjoint union to add cardinal numbers. However, due to the definition of disjoint union, it requires a \\"heterogenous equality\\" on the carrier sets of cardinalities."
+In contrast to the previous definition, this definition works for arbitrary index sets \`I\`, using the generalized disjoint union to add cardinal numbers. However, due to the definition of disjoint union, it requires a "heterogenous equality" on the carrier sets of cardinalities."
 `;
 
 exports[`render hlm library: 1.8.2.25.3 Essentials/Numbers/Cardinal/Iterated%20operators/iterated%20product 1`] = `
@@ -4344,7 +4344,7 @@ exports[`render hlm library: 1.8.2.25.3 Essentials/Numbers/Cardinal/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Cardinal numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Cardinal numbers", ⨂ = $"iterated product", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -4679,7 +4679,7 @@ x = (x-0)
 
 Remarks.
 
-This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair. This notation is later justified by \`$\\"Actual difference equals formal difference\\"\`).
+This is essentially the standard definition of integers as equivalence classes of pairs of natural numbers. We just use a notation that highlights the role of the two numbers in each pair. This notation is later justified by \`$"Actual difference equals formal difference"\`).
 
 Since an equality definition for each constructor is always part of a construction, we do not need to build the equivalence classes explicitly, they are implicit in the choice of the equality definition.
 
@@ -4900,7 +4900,7 @@ Equality.  No proof.
 
 Remarks.
 
-Due to the embedding of \`$../../Natural/\\"Natural numbers\\"\` into \`$../Integers\`, this is just an alias for \`$../../Natural/\\"Natural numbers\\"\`."
+Due to the embedding of \`$../../Natural/"Natural numbers"\` into \`$../Integers\`, this is just an alias for \`$../../Natural/"Natural numbers"\`."
 `;
 
 exports[`render hlm library: 1.8.4.10.9 Essentials/Numbers/Integer/Subsets/Positive%20numbers 1`] = `
@@ -4914,7 +4914,7 @@ Equality.  No proof.
 
 Remarks.
 
-Due to the embedding of \`$../../Natural/\\"Natural numbers\\"\` into \`$../Integers\`, this is just an alias for \`$../../Natural/Subsets/\\"Positive numbers\\"\`."
+Due to the embedding of \`$../../Natural/"Natural numbers"\` into \`$../Integers\`, this is just an alias for \`$../../Natural/Subsets/"Positive numbers"\`."
 `;
 
 exports[`render hlm library: 1.8.4.10.10 Essentials/Numbers/Integer/Subsets/Nonzero%20numbers 1`] = `
@@ -5141,7 +5141,7 @@ exports[`render hlm library: 1.8.4.26.1 Essentials/Numbers/Integer/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Integers, ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../Integers, ⨂ = $"iterated sum", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5157,7 +5157,7 @@ exports[`render hlm library: 1.8.4.26.2 Essentials/Numbers/Integer/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Integers, ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../Integers, ⨂ = $"iterated product", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5217,9 +5217,9 @@ x = (x/1)
 
 Remarks.
 
-This definition is rather similar to \`$../Integer/Integers\`. The constructor notation is later justified by \`$\\"Actual quotient equals formal quotient\\"\`.
+This definition is rather similar to \`$../Integer/Integers\`. The constructor notation is later justified by \`$"Actual quotient equals formal quotient"\`.
 
-Note that in the constructor, we force the denominator to be positive. This is not required at this point, since the given equality definition would also work for negative numbers. However, if the denominator was allowed to be negative, the definition of \`$\\"less or equal\\"\` would probably need to be split into several cases.
+Note that in the constructor, we force the denominator to be positive. This is not required at this point, since the given equality definition would also work for negative numbers. However, if the denominator was allowed to be negative, the definition of \`$"less or equal"\` would probably need to be split into several cases.
 
 References.
 
@@ -5471,7 +5471,7 @@ No proof.
 
 Remarks.
 
-This proposition justifies the notation used for the constructor. Note that the division on the right is division in \`$\\"Rational numbers\\"\`, using the embedding of the integers \`n\` and \`d\` into the rational numbers."
+This proposition justifies the notation used for the constructor. Note that the division on the right is division in \`$"Rational numbers"\`, using the embedding of the integers \`n\` and \`d\` into the rational numbers."
 `;
 
 exports[`render hlm library: 1.8.5.12 Essentials/Numbers/Rational/power 1`] = `
@@ -5514,7 +5514,7 @@ exports[`render hlm library: 1.8.5.14.1 Essentials/Numbers/Rational/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Rational numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Rational numbers", ⨂ = $"iterated sum", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5530,7 +5530,7 @@ exports[`render hlm library: 1.8.5.14.2 Essentials/Numbers/Rational/Iterated%20o
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Rational numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Rational numbers", ⨂ = $"iterated product", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5943,7 +5943,7 @@ exports[`render hlm library: 1.8.6.17.1 Essentials/Numbers/Real/Iterated%20opera
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Real numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Real numbers", ⨂ = $"iterated sum", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -5959,7 +5959,7 @@ exports[`render hlm library: 1.8.6.17.2 Essentials/Numbers/Real/Iterated%20opera
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Real numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Real numbers", ⨂ = $"iterated product", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -6041,7 +6041,7 @@ r = (r+0𝒊)
 
 Remarks.
 
-The constructor notation is later justified by \`$\\"Actual linear combination equals formal linear combination\\"\`.
+The constructor notation is later justified by \`$"Actual linear combination equals formal linear combination"\`.
 
 References.
 
@@ -6191,7 +6191,7 @@ exports[`render hlm library: 1.8.7.14.1 Essentials/Numbers/Complex/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Complex numbers\\", ⨂ = $\\"iterated sum\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Complex numbers", ⨂ = $"iterated sum", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -6207,7 +6207,7 @@ exports[`render hlm library: 1.8.7.14.2 Essentials/Numbers/Complex/Iterated%20op
 
 Example.
 
-\`$../../../Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../\\"Complex numbers\\", ⨂ = $\\"iterated product\\", n = n, _1 = {#(i: %Element($../../Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Operations/"Iterated operations"/"indexed by natural number"(X = $../"Complex numbers", ⨂ = $"iterated product", n = n, _1 = {#(i: %Element($../../Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -6223,7 +6223,7 @@ exports[`render hlm library: 2.1.1.1 Algebra/Generic/Isomorphisms/element%20cond
 
 Remarks.
 
-The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of \\"isomorphism\\" that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined."
+The definitions in this section are somewhat technical. Their purpose is to implement a generic notion of "isomorphism" that can be checked purely syntactically. If it can be determined that the equality definition of a constructor does not identify any non-isomorphic objects, definitions based on the decomposition of that constructor are automatically well-defined."
 `;
 
 exports[`render hlm library: 2.1.1.2 Algebra/Generic/Isomorphisms/function%20condition 1`] = `
@@ -6320,7 +6320,7 @@ We write “let 𝐒 be a pointed set” for “let 𝐒 ∈ 𝓟𝓽𝓢�
 
 Remarks.
 
-Strictly speaking, the elements of this set are not pointed sets but isomorphism classes of pointed sets, which are similar to cardinal numbers (see \`$../../Essentials/Numbers/Cardinal/\\"Cardinal numbers\\"\`). Due to the rules of HLM, it is not even possible to define pointed sets (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not fewer.)
+Strictly speaking, the elements of this set are not pointed sets but isomorphism classes of pointed sets, which are similar to cardinal numbers (see \`$../../Essentials/Numbers/Cardinal/"Cardinal numbers"\`). Due to the rules of HLM, it is not even possible to define pointed sets (or other structures) in a way that would distinguish two isomorphic structures. In particular, the requirement to specify an equality definition, together with the way two arbitrary sets are treated as separate types, make sure that in the most general case, equality is in fact the same as isomorphism. (It is possible to identify more structures, but not fewer.)
 
 References.
 
@@ -6674,7 +6674,7 @@ For S' ⊆ S, we canonically treat elements of 𝓑𝓲𝓷𝓣𝓻𝓮𝓮(
 
 Remarks.
 
-This is an inductive definition of binary trees with leaves labeled by elements of \`S\`. It does not really belong in this section but is required for the definition of a free magma (see \`$\\"free magma\\"\`).
+This is an inductive definition of binary trees with leaves labeled by elements of \`S\`. It does not really belong in this section but is required for the definition of a free magma (see \`$"free magma"\`).
 
 References.
 
@@ -7105,7 +7105,7 @@ by:
 
 Example.
 
-\`$../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐌 = 𝐌), ⨂ = $\\"iterated operation\\"(𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $Carrier(𝐌 = 𝐌), ⨂ = $"iterated operation"(𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -7525,7 +7525,7 @@ by:
 
 Example.
 
-\`$../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐆 = 𝐆), ⨂ = $\\"iterated operation\\"(𝐆 = 𝐆), n = n, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $Carrier(𝐆 = 𝐆), ⨂ = $"iterated operation"(𝐆 = 𝐆), n = n, _1 = {#(i: %Element($../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -7999,7 +7999,7 @@ exports[`render hlm library: 2.7.15.1 Algebra/Semirings/Iterated%20operations/it
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $"iterated sum"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -8015,7 +8015,7 @@ exports[`render hlm library: 2.7.15.2 Algebra/Semirings/Iterated%20operations/it
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated product\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $"iterated product"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -8508,7 +8508,7 @@ exports[`render hlm library: 2.8.25.1 Algebra/Rings/Iterated%20operations/iterat
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $"iterated sum"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -8524,7 +8524,7 @@ exports[`render hlm library: 2.8.25.2 Algebra/Rings/Iterated%20operations/iterat
 
 Example.
 
-\`$../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $\\"iterated product\\"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $../Carrier(𝐑 = 𝐑), ⨂ = $"iterated product"(𝐑 = 𝐑), n = n, _1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -8701,7 +8701,7 @@ Remarks.
 
 This is mostly a helper definition to define the degree (see \`$degree\`). However, in many cases this definition may actually be more useful than the degree itself.
 
-It is called \\"dimension\\" because for a field \`𝐅\`, the set of polynomials over \`𝐅\` with \\"dimension\\" \`d\` form a \`d\`-dimensional vector space over \`𝐅\`."
+It is called "dimension" because for a field \`𝐅\`, the set of polynomials over \`𝐅\` with "dimension" \`d\` form a \`d\`-dimensional vector space over \`𝐅\`."
 `;
 
 exports[`render hlm library: 2.8.26.14 Algebra/Rings/Polynomials/degree 1`] = `
@@ -8763,7 +8763,7 @@ exports[`render hlm library: 2.8.28.3 Algebra/Rings/Matrices/matrix 1`] = `
 
 We write:
 
-\`$matrix(𝐑 = 𝐑, items = [[\\"a_0,0\\", \\"a_1,0\\", \\"⋯\\", \\"a_m-1,0\\"],[\\"a_0,1\\", \\"a_1,1\\", \\"⋯\\", \\"a_m-1,1\\"],[\\"⋮\\", \\"⋮\\", \\" \\", \\"⋮\\"],[\\"a_0,n-1\\", \\"a_1,n-1\\", \\"⋯\\", \\"a_m-1,n-1\\"]])\` := \`$Matrices(𝐑 = 𝐑, m = m, n = n).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = m)), j: %Element($../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = \\"a_i,j\\"}})\`"
+\`$matrix(𝐑 = 𝐑, items = [["a_0,0", "a_1,0", "⋯", "a_m-1,0"],["a_0,1", "a_1,1", "⋯", "a_m-1,1"],["⋮", "⋮", " ", "⋮"],["a_0,n-1", "a_1,n-1", "⋯", "a_m-1,n-1"]])\` := \`$Matrices(𝐑 = 𝐑, m = m, n = n).matrix(_1 = {#(i: %Element($../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = m)), j: %Element($../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = "a_i,j"}})\`"
 `;
 
 exports[`render hlm library: 2.8.28.4 Algebra/Rings/Matrices/sum 1`] = `
@@ -8989,7 +8989,7 @@ exports[`render hlm library: 2.8.29.1.10 Algebra/Rings/Modules/Left%20modules/it
 
 Example.
 
-\`$../../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐑 = 𝐑, 𝐌 = 𝐌), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑, 𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $Carrier(𝐑 = 𝐑, 𝐌 = 𝐌), ⨂ = $"iterated sum"(𝐑 = 𝐑, 𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -9193,7 +9193,7 @@ Remarks.
 
 This defines the set of valid coordinate sequences corresponding to a given element sequence \`𝒙\`. This set only depends on the length of \`𝒙\`. A coordinate sequence is a sequence of ring elements that has the same length and finite support.
 
-For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$\\"linear combination\\"(𝐑 = 𝐑, 𝐌 = 𝐌, 𝒙 = 𝒙, 𝐚 = 𝐚)\`."
+For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$"linear combination"(𝐑 = 𝐑, 𝐌 = 𝐌, 𝒙 = 𝒙, 𝐚 = 𝐚)\`."
 `;
 
 exports[`render hlm library: 2.8.29.1.13.3 Algebra/Rings/Modules/Left%20modules/Coordinates/linear%20combination 1`] = `
@@ -9440,7 +9440,7 @@ exports[`render hlm library: 2.8.29.2.10 Algebra/Rings/Modules/Right%20modules/i
 
 Example.
 
-\`$../../../../Essentials/Operations/\\"Iterated operations\\"/\\"indexed by natural number\\"(X = $Carrier(𝐑 = 𝐑, 𝐌 = 𝐌), ⨂ = $\\"iterated sum\\"(𝐑 = 𝐑, 𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/\\"Segment (less)\\"(n = n))), {a = {a[i = i]}}})\`
+\`$../../../../Essentials/Operations/"Iterated operations"/"indexed by natural number"(X = $Carrier(𝐑 = 𝐑, 𝐌 = 𝐌), ⨂ = $"iterated sum"(𝐑 = 𝐑, 𝐌 = 𝐌), n = n, _1 = {#(i: %Element($../../../../Essentials/Numbers/Natural/Subsets/"Segment (less)"(n = n))), {a = {a[i = i]}}})\`
 
 References.
 
@@ -9630,7 +9630,7 @@ Remarks.
 
 This defines the set of valid coordinate sequences corresponding to a given element sequence \`𝒙\`. This set only depends on the length of \`𝒙\`. A coordinate sequence is a sequence of ring elements that has the same length and finite support.
 
-For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$\\"linear combination\\"(𝐑 = 𝐑, 𝐌 = 𝐌, 𝒙 = 𝒙, 𝐚 = 𝐚)\`."
+For an element sequence \`𝒙\` and a corresponding coordinate sequence  \`𝐚\`, we can define a linear combination \`$"linear combination"(𝐑 = 𝐑, 𝐌 = 𝐌, 𝒙 = 𝒙, 𝐚 = 𝐚)\`."
 `;
 
 exports[`render hlm library: 2.8.29.2.13.3 Algebra/Rings/Modules/Right%20modules/Coordinates/linear%20combination 1`] = `
@@ -9950,7 +9950,7 @@ This definition of categories includes the additional requirement that all categ
 
 For skeletal categories, the two concepts coincide. Since in HLM, all of the usual examples of categories happen to be skeletal anyway, and we care about equivalence much more than isomorphism, it makes sense to include this requirement directly in the definition of a category.
 
-The natural number \`u\` is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, \`u\` can be regarded as a \\"universe size\\" that is relevant only in the context of category theory. (The \\"universes\\" that are implicit in other contexts are already large enough.)
+The natural number \`u\` is required to be able to define a category of (smaller) categories or functors, which would otherwise be prevented by non-circularity rules. Informally, \`u\` can be regarded as a "universe size" that is relevant only in the context of category theory. (The "universes" that are implicit in other contexts are already large enough.)
 
 References.
 
@@ -10104,7 +10104,7 @@ We write “let η : F ⇀ G be an infranatural transformation” for �
 
 Remarks.
 
-Here, we first define infranatural transformations, as a prerequisite for defining natural transformations (see \`$\\"Natural transformations\\"\`). This is necessary if we want to be able to ask whether a given transformation is natural or not.
+Here, we first define infranatural transformations, as a prerequisite for defining natural transformations (see \`$"Natural transformations"\`). This is necessary if we want to be able to ask whether a given transformation is natural or not.
 
 References.
 
@@ -10173,7 +10173,7 @@ exports[`render hlm library: 4.9.1 Category%20theory/Concrete%20categories/eleme
 
 Remarks.
 
-This is one possible formalization of the discrete category obtained from elements of \`S\`. We simply define morphisms to be elements of \`S\` as well, such that \`%setEquals($../Morphisms(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a, 𝐘 = a), %enumeration($../identity(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a)), %enumeration(a))\`, and \`%setEquals($../Morphisms(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a, 𝐘 = b), $../../Essentials/Sets/\\"Empty set\\")\` if \`%not(%equals(a, b))\`.
+This is one possible formalization of the discrete category obtained from elements of \`S\`. We simply define morphisms to be elements of \`S\` as well, such that \`%setEquals($../Morphisms(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a, 𝐘 = a), %enumeration($../identity(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a)), %enumeration(a))\`, and \`%setEquals($../Morphisms(u = u, 𝓒 = $elements(u = u, S = S), 𝐗 = a, 𝐘 = b), $../../Essentials/Sets/"Empty set")\` if \`%not(%equals(a, b))\`.
 
 (Note that the existence of \`x\` in the definition of morphism composition implies that \`%equals(d, e, f)\`.)
 
@@ -10508,7 +10508,7 @@ by:
 
 Remarks.
 
-Note that we do not allow \`x\` to appear free in \`R\`. This ensures that \`x\` does not appear free in the result either, which is important for e.g. the definition \`$\\"beta reduction\\"\` of beta reduction.
+Note that we do not allow \`x\` to appear free in \`R\`. This ensures that \`x\` does not appear free in the result either, which is important for e.g. the definition \`$"beta reduction"\` of beta reduction.
 
 References.
 

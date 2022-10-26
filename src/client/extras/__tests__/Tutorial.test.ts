@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { AppTest } from '../../App';
 import { runClientTest } from '../../__mocks__/testClient';
 
