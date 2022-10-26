@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { PermanentToolTip, ToolTipPosition, ToolTipArrow } from '../components/ExpressionToolTip';
+import { PermanentToolTip, ToolTipPosition, ToolTipArrow, ToolTipParentRect } from '../components/ExpressionToolTip';
 import { PromiseHelper } from '../components/PromiseHelper';
 
 import { ReactElementManipulator, traverseReactComponents } from '../utils/traverse';
@@ -102,16 +102,14 @@ function createTutorialManipulator(tutorialState: DynamicTutorialState, parentCo
   if (toolTip) {
     let parentNode: HTMLElement | null = null;
     const toolTipParent = {
-      getBoundingClientRect(): ClientRect {
+      getBoundingClientRect(): ToolTipParentRect {
         if (parentNode) {
           return parentNode.getBoundingClientRect();
         } else {
           return {
             left: 0,
-            right: 0,
             width: 0,
             top: 0,
-            bottom: 0,
             height: 0
           };
         }

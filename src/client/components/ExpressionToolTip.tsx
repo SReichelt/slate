@@ -8,8 +8,15 @@ import './ExpressionToolTip.css';
 export type ToolTipPosition = 'left' | 'top' | 'right' | 'bottom';
 export type ToolTipArrow = 'center' | 'left' | 'top' | 'right' | 'bottom';
 
+export interface ToolTipParentRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
 export interface ToolTipParent {
-  getBoundingClientRect(): ClientRect;
+  getBoundingClientRect(): ToolTipParentRect;
 }
 
 interface ToolTipProps {

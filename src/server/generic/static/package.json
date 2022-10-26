@@ -7,11 +7,11 @@
     "slate-shared": "",
     "slate-env-node": "",
     "slate-server-generic": "",
-    "ejs": "^3.1.6",
+    "ejs": "^3.1.8",
     "remarkable": "^2.0.1"
   },
   "devDependencies": {
-    "@types/ejs": "^3.0.6",
-    "@types/remarkable": "^2.0.1"
+    "@types/ejs": "^3.1.1",
+    "@types/remarkable": "^2.0.3"
   }
 }

@@ -30,7 +30,7 @@ function StandardDialog(props: React.PropsWithChildren<StandardDialogProps>): Re
     }
     disableDefaultBehavior(event);
   };
-  let buttons: React.ReactNodeArray;
+  let buttons: React.ReactNode[];
   if (props.okVisible) {
     buttons = [
       (

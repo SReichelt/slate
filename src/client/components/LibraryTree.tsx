@@ -7,7 +7,7 @@ import './LibraryTree.css';
 
 import ScrollPane from './ScrollPane';
 import Expression, { ExpressionInteractionHandler } from './Expression';
-import ExpressionToolTip from './ExpressionToolTip';
+import ExpressionToolTip, { ToolTipParentRect } from './ExpressionToolTip';
 import Button from './Button';
 import MenuButton from './MenuButton';
 import { renderPromise } from './PromiseHelper';
@@ -274,7 +274,7 @@ function filterSearchWords(searchWords: string[], texts: (string | undefined)[])
   return searchWords;
 }
 
-function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[], section: LibraryDefinition | undefined, visibleItems: Set<LibraryTreeItem> | undefined): React.ReactNodeArray {
+function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expression | Fmt.Definition)[], section: LibraryDefinition | undefined, visibleItems: Set<LibraryTreeItem> | undefined): React.ReactNode[] {
   let parentPath: Fmt.Path | undefined = undefined;
   if (props.libraryDefinition) {
     parentPath = new Fmt.Path(props.libraryDefinition.definition.name);
@@ -300,7 +300,7 @@ function renderLibraryTreeItems(props: InnerLibraryTreeProps, items: (Fmt.Expres
   }
 
   let index = 0;
-  const treeItems: React.ReactNodeArray = [];
+  const treeItems: React.ReactNode[] = [];
   let renderedNewItem = false;
   for (const item of items) {
     if (props.newItemTitle !== undefined && props.newItemPosition === index) {
@@ -505,7 +505,7 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
   };
 
   protected getTreeItemContents(icon: React.ReactNode, specialIcon: React.ReactNode, display: React.ReactNode): React.ReactNode {
-    const columns: React.ReactNodeArray = [
+    const columns: React.ReactNode[] = [
       <div className={'tree-item-display'} key="display">
         <span key="display-span">{display}</span>
       </div>
@@ -529,17 +529,15 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
   }
 
   // Calculate visible dimensions for tooltip.
-  getBoundingClientRect(): ClientRect {
+  getBoundingClientRect(): ToolTipParentRect {
     if (this.props.parentScrollPane.htmlNode && this.htmlNode) {
       const parentRect = this.props.parentScrollPane.htmlNode.getBoundingClientRect();
       const itemRect = this.htmlNode.getBoundingClientRect();
       if (parentRect.width > 0) {
         return {
           left: parentRect.left,
-          right: parentRect.right,
           width: parentRect.width,
           top: itemRect.top,
-          bottom: itemRect.bottom,
           height: itemRect.height
         };
       } else if (itemRect.width > 0) {
@@ -548,10 +546,8 @@ abstract class LibraryTreeItemBase<PropType extends LibraryTreeItemBaseProps, St
     }
     return {
       left: 0,
-      right: 0,
       width: 0,
       top: 0,
-      bottom: 0,
       height: 0
     };
   }
@@ -1009,7 +1005,7 @@ export class LibraryTreeInsertionItem extends LibraryTreeItemBase<LibraryTreeIns
   }
 
   render(): React.ReactNode {
-    const menuItems: React.ReactNodeArray = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
+    const menuItems: React.ReactNode[] = this.props.libraryDataProvider.logic.topLevelDefinitionTypes.map((definitionType: Logic.LogicDefinitionTypeDescription) => {
       const onClick = () => this.props.onInsertButtonClicked(this.props.libraryDataProvider, this.props.section, this.props.sectionItemNumber, definitionType);
       return (
         <Button isMenuItem={true} onClick={onClick} key={definitionType.definitionType}>

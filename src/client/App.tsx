@@ -73,8 +73,7 @@ export interface AppProps extends AppTestProps {
   fileAccessor?: FileAccessor;
 }
 
-interface AppPropsWithAlert extends AppProps {
-  alert: Alert.AlertManager;
+interface AppPropsWithAlert extends AppProps, Alert.InjectedAlertProps {
 }
 
 interface SelectionState {

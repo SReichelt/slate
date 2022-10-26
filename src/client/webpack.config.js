@@ -112,18 +112,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          {
-            loader: 'style-loader'
-          },
-          {
-            loader: 'css-loader'
-          }
-        ]
+        use: ['style-loader', 'css-loader']
       },
       {
-        test: /.jpe?g$|.gif$|.png$|.svg$|.woff$|.woff2$|.ttf$|.eot$/,
-        use: 'url-loader?limit=10000'
+        test: /\.(jpe?g|gif|png|svg|woff|woff2|ttf|eot)$/,
+        type: 'asset/resource'
       }
     ]
   },

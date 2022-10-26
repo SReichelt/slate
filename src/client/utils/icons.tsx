@@ -57,7 +57,7 @@ function getGitHubLogo(enabled: boolean = true): React.ReactNode {
   );
 }
 
-function getIconWithContents(contents: React.ReactNodeArray): React.ReactNode {
+function getIconWithContents(contents: React.ReactNode[]): React.ReactNode {
   return (
     <svg height="1em" width="1em" viewBox="-8 -8 16 16" key="icon">
       {contents}
@@ -65,7 +65,7 @@ function getIconWithContents(contents: React.ReactNodeArray): React.ReactNode {
   );
 }
 
-function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true): React.ReactNodeArray {
+function getButtonIconContents(buttonType: ButtonType, enabled: boolean = true): React.ReactNode[] {
   switch (buttonType) {
   case ButtonType.Submit:
     return [
@@ -153,7 +153,7 @@ export function getButtonIcon(buttonType: ButtonType, enabled: boolean = true): 
   }
 }
 
-function getSectionIconContents(opened: boolean, containsSelection: boolean = false): React.ReactNodeArray {
+function getSectionIconContents(opened: boolean, containsSelection: boolean = false): React.ReactNode[] {
   if (opened) {
     return [
       <path d="M -6 -4 L 0 4 L 6 -4 z" fill={containsSelection ? 'var(--item-selected-background-color)' : 'var(--item-additional-background-color)'} stroke={getMainItemForegroundColor()} strokeWidth="1" key="arrow"/>
@@ -169,7 +169,7 @@ export function getSectionIcon(opened: boolean, containsSelection: boolean = fal
   return getIconWithContents(getSectionIconContents(opened, containsSelection));
 }
 
-function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNodeArray {
+function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, itemInfo?: LibraryItemInfo): React.ReactNode[] {
   switch (definitionType) {
   case Logic.LogicDefinitionType.Construction:
     return [
@@ -196,7 +196,7 @@ function getDefinitionIconContents(definitionType: Logic.LogicDefinitionType, it
         <rect x="-1.25" y="2" width="2.5" height="2.5" fill="gray" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="rect"/>
       ];
     } else {
-      const result: React.ReactNodeArray = [
+      const result: React.ReactNode[] = [
         <circle cx="0" cy="-2" r="5" fill="yellow" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="circle"/>,
         <rect x="-1.7" y="2.7" width="3.4" height="4" fill="gray" stroke={getMainItemForegroundColor()} strokeWidth="0.5" key="rect"/>
       ];

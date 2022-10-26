@@ -7,6 +7,6 @@
     "slate-server-generic": ""
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.76"
+    "@types/aws-lambda": "^8.10.108"
   }
 }
