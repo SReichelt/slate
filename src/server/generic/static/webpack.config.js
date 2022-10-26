@@ -18,14 +18,15 @@ const baseConfig = {
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
-                use: [
-                    {
-                        loader: 'ts-loader'
-                    }
-                ]
+                use: 'ts-loader'
             }
         ]
     },
+    plugins: [
+        new webpack.optimize.LimitChunkCountPlugin({
+            maxChunks: 1
+        })
+    ],
     watchOptions: {
         ignored: /node_modules/
     }
