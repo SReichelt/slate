@@ -10,11 +10,6 @@
             "name": "Launch Chrome",
             "url": "http://localhost:3000/",
             "webRoot": "${workspaceFolder}/src/client",
-            "sourceMapPathOverrides": {
-                "webpack:///./*":  "${webRoot}/*",
-                "webpack:///../*": "${webRoot}/../*",
-                "webpack:///*":    "*"
-            },
             "preLaunchTask": "npm: dev"
         },
         {

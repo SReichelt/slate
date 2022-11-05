@@ -1,7 +1,9 @@
 {
   "name": "slate-static-scripts",
   "scripts": {
-    "build": "webpack --mode production"
+    "compile-preload": "esbuild buildPreload.ts --bundle --outfile=../../../../dist/public/download/static/buildPreload.js --platform=node --minify",
+    "compile-static": "esbuild buildStatic.ts --bundle --outfile=../../../../dist/public/download/static/buildStatic.js --platform=node --minify",
+    "build": "tsc --noEmit && npm run compile-preload && npm run compile-static"
   },
   "dependencies": {
     "slate-shared": "",

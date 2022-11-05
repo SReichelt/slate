@@ -143,7 +143,7 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
 
         const webViewPath = path.join(context.extensionPath, 'webview');
         const webViewURI = vscode.Uri.file(webViewPath + '/');
-        const indexTemplateFileName = path.join(webViewPath, 'embedded.ejs');
+        const indexTemplateFileName = path.join(webViewPath, 'index.ejs');
         if (!fs.existsSync(indexTemplateFileName)) {
             return;
         }
@@ -198,9 +198,12 @@ function showGUI(context: vscode.ExtensionContext, fileAccessor: FileAccessor): 
         const baseURL = webview.asWebviewUri(webViewURI);
 
         const indexTemplatePromise = ejs.renderFile(indexTemplateFileName, {
+            'isStatic': false,
+            'isEmbedded': true,
+            'title': 'Slate',
             'baseURL': baseURL.toString(),
             'cspSource': webview.cspSource
-        });
+        }, { rmWhitespace: true });
         indexTemplatePromise.then((indexTemplate: string) => {
             if (panel) {
                 webview.html = indexTemplate;

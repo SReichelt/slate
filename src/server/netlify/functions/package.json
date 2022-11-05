@@ -1,7 +1,10 @@
 {
   "name": "slate-server-netlify-functions",
   "scripts": {
-    "build": "webpack --mode production"
+    "compile-auth-info": "esbuild authInfoFunction.ts --bundle --outfile=../../../../dist/functions/auth-info.js --platform=node --minify",
+    "compile-auth": "esbuild authFunction.ts --bundle --outfile=../../../../dist/functions/auth.js --platform=node --minify",
+    "compile-submit": "esbuild submitFunction.ts --bundle --outfile=../../../../dist/functions/submit.js --platform=node --minify",
+    "build": "tsc --noEmit && npm run compile-auth-info && npm run compile-auth && npm run compile-submit"
   },
   "dependencies": {
     "slate-server-generic": ""

@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "files": [
+    "./buildStatic.ts",
+    "./buildPreload.ts"
+  ],
+  "include": [
+    "../preload"
+  ]
+}

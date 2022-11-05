@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title><%= htmlWebpackPlugin.options.title %></title>
-    <% if (htmlWebpackPlugin.options.isEmbedded) { %>
-      <base href="<%= htmlWebpackPlugin.options.outputPlaceholder('baseURL') %>" />
-      <meta http-equiv="Content-Security-Policy" content="default-src <%= htmlWebpackPlugin.options.outputPlaceholder('cspSource') %>; style-src <%= htmlWebpackPlugin.options.outputPlaceholder('cspSource') %> 'unsafe-inline';" />
+    <title><%= title %></title>
+    <% if (isEmbedded) { %>
+      <base href="<%= baseURL %>" />
+      <meta http-equiv="Content-Security-Policy" content="default-src <%= cspSource %>; style-src <%= cspSource %> 'unsafe-inline';" />
       <link href="theme-vscode.css" rel="stylesheet" />
     <% } else { %>
       <base href="/" />
@@ -14,13 +14,15 @@
           font-family: sans-serif;
         }
       </style>
+      <link rel="icon" href="slate.png">
       <link href="theme-default.css" rel="stylesheet" />
     <% } %>
+    <link href="js/main.css" rel="stylesheet" />
     <link href="fonts/MathJax/fonts.css" rel="stylesheet" />
     <link href="fonts/LatinModern/fonts.css" rel="stylesheet" />
-    <% if (htmlWebpackPlugin.options.isStatic) { %>
+    <% if (isStatic) { %>
       <link href="static.css" rel="stylesheet" />
-      <link href="<%= htmlWebpackPlugin.options.outputPlaceholder('canonicalURL') %>" rel="canonical" />
+      <link href="<%= canonicalURL %>" rel="canonical" />
     <% } else { %>
       <style>
         .loading-screen {
@@ -73,16 +75,16 @@
   </head>
   <body>
     <div id="app">
-      <% if (htmlWebpackPlugin.options.isStatic) { %>
+      <% if (isStatic) { %>
         <div class="static">
-          <%= htmlWebpackPlugin.options.outputPlaceholder('content') %>
+          <%= content %>
         </div>
       <% } else { %>
         <header class="loading-screen">
-          <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <% if (htmlWebpackPlugin.options.isEmbedded) { %>extension for Microsoft Visual Studio Code<% } else { %>web-based interactive theorem prover<% } %>.</p>
+          <p class="loading-screen-welcome">Welcome to the <span class="loading-screen-title">Slate</span> <% if (isEmbedded) { %>extension for Microsoft Visual Studio Code<% } else { %>web-based interactive theorem prover<% } %>.</p>
           <script src="js/loading.js"></script>
         </header>
-        <% if (!htmlWebpackPlugin.options.isEmbedded) { %>
+        <% if (!isEmbedded) { %>
           <div id="static-nav">
             <p>Slate is a project to build a web-based <a href="https://en.wikipedia.org/wiki/Proof_assistant">interactive theorem prover</a> with a focus on abstract mathematics. It is optimized for being easy to learn.</p>
             <p>Running Slate in your browser requires that JavaScript is enabled.</p>
@@ -96,5 +98,6 @@
         <% } %>
       <% } %>
     </div>
+    <script src="js/main.js" defer="defer"></script>
   </body>
 </html>

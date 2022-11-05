@@ -1,7 +1,6 @@
 import * as express from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import { exec } from 'child_process';
 
 function makeDirectories(fileName: string): void {
@@ -50,18 +49,6 @@ export function devRouter(rootPath: string): express.Router {
 
   router.report('/docs/*', (request, response) => openInVSCode(request, response, rootPath));
   router.report('/data/libraries/*', (request, response) => openInVSCode(request, response, rootPath));
-
-  // All the assets are hosted by Webpack on localhost:8080 (Webpack-dev-server)
-  router.use('*.*', createProxyMiddleware({
-    target: 'http://localhost:8080/',
-    ws: true
-  }));
-
-  // Any route without a dot should render the web app html (hosted by by Webpack-dev-server)
-  router.use('**', createProxyMiddleware({
-    target: 'http://localhost:8080/',
-    pathRewrite: _ => '/index.html'
-  }));
 
   return router;
 }

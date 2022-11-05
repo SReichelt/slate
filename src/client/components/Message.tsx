@@ -14,7 +14,7 @@ interface MessageState {
 
 export function getAlertTemplate(props: any): React.ReactElement {
   props.style['textTransform'] = 'initial';
-  const AlertTemplate = require('react-alert-template-basic').default;
+  const AlertTemplate = require('react-alert-template-basic');
   return AlertTemplate(props);
 }
 

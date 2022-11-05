@@ -26,7 +26,8 @@ const renderedDefinitionOptions: Logic.RenderedDefinitionOptions = {
 };
 
 const ejsOptions: ejs.Options = {
-  escape: (text) => text
+  escape: (text) => text,
+  rmWhitespace: true
 };
 
 function escapeCharacter(c: string): string {
@@ -163,6 +164,8 @@ class StaticSiteGenerator {
       + htmlContent
       + htmlRenderer.renderElement('footer', {}, '[' + htmlRenderer.renderElement('a', {'href': this.gitHubURL + uri + fileExtension}, 'View Source') + ']');
     const data: ejs.Data = {
+      'isStatic': true,
+      'isEmbedded': false,
       'title': escapeText(title ? `Slate - ${title}` : 'Slate'),
       'canonicalURL': targetURI ? this.libraryURLWithSlash + targetURI : this.libraryURL,
       'content': htmlContent

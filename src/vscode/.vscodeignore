@@ -8,5 +8,4 @@ src/
 tsconfig.json
 .eslintrc.json
 package-lock.json
-webpack.config.js
 *.vsix

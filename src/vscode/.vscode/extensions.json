@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "sreichelt.slate",
         "connor4312.esbuild-problem-matchers"
     ]
 }

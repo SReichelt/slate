@@ -17,5 +17,6 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "alwaysStrict": true
-  }
+  },
+  "exclude": ["**/node_modules"]
 }

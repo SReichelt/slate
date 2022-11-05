@@ -2,7 +2,7 @@
 	"name": "slate",
 	"displayName": "Slate",
 	"description": "Provides syntax highlighting, navigation, auto-completion, and GUI integration for the Slate proof assistant language.",
-	"version": "0.1.25",
+	"version": "0.1.26",
 	"publisher": "sreichelt",
 	"license": "MIT",
 	"author": "Sebastian Reichelt",
@@ -67,9 +67,10 @@
 	],
 	"main": "./dist/extension",
 	"scripts": {
-		"clean": "rimraf out *.vsix",
-		"build": "npm run clean && webpack --mode production",
-		"watch": "webpack --mode development --watch",
+		"clean": "rimraf dist *.vsix",
+		"build-base": "tsc --noEmit && esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+		"build": "npm run clean && npm run build-base -- --minify",
+		"watch": "npm run build-base -- --sourcemap --watch",
 		"package": "vsce package --no-dependencies -o slate.vsix",
 		"lint": "eslint --no-eslintrc -c .eslintrc.json '**/*.@(ts|tsx)'"
 	},

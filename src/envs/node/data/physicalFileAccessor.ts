@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as util from 'util';
 import { FileAccessor, FileReference, WriteFileResult, FileWatcher } from 'slate-shared/data/fileAccessor';
 import CachedPromise from 'slate-shared/data/cachedPromise';
 
@@ -43,13 +42,13 @@ class PhysicalFileReference implements FileReference {
   constructor(public fileName: string) {}
 
   read(): CachedPromise<string> {
-    const contents = util.promisify(fs.readFile)(this.fileName, 'utf8');
+    const contents = fs.promises.readFile(this.fileName, 'utf8');
     return new CachedPromise(contents);
   }
 
   write(contents: string, isPartOfGroup: boolean): CachedPromise<WriteFileResult> {
     this.writingFile = true;
-    const result = util.promisify(fs.writeFile)(this.fileName, contents, 'utf8')
+    const result = fs.promises.writeFile(this.fileName, contents, 'utf8')
       .then(() => {
         this.writingFile = false;
         return {};

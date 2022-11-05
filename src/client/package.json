@@ -1,8 +1,8 @@
 {
   "name": "slate-client",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production webpack --mode production",
-    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack serve"
+    "build": "cross-env NODE_ENV=production node build.js",
+    "dev": "cross-env NODE_ENV=development node build.js --watch"
   },
   "dependencies": {
     "slate-shared": "",
@@ -28,12 +28,15 @@
     "utf8": "^3.0.0"
   },
   "devDependencies": {
+    "@jgoz/esbuild-plugin-livereload": "^1.1.0",
+    "@jgoz/esbuild-plugin-typecheck": "^2.0.0",
+    "@types/ejs": "^3.1.1",
     "@types/react": "^17.0.51",
     "@types/react-alert": "^7.0.2",
     "@types/react-dom": "^17.0.17",
     "@types/remarkable": "^2.0.3",
     "@types/utf8": "^3.0.1",
-    "babel-polyfill": "^6.26.0",
+		"ejs": "^3.1.8",
     "jest-environment-jsdom": "^29.2.2"
   }
 }

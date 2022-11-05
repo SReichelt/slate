@@ -99,7 +99,7 @@ module.exports = {
       from: {
         pathNot: [
           testFiles(),
-          webpackConfig(),
+          buildConfig(),
         ]
       },
       to: {
@@ -159,8 +159,8 @@ module.exports = {
         path: '^(src)',
         pathNot: [
           '\\.(spec|test)\\.(js|mjs|cjs|ts|ls|coffee|litcoffee|coffee\\.md)$',
-          webpackConfig(),
           dir('src/scripts'),
+          buildConfig(),
         ]
       },
       to: {
@@ -302,32 +302,6 @@ module.exports = {
     tsConfig: {
       fileName: 'tsconfig.json'
     },
-
-    /* Webpack configuration to use to get resolve options from.
-
-       The (optional) fileName attribute specifies which file to take (relative
-       to dependency-cruiser's current working directory. When not provided defaults
-       to './webpack.conf.js'.
-
-       The (optional) `env` and `args` attributes contain the parameters to be passed if
-       your webpack config is a function and takes them (see webpack documentation
-       for details)
-     */
-    // webpackConfig: {
-    //  fileName: './webpack.config.js',
-    //  env: {},
-    //  args: {},
-    // },
-
-    /* Babel config ('.babelrc', '.babelrc.json', '.babelrc.json5', ...) to use
-      for compilation (and whatever other naughty things babel plugins do to
-      source code). This feature is well tested and usable, but might change
-      behavior a bit over time (e.g. more precise results for used module
-      systems) without dependency-cruiser getting a major version bump.
-     */
-    // babelConfig: {
-    //   fileName: './.babelrc'
-    // },
 
     /* List of strings you have in use in addition to cjs/ es6 requires
        & imports to declare module dependencies. Use this e.g. if you've
@@ -480,8 +454,8 @@ function npmDeps(...packageNames) {
   return packageNames.map(npmDep).concat(packageNames.map(npmDepVSCode));
 }
 
-function webpackConfig() {
-  return '/webpack\\.config\\.js$'
+function buildConfig() {
+  return '/build.js$'
 }
 
 function testFiles() {
