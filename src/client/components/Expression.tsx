@@ -802,7 +802,6 @@ class Expression extends React.Component<ExpressionProps, ExpressionState> {
     if (this.props.interactionHandler && expression.onTextChanged) {
       const onChange = (newText: string) => {
         expression.text = newText;
-        this.forceUpdate();
         if (expression.onTextChanged) {
           expression.onTextChanged(newText);
         }
