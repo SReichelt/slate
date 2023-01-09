@@ -64,7 +64,7 @@
     "@typescript-eslint/parser": "^5.41.0",
     "concurrently": "^7.5.0",
     "copyfiles": "^2.4.1",
-    "dependency-cruiser": "^11.18.0",
+    "dependency-cruiser": "^12.4.0",
     "esbuild": "^0.15.12",
     "eslint": "^8.26.0",
     "eslint-plugin-react": "^7.31.10",
